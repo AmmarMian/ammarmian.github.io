@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Homes on Ammar Mian</title>
+    <link>https://ammarmian.github.io/fr/home/</link>
+    <description>Recent content in Homes on Ammar Mian</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>Fr</language>
+    <copyright>&amp;copy;Ammar Mian 2018</copyright>
+    <lastBuildDate>Mon, 15 Oct 2018 18:00:00 +0200</lastBuildDate>
+    
+	<atom:link href="https://ammarmian.github.io/fr/home/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title></title>
+      <link>https://ammarmian.github.io/fr/home/about/</link>
+      <pubDate>Mon, 15 Oct 2018 18:00:00 +0200</pubDate>
+      
+      <guid>https://ammarmian.github.io/fr/home/about/</guid>
+      <description>Biography Je suis actuellement doctorant en traitement du signal au Laboratoire SONDRA à CentraleSupélec. J&amp;rsquo;effectue ma thèse sous la direction de Jean-Philippe Ovarlez et de Guillaume Ginolhac.
+Mon travail consiste à développer des méthodologies pour le traitement des séries temporelles d&amp;rsquo;images SAR.</description>
+    </item>
+    
+  </channel>
+</rss>
