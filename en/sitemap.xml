@@ -4,6 +4,9 @@
     
     <url>
     
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/publication/eusipco-2018/" hreflang="en"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/publication/eusipco-2018/" hreflang="fr"/>
+    
       <loc>https://ammarmian.github.io/publication/eusipco-2018/</loc>
       <lastmod>2018-09-01T00:00:00+00:00</lastmod>
     </url>
@@ -11,6 +14,9 @@
   
     
     <url>
+    
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/publication/icassp-2018/" hreflang="en"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/publication/icassp-2018/" hreflang="fr"/>
     
       <loc>https://ammarmian.github.io/publication/icassp-2018/</loc>
       <lastmod>2018-05-01T00:00:00+00:00</lastmod>
@@ -20,6 +26,9 @@
     
     <url>
     
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/publication/gretsi-2017/" hreflang="en"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/publication/gretsi-2017/" hreflang="fr"/>
+    
       <loc>https://ammarmian.github.io/publication/gretsi-2017/</loc>
       <lastmod>2017-09-01T00:00:00+00:00</lastmod>
     </url>
@@ -27,6 +36,9 @@
   
     
     <url>
+    
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/publication/eusipco-2017/" hreflang="en"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/publication/eusipco-2017/" hreflang="fr"/>
     
       <loc>https://ammarmian.github.io/publication/eusipco-2017/</loc>
       <lastmod>2017-08-27T00:00:00+00:00</lastmod>
@@ -51,6 +63,9 @@
   
     
     <url>
+    
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/publication_types/1/" hreflang="en"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/publication_types/1/" hreflang="fr"/>
     
       <loc>https://ammarmian.github.io/publication_types/1/</loc>
       <lastmod>2018-09-01T00:00:00+00:00</lastmod>
@@ -95,6 +110,9 @@
   
     
     <url>
+    
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/publication/" hreflang="en"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/publication/" hreflang="fr"/>
     
       <loc>https://ammarmian.github.io/publication/</loc>
       <lastmod>2018-09-01T00:00:00+00:00</lastmod>

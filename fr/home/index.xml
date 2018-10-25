@@ -23,13 +23,31 @@ Mon travail consiste à développer des méthodologies pour le traitement des s�
     </item>
     
     <item>
-      <title>Teaching</title>
+      <title>Publications récentes</title>
+      <link>https://ammarmian.github.io/fr/home/publications/</link>
+      <pubDate>Wed, 20 Apr 2016 00:00:00 +0200</pubDate>
+      
+      <guid>https://ammarmian.github.io/fr/home/publications/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Enseignement</title>
       <link>https://ammarmian.github.io/fr/home/teaching/</link>
       <pubDate>Sat, 20 Oct 2018 00:00:00 +0000</pubDate>
       
       <guid>https://ammarmian.github.io/fr/home/teaching/</guid>
-      <description>I am currently teaching at the Institut Universitaire de Technologie (IUT) of Orsay.
- Projet NAO: Managing students for a robotic project on NAO robots. Febuary 2017 - April 2017. 23 hours Java: Introductory courses. Mars 2017 - June 2017. 25 hours Architecture des ordinateurs: Introductory courses to micro-processors and assembly language. May 2017 - June 2017 20 hours C++: Introductory courses to programming. Septembre 2017 - Novembre 2017. 35 hours Architecture des ordinateurs: Introductory courses to micro-processors and assembly language.</description>
+      <description>J&amp;rsquo;enseigne actuellement à l&amp;rsquo;IUT Orsay en qualité de moniteur. Les cours dont j&amp;rsquo;ai eu la charge sont les suivants:
+ Projet NAO: Encradrement de 16 étudiants dans la réalisation d&amp;rsquo;un projet de robotique. Février 2017 - Avril 2017. 23 heures Java: Inctroduction à la programmation orienté objet. Mars 2017 - Juin 2017. 25 heures Architecture des ordinateurs: Cours d&amp;rsquo;introduction sur les microprocesseurs et le language assembleur. Mai 2017 - Juin 2017 et Mai 2018 - Juin 2018 40 heures C++: Introduction à l&amp;rsquo;algorithmique et à la programmation.</description>
+    </item>
+    
+    <item>
+      <title>Compétences</title>
+      <link>https://ammarmian.github.io/fr/home/skills/</link>
+      <pubDate>Wed, 20 Sep 2017 00:00:00 +0200</pubDate>
+      
+      <guid>https://ammarmian.github.io/fr/home/skills/</guid>
+      <description></description>
     </item>
     
   </channel>
