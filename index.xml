@@ -11,6 +11,15 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>New Robust Statistics for Change Detection in Time Series of Multivariate SAR Images</title>
+      <link>https://ammarmian.github.io/publication/tsp-2018/</link>
+      <pubDate>Thu, 01 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/publication/tsp-2018/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Robust Detection and Estimation of Change-Points in a Time Series of Multivariate Images</title>
       <link>https://ammarmian.github.io/publication/eusipco-2018/</link>
       <pubDate>Sat, 01 Sep 2018 00:00:00 +0000</pubDate>

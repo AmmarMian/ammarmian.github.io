@@ -4,6 +4,17 @@
     
     <url>
     
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/publication/tsp-2018/" hreflang="fr"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/publication/tsp-2018/" hreflang="en"/>
+    
+      <loc>https://ammarmian.github.io/fr/publication/tsp-2018/</loc>
+      <lastmod>2018-11-01T00:00:00+00:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/publication/eusipco-2018/" hreflang="fr"/>
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/publication/eusipco-2018/" hreflang="en"/>
     
@@ -60,6 +71,18 @@
     
     <url>
     
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/publication_types/2/" hreflang="fr"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/publication_types/2/" hreflang="en"/>
+    
+      <loc>https://ammarmian.github.io/fr/publication_types/2/</loc>
+      <lastmod>2018-11-01T00:00:00+00:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/" hreflang="fr"/>
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/" hreflang="en"/>
     
@@ -99,7 +122,7 @@
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/publication/" hreflang="en"/>
     
       <loc>https://ammarmian.github.io/fr/publication/</loc>
-      <lastmod>2018-09-01T00:00:00+00:00</lastmod>
+      <lastmod>2018-11-01T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     
