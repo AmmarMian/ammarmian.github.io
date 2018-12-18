@@ -7,17 +7,26 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy;Ammar Mian 2018</copyright>
-    <lastBuildDate>Thu, 01 Nov 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 17 Dec 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://ammarmian.github.io/publication_types/2/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>New Robust Statistics for Change Detection in Time Series of Multivariate SAR Images</title>
-      <link>https://ammarmian.github.io/publication/tsp-2018/</link>
-      <pubDate>Thu, 01 Nov 2018 00:00:00 +0000</pubDate>
+      <title>Design of New Wavelet Packets Adapted to High-Resolution SAR Images with an Application to Target Detection</title>
+      <link>https://ammarmian.github.io/publication/tgrs_2019/</link>
+      <pubDate>Mon, 17 Dec 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://ammarmian.github.io/publication/tsp-2018/</guid>
+      <guid>https://ammarmian.github.io/publication/tgrs_2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>New Robust Statistics for Change Detection in Time Series of Multivariate SAR Images</title>
+      <link>https://ammarmian.github.io/publication/tsp-2019/</link>
+      <pubDate>Tue, 27 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/publication/tsp-2019/</guid>
       <description></description>
     </item>
     
