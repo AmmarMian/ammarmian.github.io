@@ -4,6 +4,17 @@
     
     <url>
     
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/publication/grsl_2019/" hreflang="fr"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/publication/grsl_2019/" hreflang="en"/>
+    
+      <loc>https://ammarmian.github.io/fr/publication/grsl_2019/</loc>
+      <lastmod>2018-12-26T00:00:00+00:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/publication/tgrs_2019/" hreflang="fr"/>
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/publication/tgrs_2019/" hreflang="en"/>
     
@@ -75,7 +86,7 @@
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/publication_types/2/" hreflang="en"/>
     
       <loc>https://ammarmian.github.io/fr/publication_types/2/</loc>
-      <lastmod>2018-12-17T00:00:00+00:00</lastmod>
+      <lastmod>2018-12-26T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -122,7 +133,7 @@
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/publication/" hreflang="en"/>
     
       <loc>https://ammarmian.github.io/fr/publication/</loc>
-      <lastmod>2018-12-17T00:00:00+00:00</lastmod>
+      <lastmod>2018-12-26T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     
