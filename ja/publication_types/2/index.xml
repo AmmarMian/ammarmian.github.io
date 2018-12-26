@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>2 on Ammar Mian</title>
+    <link>https://ammarmian.github.io/ja/publication_types/2/</link>
+    <description>Recent content in 2 on Ammar Mian</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>Ja</language>
+    <copyright>&amp;copy;Ammar Mian 2018</copyright>
+    <lastBuildDate>Wed, 26 Dec 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://ammarmian.github.io/ja/publication_types/2/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Detection Methods Based on Structured Covariance Matrices for Multivariate SAR Images Processing</title>
+      <link>https://ammarmian.github.io/ja/publication/grsl_2019/</link>
+      <pubDate>Wed, 26 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/ja/publication/grsl_2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Design of New Wavelet Packets Adapted to High-Resolution SAR Images with an Application to Target Detection</title>
+      <link>https://ammarmian.github.io/ja/publication/tgrs_2019/</link>
+      <pubDate>Mon, 17 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/ja/publication/tgrs_2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>New Robust Statistics for Change Detection in Time Series of Multivariate SAR Images</title>
+      <link>https://ammarmian.github.io/ja/publication/tsp-2019/</link>
+      <pubDate>Tue, 27 Nov 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/ja/publication/tsp-2019/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
