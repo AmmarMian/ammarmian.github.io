@@ -11,6 +11,15 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Detection Methods Based on Structured Covariance Matrices for Multivariate SAR Images Processing</title>
+      <link>https://ammarmian.github.io/publication/grsl_2019/</link>
+      <pubDate>Wed, 26 Dec 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/publication/grsl_2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Design of New Wavelet Packets Adapted to High-Resolution SAR Images with an Application to Target Detection</title>
       <link>https://ammarmian.github.io/publication/tgrs_2019/</link>
       <pubDate>Mon, 17 Dec 2018 00:00:00 +0000</pubDate>
