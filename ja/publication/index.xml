@@ -7,10 +7,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>Ja</language>
     <copyright>&amp;copy;Ammar Mian 2018</copyright>
-    <lastBuildDate>Wed, 26 Dec 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 14 Feb 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://ammarmian.github.io/ja/publication/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Designing SAR Images Change-Point Estimation Strategies using an MSE Lower Bound</title>
+      <link>https://ammarmian.github.io/ja/publication/icassp-2019/</link>
+      <pubDate>Thu, 14 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/ja/publication/icassp-2019/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Detection Methods Based on Structured Covariance Matrices for Multivariate SAR Images Processing</title>
