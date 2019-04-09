@@ -2,13 +2,6 @@
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	
 	<sitemap>
-	   	<loc>https://ammarmian.github.io/fr/sitemap.xml</loc>
-		
-	   	<lastmod>2019-02-14T00:00:00+00:00</lastmod>
-		
-	</sitemap>
-	
-	<sitemap>
 	   	<loc>https://ammarmian.github.io/ja/sitemap.xml</loc>
 		
 	   	<lastmod>2019-02-14T00:00:00+00:00</lastmod>
@@ -19,6 +12,13 @@
 	   	<loc>https://ammarmian.github.io/en/sitemap.xml</loc>
 		
 	   	<lastmod>2019-04-09T00:00:00+02:00</lastmod>
+		
+	</sitemap>
+	
+	<sitemap>
+	   	<loc>https://ammarmian.github.io/fr/sitemap.xml</loc>
+		
+	   	<lastmod>2019-02-14T00:00:00+00:00</lastmod>
 		
 	</sitemap>
 	
