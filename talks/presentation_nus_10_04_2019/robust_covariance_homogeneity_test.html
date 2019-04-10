@@ -494,16 +494,31 @@ q(\mathbf{x},\mathbf{\Sigma}) & = \mathbf{x}^{\mathrm{H}}{\mathbf{\Sigma}}^{-1} 
 					</section>
 
 				<section>
-					<h3>Approach 3: Compound-Gaussian model</h3>
+					<h3>Approach 3: Compound-Gaussian model (1/2)</h3>
 
 					We consider the Compound-Gaussian model: $\mathbf{x}_k^{t} \sim \sqrt{\tau_k^{t}}\mathbb{C}\mathcal{N}(\mathbf{0}_p, \boldsymbol{\xi}_{t}),$
 			where $\tau_k^{t}$ are assumed to be <b>deterministic</b> and $Tr(\boldsymbol{\xi})=p$.
 
 			$\rightarrow$ We can integrate these unknown parameters in the GLRT$^1$:
 				    \begin{equation}
-			\hat{\Lambda}_\mathrm{MT} = \frac{|{\hat{\mathbf{\Sigma}}_0^{\mathrm{MT}}}|^{TN}}{\displaystyle\prod_{t=1}^{T} |{\hat{\mathbf{\Sigma}}_t^{\mathrm{MT}}}|^N}  \displaystyle\prod_{k=1}^N \dfrac{\left(\displaystyle\sum_{t=1}^T {\mathbf{x}_k^{t}}^{\mathrm{H}}\{\hat{\mathbf{\Sigma}}_t^{\mathrm{MT}}\}^{-1}\mathbf{x}_k^{t}\right)^{Tp}}{\displaystyle\prod_{t=1}^T\left({\mathbf{x}_k^{t}}^{\mathrm{H}}\{\hat{\mathbf{\Sigma}}_0^{\mathrm{MT}}\}^{-1}\mathbf{x}_k^{t}\right)^p}\underset{\mathrm{H}_0}{\overset{\mathrm{H}_1}{\gtrless}} \lambda,\,\mathrm{where:}
+			\hat{\Lambda}_\mathrm{MT} = \frac{|{\hat{\mathbf{\Sigma}}_0^{\mathrm{MT}}}|^{TN}}{\displaystyle\prod_{t=1}^{T} |{\hat{\mathbf{\Sigma}}_t^{\mathrm{M}}}|^N}  \displaystyle\prod_{k=1}^N \dfrac{\left(\displaystyle\sum_{t=1}^T {\mathbf{x}_k^{t}}^{\mathrm{H}}\{\hat{\mathbf{\Sigma}}_t^{\mathrm{MT}}\}^{-1}\mathbf{x}_k^{t}\right)^{Tp}}{\displaystyle\prod_{t=1}^T\left({\mathbf{x}_k^{t}}^{\mathrm{H}}\{\hat{\mathbf{\Sigma}}_0^{\mathrm{M}}\}^{-1}\mathbf{x}_k^{t}\right)^p}\underset{\mathrm{H}_0}{\overset{\mathrm{H}_1}{\gtrless}} \lambda,\,\mathrm{where:}
 			\end{equation}
-			$\hat{\mathbf{\Sigma}}_t^{\mathrm{MT}} = \frac{p}{N}\displaystyle\sum_{k=1}^N  \dfrac{\mathbf{x}_k^{t}{\mathbf{x}_k^{t}}^{\mathrm{H}}}{{\mathbf{x}_k^{t}}^{\mathrm{H}}\{\hat{\mathbf{\Sigma}}^{\mathrm{MT}}\}^{-1}\mathbf{x}_k^{t}}$ and  $\hat{\mathbf{\Sigma}}_0^{\mathrm{MT}} = \frac{p}{N}\displaystyle\sum_{k=1}^N  \dfrac{\displaystyle\sum_{t=1}^T \mathbf{x}_k^{t}{\mathbf{x}_k^{t}}^{\mathrm{H}}}{\displaystyle\sum_{t=1}^T{\mathbf{x}_k^{t}}^{\mathrm{H}}\{\hat{\mathbf{\Sigma}}^{\mathrm{MT}}\}^{-1}\mathbf{x}_k^{t}} $ 
+			$\hat{\mathbf{\Sigma}}_t^{\mathrm{M}} = \frac{p}{N}\displaystyle\sum_{k=1}^N  \dfrac{\mathbf{x}_k^{t}{\mathbf{x}_k^{t}}^{\mathrm{H}}}{{\mathbf{x}_k^{t}}^{\mathrm{H}}\{\hat{\mathbf{\Sigma}}^{\mathrm{M}}\}^{-1}\mathbf{x}_k^{t}}$ and  $\hat{\mathbf{\Sigma}}_0^{\mathrm{MT}} = \frac{p}{N}\displaystyle\sum_{k=1}^N  \dfrac{\displaystyle\sum_{t=1}^T \mathbf{x}_k^{t}{\mathbf{x}_k^{t}}^{\mathrm{H}}}{\displaystyle\sum_{t=1}^T{\mathbf{x}_k^{t}}^{\mathrm{H}}\{\hat{\mathbf{\Sigma}}^{\mathrm{MT}}\}^{-1}\mathbf{x}_k^{t}} $ 
+
+			<p>$^1$ A. Mian, G. Ginolhac, J. Ovarlez and A. M. Atto, "New Robust Statistics for Change Detection in Time Series of Multivariate SAR Images," in IEEE Transactions on Signal Processing, vol. 67, no. 2, pp. 520-534, 15 Jan.15, 2019.</p>
+
+				</section>
+
+				<section>
+					<h3>Approach 3: Compound-Gaussian model (2/2)</h3>
+
+					We can also test the scale parameters only and ignoring a change in the shape matrix.</br>
+
+			$\rightarrow$ The GLRT$^1$ yields:
+				    \begin{equation}
+			\hat{\Lambda}_\mathrm{Tex} = \displaystyle\prod_{t=1}^{T}\frac{|{\hat{\mathbf{\Sigma}}_t^{\mathrm{Tex}}}|^{N}}{ |{\hat{\mathbf{\Sigma}}_t^{\mathrm{M}}}|^N}  \displaystyle\prod_{k=1}^N \dfrac{\left(\displaystyle\sum_{t=1}^T {\mathbf{x}_k^{t}}^{\mathrm{H}}\{\hat{\mathbf{\Sigma}}_t^{\mathrm{Tex}}\}^{-1}\mathbf{x}_k^{t}\right)^{Tp}}{\displaystyle\prod_{t=1}^T\left({\mathbf{x}_k^{t}}^{\mathrm{H}}\{\hat{\mathbf{\Sigma}}_0^{\mathrm{M}}\}^{-1}\mathbf{x}_k^{t}\right)^p}\underset{\mathrm{H}_0}{\overset{\mathrm{H}_1}{\gtrless}} \lambda,\,\mathrm{where:}
+			\end{equation}
+			$\hat{\mathbf{\Sigma}}_t^{\mathrm{M}} = \frac{p}{N}\displaystyle\sum_{k=1}^N  \dfrac{\mathbf{x}_k^{t}{\mathbf{x}_k^{t}}^{\mathrm{H}}}{{\mathbf{x}_k^{t}}^{\mathrm{H}}\{\hat{\mathbf{\Sigma}}^{\mathrm{M}}\}^{-1}\mathbf{x}_k^{t}}$ and  $\hat{\mathbf{\Sigma}}_t^{\mathrm{Tex}} = \frac{p}{N}\displaystyle\sum_{k=1}^N  \dfrac{\displaystyle\sum_{t=1}^T \mathbf{x}_k^{t}{\mathbf{x}_k^{t}}^{\mathrm{H}}}{\displaystyle\sum_{t=1}^T{\mathbf{x}_k^{t}}^{\mathrm{H}}\{\hat{\mathbf{\Sigma}}^{\mathrm{Tex}}\}^{-1}\mathbf{x}_k^{t}} $ 
 
 			<p>$^1$ A. Mian, G. Ginolhac, J. Ovarlez and A. M. Atto, "New Robust Statistics for Change Detection in Time Series of Multivariate SAR Images," in IEEE Transactions on Signal Processing, vol. 67, no. 2, pp. 520-534, 15 Jan.15, 2019.</p>
 
@@ -585,13 +600,483 @@ q(\mathbf{x},\mathbf{\Sigma}) & = \mathbf{x}^{\mathrm{H}}{\mathbf{\Sigma}}^{-1} 
 					</section>
 
 					<section>
-						<h3>Results</h3>
+						<h3>Results (1/2)</h3>
+						<div class="row center-md">
+							<div class="col-md-3">
+								<img src="Figures/Change-Detection/Scene1Gauss-eps-converted-to-1.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-Detection/Scene1MatAndText-eps-converted-to-1.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-Detection/Scene1MatGen-eps-converted-to-1.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-Detection/Scene1TextGen-eps-converted-to-1.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+						
+					</section>	
+
+					<section>
+						<h3>Results (2/2)</h3>
 						<img src="Figures/Change-Detection/ROC_UAVSAR.PNG"
 								width="75%"
 								style="border: 0;box-shadow: none !important;">
-					</section>				
+					</section>	
+
+					<section>
+						<h3>Result on another dataset</h3>
+
+						<div class="row center-md">
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=0.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=1.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Gaussian_GLRT_statistic_at_t=1.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Robust_statistic_at_t=1.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+
+
+					</section>		
+
+					<section>
+						<h3>Result on another dataset</h3>
+
+						<div class="row center-md">
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=1.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=2.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Gaussian_GLRT_statistic_at_t=2.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Robust_statistic_at_t=2.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+
+
+					</section>	
+
+					<section>
+						<h3>Result on another dataset</h3>
+
+						<div class="row center-md">
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=2.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=3.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Gaussian_GLRT_statistic_at_t=3.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Robust_statistic_at_t=3.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+					</section>	
+
+					<section>
+						<h3>Result on another dataset</h3>
+
+						<div class="row center-md">
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=3.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=4.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Gaussian_GLRT_statistic_at_t=4.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Robust_statistic_at_t=4.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+					</section>	
+
+					<section>
+						<h3>Result on another dataset</h3>
+
+						<div class="row center-md">
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=4.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=5.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Gaussian_GLRT_statistic_at_t=5.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Robust_statistic_at_t=5.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+					</section>	
+
+					<section>
+						<h3>Result on another dataset</h3>
+
+						<div class="row center-md">
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=5.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=6.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Gaussian_GLRT_statistic_at_t=6.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Robust_statistic_at_t=6.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+					</section>	
+
+
+					<section>
+						<h3>Result on another dataset</h3>
+
+						<div class="row center-md">
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=6.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=7.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Gaussian_GLRT_statistic_at_t=7.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Robust_statistic_at_t=7.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h3>Result on another dataset</h3>
+
+						<div class="row center-md">
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=7.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=8.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Gaussian_GLRT_statistic_at_t=8.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Robust_statistic_at_t=8.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h3>Result on another dataset</h3>
+
+						<div class="row center-md">
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=8.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=9.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Gaussian_GLRT_statistic_at_t=9.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Robust_statistic_at_t=9.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h3>Result on another dataset</h3>
+
+						<div class="row center-md">
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=9.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=10.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Gaussian_GLRT_statistic_at_t=10.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Robust_statistic_at_t=10.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h3>Result on another dataset</h3>
+
+						<div class="row center-md">
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=10.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=11.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Gaussian_GLRT_statistic_at_t=11.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Robust_statistic_at_t=11.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h3>Result on another dataset</h3>
+
+						<div class="row center-md">
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=11.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=12.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Gaussian_GLRT_statistic_at_t=12.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Robust_statistic_at_t=12.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h3>Result on another dataset</h3>
+
+						<div class="row center-md">
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=12.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=13.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Gaussian_GLRT_statistic_at_t=13.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Robust_statistic_at_t=13.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h3>Result on another dataset</h3>
+
+						<div class="row center-md">
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=13.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=14.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Gaussian_GLRT_statistic_at_t=14.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Robust_statistic_at_t=14.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h3>Result on another dataset</h3>
+
+						<div class="row center-md">
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=14.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=15.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Gaussian_GLRT_statistic_at_t=15.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Robust_statistic_at_t=15.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+					</section>
+
+
+					<section>
+						<h3>Result on another dataset</h3>
+
+						<div class="row center-md">
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=15.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Image_at_t=16.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Gaussian_GLRT_statistic_at_t=16.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-3">
+								<img src="Figures/Change-point-time-series/Robust_statistic_at_t=16.png"
+								width="95%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+					</section>
+
 
 				</section>	
+
+				<section>
+					<h2>Thanks for your attention !</h2>
+				</section>
 
 			
 			</div>
