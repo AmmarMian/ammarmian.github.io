@@ -11,6 +11,15 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Robust Low-rank Change Detection for SAR Image Time Series</title>
+      <link>https://ammarmian.github.io/publication/igarss-2019/</link>
+      <pubDate>Mon, 15 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/publication/igarss-2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Change detection for SAR Images</title>
       <link>https://ammarmian.github.io/talk/presentation_overview_cd/</link>
       <pubDate>Tue, 09 Apr 2019 00:00:00 +0200</pubDate>

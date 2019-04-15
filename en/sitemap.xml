@@ -4,6 +4,22 @@
     
     <url>
     
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/publication/igarss-2019/" hreflang="en"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/publication/igarss-2019/" hreflang="fr"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/ja/publication/igarss-2019/" hreflang="ja"/>
+    
+      <loc>https://ammarmian.github.io/publication/igarss-2019/</loc>
+      <lastmod>2019-04-15T00:00:00+00:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/talk/presentation_overview_cd/" hreflang="en"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/talk/presentation_overview_cd/" hreflang="fr"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/ja/talk/presentation_overview_cd/" hreflang="ja"/>
+    
       <loc>https://ammarmian.github.io/talk/presentation_overview_cd/</loc>
       <lastmod>2019-04-09T00:00:00+02:00</lastmod>
     </url>
@@ -11,6 +27,10 @@
   
     
     <url>
+    
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/talk/presentation_nus/" hreflang="en"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/talk/presentation_nus/" hreflang="fr"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/ja/talk/presentation_nus/" hreflang="ja"/>
     
       <loc>https://ammarmian.github.io/talk/presentation_nus/</loc>
       <lastmod>2019-04-09T00:00:00+02:00</lastmod>
@@ -124,6 +144,10 @@
     
     <url>
     
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/talk/" hreflang="en"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/talk/" hreflang="fr"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/ja/talk/" hreflang="ja"/>
+    
       <loc>https://ammarmian.github.io/talk/</loc>
       <lastmod>2017-01-01T00:00:00+01:00</lastmod>
     </url>
@@ -137,7 +161,7 @@
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/ja/publication_types/1/" hreflang="ja"/>
     
       <loc>https://ammarmian.github.io/publication_types/1/</loc>
-      <lastmod>2019-02-14T00:00:00+00:00</lastmod>
+      <lastmod>2019-04-15T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -188,7 +212,7 @@
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/ja/publication_types/" hreflang="ja"/>
     
       <loc>https://ammarmian.github.io/publication_types/</loc>
-      <lastmod>2019-02-14T00:00:00+00:00</lastmod>
+      <lastmod>2019-04-15T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -201,7 +225,7 @@
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/ja/publication/" hreflang="ja"/>
     
       <loc>https://ammarmian.github.io/publication/</loc>
-      <lastmod>2019-02-14T00:00:00+00:00</lastmod>
+      <lastmod>2019-04-15T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     

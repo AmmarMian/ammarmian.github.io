@@ -4,6 +4,42 @@
     
     <url>
     
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/ja/publication/igarss-2019/" hreflang="ja"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/publication/igarss-2019/" hreflang="fr"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/publication/igarss-2019/" hreflang="en"/>
+    
+      <loc>https://ammarmian.github.io/ja/publication/igarss-2019/</loc>
+      <lastmod>2019-04-15T00:00:00+00:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/ja/talk/presentation_overview_cd/" hreflang="ja"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/talk/presentation_overview_cd/" hreflang="fr"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/talk/presentation_overview_cd/" hreflang="en"/>
+    
+      <loc>https://ammarmian.github.io/ja/talk/presentation_overview_cd/</loc>
+      <lastmod>2019-04-09T00:00:00+02:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/ja/talk/presentation_nus/" hreflang="ja"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/talk/presentation_nus/" hreflang="fr"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/talk/presentation_nus/" hreflang="en"/>
+    
+      <loc>https://ammarmian.github.io/ja/talk/presentation_nus/</loc>
+      <lastmod>2019-04-09T00:00:00+02:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/ja/publication/icassp-2019/" hreflang="ja"/>
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/publication/icassp-2019/" hreflang="fr"/>
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/publication/icassp-2019/" hreflang="en"/>
@@ -105,7 +141,7 @@
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/publication_types/1/" hreflang="fr"/>
     
       <loc>https://ammarmian.github.io/ja/publication_types/1/</loc>
-      <lastmod>2019-02-14T00:00:00+00:00</lastmod>
+      <lastmod>2019-04-15T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -156,7 +192,7 @@
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/publication_types/" hreflang="fr"/>
     
       <loc>https://ammarmian.github.io/ja/publication_types/</loc>
-      <lastmod>2019-02-14T00:00:00+00:00</lastmod>
+      <lastmod>2019-04-15T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -169,7 +205,7 @@
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/publication/" hreflang="fr"/>
     
       <loc>https://ammarmian.github.io/ja/publication/</loc>
-      <lastmod>2019-02-14T00:00:00+00:00</lastmod>
+      <lastmod>2019-04-15T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -182,6 +218,19 @@
       <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/tags/" hreflang="fr"/>
     
       <loc>https://ammarmian.github.io/ja/tags/</loc>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/ja/talk/" hreflang="ja"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/talk/" hreflang="en"/>
+      <xhtml:link rel="alternate" href="https://ammarmian.github.io/fr/talk/" hreflang="fr"/>
+    
+      <loc>https://ammarmian.github.io/ja/talk/</loc>
+      <lastmod>2019-04-09T00:00:00+02:00</lastmod>
       <priority>0</priority>
     </url>
     
