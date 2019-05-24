@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="282.667px" height="168.667px" viewBox="0 0 282.667 168.667" enable-background="new 0 0 282.667 168.667"
+	 xml:space="preserve">
+<line fill="none" stroke="#000000" stroke-miterlimit="10" x1="30.8" y1="5.533" x2="30" y2="155.933"/>
+<line fill="none" stroke="#000000" stroke-miterlimit="10" x1="8.4" y1="140.733" x2="268.4" y2="140.733"/>
+<g>
+	<g>
+		<path fill="none" stroke="#000000" stroke-miterlimit="10" d="M30,140.733c0,0,0.118-0.868,0.457-2.453"/>
+		<path fill="none" stroke="#000000" stroke-miterlimit="10" stroke-dasharray="5.1526,10.3052" d="M33.271,128.375
+			c9.926-28.717,48.14-97.935,186.666-103.407"/>
+		<path fill="none" stroke="#000000" stroke-miterlimit="10" d="M225.101,24.795c0.829-0.023,1.662-0.043,2.499-0.062"/>
+	</g>
+</g>
+<text transform="matrix(1 0 0 1 258.667 156.6665)" font-family="'LatinModernMath-Regular'" font-size="12">P</text>
+<text transform="matrix(0.583 0 0 0.583 266.8389 160.6626)" font-family="'LatinModernMath-Regular'" font-size="12">FA</text>
+<text transform="matrix(1 0 0 1 8.3999 19.9019)" font-family="'LatinModernMath-Regular'" font-size="12">P</text>
+<text transform="matrix(0.583 0 0 0.583 16.5718 23.8979)" font-family="'LatinModernMath-Regular'" font-size="12">D</text>
+</svg>
