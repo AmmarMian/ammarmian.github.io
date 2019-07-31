@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy;Ammar Mian 2018</copyright>
-    <lastBuildDate>Sun, 15 Oct 2017 00:00:00 +0200</lastBuildDate>
+    <lastBuildDate>Sun, 15 Oct 2017 00:00:00 +0900</lastBuildDate>
     
 	<atom:link href="https://ammarmian.github.io/home/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,7 +15,7 @@
     <item>
       <title></title>
       <link>https://ammarmian.github.io/home/hero_carousel/</link>
-      <pubDate>Sun, 15 Oct 2017 00:00:00 +0200</pubDate>
+      <pubDate>Sun, 15 Oct 2017 00:00:00 +0900</pubDate>
       
       <guid>https://ammarmian.github.io/home/hero_carousel/</guid>
       <description></description>
@@ -24,7 +24,7 @@
     <item>
       <title>Academic</title>
       <link>https://ammarmian.github.io/home/hero/</link>
-      <pubDate>Sun, 15 Oct 2017 00:00:00 +0200</pubDate>
+      <pubDate>Sun, 15 Oct 2017 00:00:00 +0900</pubDate>
       
       <guid>https://ammarmian.github.io/home/hero/</guid>
       <description>The highly flexible website framework for Hugo with an extensible plugin mechanism. Create a beautifully simple site in under 10 minutes 🚀 Latest release   Star</description>
@@ -33,7 +33,7 @@
     <item>
       <title></title>
       <link>https://ammarmian.github.io/home/about/</link>
-      <pubDate>Wed, 20 Apr 2016 00:00:00 +0200</pubDate>
+      <pubDate>Wed, 20 Apr 2016 00:00:00 +0900</pubDate>
       
       <guid>https://ammarmian.github.io/home/about/</guid>
       <description>Biography I am currently a Phd student at CentraleSupélec SONDRA under the supervision of Jean-Philippe Ovarlez, Guillaume Ginolhac and Abdourrahmane M. ATTO . My work is focused on the exploitation of Time Series of Synthetic Aperture Radar (SAR) images using Time-Frequency and Statistical tools.</description>
@@ -42,7 +42,7 @@
     <item>
       <title>Recent &amp; Upcoming Talks</title>
       <link>https://ammarmian.github.io/home/talks/</link>
-      <pubDate>Wed, 20 Apr 2016 00:00:00 +0200</pubDate>
+      <pubDate>Wed, 20 Apr 2016 00:00:00 +0900</pubDate>
       
       <guid>https://ammarmian.github.io/home/talks/</guid>
       <description></description>
@@ -60,7 +60,7 @@
     <item>
       <title>Recent Publications</title>
       <link>https://ammarmian.github.io/home/publications/</link>
-      <pubDate>Wed, 20 Apr 2016 00:00:00 +0200</pubDate>
+      <pubDate>Wed, 20 Apr 2016 00:00:00 +0900</pubDate>
       
       <guid>https://ammarmian.github.io/home/publications/</guid>
       <description></description>
@@ -79,7 +79,7 @@
     <item>
       <title>Selected Publications</title>
       <link>https://ammarmian.github.io/home/publications_selected/</link>
-      <pubDate>Wed, 20 Apr 2016 00:00:00 +0200</pubDate>
+      <pubDate>Wed, 20 Apr 2016 00:00:00 +0900</pubDate>
       
       <guid>https://ammarmian.github.io/home/publications_selected/</guid>
       <description></description>
@@ -88,7 +88,7 @@
     <item>
       <title>Selected Talks</title>
       <link>https://ammarmian.github.io/home/talks_selected/</link>
-      <pubDate>Wed, 20 Apr 2016 00:00:00 +0200</pubDate>
+      <pubDate>Wed, 20 Apr 2016 00:00:00 +0900</pubDate>
       
       <guid>https://ammarmian.github.io/home/talks_selected/</guid>
       <description></description>
@@ -97,7 +97,7 @@
     <item>
       <title>Recent Posts</title>
       <link>https://ammarmian.github.io/home/posts/</link>
-      <pubDate>Wed, 20 Apr 2016 00:00:00 +0200</pubDate>
+      <pubDate>Wed, 20 Apr 2016 00:00:00 +0900</pubDate>
       
       <guid>https://ammarmian.github.io/home/posts/</guid>
       <description></description>
@@ -106,7 +106,7 @@
     <item>
       <title>Projects</title>
       <link>https://ammarmian.github.io/home/projects/</link>
-      <pubDate>Wed, 20 Apr 2016 00:00:00 +0200</pubDate>
+      <pubDate>Wed, 20 Apr 2016 00:00:00 +0900</pubDate>
       
       <guid>https://ammarmian.github.io/home/projects/</guid>
       <description></description>
@@ -115,7 +115,7 @@
     <item>
       <title>Skills</title>
       <link>https://ammarmian.github.io/home/skills/</link>
-      <pubDate>Wed, 20 Sep 2017 00:00:00 +0200</pubDate>
+      <pubDate>Wed, 20 Sep 2017 00:00:00 +0900</pubDate>
       
       <guid>https://ammarmian.github.io/home/skills/</guid>
       <description></description>
@@ -124,7 +124,7 @@
     <item>
       <title>Tags</title>
       <link>https://ammarmian.github.io/home/tags/</link>
-      <pubDate>Wed, 20 Sep 2017 00:00:00 +0200</pubDate>
+      <pubDate>Wed, 20 Sep 2017 00:00:00 +0900</pubDate>
       
       <guid>https://ammarmian.github.io/home/tags/</guid>
       <description></description>
@@ -133,7 +133,7 @@
     <item>
       <title>Search</title>
       <link>https://ammarmian.github.io/home/search/</link>
-      <pubDate>Mon, 23 Jul 2018 00:00:00 +0200</pubDate>
+      <pubDate>Mon, 23 Jul 2018 00:00:00 +0900</pubDate>
       
       <guid>https://ammarmian.github.io/home/search/</guid>
       <description></description>
@@ -142,7 +142,7 @@
     <item>
       <title>Contact</title>
       <link>https://ammarmian.github.io/home/contact/</link>
-      <pubDate>Wed, 20 Apr 2016 00:00:00 +0200</pubDate>
+      <pubDate>Wed, 20 Apr 2016 00:00:00 +0900</pubDate>
       
       <guid>https://ammarmian.github.io/home/contact/</guid>
       <description></description>
