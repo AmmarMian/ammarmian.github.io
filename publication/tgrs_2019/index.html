@@ -1,26 +1,35 @@
 <!DOCTYPE html>
 <html lang="en-us">
+
 <head>
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="generator" content="Source Themes Academic 2.4.0">
-  <meta name="generator" content="Hugo 0.49.2" />
-  <meta name="author" content="Ammar Mian">
+  <meta name="generator" content="Source Themes Academic 4.3.1">
 
+  
+
+  
   
   
   
   
     
+    
+    
   
-  <meta name="description" content="High-Resolution in synthetic  aperture radar (SAR) leads to new physical characterizations of scatterers which are anisotropic and dispersive. These behaviors present an interesting source of diversity for target detection schemes. Unfortunately, such characteristics have been integrated and have been naturally lost in monovariate single look SAR images. Modeling this behavior as non-stationarity, wavelet analysis has been successful in retrieving this information. However, the sharp-edge of the used wavelet functions  introduces undesired high side-lobes for the strong scatterers present in the images. In this paper, a new family of parametrized wavelets, designed specifically to reduce those side-lobes in the SAR image decomposition, is proposed. Target detection schemes are then explored using this spectro-angular diversity and it can be shown that in High-Resolution SAR images, the non-Gaussian and robust framework leads to better results.">
+  
+
+  <meta name="author" content="Ammar Mian">
 
   
-  <link rel="alternate" hreflang="fr" href="https://ammarmian.github.io/fr/publication/tgrs_2019/">
   
-  <link rel="alternate" hreflang="ja" href="https://ammarmian.github.io/ja/publication/tgrs_2019/">
+  
+    
+  
+  <meta name="description" content="Wavelet packets for SAR image target detection.">
+
   
   <link rel="alternate" hreflang="en-us" href="https://ammarmian.github.io/publication/tgrs_2019/">
 
@@ -30,13 +39,9 @@
   
 
   
-
-  
-
   
   
-  
-  <meta name="theme-color" content="hsl(339, 90%, 68%)">
+  <meta name="theme-color" content="#2962ff">
   
 
   
@@ -44,9 +49,8 @@
   
   
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css" integrity="sha384-aOkxzJ5uQz7WBObEZcHvV5JvRW3TUc2rNPA7pe3AwnsUohiw1Vj2Rgx2KSOkF5+h" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" integrity="sha256-ygkqlh3CYSUri3LhQxzdcm0n1EQvH2Y+U5S2idbLtxs=" crossorigin="anonymous">
 
     
@@ -58,7 +62,8 @@
       
       
         
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/dracula.min.css" crossorigin="anonymous">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
         
       
     
@@ -73,19 +78,20 @@
 
   
   
-  <link rel="stylesheet" href=//fonts.googleapis.com/css?family=Montserrat:400,700|Roboto:400,400italic,700|Roboto+Mono>
-  
-
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Playfair+Display:400,700|Fauna+One">
   
 
   
   
   
+  <link rel="stylesheet" href="/css/academic.min.820fb5ef4d8083eb338b5672b9aa6549.css">
 
   
-  <link rel="alternate" href="https://ammarmian.github.io/index.xml" type="application/rss+xml" title="Ammar Mian">
-  <link rel="feed" href="https://ammarmian.github.io/index.xml" type="application/rss+xml" title="Ammar Mian">
+
+  
+  
+  
+
   
 
   <link rel="manifest" href="/site.webmanifest">
@@ -94,32 +100,75 @@
 
   <link rel="canonical" href="https://ammarmian.github.io/publication/tgrs_2019/">
 
-  <meta property="twitter:card" content="summary_large_image">
   
-  <meta property="og:site_name" content="Ammar Mian">
-  <meta property="og:url" content="https://ammarmian.github.io/publication/tgrs_2019/">
-  <meta property="og:title" content="Design of New Wavelet Packets Adapted to High-Resolution SAR Images with an Application to Target Detection | Ammar Mian">
-  <meta property="og:description" content="High-Resolution in synthetic  aperture radar (SAR) leads to new physical characterizations of scatterers which are anisotropic and dispersive. These behaviors present an interesting source of diversity for target detection schemes. Unfortunately, such characteristics have been integrated and have been naturally lost in monovariate single look SAR images. Modeling this behavior as non-stationarity, wavelet analysis has been successful in retrieving this information. However, the sharp-edge of the used wavelet functions  introduces undesired high side-lobes for the strong scatterers present in the images. In this paper, a new family of parametrized wavelets, designed specifically to reduce those side-lobes in the SAR image decomposition, is proposed. Target detection schemes are then explored using this spectro-angular diversity and it can be shown that in High-Resolution SAR images, the non-Gaussian and robust framework leads to better results.">
+  
   
   
     
-  <meta property="og:image" content="https://ammarmian.github.io/img/icon-192.png">
+    
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="Ammar Mian">
+  <meta property="og:url" content="https://ammarmian.github.io/publication/tgrs_2019/">
+  <meta property="og:title" content="Design of New Wavelet Packets Adapted to High-Resolution SAR Images With an Application to Target Detection | Ammar Mian">
+  <meta property="og:description" content="Wavelet packets for SAR image target detection."><meta property="og:image" content="https://ammarmian.github.io/img/icon-192.png">
   <meta property="og:locale" content="en-us">
   
-  <meta property="article:published_time" content="2018-12-17T00:00:00&#43;00:00">
+  <meta property="article:published_time" content="2019-01-01T00:00:00&#43;00:00">
   
-  <meta property="article:modified_time" content="2018-12-17T00:00:00&#43;00:00">
-  
-
+  <meta property="article:modified_time" content="2019-01-14T00:00:00&#43;00:00">
   
 
   
 
-  <title>Design of New Wavelet Packets Adapted to High-Resolution SAR Images with an Application to Target Detection | Ammar Mian</title>
+
+  
+
+
+
+
+
+  <title>Design of New Wavelet Packets Adapted to High-Resolution SAR Images With an Application to Target Detection | Ammar Mian</title>
 
 </head>
-<body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" class="dark">
 
+
+<body id="top" data-spy="scroll" data-target="#TableOfContents" data-offset="71" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" role="textbox" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
 <nav class="navbar navbar-light fixed-top navbar-expand-lg py-0" id="navbar-main">
   <div class="container">
 
@@ -137,7 +186,7 @@
 
       
       
-      <ul class="navbar-nav ml-auto">
+      <ul class="navbar-nav mr-auto">
         
 
         
@@ -148,12 +197,22 @@
           
         
 
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
         <li class="nav-item">
-          <a class="nav-link" href="/#about">
-            
-            <span>Home</span>
-            
-          </a>
+          <a class="nav-link " href="/#about"><span>Home</span></a>
         </li>
 
         
@@ -167,12 +226,55 @@
           
         
 
+        
+        
+        
+        
+        
+        
+
         <li class="nav-item">
-          <a class="nav-link" href="/#talks">
-            
-            <span>Talks</span>
-            
-          </a>
+          <a class="nav-link  active" href="/publication"><span>Publications</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/talk"><span>Talks</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/cv/"><span>CV</span></a>
         </li>
 
         
@@ -186,89 +288,49 @@
           
         
 
-        <li class="nav-item">
-          <a class="nav-link" href="/#publications">
-            
-            <span>Publications</span>
-            
-          </a>
-        </li>
-
-        
-        
-
-        
-
         
         
         
-          
+        
+        
         
 
         <li class="nav-item">
-          <a class="nav-link" href="/#search">
-            
-            <span>Search</span>
-            
-          </a>
-        </li>
-
-        
-        
-
-        
-
-        
-        
-        
-          
-        
-
-        <li class="nav-item">
-          <a class="nav-link" href="/#contact">
-            
-            <span>Contact</span>
-            
-          </a>
+          <a class="nav-link " href="/contact/"><span>Contact</span></a>
         </li>
 
         
         
 
       
+      </ul>
+      <ul class="navbar-nav ml-auto">
+      
 
         
 
         
-        <li class="nav-item dropdown">
-          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
-            <i class="fas fa-globe" aria-hidden="true"></i>
-            <span>English</span>
-          </a>
-          <ul class="dropdown-menu">
-            
-            <li class="dropdown-item my-0 py-0 mx-0 px-0">
-              <a href="/fr/publication/tgrs_2019/">
-                <span>Français</span>
-              </a>
-            </li>
-            
-            <li class="dropdown-item my-0 py-0 mx-0 px-0">
-              <a href="/ja/publication/tgrs_2019/">
-                <span>日本語</span>
-              </a>
-            </li>
-            
-          </ul>
+        <li class="nav-item">
+          <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
         </li>
         
+
+        
+
+        
+        <li class="nav-item">
+          <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+        </li>
+        
+
       </ul>
 
     </div>
   </div>
 </nav>
 
-<div class="pub" itemscope itemtype="http://schema.org/CreativeWork">
+
+  <div class="pub" itemscope itemtype="http://schema.org/CreativeWork">
 
   
 
@@ -289,100 +351,138 @@
   
   
 <div class="article-container pt-3">
-  <h1 itemprop="name">Design of New Wavelet Packets Adapted to High-Resolution SAR Images with an Application to Target Detection</h1>
+  <h1 itemprop="name">Design of New Wavelet Packets Adapted to High-Resolution SAR Images With an Application to Target Detection</h1>
 
   
 
   
     
+
+
+
+<meta content="2019-01-14 00:00:00 &#43;0000 UTC" itemprop="datePublished">
+<meta content="2019-01-14 00:00:00 &#43;0000 UTC" itemprop="dateModified">
 
 <div class="article-metadata">
 
   
   
   
+  
   <div>
     
-    <span itemscope itemprop="author" itemtype="http://schema.org/Person">
-      <span itemprop="name">Ammar Mian</span>
-    </span>, 
-    
-    <span itemscope itemprop="author" itemtype="http://schema.org/Person">
-      <span itemprop="name">Jean-Philippe Ovarlez</span>
-    </span>, 
-    
-    <span itemscope itemprop="author" itemtype="http://schema.org/Person">
-      <span itemprop="name">Abdourahmane M. Atto</span>
-    </span>, 
-    
-    <span itemscope itemprop="author" itemtype="http://schema.org/Person">
-      <span itemprop="name">Guillaume Ginolhac</span>
-    </span>
-    
+
+
+
+  <span itemprop="author name" itemtype="http://schema.org/Person"><a href="/authors/admin/">Ammar Mian</a></span>, <span itemprop="author name" itemtype="http://schema.org/Person"><a href="/authors/jean-philippe-ovarlez/">Jean-Philippe Ovarlez</a></span>, <span itemprop="author name" itemtype="http://schema.org/Person"><a href="/authors/guillaume-ginolhac/">Guillaume Ginolhac</a></span>, <span itemprop="author name" itemtype="http://schema.org/Person"><a href="/authors/abdourahmane-m.-atto/">Abdourahmane M. Atto</a></span>
+
   </div>
   
+  
 
+  
   <span class="article-date">
     
-    <meta content="2018-12-17 00:00:00 &#43;0000 UTC" itemprop="datePublished">
-    <time datetime="2018-12-17 00:00:00 &#43;0000 UTC" itemprop="dateModified">
-      Dec 17, 2018
-    </time>
-  </span>
-  <span itemscope itemprop="publisher" itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="Ammar Mian">
-  </span>
-
-  
-  <span class="middot-divider"></span>
-  <span class="article-reading-time">
-    0 min read
+    
+      
+    
+    <time>January 2019</time>
   </span>
   
 
   
-  
 
   
 
   
   
+
+  
+  
+
+  
+    
 <div class="share-box" aria-hidden="true">
   <ul class="share">
-    <li>
-      <a class="twitter"
-         href="https://twitter.com/intent/tweet?text=Design%20of%20New%20Wavelet%20Packets%20Adapted%20to%20High-Resolution%20SAR%20Images%20with%20an%20Application%20to%20Target%20Detection&amp;url=https%3a%2f%2fammarmian.github.io%2fpublication%2ftgrs_2019%2f"
-         target="_blank" rel="noopener">
-        <i class="fab fa-twitter"></i>
-      </a>
-    </li>
-    <li>
-      <a class="facebook"
-         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fammarmian.github.io%2fpublication%2ftgrs_2019%2f"
-         target="_blank" rel="noopener">
-        <i class="fab fa-facebook-f"></i>
-      </a>
-    </li>
-    <li>
-      <a class="linkedin"
-         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fammarmian.github.io%2fpublication%2ftgrs_2019%2f&amp;title=Design%20of%20New%20Wavelet%20Packets%20Adapted%20to%20High-Resolution%20SAR%20Images%20with%20an%20Application%20to%20Target%20Detection"
-         target="_blank" rel="noopener">
-        <i class="fab fa-linkedin-in"></i>
-      </a>
-    </li>
-    <li>
-      <a class="weibo"
-         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fammarmian.github.io%2fpublication%2ftgrs_2019%2f&amp;title=Design%20of%20New%20Wavelet%20Packets%20Adapted%20to%20High-Resolution%20SAR%20Images%20with%20an%20Application%20to%20Target%20Detection"
-         target="_blank" rel="noopener">
-        <i class="fab fa-weibo"></i>
-      </a>
-    </li>
-    <li>
-      <a class="email"
-         href="mailto:?subject=Design%20of%20New%20Wavelet%20Packets%20Adapted%20to%20High-Resolution%20SAR%20Images%20with%20an%20Application%20to%20Target%20Detection&amp;body=https%3a%2f%2fammarmian.github.io%2fpublication%2ftgrs_2019%2f">
-        <i class="fas fa-envelope"></i>
-      </a>
-    </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=https://ammarmian.github.io/publication/tgrs_2019/&amp;text=Design%20of%20New%20Wavelet%20Packets%20Adapted%20to%20High-Resolution%20SAR%20Images%20With%20an%20Application%20to%20Target%20Detection" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=https://ammarmian.github.io/publication/tgrs_2019/&amp;t=Design%20of%20New%20Wavelet%20Packets%20Adapted%20to%20High-Resolution%20SAR%20Images%20With%20an%20Application%20to%20Target%20Detection" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=Design%20of%20New%20Wavelet%20Packets%20Adapted%20to%20High-Resolution%20SAR%20Images%20With%20an%20Application%20to%20Target%20Detection&amp;body=https://ammarmian.github.io/publication/tgrs_2019/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=https://ammarmian.github.io/publication/tgrs_2019/&amp;title=Design%20of%20New%20Wavelet%20Packets%20Adapted%20to%20High-Resolution%20SAR%20Images%20With%20an%20Application%20to%20Target%20Detection" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=Design%20of%20New%20Wavelet%20Packets%20Adapted%20to%20High-Resolution%20SAR%20Images%20With%20an%20Application%20to%20Target%20Detection%20https://ammarmian.github.io/publication/tgrs_2019/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=https://ammarmian.github.io/publication/tgrs_2019/&amp;title=Design%20of%20New%20Wavelet%20Packets%20Adapted%20to%20High-Resolution%20SAR%20Images%20With%20an%20Application%20to%20Target%20Detection" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
   </ul>
 </div>
 
@@ -390,6 +490,91 @@
   
 
 </div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+<div class="btn-links mb-3">
+  
+  
+
+
+
+
+
+
+
+
+  
+    
+  
+
+
+
+<a class="btn btn-outline-primary my-1 mr-1" href="/pdf/tgrs_paper_2019.pdf" target="_blank" rel="noopener">
+  PDF
+</a>
+
+
+
+<button type="button" class="btn btn-outline-primary my-1 mr-1 js-cite-modal"
+        data-filename="/publication/tgrs_2019/cite.bib">
+  Cite
+</button>
+
+
+  
+  
+    
+  
+<a class="btn btn-outline-primary my-1 mr-1" href="https://github.com/AmmarMian/Wavelet-Packets-for-High-Resolution-SAR-images" target="_blank" rel="noopener">
+  Code
+</a>
+
+
+  
+  
+    
+  
+<a class="btn btn-outline-primary my-1 mr-1" href="https://www.sdms.afrl.af.mil/index.php?collection=ccd_challenge" target="_blank" rel="noopener">
+  Dataset
+</a>
+
+
+
+  
+    
+  
+
+
+
+
+
+
+
+
+
+<a class="btn btn-outline-primary my-1 mr-1" href="https://doi.org/10.1109/TGRS.2018.2888993" target="_blank" rel="noopener">
+  DOI
+</a>
+
+
+
+</div>
+
 
   
 </div>
@@ -400,7 +585,7 @@
 
     
     <h3>Abstract</h3>
-    <p class="pub-abstract" itemprop="text">High-Resolution in synthetic  aperture radar (SAR) leads to new physical characterizations of scatterers which are anisotropic and dispersive. These behaviors present an interesting source of diversity for target detection schemes. Unfortunately, such characteristics have been integrated and have been naturally lost in monovariate single look SAR images. Modeling this behavior as non-stationarity, wavelet analysis has been successful in retrieving this information. However, the sharp-edge of the used wavelet functions  introduces undesired high side-lobes for the strong scatterers present in the images. In this paper, a new family of parametrized wavelets, designed specifically to reduce those side-lobes in the SAR image decomposition, is proposed. Target detection schemes are then explored using this spectro-angular diversity and it can be shown that in High-Resolution SAR images, the non-Gaussian and robust framework leads to better results.</p>
+    <p class="pub-abstract" itemprop="text">High resolution in synthetic aperture radar (SAR) leads to new physical characterizations of scatterers which are anisotropic and dispersive. These behaviors present an interesting source of diversity for target detection schemes. Unfortunately, such characteristics have been integrated and have been naturally lost in monovariate single-look SAR images. Modeling this behavior as nonstationarity, wavelet analysis has been successful in retrieving this information. However, the sharp-edge of the used wavelet functions introduces undesired high side-lobes for the strong scatterers present in the images. In this paper, a new family of parameterized wavelets, designed specifically to reduce those side lobes in the SAR image decomposition, is proposed. Target detection schemes are then explored using this spectro-angular diversity and it can be shown that in high-resolution SAR images, the non-Gaussian and robust framework leads to better results.</p>
     
 
     
@@ -410,6 +595,7 @@
         <div class="row">
           <div class="col-12 col-md-3 pub-row-heading">Type</div>
           <div class="col-12 col-md-9">
+            
             
             <a href="/publication/#2">
               Journal article
@@ -429,78 +615,13 @@
       <div class="col-md-10">
         <div class="row">
           <div class="col-12 col-md-3 pub-row-heading">Publication</div>
-          <div class="col-12 col-md-9">In <em>Transactions on Geoscience and Remote Sensing</em>, to appear</div>
+          <div class="col-12 col-md-9">In * IEEE Transactions on Geoscience and Remote Sensing (Volume 57, Issue 6, June 2019)*</div>
         </div>
       </div>
       <div class="col-md-1"></div>
     </div>
     <div class="d-md-none space-below"></div>
     
-
-    <div class="row">
-      <div class="col-md-1"></div>
-      <div class="col-md-10">
-        <div class="row">
-          <div class="col-12 col-md-3 pub-row-heading">Date</div>
-          <div class="col-12 col-md-9" itemprop="datePublished">
-            December, 2018
-          </div>
-        </div>
-      </div>
-      <div class="col-md-1"></div>
-    </div>
-    <div class="d-sm-none space-below"></div>
-
-    <div class="row" style="padding-top: 10px">
-      <div class="col-md-1"></div>
-      <div class="col-md-10">
-        <div class="row">
-          <div class="col-12 col-md-3 pub-row-heading" style="line-height:34px;">Links</div>
-          <div class="col-12 col-md-9">
-
-            
-
-
-
-<a class="btn btn-outline-primary my-1 mr-1" href="/pdf/tgrs_paper_2019.pdf" target="_blank" rel="noopener">
-  Preprint
-</a>
-
-
-
-
-
-
-<a class="btn btn-outline-primary my-1 mr-1" href="https://github.com/AmmarMian/Wavelet-Packets-for-High-Resolution-SAR-images" target="_blank" rel="noopener">
-  Code
-</a>
-
-
-<a class="btn btn-outline-primary my-1 mr-1" href="https://www.sdms.afrl.af.mil/index.php?collection=ccd_challenge" target="_blank" rel="noopener">
-  Dataset
-</a>
-
-
-
-<a class="btn btn-outline-primary my-1 mr-1" href="http://am.atto.free.fr/index_phoenix.htm" target="_blank" rel="noopener">
-  Project
-</a>
-
-
-
-
-
-
-
-
-
-
-          </div>
-        </div>
-      </div>
-      <div class="col-md-1"></div>
-    </div>
-    <div class="d-sm-none space-below"></div>
 
     <div class="space-below"></div>
 
@@ -509,88 +630,160 @@
     
 
 
-  </div>
-</div>
+    
 
 
 
-<div class="container">
-  <footer class="site-footer">
+
+
+
+
+
+  
+  
+    
+  
   
 
-  <p class="powered-by">
-    &copy;Ammar Mian 2018 &middot; 
 
-    Powered by the
-    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
-    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
 
+
+
+  
+  
+  
     
-    <span class="float-right" aria-hidden="true">
-      <a href="#" id="back_to_top">
-        <span class="button_icon">
-          <i class="fas fa-chevron-up fa-2x"></i>
-        </span>
-      </a>
-    </span>
+  
+  
+  <div class="media author-card" itemscope itemtype="http://schema.org/Person">
     
-  </p>
-</footer>
+      
+      <img class="portrait mr-3" src="/authors/admin/avatar_hu27f7dc34c9db8fd2b063f3fba6be9864_793204_250x250_fill_q90_lanczos_center.JPG" itemprop="image" alt="Avatar">
+    
 
-</div>
-
-
-<div id="modal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Cite</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <pre><code class="tex hljs"></code></pre>
-      </div>
-      <div class="modal-footer">
-        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
-          <i class="fas fa-copy"></i> Copy
-        </a>
-        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
-          <i class="fas fa-download"></i> Download
-        </a>
-        <div id="modal-error"></div>
-      </div>
+    <div class="media-body">
+      <h5 class="card-title" itemprop="name"><a href="https://ammarmian.github.io/">Ammar Mian</a></h5>
+      <h6 class="card-subtitle">Post-doc in Signal Processing</h6>
+      <p class="card-text" itemprop="description">Post-doc in Signal Processing. My interest includes Riemannian Geometry, Multivariate Statistical Analysis, Machine learning and Remote Sensing.</p>
+      <ul class="network-icon" aria-hidden="true">
+        
+          
+          
+          
+            
+          
+          
+          
+          
+          
+          <li>
+            <a itemprop="sameAs" href="mailto:ammar.mian@aalto.fi" >
+              <i class="fas fa-envelope"></i>
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          
+          
+            
+          
+          <li>
+            <a itemprop="sameAs" href="https://scholar.google.fr/citations?user=XDirnBMAAAAJ&amp;hl=fr" target="_blank" rel="noopener">
+              <i class="ai ai-google-scholar"></i>
+            </a>
+          </li>
+        
+          
+          
+          
+            
+          
+          
+          
+          
+          
+            
+          
+          <li>
+            <a itemprop="sameAs" href="https://github.com/ammarmian" target="_blank" rel="noopener">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+        
+          
+          
+          
+          
+          
+          
+          
+            
+          
+          <li>
+            <a itemprop="sameAs" href="https://www.researchgate.net/profile/Ammar_Mian" target="_blank" rel="noopener">
+              <i class="ai ai-researchgate"></i>
+            </a>
+          </li>
+        
+      </ul>
     </div>
+  </div>
+
+
+
+
   </div>
 </div>
 
+
+<div class="article-container article-widget">
+  
+<div class="post-nav">
+  
+  
+  
+  <div class="post-nav-item">
+    <div class="meta-nav">Next</div>
+    <a href="/publication/grsl_2019/" rel="next">Detection Methods Based on Structured Covariance Matrices for Multivariate SAR Images Processing</a>
+  </div>
+  
+  
+  
+  <div class="post-nav-item">
+    <div class="meta-nav">Previous</div>
+    <a href="/publication/tsp_2019/" rel="prev">New Robust Statistics for Change Detection in Time Series of Multivariate SAR Images</a>
+  </div>
+  
+</div>
+
+</div>
+
+
+      
+
+    
+    
+    
+    <script src="/js/mathjax-config.js"></script>
     
 
     
     
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Config({
-        CommonHTML: { linebreaks: { automatic: true } },
-        tex2jax: { inlineMath: [ ['$', '$'], ['\\(','\\)'] ], displayMath: [ ['$$','$$'], ['\\[', '\\]'] ], processEscapes: false },
-        TeX: { noUndefined: { attributes: { mathcolor: 'red', mathbackground: '#FFEEEE', mathsize: '90%' } } },
-        messageStyle: 'none'
-      });
-    </script>
     
-
-    
-    
-    
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha512-+NqPlbbtM1QqiK8ZAo4Yrj2c4lNQoGv8P79DPtKzj++l5jnN39rHA/xsqn8zE9l0uSoxaCdrOgFs6yjyfbBxSg==" crossorigin="anonymous"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha256-VsEqElsCHSGmnmHXGQzvoWjWwoznFSZc6hs7ARLRacQ=" crossorigin="anonymous"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" integrity="sha256-X5PoE3KU5l+JcX+w09p/wHl9AzK333C4hJ2I9S5mD4M=" crossorigin="anonymous"></script>
 
       
+
+      
         
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js" integrity="sha256-aYTdUrn6Ow1DDgh5JTc3aDGnnju48y/1c8s1dgkYPQ8=" crossorigin="anonymous"></script>
         
       
 
@@ -598,9 +791,6 @@
       
       <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML-full" integrity="sha256-GhM+5JHb6QUzOQPXSJLEWP7R73CbkisjzK5Eyij4U9w=" crossorigin="anonymous" async></script>
       
-    
-
-    <script src="/js/hugo-academic.js"></script>
     
 
     
@@ -623,7 +813,7 @@
       const search_index_filename = "/index.json";
       const i18n = {
         'placeholder': "Search...",
-        'results': "Search Results",
+        'results': "results found",
         'no_results': "No results found"
       };
       const content_type = {
@@ -657,12 +847,86 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
-    <script src="/js/search.js"></script>
     
 
     
     
 
-  </body>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.9ef1b53ee2bde6c7f33b150c6ba4d452.js"></script>
+
+    
+
+
+
+
+
+
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+
+  <p class="powered-by">
+    
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" id="back_to_top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
 </html>
-

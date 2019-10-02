@@ -4,29 +4,28 @@
     <title>Recent &amp; Upcoming Talks on Ammar Mian</title>
     <link>https://ammarmian.github.io/talk/</link>
     <description>Recent content in Recent &amp; Upcoming Talks on Ammar Mian</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator>
     <language>en-us</language>
-    <copyright>&amp;copy;Ammar Mian 2018</copyright>
-    <lastBuildDate>Sun, 01 Jan 2017 00:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Thu, 11 Apr 2019 12:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://ammarmian.github.io/talk/index.xml" rel="self" type="application/rss+xml" />
+	    <atom:link href="https://ammarmian.github.io/talk/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Change detection for SAR Images</title>
-      <link>https://ammarmian.github.io/talk/presentation_overview_cd/</link>
-      <pubDate>Tue, 09 Apr 2019 00:00:00 +0900</pubDate>
+      <link>https://ammarmian.github.io/talk/talk_overview_cd/</link>
+      <pubDate>Thu, 11 Apr 2019 12:00:00 +0000</pubDate>
       
-      <guid>https://ammarmian.github.io/talk/presentation_overview_cd/</guid>
+      <guid>https://ammarmian.github.io/talk/talk_overview_cd/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Robust statistics for testing the homogeneity of covariance scale and shape</title>
-      <link>https://ammarmian.github.io/talk/presentation_nus/</link>
-      <pubDate>Tue, 09 Apr 2019 00:00:00 +0900</pubDate>
+      <link>https://ammarmian.github.io/talk/talk_nus/</link>
+      <pubDate>Wed, 10 Apr 2019 11:30:00 +0000</pubDate>
       
-      <guid>https://ammarmian.github.io/talk/presentation_nus/</guid>
+      <guid>https://ammarmian.github.io/talk/talk_nus/</guid>
       <description></description>
     </item>
     
