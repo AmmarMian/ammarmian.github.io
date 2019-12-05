@@ -6,10 +6,19 @@
     <description>Recent content in Arnaud Breloy on Ammar Mian</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 27 Jun 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 27 Aug 2019 00:00:00 +0000</lastBuildDate>
     
 	    <atom:link href="https://ammarmian.github.io/authors/arnaud-breloy/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Détection de Changement Robuste en Rang Faible pour les Séries Temporelles d&#39;Images SAR</title>
+      <link>https://ammarmian.github.io/publication/gretsi_2019/</link>
+      <pubDate>Tue, 27 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/publication/gretsi_2019/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Robust Low-rank Change Detection for SAR Image Time Series</title>

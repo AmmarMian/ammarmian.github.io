@@ -29,5 +29,50 @@
       <description></description>
     </item>
     
+    <item>
+      <title>Exploitation of SAR image time series</title>
+      <link>https://ammarmian.github.io/talk/talk_onera_2019/</link>
+      <pubDate>Tue, 15 Jan 2019 11:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/talk/talk_onera_2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Robust statistics for testing the homogeneity of covariance scale and shape</title>
+      <link>https://ammarmian.github.io/talk/talk_aalto_2018/</link>
+      <pubDate>Fri, 07 Dec 2018 16:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/talk/talk_aalto_2018/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Change Detection for SAR Images in non-Gaussian Environment, LISTIC, Annecy,France</title>
+      <link>https://ammarmian.github.io/talk/talk_listic_2018/</link>
+      <pubDate>Fri, 10 Aug 2018 13:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/talk/talk_listic_2018/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Change Detection under Compound Gaussian Assumptions</title>
+      <link>https://ammarmian.github.io/talk/talk_margarita_2017/</link>
+      <pubDate>Fri, 15 Dec 2017 11:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/talk/talk_margarita_2017/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Linear Time-Frequency Analysis in High Resolution SAR Images and Applications</title>
+      <link>https://ammarmian.github.io/talk/talk_peyresq_2017/</link>
+      <pubDate>Fri, 30 Jun 2017 18:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/talk/talk_peyresq_2017/</guid>
+      <description></description>
+    </item>
+    
   </channel>
 </rss>

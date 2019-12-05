@@ -6,7 +6,7 @@
     <description>Recent content on Ammar Mian</description>
     <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 27 Jun 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 27 Aug 2019 00:00:00 +0000</lastBuildDate>
     
 	    <atom:link href="https://ammarmian.github.io/index.xml" rel="self" type="application/rss+xml" />
     
@@ -81,6 +81,15 @@
 
 &lt;p&gt;Aliquam in turpis accumsan, malesuada nibh ut, hendrerit justo. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Quisque sed erat nec justo posuere suscipit. Donec ut efficitur arcu, in malesuada neque. Nunc dignissim nisl massa, id vulputate nunc pretium nec. Quisque eget urna in risus suscipit ultricies. Pellentesque odio odio, tincidunt in eleifend sed, posuere a diam. Nam gravida nisl convallis semper elementum. Morbi vitae felis faucibus, vulputate orci placerat, aliquet nisi. Aliquam erat volutpat. Maecenas sagittis pulvinar purus, sed porta quam laoreet at.&lt;/p&gt;
 </description>
+    </item>
+    
+    <item>
+      <title>Détection de Changement Robuste en Rang Faible pour les Séries Temporelles d&#39;Images SAR</title>
+      <link>https://ammarmian.github.io/publication/gretsi_2019/</link>
+      <pubDate>Tue, 27 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/publication/gretsi_2019/</guid>
+      <description></description>
     </item>
     
     <item>
@@ -374,6 +383,15 @@ $$&lt;/p&gt;
     </item>
     
     <item>
+      <title>Exploitation of SAR image time series</title>
+      <link>https://ammarmian.github.io/talk/talk_onera_2019/</link>
+      <pubDate>Tue, 15 Jan 2019 11:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/talk/talk_onera_2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Design of New Wavelet Packets Adapted to High-Resolution SAR Images With an Application to Target Detection</title>
       <link>https://ammarmian.github.io/publication/tgrs_2019/</link>
       <pubDate>Mon, 14 Jan 2019 00:00:00 +0000</pubDate>
@@ -392,11 +410,38 @@ $$&lt;/p&gt;
     </item>
     
     <item>
+      <title>Robust statistics for testing the homogeneity of covariance scale and shape</title>
+      <link>https://ammarmian.github.io/talk/talk_aalto_2018/</link>
+      <pubDate>Fri, 07 Dec 2018 16:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/talk/talk_aalto_2018/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>New Robust Statistics for Change Detection in Time Series of Multivariate SAR Images</title>
       <link>https://ammarmian.github.io/publication/tsp_2019/</link>
       <pubDate>Tue, 27 Nov 2018 00:00:00 +0000</pubDate>
       
       <guid>https://ammarmian.github.io/publication/tsp_2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Robust Detection and Estimation of Change-Points in a Time Series of Multivariate Images</title>
+      <link>https://ammarmian.github.io/publication/eusipco_2018/</link>
+      <pubDate>Sat, 01 Sep 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/publication/eusipco_2018/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Change Detection for SAR Images in non-Gaussian Environment, LISTIC, Annecy,France</title>
+      <link>https://ammarmian.github.io/talk/talk_listic_2018/</link>
+      <pubDate>Fri, 10 Aug 2018 13:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/talk/talk_listic_2018/</guid>
       <description></description>
     </item>
     
@@ -410,11 +455,11 @@ $$&lt;/p&gt;
     </item>
     
     <item>
-      <title>Robust Detection and Estimation of Change-Points in a Time Series of Multivariate Images</title>
-      <link>https://ammarmian.github.io/publication/eusipco_2018/</link>
-      <pubDate>Mon, 01 Jan 2018 00:00:00 +0000</pubDate>
+      <title>Change Detection under Compound Gaussian Assumptions</title>
+      <link>https://ammarmian.github.io/talk/talk_margarita_2017/</link>
+      <pubDate>Fri, 15 Dec 2017 11:00:00 +0000</pubDate>
       
-      <guid>https://ammarmian.github.io/publication/eusipco_2018/</guid>
+      <guid>https://ammarmian.github.io/talk/talk_margarita_2017/</guid>
       <description></description>
     </item>
     
@@ -424,6 +469,15 @@ $$&lt;/p&gt;
       <pubDate>Sun, 27 Aug 2017 00:00:00 +0000</pubDate>
       
       <guid>https://ammarmian.github.io/publication/eusipco_2017/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Linear Time-Frequency Analysis in High Resolution SAR Images and Applications</title>
+      <link>https://ammarmian.github.io/talk/talk_peyresq_2017/</link>
+      <pubDate>Fri, 30 Jun 2017 18:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/talk/talk_peyresq_2017/</guid>
       <description></description>
     </item>
     
