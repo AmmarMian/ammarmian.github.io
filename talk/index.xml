@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Recent &amp; Upcoming Talks on Ammar Mian</title>
+    <title>Recent &amp; Upcoming Talks | Ammar Mian</title>
     <link>https://ammarmian.github.io/talk/</link>
-    <description>Recent content in Recent &amp; Upcoming Talks on Ammar Mian</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator>
-    <language>en-us</language>
-    <lastBuildDate>Thu, 11 Apr 2019 12:00:00 +0000</lastBuildDate>
-    
-	    <atom:link href="https://ammarmian.github.io/talk/index.xml" rel="self" type="application/rss+xml" />
-    
+      <atom:link href="https://ammarmian.github.io/talk/index.xml" rel="self" type="application/rss+xml" />
+    <description>Recent &amp; Upcoming Talks</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Thu, 11 Apr 2019 12:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Recent &amp; Upcoming Talks</title>
+      <link>https://ammarmian.github.io/talk/</link>
+    </image>
     
     <item>
       <title>Change detection for SAR Images</title>
       <link>https://ammarmian.github.io/talk/talk_overview_cd/</link>
       <pubDate>Thu, 11 Apr 2019 12:00:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/talk/talk_overview_cd/</guid>
       <description></description>
     </item>
@@ -24,7 +24,6 @@
       <title>Robust statistics for testing the homogeneity of covariance scale and shape</title>
       <link>https://ammarmian.github.io/talk/talk_nus/</link>
       <pubDate>Wed, 10 Apr 2019 11:30:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/talk/talk_nus/</guid>
       <description></description>
     </item>
@@ -33,7 +32,6 @@
       <title>Exploitation of SAR image time series</title>
       <link>https://ammarmian.github.io/talk/talk_onera_2019/</link>
       <pubDate>Tue, 15 Jan 2019 11:00:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/talk/talk_onera_2019/</guid>
       <description></description>
     </item>
@@ -42,7 +40,6 @@
       <title>Robust statistics for testing the homogeneity of covariance scale and shape</title>
       <link>https://ammarmian.github.io/talk/talk_aalto_2018/</link>
       <pubDate>Fri, 07 Dec 2018 16:00:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/talk/talk_aalto_2018/</guid>
       <description></description>
     </item>
@@ -51,7 +48,6 @@
       <title>Change Detection for SAR Images in non-Gaussian Environment, LISTIC, Annecy,France</title>
       <link>https://ammarmian.github.io/talk/talk_listic_2018/</link>
       <pubDate>Fri, 10 Aug 2018 13:00:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/talk/talk_listic_2018/</guid>
       <description></description>
     </item>
@@ -60,7 +56,6 @@
       <title>Change Detection under Compound Gaussian Assumptions</title>
       <link>https://ammarmian.github.io/talk/talk_margarita_2017/</link>
       <pubDate>Fri, 15 Dec 2017 11:00:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/talk/talk_margarita_2017/</guid>
       <description></description>
     </item>
@@ -69,7 +64,6 @@
       <title>Linear Time-Frequency Analysis in High Resolution SAR Images and Applications</title>
       <link>https://ammarmian.github.io/talk/talk_peyresq_2017/</link>
       <pubDate>Fri, 30 Jun 2017 18:00:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/talk/talk_peyresq_2017/</guid>
       <description></description>
     </item>

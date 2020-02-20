@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Authors on Ammar Mian</title>
+    <title>Authors | Ammar Mian</title>
     <link>https://ammarmian.github.io/authors/</link>
-    <description>Recent content in Authors on Ammar Mian</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator>
-    <language>en-us</language>
-    <lastBuildDate>Tue, 27 Aug 2019 00:00:00 +0000</lastBuildDate>
-    
-	    <atom:link href="https://ammarmian.github.io/authors/index.xml" rel="self" type="application/rss+xml" />
-    
+      <atom:link href="https://ammarmian.github.io/authors/index.xml" rel="self" type="application/rss+xml" />
+    <description>Authors</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 27 Aug 2019 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Authors</title>
+      <link>https://ammarmian.github.io/authors/</link>
+    </image>
     
     <item>
       <title></title>
       <link>https://ammarmian.github.io/authors/admin/</link>
       <pubDate>Tue, 27 Aug 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/authors/admin/</guid>
-      <description>&lt;p&gt;I am currently a post-doc at &lt;a href=&#34;https://www.aalto.fi/en&#34; target=&#34;_blank&#34;&gt;Aalto University&lt;/a&gt; in the Dept. of Signal Processing and Acoustics working under the supervision of &lt;a href=&#34;http://users.spa.aalto.fi/esollila/&#34; target=&#34;_blank&#34;&gt;Esa Ollila&lt;/a&gt;. My main focus concerns the use of Riemannian Geometry tools in Machine Learning applictions.&lt;/p&gt;
+      <description>&lt;p&gt;I am currently a post-doc at 
+&lt;a href=&#34;https://www.aalto.fi/en&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Aalto University&lt;/a&gt; in the Dept. of Signal Processing and Acoustics working under the supervision of 
+&lt;a href=&#34;http://users.spa.aalto.fi/esollila/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Esa Ollila&lt;/a&gt;. My main focus concerns the use of Riemannian Geometry tools in Machine Learning applictions.&lt;/p&gt;
 </description>
     </item>
     
@@ -25,7 +27,6 @@
       <title>Arnaud Breloy</title>
       <link>https://ammarmian.github.io/authors/arnaud-breloy/</link>
       <pubDate>Tue, 27 Aug 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/authors/arnaud-breloy/</guid>
       <description></description>
     </item>
@@ -34,7 +35,6 @@
       <title>Guillaume Ginolhac</title>
       <link>https://ammarmian.github.io/authors/guillaume-ginolhac/</link>
       <pubDate>Tue, 27 Aug 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/authors/guillaume-ginolhac/</guid>
       <description></description>
     </item>
@@ -43,7 +43,6 @@
       <title>Jean-Philippe Ovarlez</title>
       <link>https://ammarmian.github.io/authors/jean-philippe-ovarlez/</link>
       <pubDate>Tue, 27 Aug 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/authors/jean-philippe-ovarlez/</guid>
       <description></description>
     </item>
@@ -52,7 +51,6 @@
       <title>Alexandre Renaux</title>
       <link>https://ammarmian.github.io/authors/alexandre-renaux/</link>
       <pubDate>Sun, 12 May 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/authors/alexandre-renaux/</guid>
       <description></description>
     </item>
@@ -61,7 +59,6 @@
       <title>Lucien Bacharach</title>
       <link>https://ammarmian.github.io/authors/lucien-bacharach/</link>
       <pubDate>Sun, 12 May 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/authors/lucien-bacharach/</guid>
       <description></description>
     </item>
@@ -70,7 +67,6 @@
       <title>Mohammed Nabil El Korso</title>
       <link>https://ammarmian.github.io/authors/mohammed-nabil-el-korso/</link>
       <pubDate>Sun, 12 May 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/authors/mohammed-nabil-el-korso/</guid>
       <description></description>
     </item>
@@ -79,7 +75,6 @@
       <title>David Lautru</title>
       <link>https://ammarmian.github.io/authors/david-lautru/</link>
       <pubDate>Mon, 28 Jan 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/authors/david-lautru/</guid>
       <description></description>
     </item>
@@ -88,7 +83,6 @@
       <title>Rayen Ben Abdallah</title>
       <link>https://ammarmian.github.io/authors/rayen-ben-abdallah/</link>
       <pubDate>Mon, 28 Jan 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/authors/rayen-ben-abdallah/</guid>
       <description></description>
     </item>
@@ -97,7 +91,6 @@
       <title>Abdourahmane M. Atto</title>
       <link>https://ammarmian.github.io/authors/abdourahmane-m.-atto/</link>
       <pubDate>Mon, 14 Jan 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/authors/abdourahmane-m.-atto/</guid>
       <description></description>
     </item>

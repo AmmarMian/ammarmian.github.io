@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Categories on Ammar Mian</title>
+    <title>Categories | Ammar Mian</title>
     <link>https://ammarmian.github.io/categories/</link>
-    <description>Recent content in Categories on Ammar Mian</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator>
-    <language>en-us</language>
-    
-	    <atom:link href="https://ammarmian.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
-    
+      <atom:link href="https://ammarmian.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <description>Categories</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Categories</title>
+      <link>https://ammarmian.github.io/categories/</link>
+    </image>
     
   </channel>
 </rss>

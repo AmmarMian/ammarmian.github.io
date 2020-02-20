@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>David Lautru on Ammar Mian</title>
+    <title>David Lautru | Ammar Mian</title>
     <link>https://ammarmian.github.io/authors/david-lautru/</link>
-    <description>Recent content in David Lautru on Ammar Mian</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator>
-    <language>en-us</language>
-    <lastBuildDate>Mon, 28 Jan 2019 00:00:00 +0000</lastBuildDate>
-    
-	    <atom:link href="https://ammarmian.github.io/authors/david-lautru/index.xml" rel="self" type="application/rss+xml" />
-    
+      <atom:link href="https://ammarmian.github.io/authors/david-lautru/index.xml" rel="self" type="application/rss+xml" />
+    <description>David Lautru</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Mon, 28 Jan 2019 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>David Lautru</title>
+      <link>https://ammarmian.github.io/authors/david-lautru/</link>
+    </image>
     
     <item>
       <title>Detection Methods Based on Structured Covariance Matrices for Multivariate SAR Images Processing</title>
       <link>https://ammarmian.github.io/publication/grsl_2019/</link>
       <pubDate>Mon, 28 Jan 2019 00:00:00 +0000</pubDate>
-      
       <guid>https://ammarmian.github.io/publication/grsl_2019/</guid>
       <description></description>
     </item>
