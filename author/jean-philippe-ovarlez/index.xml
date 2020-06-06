@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Jean-Philippe Ovarlez | Ammar Mian</title>
+    <link>https://ammarmian.github.io/author/jean-philippe-ovarlez/</link>
+      <atom:link href="https://ammarmian.github.io/author/jean-philippe-ovarlez/index.xml" rel="self" type="application/rss+xml" />
+    <description>Jean-Philippe Ovarlez</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Mon, 01 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://ammarmian.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <title>Jean-Philippe Ovarlez</title>
+      <link>https://ammarmian.github.io/author/jean-philippe-ovarlez/</link>
+    </image>
+    
+    <item>
+      <title>Robust Low-rank Change Detection for Multivariate SAR Image Time Series</title>
+      <link>https://ammarmian.github.io/publication/jstars_2020/</link>
+      <pubDate>Mon, 01 Jun 2020 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/jstars_2020/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Détection de Changement Robuste en Rang Faible pour les Séries Temporelles d&#39;Images SAR</title>
+      <link>https://ammarmian.github.io/publication/gretsi_2019/</link>
+      <pubDate>Tue, 27 Aug 2019 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/gretsi_2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Robust Low-rank Change Detection for SAR Image Time Series</title>
+      <link>https://ammarmian.github.io/publication/igarss_2019/</link>
+      <pubDate>Thu, 27 Jun 2019 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/igarss_2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Designing SAR Images Change-point Estimation Strategies Using an Mse Lower Bound</title>
+      <link>https://ammarmian.github.io/publication/icassp_2019/</link>
+      <pubDate>Sun, 12 May 2019 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/icassp_2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Design of New Wavelet Packets Adapted to High-Resolution SAR Images With an Application to Target Detection</title>
+      <link>https://ammarmian.github.io/publication/tgrs_2019/</link>
+      <pubDate>Mon, 14 Jan 2019 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/tgrs_2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>New Robust Statistics for Change Detection in Time Series of Multivariate SAR Images</title>
+      <link>https://ammarmian.github.io/publication/tsp_2019/</link>
+      <pubDate>Tue, 27 Nov 2018 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/tsp_2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Robust Detection and Estimation of Change-Points in a Time Series of Multivariate Images</title>
+      <link>https://ammarmian.github.io/publication/eusipco_2018/</link>
+      <pubDate>Sat, 01 Sep 2018 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/eusipco_2018/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>A Robust Change Detector for Highly Heterogeneous Multivariate Images</title>
+      <link>https://ammarmian.github.io/publication/icassp_2018/</link>
+      <pubDate>Sun, 15 Apr 2018 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/icassp_2018/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Multivariate Change Detection on High Resolution Monovariate SAR Image Using Linear Time-Frequency Analysis</title>
+      <link>https://ammarmian.github.io/publication/eusipco_2017/</link>
+      <pubDate>Sun, 27 Aug 2017 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/eusipco_2017/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Détection de changement sur images SAR monovariées par analyse temps-fréquence linéaire</title>
+      <link>https://ammarmian.github.io/publication/gretsi_2017/</link>
+      <pubDate>Sun, 01 Jan 2017 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/gretsi_2017/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

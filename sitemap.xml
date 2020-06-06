@@ -18,52 +18,77 @@
   </url>
   
   <url>
-    <loc>https://ammarmian.github.io/authors/admin/</loc>
-    <lastmod>2019-08-27T00:00:00+00:00</lastmod>
+    <loc>https://ammarmian.github.io/publication-type/1/</loc>
+    <lastmod>2020-06-01T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://ammarmian.github.io/publication_types/1/</loc>
-    <lastmod>2019-08-27T00:00:00+00:00</lastmod>
+    <loc>https://ammarmian.github.io/publication-type/2/</loc>
+    <lastmod>2020-06-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ammarmian.github.io/publication/eusipco_2020/</loc>
+    <lastmod>2020-06-01T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ammarmian.github.io/</loc>
-    <lastmod>2019-08-27T00:00:00+00:00</lastmod>
+    <lastmod>2020-06-01T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://ammarmian.github.io/authors/arnaud-breloy/</loc>
-    <lastmod>2019-08-27T00:00:00+00:00</lastmod>
+    <loc>https://ammarmian.github.io/author/ammar-mian/</loc>
+    <lastmod>2020-06-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ammarmian.github.io/author/arnaud-breloy/</loc>
+    <lastmod>2020-06-01T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ammarmian.github.io/authors/</loc>
-    <lastmod>2019-08-27T00:00:00+00:00</lastmod>
+    <lastmod>2020-06-01T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://ammarmian.github.io/publication/gretsi_2019/</loc>
-    <lastmod>2019-08-27T00:00:00+00:00</lastmod>
+    <loc>https://ammarmian.github.io/author/elias-raninen/</loc>
+    <lastmod>2020-06-01T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://ammarmian.github.io/authors/guillaume-ginolhac/</loc>
-    <lastmod>2019-08-27T00:00:00+00:00</lastmod>
+    <loc>https://ammarmian.github.io/author/esa-ollila/</loc>
+    <lastmod>2020-06-01T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://ammarmian.github.io/authors/jean-philippe-ovarlez/</loc>
-    <lastmod>2019-08-27T00:00:00+00:00</lastmod>
+    <loc>https://ammarmian.github.io/author/guillaume-ginolhac/</loc>
+    <lastmod>2020-06-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ammarmian.github.io/author/jean-philippe-ovarlez/</loc>
+    <lastmod>2020-06-01T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ammarmian.github.io/publication_types/</loc>
-    <lastmod>2019-08-27T00:00:00+00:00</lastmod>
+    <lastmod>2020-06-01T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://ammarmian.github.io/publication/</loc>
+    <lastmod>2020-06-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ammarmian.github.io/publication/jstars_2020/</loc>
+    <lastmod>2020-06-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ammarmian.github.io/publication/gretsi_2019/</loc>
     <lastmod>2019-08-27T00:00:00+00:00</lastmod>
   </url>
   
@@ -73,7 +98,7 @@
   </url>
   
   <url>
-    <loc>https://ammarmian.github.io/authors/alexandre-renaux/</loc>
+    <loc>https://ammarmian.github.io/author/alexandre-renaux/</loc>
     <lastmod>2019-05-12T00:00:00+00:00</lastmod>
   </url>
   
@@ -83,13 +108,18 @@
   </url>
   
   <url>
-    <loc>https://ammarmian.github.io/authors/lucien-bacharach/</loc>
+    <loc>https://ammarmian.github.io/author/lucien-bacharach/</loc>
     <lastmod>2019-05-12T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>https://ammarmian.github.io/authors/mohammed-nabil-el-korso/</loc>
+    <loc>https://ammarmian.github.io/author/mohammed-nabil-el-korso/</loc>
     <lastmod>2019-05-12T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ammarmian.github.io/courses/</loc>
+    <lastmod>2019-05-05T00:00:00+01:00</lastmod>
   </url>
   
   <url>
@@ -128,12 +158,7 @@
   </url>
   
   <url>
-    <loc>https://ammarmian.github.io/publication_types/2/</loc>
-    <lastmod>2019-01-28T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ammarmian.github.io/authors/david-lautru/</loc>
+    <loc>https://ammarmian.github.io/author/david-lautru/</loc>
     <lastmod>2019-01-28T00:00:00+00:00</lastmod>
   </url>
   
@@ -143,7 +168,7 @@
   </url>
   
   <url>
-    <loc>https://ammarmian.github.io/authors/rayen-ben-abdallah/</loc>
+    <loc>https://ammarmian.github.io/author/rayen-ben-abdallah/</loc>
     <lastmod>2019-01-28T00:00:00+00:00</lastmod>
   </url>
   
@@ -153,7 +178,7 @@
   </url>
   
   <url>
-    <loc>https://ammarmian.github.io/authors/abdourahmane-m.-atto/</loc>
+    <loc>https://ammarmian.github.io/author/abdourahmane-m.-atto/</loc>
     <lastmod>2019-01-14T00:00:00+00:00</lastmod>
   </url>
   
@@ -218,7 +243,7 @@
   </url>
   
   <url>
-    <loc>https://ammarmian.github.io/tags/academic/</loc>
+    <loc>https://ammarmian.github.io/tag/academic/</loc>
     <lastmod>2019-04-17T00:00:00+00:00</lastmod>
   </url>
   
@@ -238,10 +263,6 @@
   
   <url>
     <loc>https://ammarmian.github.io/contact/</loc>
-  </url>
-  
-  <url>
-    <loc>https://ammarmian.github.io/courses/</loc>
   </url>
   
 </urlset>

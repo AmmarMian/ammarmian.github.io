@@ -5,9 +5,9 @@
     <link>https://ammarmian.github.io/</link>
       <atom:link href="https://ammarmian.github.io/index.xml" rel="self" type="application/rss+xml" />
     <description>Ammar Mian</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Tue, 27 Aug 2019 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Mon, 01 Jun 2020 00:00:00 +0000</lastBuildDate>
     <image>
-      <url>img/map[gravatar:%!s(bool=false) shape:square]</url>
+      <url>https://ammarmian.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Ammar Mian</title>
       <link>https://ammarmian.github.io/</link>
     </image>
@@ -52,6 +52,22 @@
 &lt;p&gt;Suspendisse a tincidunt lacus. Curabitur at urna sagittis, dictum ante sit amet, euismod magna. Sed rutrum massa id tortor commodo, vitae elementum turpis tempus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean purus turpis, venenatis a ullamcorper nec, tincidunt et massa. Integer posuere quam rutrum arcu vehicula imperdiet. Mauris ullamcorper quam vitae purus congue, quis euismod magna eleifend. Vestibulum semper vel augue eget tincidunt. Fusce eget justo sodales, dapibus odio eu, ultrices lorem. Duis condimentum lorem id eros commodo, in facilisis mauris scelerisque. Morbi sed auctor leo. Nullam volutpat a lacus quis pharetra. Nulla congue rutrum magna a ornare.&lt;/p&gt;
 &lt;p&gt;Aliquam in turpis accumsan, malesuada nibh ut, hendrerit justo. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Quisque sed erat nec justo posuere suscipit. Donec ut efficitur arcu, in malesuada neque. Nunc dignissim nisl massa, id vulputate nunc pretium nec. Quisque eget urna in risus suscipit ultricies. Pellentesque odio odio, tincidunt in eleifend sed, posuere a diam. Nam gravida nisl convallis semper elementum. Morbi vitae felis faucibus, vulputate orci placerat, aliquet nisi. Aliquam erat volutpat. Maecenas sagittis pulvinar purus, sed porta quam laoreet at.&lt;/p&gt;
 </description>
+    </item>
+    
+    <item>
+      <title>A Comparative Study of Supervised Learning Algorithms for Symmetric Positive Definite Features</title>
+      <link>https://ammarmian.github.io/publication/eusipco_2020/</link>
+      <pubDate>Mon, 01 Jun 2020 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/eusipco_2020/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Robust Low-rank Change Detection for Multivariate SAR Image Time Series</title>
+      <link>https://ammarmian.github.io/publication/jstars_2020/</link>
+      <pubDate>Mon, 01 Jun 2020 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/jstars_2020/</guid>
+      <description></description>
     </item>
     
     <item>
@@ -223,6 +239,7 @@ Three
 &lt;li&gt;Only the speaker can read these notes&lt;/li&gt;
 &lt;li&gt;Press &lt;code&gt;S&lt;/code&gt; key to view&lt;/li&gt;
 &lt;/ul&gt;
+
 &lt;/aside&gt;
 &lt;hr&gt;
 &lt;h2 id=&#34;themes&#34;&gt;Themes&lt;/h2&gt;
