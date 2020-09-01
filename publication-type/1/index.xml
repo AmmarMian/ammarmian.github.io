@@ -5,12 +5,20 @@
     <link>https://ammarmian.github.io/publication-type/1/</link>
       <atom:link href="https://ammarmian.github.io/publication-type/1/index.xml" rel="self" type="application/rss+xml" />
     <description>1</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Mon, 01 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Thu, 10 Sep 2020 00:00:00 +0000</lastBuildDate>
     <image>
       <url>https://ammarmian.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>1</title>
       <link>https://ammarmian.github.io/publication-type/1/</link>
     </image>
+    
+    <item>
+      <title>Block-wise Minimization-Majorization Algorithm for Huber&#39;s Criterion: Sparse learning and Applications</title>
+      <link>https://ammarmian.github.io/publication/mlsp_2020/</link>
+      <pubDate>Thu, 10 Sep 2020 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/mlsp_2020/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>A Comparative Study of Supervised Learning Algorithms for Symmetric Positive Definite Features</title>
