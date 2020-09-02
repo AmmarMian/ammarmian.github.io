@@ -3,21 +3,6 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://ammarmian.github.io/courses/example/example1/</loc>
-    <lastmod>2019-10-02T18:57:32+03:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ammarmian.github.io/courses/example/</loc>
-    <lastmod>2019-10-02T18:57:32+03:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ammarmian.github.io/courses/example/example2/</loc>
-    <lastmod>2019-10-02T18:57:32+03:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://ammarmian.github.io/publication-type/1/</loc>
     <lastmod>2020-09-01T20:03:03+02:00</lastmod>
   </url>
@@ -128,11 +113,6 @@
   </url>
   
   <url>
-    <loc>https://ammarmian.github.io/post/jupyter/</loc>
-    <lastmod>2019-10-02T18:57:32+03:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://ammarmian.github.io/slides/</loc>
     <lastmod>2019-10-02T18:57:32+03:00</lastmod>
   </url>
@@ -228,21 +208,6 @@
   </url>
   
   <url>
-    <loc>https://ammarmian.github.io/tag/academic/</loc>
-    <lastmod>2019-10-02T18:57:32+03:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ammarmian.github.io/post/getting-started/</loc>
-    <lastmod>2019-10-02T18:57:32+03:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ammarmian.github.io/tags/</loc>
-    <lastmod>2019-10-02T18:57:32+03:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://ammarmian.github.io/author/ammar-mian/</loc>
     <lastmod>2020-09-01T20:03:03+02:00</lastmod>
   </url>
@@ -257,16 +222,6 @@
   </url>
   
   <url>
-    <loc>https://ammarmian.github.io/courses/</loc>
-    <lastmod>2019-10-02T18:57:32+03:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ammarmian.github.io/post/</loc>
-    <lastmod>2019-10-02T18:57:32+03:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://ammarmian.github.io/publication/</loc>
     <lastmod>2019-10-02T18:57:32+03:00</lastmod>
   </url>
@@ -274,6 +229,10 @@
   <url>
     <loc>https://ammarmian.github.io/talk/</loc>
     <lastmod>2019-10-02T18:57:32+03:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ammarmian.github.io/tags/</loc>
   </url>
   
 </urlset>
