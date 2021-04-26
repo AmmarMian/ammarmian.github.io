@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Synthetic Aperture Radar | Ammar Mian</title>
+    <link>https://ammarmian.github.io/tag/synthetic-aperture-radar/</link>
+      <atom:link href="https://ammarmian.github.io/tag/synthetic-aperture-radar/index.xml" rel="self" type="application/rss+xml" />
+    <description>Synthetic Aperture Radar</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>© 2021 Ammar Mian</copyright><lastBuildDate>Mon, 01 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://ammarmian.github.io/media/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <title>Synthetic Aperture Radar</title>
+      <link>https://ammarmian.github.io/tag/synthetic-aperture-radar/</link>
+    </image>
+    
+    <item>
+      <title>Robust Low-rank Change Detection for Multivariate SAR Image Time Series</title>
+      <link>https://ammarmian.github.io/publication/jstars_2020/</link>
+      <pubDate>Mon, 01 Jun 2020 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/jstars_2020/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Contributions to SAR Image Time Series Analysis</title>
+      <link>https://ammarmian.github.io/publication/phd_thesis/</link>
+      <pubDate>Thu, 26 Sep 2019 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/phd_thesis/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Robust Low-rank Change Detection for SAR Image Time Series</title>
+      <link>https://ammarmian.github.io/publication/igarss_2019/</link>
+      <pubDate>Thu, 27 Jun 2019 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/igarss_2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Change detection for SAR Images</title>
+      <link>https://ammarmian.github.io/talk/change-detection-for-sar-images/</link>
+      <pubDate>Thu, 11 Apr 2019 12:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/talk/change-detection-for-sar-images/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Detection Methods Based on Structured Covariance Matrices for Multivariate SAR Images Processing</title>
+      <link>https://ammarmian.github.io/publication/grsl_2019/</link>
+      <pubDate>Mon, 28 Jan 2019 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/grsl_2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Exploitation of SAR image time series</title>
+      <link>https://ammarmian.github.io/talk/exploitation-of-sar-image-time-series/</link>
+      <pubDate>Tue, 15 Jan 2019 11:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/talk/exploitation-of-sar-image-time-series/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Design of New Wavelet Packets Adapted to High-Resolution SAR Images With an Application to Target Detection</title>
+      <link>https://ammarmian.github.io/publication/tgrs_2019/</link>
+      <pubDate>Mon, 14 Jan 2019 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/tgrs_2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>New Robust Statistics for Change Detection in Time Series of Multivariate SAR Images</title>
+      <link>https://ammarmian.github.io/publication/tsp_2019/</link>
+      <pubDate>Tue, 27 Nov 2018 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/tsp_2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Multivariate Change Detection on High Resolution Monovariate SAR Image Using Linear Time-Frequency Analysis</title>
+      <link>https://ammarmian.github.io/publication/eusipco_2017/</link>
+      <pubDate>Sun, 27 Aug 2017 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/eusipco_2017/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Linear Time-Frequency Analysis in High Resolution SAR Images and Applications</title>
+      <link>https://ammarmian.github.io/talk/linear-time-frequency-analysis-in-high-resolution-sar-images-and-applications/</link>
+      <pubDate>Fri, 30 Jun 2017 18:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/talk/linear-time-frequency-analysis-in-high-resolution-sar-images-and-applications/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Détection de changement sur images SAR monovariées par analyse temps-fréquence linéaire</title>
+      <link>https://ammarmian.github.io/publication/gretsi_2017/</link>
+      <pubDate>Sun, 01 Jan 2017 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/gretsi_2017/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Change detection on SAR Image Time Series</title>
+      <link>https://ammarmian.github.io/project/change-detection/</link>
+      <pubDate>Thu, 01 Sep 2016 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/project/change-detection/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

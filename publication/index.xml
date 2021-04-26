@@ -5,9 +5,9 @@
     <link>https://ammarmian.github.io/publication/</link>
       <atom:link href="https://ammarmian.github.io/publication/index.xml" rel="self" type="application/rss+xml" />
     <description>Publications</description>
-    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>© 2021 Ammar Mian</copyright><lastBuildDate>Thu, 10 Sep 2020 00:00:00 +0000</lastBuildDate>
     <image>
-      <url>https://ammarmian.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <url>https://ammarmian.github.io/media/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Publications</title>
       <link>https://ammarmian.github.io/publication/</link>
     </image>
@@ -41,6 +41,14 @@
       <link>https://ammarmian.github.io/publication/jstars_2020/</link>
       <pubDate>Mon, 01 Jun 2020 00:00:00 +0000</pubDate>
       <guid>https://ammarmian.github.io/publication/jstars_2020/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Contributions to SAR Image Time Series Analysis</title>
+      <link>https://ammarmian.github.io/publication/phd_thesis/</link>
+      <pubDate>Thu, 26 Sep 2019 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/phd_thesis/</guid>
       <description></description>
     </item>
     
@@ -121,6 +129,14 @@
       <link>https://ammarmian.github.io/publication/gretsi_2017/</link>
       <pubDate>Sun, 01 Jan 2017 00:00:00 +0000</pubDate>
       <guid>https://ammarmian.github.io/publication/gretsi_2017/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Analysis of GNSS reflectometry data of the space mission TechDemoSat-1</title>
+      <link>https://ammarmian.github.io/publication/master_thesis/</link>
+      <pubDate>Mon, 26 Sep 2016 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/master_thesis/</guid>
       <description></description>
     </item>
     

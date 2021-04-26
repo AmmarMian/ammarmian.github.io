@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Sparsity | Ammar Mian</title>
+    <link>https://ammarmian.github.io/tag/sparsity/</link>
+      <atom:link href="https://ammarmian.github.io/tag/sparsity/index.xml" rel="self" type="application/rss+xml" />
+    <description>Sparsity</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>© 2021 Ammar Mian</copyright><lastBuildDate>Thu, 05 Nov 2020 15:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://ammarmian.github.io/media/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <title>Sparsity</title>
+      <link>https://ammarmian.github.io/tag/sparsity/</link>
+    </image>
+    
+    <item>
+      <title>Learning with constraints : Geometry and sparsity</title>
+      <link>https://ammarmian.github.io/talk/learning-with-constraints-geometry-and-sparsity/</link>
+      <pubDate>Thu, 05 Nov 2020 15:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/talk/learning-with-constraints-geometry-and-sparsity/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Block-wise Minimization-Majorization Algorithm for Huber&#39;s Criterion: Sparse learning and Applications</title>
+      <link>https://ammarmian.github.io/publication/mlsp_2020/</link>
+      <pubDate>Thu, 10 Sep 2020 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/mlsp_2020/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Projects | Ammar Mian</title>
+    <link>https://ammarmian.github.io/fr/project/</link>
+      <atom:link href="https://ammarmian.github.io/fr/project/index.xml" rel="self" type="application/rss+xml" />
+    <description>Projects</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>fr</language><copyright>© 2021 Ammar Mian</copyright><lastBuildDate>Thu, 01 Sep 2016 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://ammarmian.github.io/media/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <title>Projects</title>
+      <link>https://ammarmian.github.io/fr/project/</link>
+    </image>
+    
+    <item>
+      <title>Change detection on SAR Image Time Series</title>
+      <link>https://ammarmian.github.io/fr/project/change-detection/</link>
+      <pubDate>Thu, 01 Sep 2016 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/fr/project/change-detection/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Machine learning with Riemannian Geometry</title>
+      <link>https://ammarmian.github.io/fr/project/riemannian-machine-learning/</link>
+      <pubDate>Thu, 01 Sep 2016 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/fr/project/riemannian-machine-learning/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Stratigraphie de Montagne Aéroportée (SMGA)</title>
+      <link>https://ammarmian.github.io/fr/project/smga/</link>
+      <pubDate>Thu, 01 Sep 2016 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/fr/project/smga/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

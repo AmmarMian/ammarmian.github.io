@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Covariance homogeneity | Ammar Mian</title>
+    <link>https://ammarmian.github.io/tag/covariance-homogeneity/</link>
+      <atom:link href="https://ammarmian.github.io/tag/covariance-homogeneity/index.xml" rel="self" type="application/rss+xml" />
+    <description>Covariance homogeneity</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>© 2021 Ammar Mian</copyright><lastBuildDate>Thu, 26 Sep 2019 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://ammarmian.github.io/media/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <title>Covariance homogeneity</title>
+      <link>https://ammarmian.github.io/tag/covariance-homogeneity/</link>
+    </image>
+    
+    <item>
+      <title>Contributions to SAR Image Time Series Analysis</title>
+      <link>https://ammarmian.github.io/publication/phd_thesis/</link>
+      <pubDate>Thu, 26 Sep 2019 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/phd_thesis/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Robust statistics for testing the homogeneity of covariance scale and shape</title>
+      <link>https://ammarmian.github.io/talk/robust-statistics-for-testing-the-homogeneity-of-covariance-scale-and-shape/</link>
+      <pubDate>Wed, 10 Apr 2019 11:30:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/talk/robust-statistics-for-testing-the-homogeneity-of-covariance-scale-and-shape/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Exploitation of SAR image time series</title>
+      <link>https://ammarmian.github.io/talk/exploitation-of-sar-image-time-series/</link>
+      <pubDate>Tue, 15 Jan 2019 11:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/talk/exploitation-of-sar-image-time-series/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Robust statistics for testing the homogeneity of covariance scale and shape</title>
+      <link>https://ammarmian.github.io/talk/robust-statistics-for-testing-the-homogeneity-of-covariance-scale-and-shape/</link>
+      <pubDate>Fri, 07 Dec 2018 16:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/talk/robust-statistics-for-testing-the-homogeneity-of-covariance-scale-and-shape/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>New Robust Statistics for Change Detection in Time Series of Multivariate SAR Images</title>
+      <link>https://ammarmian.github.io/publication/tsp_2019/</link>
+      <pubDate>Tue, 27 Nov 2018 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/tsp_2019/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Change Detection under Compound Gaussian Assumptions</title>
+      <link>https://ammarmian.github.io/talk/change-detection-under-compound-gaussian-assumptions/</link>
+      <pubDate>Fri, 15 Dec 2017 11:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/talk/change-detection-under-compound-gaussian-assumptions/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Change detection on SAR Image Time Series</title>
+      <link>https://ammarmian.github.io/project/change-detection/</link>
+      <pubDate>Thu, 01 Sep 2016 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/project/change-detection/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
