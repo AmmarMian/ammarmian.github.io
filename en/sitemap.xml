@@ -54,97 +54,6 @@
                 href="https://ammarmian.github.io/tags/"
                 />
   </url><url>
-    <loc>https://ammarmian.github.io/tag/academic/</loc>
-    <lastmod>2020-12-13T00:00:00+00:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://ammarmian.github.io/fr/tag/academic/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://ammarmian.github.io/tag/academic/"
-                />
-  </url><url>
-    <loc>https://ammarmian.github.io/categories/</loc>
-    <lastmod>2020-12-13T00:00:00+00:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://ammarmian.github.io/fr/categories/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://ammarmian.github.io/categories/"
-                />
-  </url><url>
-    <loc>https://ammarmian.github.io/category/demo/</loc>
-    <lastmod>2020-12-13T00:00:00+00:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://ammarmian.github.io/fr/category/demo/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://ammarmian.github.io/category/demo/"
-                />
-  </url><url>
-    <loc>https://ammarmian.github.io/post/</loc>
-    <lastmod>2020-12-13T00:00:00+00:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://ammarmian.github.io/fr/post/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://ammarmian.github.io/post/"
-                />
-  </url><url>
-    <loc>https://ammarmian.github.io/post/getting-started/</loc>
-    <lastmod>2020-12-13T00:00:00+00:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://ammarmian.github.io/fr/post/getting-started/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://ammarmian.github.io/post/getting-started/"
-                />
-  </url><url>
-    <loc>https://ammarmian.github.io/tag/%E5%BC%80%E6%BA%90/</loc>
-    <lastmod>2020-12-13T00:00:00+00:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://ammarmian.github.io/fr/tag/%E5%BC%80%E6%BA%90/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://ammarmian.github.io/tag/%E5%BC%80%E6%BA%90/"
-                />
-  </url><url>
-    <loc>https://ammarmian.github.io/category/%E6%95%99%E7%A8%8B/</loc>
-    <lastmod>2020-12-13T00:00:00+00:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://ammarmian.github.io/fr/category/%E6%95%99%E7%A8%8B/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://ammarmian.github.io/category/%E6%95%99%E7%A8%8B/"
-                />
-  </url><url>
     <loc>https://ammarmian.github.io/talk/learning-with-constraints-geometry-and-sparsity/</loc>
     <lastmod>2020-11-05T15:00:00+00:00</lastmod>
     <xhtml:link
@@ -947,6 +856,18 @@
                 rel="alternate"
                 hreflang="en"
                 href="https://ammarmian.github.io/contact/"
+                />
+  </url><url>
+    <loc>https://ammarmian.github.io/categories/</loc>
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://ammarmian.github.io/fr/categories/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://ammarmian.github.io/categories/"
                 />
   </url><url>
     <loc>https://ammarmian.github.io/cv/</loc>
