@@ -1,0 +1,581 @@
+.. -*- coding: utf-8 -*-
+
+.. _Exemples:
+
+********
+Exemples
+********
+
+.. note::
+
+   Cette partie contient des exemples de fonctions qui illustrent les principes vus dans les chapitres précédents.
+   Ils permettent de progresser en les analysant et en les testant sur machine.
+ 
+.. important::
+  
+   On rappelle que le livre de Gérard Swinnen `Apprendre à programmer avec Python 3`_ est en diffusion libre. 
+   Il contient de nombreux exercices dont les corrigés sont téléchargeables sur la
+   `page de Gérard Swinnen`_.
+   
+Somme des *n* premiers entiers
+==============================
+
+Le principe de cet algorithme consiste à accumuler la somme dans une variable. 
+
+.. literalinclude:: Python/INFO501/FonctionSomme.py
+    :language: python
+    :lines: 1,7-
+
+.. code-block:: python 
+       
+    In [1]: print(somme(0)) 
+    0
+    
+    In [2]: print(somme(5)) 
+    15 
+    
+Suite
+=====
+
+Le programme suivant calcule la suite :math:`u_n = 4 u_{n-1} - 1` avec :math:`u_0 = 1/3`.    
+
+.. literalinclude:: Python/INFO501/FonctionSuite.py
+    :language: python
+    :lines: 1,7-    
+ 
+.. admonition:: Exercice
+
+   Quelles sont les valeurs affichées pour *suite(0)*, *suite(10)*, *suite(100)* ?
+   
+   Expliquer ce résultat.    
+  
+Calcul de *n*!
+==============
+
+Le calcul de *n*! est, dans le principe, similaire au calcul de la somme des *n* premiers entiers.
+A la place d'accumuler la somme, on accumule le produit dans la variable *result*.
+
+.. literalinclude:: Python/INFO501/FonctionFactorielle.py
+    :language: python
+    :lines: 1,7-
+
+Contrairement à beaucoup d’autres langages, Python permet de faire des calculs
+en entier sans problème de débordement.
+
+.. code-block:: python 
+ 
+    In [1]: print(factorielle(0)) 
+    1
+    
+    In [2]: print(factorielle(3)) 
+    6 
+    
+    In [3]: print(factorielle(300))        
+    30605751221644063603537046129726862938858880417357699941677674125947653317671686
+    74655152914224775733499391478887017263688642639077590031542268429279069745598412
+    25476930271954604008012215776252176854255965356903506788725264321896264299365204
+    57644883038890975394348962543605322598077652127082243763944912012867867536830571
+    22936819436499564604981664502277165001851765464693401122260347297240663332585835
+    06870150169794168850353752137554910289126407157154830282284937952636580145235233
+    15693648223343679925459409527682060806223281238738388081704960000000000000000000
+    0000000000000000000000000000000000000000000000000000000
+
+Suite de Fibonacci
+==================
+
+La `suite de Fibonacci`_ est définie par :
+
+.. math::
+
+    y_n = y_{n-1} + y_{n-2} \; avec \;  y_0 = 0 \;  et \;  y_1 = 1.
+
+Le principe de l'algorithme consiste à utiliser trois variables, par exemple
+*a*, *b* et *c*. Pour calculer le terme *y*:sub:`2`, on place dans les
+variables *a* et *b* les valeurs de *y*:sub:`0` et *y*:sub:`1` puis on effectue
+la somme que l'on place dans *c*. Pour que ce principe puisse être itéré, il
+reste à décaler correctement les variables. Si nous calculions *y*:sub:`3`, il
+faudrait que les variables *a* et *b* contiennent respectivement les valeurs de
+*y*:sub:`1` et *y*:sub:`2`. On en déduit que la variable *b*, qui contient
+*y*:sub:`1`, doit être transférée dans la variable *a* et que la variable *c*,
+qui contient *y*:sub:`2`, doit être transférée dans la variable *b*. Ce
+principe est illustré :numref:`Fibonacci`.
+
+.. _Fibonacci:
+
+.. figure:: Images/Fibonacci.png
+    :scale: 40%
+    :align: center
+  
+    Principe des décalages à effectuer
+
+Le code de la fonction qui calcule la *n*-ième valeur de la suite de Fibonacci
+découle de ce principe. Un test est ajouté pour traiter les cas où la fonction
+serait appelée avec les valeurs 0 ou 1 en paramètre.
+
+.. literalinclude:: Python/INFO501/FonctionFibonacci.py
+    :language: python
+    :lines: 1,7-
+
+
+L'appel à la fonction s'effectue sans difficulté. 
+
+.. code-block:: python 
+
+    In [1]: print(fibonacci(0))
+    0
+   
+    In [2]: print(fibonacci(6))
+    8
+
+    In [3]: print(fibonacci(100))
+    354224848179261915075 
+    
+Persistance d’un nombre    
+=======================
+    
+On appelle persistance multiplicative d’un nombre, le nombre d’itérations pour le réduire à un seul chiffre
+en multipliant tous ceux qui le composent. Par exemple, le nombre 963 a une persistance de 3 car 9*6*3=162,
+1*6*2=12, 1*2=2 (voir `persistance d'un nombre`_ pour plus de détails). 
+
+On effectue une itération que si le nombre est supérieur à 10. L'itération consiste à multiplier tous les 
+chiffres entre eux. On les obtient en calculant le reste de la division entière par 10, opération que l'on effectue 
+tant que le nombre est strictement positif. Les produits sont accumulés dans la variable *x* qui devient le nouveau nombre à traiter 
+à la fin de l'itération. On a donc deux itérations imbriquées dont le nombre n'est pas connu *a priori*, ce que l'on
+code par deux instructions *while*. 
+
+.. literalinclude:: Python/INFO501/FonctionPersistanceMultiplicative.py
+    :language: python
+    :lines: 1,7-
+  
+
+.. code-block:: python   
+
+    In [1]: print(persistanceMultiplicative (963))
+    3  
+
+    In [2]: print(persistanceMultiplicative(277777788888899))
+    11  
+    
+Palindrome    
+==========
+
+Un palindrome est un mot ou un texte qui reste identique si on le lit de gauche à droite ou de droite à gauche.
+Le programme suivant vérifie si un mot est un palindrome. Le principe consiste à comparer le *i*-ème caractère de la
+chaîne avec le (*longueur - i*)-ème caractère. On itère cette comparaison tant qu'elle est valide et que l'on n'a pas
+atteint la moitié de la chaîne.
+
+.. literalinclude:: Python/INFO501/FonctionPalindrome.py
+    :language: python
+    :lines: 1,7-    
+    
+.. code-block:: python   
+
+    In [1]: print(palindrome('kayak'))
+    True
+    
+    In [2]: print(palindrome('kabuki'))
+    False   
+    
+Le langage Python permet de couper simplement certains types de données (`slicing`_). L'algorithme suivant exploite cette
+spécificité du langage où *s[::-1]* est la chaîne *s* à l'envers. Il ne faut cependant pas oublier que, derrière la simplicité de l'écriture, 
+le test d'égalité *==* cache une répétion.  
+
+.. literalinclude:: Python/INFO501/FonctionPalindromePython.py
+    :language: python
+    :lines: 1,7-    
+    
+Notons que l'algoritme précédent compare toute la chaîne *s* avec toute la chaîne *s* inversée. Dans le cas où l'on a un palindrome, on effectue 
+donc *longueur//2* comparaisons inutiles avec *longueur* la longueur de la chaîne *s*. L'algorithme suivant utilise le même principe en évitant ces 
+comparaisons inutiles.   
+    
+.. literalinclude:: Python/INFO501/FonctionPalindromePythonOptimisee.py
+    :language: python
+    :lines: 1,7-    
+            
+La notation *s[: longueur//2 :]* retourne la chaîne commençant à l'indice 0 et se terminant à l'indice *longueur//2 - 1*.
+De la même manière, *s[longueur - 1 : (longueur - 1)//2 : -1]* retourne la chaîne commençant à l'indice *longueur - 1* et se terminant à
+l'indice *(longueur - 1)//2 + 1*. Le pas étant -1, la chaîne est obtenue à l'envers.
+
+.. code-block:: python   
+
+    In [1]: s = 'azertyu'
+    
+    In [2]: longueur = len(s)
+    
+    In [3]: print(s[: longueur//2 :])
+    aze
+    
+    In [4]: print(s[longueur - 1 : (longueur - 1)//2 : -1])
+    uyt
+
+Conversion de la base 10 vers une autre base par divisions successives
+======================================================================
+
+Le principe de l’algorithme est le suivant :
+
+- On divise le nombre par la base tant qu’il est plus grand ou égal à celle-ci ;
+- Le reste de la division (modulo) est inséré à gauche d’une chaine ;
+- Le dividende devient le nouveau nombre à traiter ;
+- A la fin, on ajoute à gauche le nombre restant.
+
+.. figure:: Images/ChangementBase.png
+    :scale: 50%
+    :align: center 
+  
+    Conversion du nombre 11 en base 2
+
+.. literalinclude:: Python/INFO501/FonctionDecimalToBase.py
+    :language: python
+    :lines: 1,7-
+
+.. code-block:: python 
+ 
+    In [1]: print(decimalToBase(11, 2))
+    1011
+    
+    In [2]: print(decimalToBase(11, 8))
+    13
+
+L’algorithme précédent ne fonctionne toujours correctement que si la base
+est inférieure ou égale à 10. Si la base est plus grande, les digits
+supérieurs à 9 ne sont pas convertis. Ainsi, dans l'exemple suivant la première
+conversion est correcte alors que la seconde affiche 115 à la place de 1F.
+
+.. code-block:: python 
+ 
+    In [3]: print(decimalToBase(33,16))
+    21
+    
+    In [4]: print(decimalToBase(31,16))
+    115
+
+On peut améliorer l’algorithme en ne fournissant plus la base mais une chaine
+de caractères formée des digits de la base comme, par exemple :
+
+- ``'01'`` pour la base 2 ;
+
+- ``'01234567'`` pour la base 8 ;
+
+- ``'0123456789ABCDEF'`` pour la base 16.
+
+La longueur de cette chaine, obtenue grâce à la fonction `len()`_, est la base.
+Ainsi, len(``'01234567'``) retourne 8.
+
+.. literalinclude:: Python/INFO501/FonctionDecimalToBaseWithDigits.py
+    :language: python
+    :lines: 1,7-
+
+.. code-block:: python 
+
+    In [1]: print(decimalToBaseWithDigits(31,'01'))
+    11111
+
+    In [2]: print(decimalToBaseWithDigits(31,'0123456789ABCDEF'))
+    1F
+
+Cryptage par le chiffrement de César
+====================================
+
+Un des chiffrements les plus simples consiste à remplacer les lettres d'un texte
+par d'autres lettres en utilisant une permutation circulaire de l'alphabet. Par
+exemple on remplace le A par le D, le B par le E, le C par le F et ainsi de
+suite. La longueur du décalage, ici 3, constitue la clé du chiffrement qui est
+l'information à transmettre pour décrypter le message.
+Ce chiffrement par décalage est connu sous le nom de chiffre de
+César car Jules César l'utilisait pour crypter ses correspondances.
+
+.. figure:: Images/Cesar.png
+    :scale: 50%
+    :align: center 
+  
+    Chiffrement de César (source Wikipédia)
+
+Ce chiffrement par substitution mono-alphabétique dans
+lequel on remplace un alphabet par un autre alphabet n'offre aucune
+sécurité car une analyse fondée sur la fréquence d'apparition des lettres permet
+de trouver rapidement la clé.
+
+On rappelle que les caractères sont représentés par leur code ASCII. Le caractère A a comme code 65. En
+python, on obtient le code ASCII d'un caractère grâce à la fonction `ord()`_. Pour obtenir la position d'un 
+caractère dans l'alphabet à partir de 0, il suffit donc de soustraire 65 à son code ASCII. 
+La fonction *charToPos()* ci-après réalise le passage du caractère à sa position. 
+
+.. code-block:: python 
+
+    def charToPos(c):
+        return ord(c) - 65
+      
+.. code-block:: python
+
+    In [1]: print(charToPos('A')) 
+    0
+
+    In [2]: print(charToPos('Z')) 
+    25      
+
+De manière réciproque, connaissant la position d'une lettre dans l'alphabet en comptant à partir de 0, le code ASCII
+du caractère s'obtient en ajoutant 65. En Python, pour engendrer un caractère dont le code ASCII est connu, on utilise
+la fonction `chr()`_. La fonction *posToChar()* ci-après réalise le passage de la position au caractère. 
+
+.. code-block:: python 
+
+    def posToChar(x):
+        return chr(x + 65)
+      
+.. code-block:: python 
+
+    In [1]: print(posToChar(0)) 
+    A
+  
+    In [2]: print(posToChar(25)) 
+    Z 
+
+Le cryptage d'une lettre par le chiffrement de César consite à ajouter le décalage à la position de la lettre à coder. 
+On effectue cette somme modulo 26 pour obtenir une nouvelle position que l'on convertit en caractère. 
+La fonction *crypt()* réalise cette opération où *key* est le décalage.
+
+.. code-block:: python
+
+    def crypt(c, key):
+        return posToChar((charToPos(c) + key) % 26)
+      
+.. code-block:: python 
+
+    In [1]: print(crypt('A', 3)) 
+    D
+  
+    In [2]: print(crypt('Z', 3)) 
+    C        
+    
+Finalement, le cryptage d'un message consiste simplement à crypter toutes les lettres du message. Pour cela, on utilise
+une variable *result* initialisée par une chaîne vide et on effectue une répétition pour traiter chaque caractère. 
+Pour que cette opération soit possible, il est nécessaire que le caractère à crypter soit en majuscule et entre A et Z.
+Dans ce cas, on accumule dans la variable *result* les concaténations des caractères cryptés.
+On notera, dans l'algorithme suivant que le langage Python permet d'introduire des fonctions locales à une fonction. 
+
+.. literalinclude:: Python/INFO501/FonctionCesarCrypt.py
+    :language: python
+    :lines: 1,7-    
+    
+.. code-block:: python
+        
+    In [1]: print(cesarCrypt('Polytech Annecy-Chambery', 3))
+    SROBWHFK DQQHFB-FKDPEHUB
+
+Pour décrypter un message crypté, on procède comme pour le cryptage mais, bien sûr, en décrpytant chaque caractère.
+Pour décrypter un caractère, on retire le décalage à la position de la lettre à coder. On notera l'ajout de 26 qui
+garantit d'obtenir un résultat positif. 
+
+.. code-block:: python
+
+    def uncrypt(c, key):
+        return posToChar((charToPos(c) - key + 26) % 26)
+            
+.. code-block:: python 
+
+    In [1]: print(uncrypt('D', 3)) 
+    A
+  
+    In [2]: print(uncrypt('C', 3)) 
+    Z                 
+
+Finalement, l'algorithme de décryptage est le suivant.
+
+.. literalinclude:: Python/INFO501/FonctionCesarUncrypt.py
+    :language: python
+    :lines: 1,7-  
+    
+.. code-block:: python 
+
+    In [1]: print(cesarUncrypt('SROBWHFK DQQHFB-FKDPEHUB', 3))
+    POLYTECH ANNECY-CHAMBERY    
+
+Cryptage par le chiffrement de Vigenère
+=======================================
+
+Le chiffrement de Vigenère est un chiffrement poly-alphabétique par substitution
+dont le principe est illustré à la figure suivante. Les trois premières lettres du texte et
+de la clé sont mises en correspondance à l'aide de la table. Ainsi, le couple (``'M'``, ``'C'``) donne
+la lettre ``'O'``, le couple (``'E'``, ``'L'``) donne ``'P'`` et le couple (``'S'``, ``'E'``) donne ``'W'``.
+Pour la quatrième lettre du texte on reprend la première lettre de la clé.
+Le couple (``'S'``, ``'C'``) donne la lettre ``'U'`` et ainsi de suite pour le reste du message.
+
+.. figure:: Images/Vigenere.png
+    :scale: 50%
+    :align: center 
+  
+    Illustration du principe de chiffrement
+
+On peut formaliser l'obtention de la lettre codée. En effet, en comptant les
+positions à partir de 0, la lettre codée  a
+comme position dans l’alphabet la somme des positions du caractère du message
+et du carctère de la clé modulo 26. 
+
+Exemples :
+
+- Pour le couple (``'M'``, ``'C'``) :
+
+  | charToPos(``'M'``) = 12,
+  | charToPos(``'C'``) = 2,
+  | (12 + 2) % 26 = 14 
+  | posToChar(14) = ``'O'``
+
+- Pour le couple (``'M'``, ``'T'``) :
+
+  | charToPos(``'M'``) = 12,
+  | charToPos(``'T'``) = 19,
+  | (12 + 19) % 26  = 5
+  | posToChar(5) = ``'F'``
+
+On en déduit la fonction de cryptage d'un caractère du message
+connaissant un caractère de la clé.
+
+.. code-block:: python
+
+    def crypt(c, keyChar):
+        return posToChar((charToPos(c) + charToPos(keyChar)) % 26)
+
+En supposant que le message à traduire et la clé sont dans des chaînes de
+caractères, le principe de l'algorithme est assez simple.
+
+|  Initialiser un compteur pour la clé
+|  **Pour** chaque caractère de la chaine
+|    Convertir en majuscule le caractère à crypter 
+|    Convertir en majuscule le caractère de la clé dont la position est fournie par le compteur
+|    **Si** le caractère à crypter est entre ``'A'`` et ``'Z'``
+|      Crypter le caractère
+|    **Sinon**
+|      Utiliser le caractère tel quel
+|    Mettre à jour le compteur pour la clé (compteur modulo la taille de la clé)
+
+Le code en Python est le suivant.
+
+.. literalinclude:: Python/INFO501/FonctionVigenereCrypt.py
+    :language: python
+    :lines: 1,7- 
+
+.. code-block:: python
+
+    In [1]: print(vigenereCrypt('Polytech Annecy-Chambery', 'azerty'))
+    PNPPMCCG RGLEBC-VFALFVKW
+
+L'algorithme de décryptage repose sur le même principe. Un ajout de 26 dans le
+calcul de la position de la nouvelle position permet de gérer le décalage
+négatif de la position du caractère de la clé.
+
+.. code-block:: python
+
+    def uncrypt(c, keyChar):
+        return posToChar((charToPos(c) - charToPos(keyChar) + 26) % 26)
+
+Le code en Python de l'algorithme de décryptage est le suivant.
+
+.. literalinclude:: Python/INFO501/FonctionVigenereUncrypt.py
+    :language: python
+    :lines: 1,7- 
+
+.. code-block:: python
+
+    In [1]: print(vigenereUncrypt('PNPPMCCG LG JNYI, PNPPMCCG KHSJNYIL', 'azerty'))
+    POLYTECH UN JOUR, POLYTECH TOUJOURS
+    
+Le chiffrement de Vigenère peut paraître plus sûr que le chiffrement de César.
+Cependant si l'on connait la longueur de la clé, une analyse fréquentielle devient
+possible. A ce titre, on pourra consulter la `cryptanalyse du chiffre de Vigenère`_.
+
+Tri à bulles
+============
+
+Le tri à bulles est un algorithme de tri essentiellement utilisé
+à des fins pédagogiques car il est l'un des plus lents. Son principe consiste
+à comparer les éléments deux à deux et à faire une permutation afin de déplacer
+les éléments les plus petits vers le début du tableau. Les éléments les "plus
+légers" remontent comme des bulles d'air d'où le nom de ce tri.
+
+.. note:: 
+
+  Principe de l'algorithme
+
+  | **Itération 0 :**
+  | :math:`\color{red}{5\ 4}` 6 3 2 1 => 4 5 6 3 2 1
+  | 4 :math:`\color{red}{5\ 6}` 3 2 1
+  | 4 5 :math:`\color{red}{6\ 3}` 2 1 => 4 5 3 6 2 1
+  | 4 5 3 :math:`\color{red}{6\ 2}` 1 => 4 5 3 2 6 1
+  | 4 5 3 2 :math:`\color{red}{6\ 1}` => 4 5 3 2 1 :math:`\color{magenta}{6\ Bien\ plac\acute e}`
+  |
+  | **Itération 1 :**
+  | :math:`\color{red}{4\ 5}` 3 2 1 6
+  | 4 :math:`\color{red}{5\ 3}` 2 1 6 => 4 3 5 2 1 6
+  | 4 3 :math:`\color{red}{5\ 2}` 1 6 => 4 3 2 5 1 6
+  | 4 3 2 5 :math:`\color{red}{1\ 6}` => 4 3 2 1 :math:`\color{magenta}{5\ 6\ Bien\ plac\acute es}`
+  |
+  | **Itération 2 :**
+  | :math:`\color{red}{4\ 3}` 2 1 5 6 => 3 4 2 1 5 6
+  | 3 :math:`\color{red}{4\ 2}` 1 5 6 => 3 2 4 1 5 6
+  | 3 2 :math:`\color{red}{4\ 1}` 5 6 => 3 2 1 :math:`\color{magenta}{4\ 5\ 6\ Bien\ plac\acute es}`
+  |
+  | **Itération 3 :**
+  | :math:`\color{red}{3\ 2}` 1 4 5 6 => 2 3 1 4 5 6
+  | 2 :math:`\color{red}{3\ 1}` 4 5 6 => 2 1 :math:`\color{magenta}{3\ 4\ 5\ 6\ Bien\ plac\acute es}`
+  |
+  | **Itération 4 :**
+  | :math:`\color{red}{2\ 1}` 3 4 5 6 => :math:`\color{magenta}{1\ 2\ 3\ 4\ 5\ 6\ Bien\ plac\acute es}`
+
+
+Le code Python se déduit de cette analyse.
+
+.. literalinclude:: Python/INFO501/FonctionTriBulle.py
+    :language: python
+    :lines: 1,7- 
+    
+.. code-block:: python
+
+    In [1]: print(triBulle([5, 4, 6, 3, 2, 1]))    
+    [1, 2, 3, 4, 5, 6]
+    
+Le principe proposé dans cet exemple n’est pas le plus optimisé mais il présente
+l’intérêt de mettre facilement en évidence le nombre de tests.
+
+En effet, on effectue 5 tests à l'itération 0, puis 4 à
+l'itération 1, puis 3 à l'itération 2... Pour un tableau de 6 éléments on a donc
+1 + 2 + 3 + 4 + 5 tests. Dans le cas général, pour un tableau de *n* éléments
+le nombre de tests est donc la somme des *n*-1 premiers entiers soit *n* (*n*-1)/2.
+
+Même dans les versions « optimisées », en moyenne ce tri a une `complexité`_ O(*n*:sup:`2`).
+
+La figure suivante représente le temps moyen du tri bulle sur des séries de données tirées aléatoirement. 
+
+.. figure:: Images/TriBulleComplexite.png
+    :align: center 
+    
+    Temps moyen du tri bulle en fonction du nombre d'éléments à trier
+    
+
+.. _fusion:
+
+Fusion de deux listes triées
+============================
+
+Etant données deux listes *liste1* et *liste2* triées par ordre croissant, l'objectif de cet exemple est d'écrire 
+une fonction *fusion(liste1, liste2)* qui fusionne deux listes passées en paramètre en  une nouvelle liste triée.
+Cette fonction sera réutilisée dans la partie consacrée à la récursivité dans l'algorithme du tri fusion.
+
+.. code-block:: python 
+
+    In [1]: print(fusion([1, 4, 7, 9], [2, 3, 6]))
+    [1, 2, 3, 4, 6, 7, 9]
+    
+Une solution consiste à utiliser deux compteurs *compteur1* et *compteur2* pour indexer respectivement *liste1* et *liste2*.
+On part d'une liste fusionnée vide *listeFusionnee*. Si l'un des compteurs a atteint la longueur de sa liste associée, 
+on ajoute à *listeFusionnee* tous les éléments de l'autre liste avec la méthode `extend()`_, terminant ainsi l'algorithme.
+Dans le cas contraire, *compteur1* et *compteur2* sont donc respectivement inférieurs à la longueur de leur liste associée. Dans 
+ce cas, on vient ajouter à *listeFusionnee* le plus petit des éléments *liste1[compteur1]* et *liste2[compteur2]* avec la méthode `append()`_ 
+et on incrémente le compteur associé. On répète ceci tant que l'on n'a pas terminé.
+
+.. literalinclude:: Python/INFO501/FonctionFusion.py
+    :language: python
+    :lines: 1,7- 
+    
+
+.. include:: References.rst
+

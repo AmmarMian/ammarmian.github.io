@@ -1,0 +1,454 @@
+.. -*- coding: utf-8 -*-
+
+********************
+Programmer en Python
+********************
+
+Introduction
+============
+ 
+.. important::
+  
+  Dans ce document les exemples apparaissent dans des blocs en vert. 
+     
+  - Si vous entrez les mêmes lignes dans la partie console de Spider, les instructions  
+    saisies sont identifiées par In[xxx] où xxx est un entier croissant représentant le numéro de la 
+    saisie. Les sorties seront identifiées par Out[xxx], comme c'est le cas lorsque l'on demande la
+    valeur de *x* à l'interpréteur. On notera la différence avec l'affichage  
+    la valeur de *x* avec la fonction `print()`_ qui n'est pas précédé par Out[xxx].
+  
+    .. figure:: Images/InterpreteurSpyder.png
+      :scale: 80%
+      :align: center
+
+.. important::
+
+  - Lorsque les lignes sont saisies dans un interpréteur python comme le montre la figure suivante,
+    les entrées sont précédées par ">>>".
+  
+    .. figure:: Images/InterpreteurPython.png
+      :scale: 80%
+      :align: center 
+      
+  - Lorsqu'il n'y a rien devant les lignes, il s'agit d'instructions qui ont été 
+    saisies dans un éditeur de texte (par exemple celui de Spyder). Le fichier doit alors être exécuté
+    soit dans un interpréteur python (python monFichier.py) soit en cliquant sur le bouton d'exécution si 
+    vous travaillez dans l'environnement Spyder.  
+     
+
+Ecrire un programme consiste à écrire une suite d’instructions. Dans
+les langages « évolués » on peut distinguer quatre grandes classes d'intructions :
+
+- L’affectation ;
+- Le choix ;
+- La répétition ;
+- Le regroupement d’instructions.
+
+.. note::
+
+  On pourra consulter les documents du cours IGI501 pour approfondir les
+  notions de cette partie à l'aide d'un langage d’analyse et de son transcodage
+  en C. Ce document est situé dans le répertoire *Documents complémentaires* des supports
+  de cours.
+  
+
+Affectation
+===========
+
+L'affectation consiste à donner un contenu à une variable. La syntaxe change
+selon les langages mais le symbole ``=`` est très souvent utilisé à cet effet.
+Ainsi dans l'exemple suivant la valeur 3 est placée dans la variable *x*. Elle
+est ensuite affichée à l'aide la fonction `print()`_.
+
+.. code-block:: python
+
+  In [1]: x = 3
+  
+  In [2]: print(x)
+  3
+
+.. note::
+
+  Contrairement à d'autres langages, comme le langage C par exemple, on ne 
+  déclare pas le type des variables. Lors de l'affectation, le
+  type de la partie droite définit le type de la variable. La fonction `type()`_ 
+  permet de connaître le type de la variable *x*. On reverra ce point dans 
+  la partie consacrée à la notion d'objets, observons simplement que *x* change de type
+  selon que l'on place 3 ou 3.0 à droite de l'affectation.
+  
+  .. code-block:: python
+  
+    In [1]: x = 3
+    
+    In [2]: type(x)
+    Out[2]: int
+    
+    In [3]: x = 3.0
+    
+    In [4]: type(x)
+    Out[4]: float
+
+Pour affecter une variable avec une information saisie au clavier, on utilise la fonction
+`input()`_.
+
+.. important::
+
+  En Python 3, la fonction `input()`_ retourne toujours une chaine de caractères comme le montre 
+  l'exemple suivant :
+  
+  .. code-block:: python
+  
+    In [1]: x = input('Entrer une valeur : ')
+    
+    Entrer une valeur : 3
+    
+    In [2]: type(x)
+    Out[2]: str    
+    
+  Pour que le type de l'information saisie soit affecté à la variable, il faut utiliser en plus 
+  la fonction `eval()`_ comme suit :
+  
+  .. code-block:: python  
+  
+    In [1]: x = eval(input('Entrer une valeur : '))
+    
+    Entrer une valeur : 3
+    
+    In [2]: type(x)
+    Out[2]: int
+    
+    In [3]: x = eval(input('Entrer une valeur : '))
+    
+    Entrer une valeur : 3.0
+    
+    In [4]: type(x)
+    Out[4]: float  
+  
+Nous avons vu que l'affichage des variables s'effectuait avec la fonction `print()`_. Les affichages ont souvent besoin 
+d'être mis en forme, comme par exemple l'affichage d'un entier en base 2, 8 ou 16 ou encore l'affichage d'un flottant 
+avec un nombre de décimales donné. Ce formatage est réalisé par la fonction `format()`_ selon des règles de
+`spécification de format`_. L'exemple suivant illustre l'affichage d'un entier en base 10, 2, 8 et 16 ainsi que d'un flottant 
+avec deux décimales après la virgule.
+
+.. literalinclude:: Python/INFO501/AffichageAvecFonctionFormat.py
+    :language: python
+    :lines: 1,7-
+
+L'exécution de ce programme produit l'affichage suivant.
+
+.. code-block:: text
+  
+  L'entier 45 vaut 101101 en base 2
+  L'entier 45 vaut 55 en base 8
+  L'entier 45 vaut 2d en base 16
+  Le flottant 12.5678 vaut 12.57 avec deux décimales
+
+.. note::
+
+  On notera que la concaténation de chaînes de caractères s'effectue avec l'opérateur ``+``. Comme la variable *x*
+  est de type entier, il faut la convertir explicitement en chaîne de caractères grâce à la fonction `str()`_. 
+  On notera aussi que pour afficher le caractère ``'``, qui est un caractère spécial, on utilise le caractère d'échappement ``\``.
+  
+En utilisant la `méthode format()`_ associée aux objets de type string, on peut effectuer des formatages plus complexes. L'exemple suivant
+illustre cette utilisation. On reverra la notion de méthode dans la partie consacrée aux objets.   
+
+.. literalinclude:: Python/INFO501/AffichageAvecMethodeFormat.py
+    :language: python
+    :lines: 1,7-
+
+L'exécution de ce programme produit l'affichage suivant.
+
+
+.. code-block:: text
+
+  L'entier 45 vaut 101101 en base 2, 55 en base 8, 2d en base 16.
+  Le flottant 12.5678 vaut 12.57 avec 2 décimales
+
+.. note::
+  
+  On notera l'utilisation de la syntaxe {*n*:*z*} où *n* est le numéro du paramètre dans la `méthode format()`_ et z est le format. 
+  Ainsi, 0 indique que l'on considère le premier paramètre, soit la variable *x*, et 1 le second paramètre, soit la variable *y*.
+  On notera aussi l'utilisation de ``\`` pour écrire la chaîne sur deux lignes et de ``\n`` qui permet 
+  le passage à la ligne suivante pour l'affichage.
+  
+Choix
+=====
+
+L’instruction `if`_ permet de coder l’alternative sur la base d’une **expression
+booléenne**.
+
+L’expression booléenne peut être construite à l’aide d’opérateurs de comparaison
+comme suit :
+
+- x == y	est vraie si x est égal à y ;
+- x != y	est vraie si x est différent de y ;
+- x > y	  est vraie si x est plus grand que y ;
+- x < y	  est vraie si x est plus petit que y ;
+- x >= y	est vraie si x est plus grand que, ou égal à y ;
+- x <= y	est vraie si x est plus petit que, ou égal à y.
+
+Exemple : racine de l'équation du second degré
+----------------------------------------------
+
+On va construire un programme qui permet la saisie au clavier des trois
+paramètres *a*, *b*, *c* de l'équation du second degré et qui affiche ses
+racines. 
+
+Les racines de l'équation seront placées dans une liste. En Python, une liste
+est une structure de données sur laquelle nous reviendrons plus tard dans ce
+cours. On crée une liste en plaçant ses éléments entre [] et en les séparant
+par une virgule (on rappelle que la fonction `type()`_  permet de connaître le type de la
+variable *x*).
+
+.. code-block:: python
+  
+  In [1]: x = [1, 2, 3]
+
+  In [2]: type(x)
+  Out[2]: list
+
+
+Trois solutions sont possibles pour l'équation du second degré. Soit les racines
+sont deux nombres réels différents, soit les racines sont deux nombres
+imaginaires différents, soit il y a une racine double. Le type complexe existe en
+Python, ce que l'on peut vérifier en utilisant la fonction `type()`_. La notion
+est proche de celle utilisée en mathématiques. La partie imaginaire s'obtient
+en ajoutant *j* après une valeur numérique comme dans l'exemple suivant.
+
+.. code-block:: python
+
+  In [1]: x = 1 + 3j
+
+  In [2]: type(x)
+  Out[2]: complex
+
+Pour résoudre ce problème nous allons utiliser une structure de type
+*if elif else*.
+
+.. literalinclude:: Python/INFO501/RacinesEquationSecondDegre.py
+    :language: python
+    :lines: 1,7-
+
+.. important::
+
+  On fera bien attention à respecter l'indentation, c'est-à-dire le décalage
+  dans la structure *if elif else*. C'est grâce à ce décalage que Python
+  connaît la séquence d'instructions à exécuter.
+
+  On fera aussi bien attention de ne pas oublier les `:` à la fin de chaque
+  partie de la structure *if elif else*.
+  
+
+Lorsque l'on écrit des programmes, on peut admettre qu'il
+revient à l'utilisateur d'utiliser correctement le code fourni. Ainsi, dans
+cet exemple on fait l'hypothèse que l'utilisateur ne manipulera que des
+équations du second degré et, par conséquent, qu'il n'entrera pas une valeur
+nulle pour *a*. On peut aussi gérer ce type d'erreur, dans notre cas une division par 0,
+en utilisant la syntaxe `try`_ ... `except`_ pour capturer une `exception`_.
+  
+.. literalinclude:: Python/INFO501/RacinesEquationSecondDegreAvecTryExcept.py
+    :language: python
+    :lines: 1,7-  
+
+
+Regroupement d’instructions
+===========================
+
+Si le code précédent répond au problème posé, son utilisation pour tester
+plusieurs cas n'est pas des plus aisées. Les langages informatiques permettent
+le regroupement d'instructions en les englobant dans une structure qui permet
+une réutilisation facile. En Python, le regroupement s'effectue à l'aide des
+*fonctions* auxquelles il est possible de fournir des paramètres. Dans l'exemple
+précédent, on peut penser à fournir les trois paramètres *a*, *b* et *c* à une
+fonction *racine()* comme suit.
+
+.. literalinclude:: Python/INFO501/FonctionRacines.py
+    :language: python
+    :lines: 1,7-  
+
+Après importation de ce code, on peut utiliser la fonction assez simplement
+dans l'interpréteur de commande.
+
+.. code-block:: python
+
+  In [1]: racines(1, 0, -1)
+  Out[1]: [-1.0, 1.0]
+
+  In [2]: racines(1, -2, 1)
+  Out[2]: [1.0]
+
+  In [3]: racines(1, 0, 1)
+  Out[3]: [-1j, 1j]
+
+.. important::
+
+  Lors de la définition d'une fonction, ne pas oublier les *:* à la fin de
+  l'instruction *def*.
+
+  L'utilisation de *return* permet de préciser la valeur retournée par la
+  fonction.
+  
+Supposons que la fonction soit dans le fichier *FonctionRacines.py*. Il est alors possible de l'utiliser 
+dans un programme en l'important comme le montre l'exemple suivant. 
+
+.. literalinclude:: Python/INFO501/RacinesEquationSecondDegreAvecFonction.py
+    :language: python
+    :lines: 1,7-  
+    
+Ce programme demande la saisie des coefficients de l'équation puis calcule les racines dans la variable *resultat*. 
+On rappelle que la fonction *racines()* retourne une liste. la variable  *resultat* est donc elle-même une liste.
+La fonction `len()`_ détermine le nombre d'éléments dans
+cette liste. Si ce nombre vaut 1 on a une racine double. Dans le cas contraire, on a deux racines.
+Le premier élément de la liste est à l'indice 0, soit *resultat[0]*, le second, s'il existe, est à l'indice 1, soit *resultat[1]*.
+On notera l'affichage formaté du résultat dans les deux cas.    
+    
+.. code-block:: text
+    
+  Entrer a : 1
+
+  Entrer b : 1
+
+  Entrer c : 1
+  L'équation 1x^2 + 1x + 1 a pour racines -0.5000-0.8660j et -0.5000+0.8660j
+
+
+Répétitions
+===========
+
+On peut considérer qu'il y a deux grandes classes de répétitions :
+
+- Les répétitions un nombre de fois connu a priori, comme par exemple la
+  moyenne des éléments d'une liste. Dans ce cas, on utilisera l'instruction
+  `for`_ ;
+- Les répétitions dont le nombre n’est pas connu a priori, comme par exemple
+  la position dans une liste d’un certain élément. Dans ce cas, on utilisera
+  l’instruction `while`_.
+
+Pour être complet, l’instruction `break`_ permet de « rompre » une instruction
+`for`_ sur une condition et, de ce fait, d’avoir un comportement proche de
+l’instruction `while`_.
+
+Instruction for
+---------------
+
+Elle permet de parcourir les éléments d’une chaîne (tous les caractères), d’une
+liste, d’un tuple ou de tout objet itérable.
+
+Par exemple, supposons que nous disposons d'une liste contenant des nombres et que nous 
+souhaitons calculer la moyenne de ces nombres. Il suffit pour cela de sommer les éléments de la liste et
+de diviser par le nombre d'éléments de cette liste. En Python, l'instruction `for`_ permet d'obtenir directement
+les éléments de la liste sans avoir besoin de passer par leur indice comme dans d'autres langages.
+
+.. literalinclude:: Python/INFO501/FonctionMoyenne.py
+    :language: python
+    :lines: 1,7-    
+
+Après importation, on peut utiliser cette fonction dans l'interpréteur de commande. 
+
+.. code-block:: python
+
+  In [1]: moyenne([5, 8, 1, 3])
+  Out[1]: 4.25
+
+Supposons maintenant que nous disposons d'une seconde liste de poids et que nous souhaitons calculer 
+la moyenne pondérée de la première liste par les poids de la seconde liste. Le principe est similaire au calcul
+précédent mais nous devons multiplier les éléments de la première liste par leur poids respectif dans 
+la seconde liste. Dans un premier temps nous allons effectuer ce calcul en utilisant l'indice des éléments comme on
+le ferait naturellement avec d'autres langages, comme le langage C.
+Pour cela nous allons utiliser la fonction `range()`_ qui produit une séquence de nombres que l'on peut visualiser
+en créant explicitement une liste avec la fonction `list()`_.
+
+.. code-block:: python
+
+  In [1]: range(4)
+  Out[1]: range(0, 4)
+
+  In [2]: list(range(4))
+  Out[2]: [0, 1, 2, 3]
+  
+  In [3]: range(1, 4)
+  Out[3]: range(1, 4)
+
+  In [4]: list(range(1, 4))
+  Out[4]: [1, 2, 3]  
+
+Le code de la fonction *moyennePondere()* est alors le suivant :
+
+.. literalinclude:: Python/INFO501/FonctionMoyennePonderee.py
+    :language: python
+    :lines: 1,7-    
+ 
+Après importation, on peut utiliser cette fonction dans l'interpréteur de commande. 
+
+.. code-block:: python
+
+  In [1]: moyennePonderee([5, 8, 1, 3], [1, 2, 1, 1])
+  Out[1]: 5.0
+  
+Le langage Python permet, grâce à la fonction `enumerate()`_, de récupérer à la fois l'indice et le contenu des éléments 
+d'un objet itérable comme le montre le code suivant de la fonction *moyennePondere()*.
+
+.. literalinclude:: Python/INFO501/FonctionMoyennePondereeAvecEnumerate.py
+    :language: python
+    :lines: 1,7-  
+
+Le langage Python permet aussi, grâce à la fonction `zip()`_, d'agréger des éléments itérables et de récupérer leur contenu
+dans une instruction `for`_ comme le montre le code suivant de la fonction *moyennePondere()*.
+
+.. literalinclude:: Python/INFO501/FonctionMoyennePondereeAvecZip.py
+    :language: python
+    :lines: 1,7-      
+
+Instruction while
+-----------------
+
+Elle permet de répéter une séquence d'instructions tant qu'une condition est
+vraie.
+
+.. important::
+
+  Il convient de toujours vérifier que la séquence d'instructions fait évoluer
+  la condition de sorte à ce qu'elle devienne fausse à un moment.
+
+Illustrons cette instruction avec le calcul du nombre de bits nécessaires pour coder des informations.
+Dans la partie consacrée à la numération, nous avons vu que le nombre de bits
+nécessaires pour associer un code binaire à un nombre *N* d'informations était
+l'entier *n* tel que :
+
+.. math::
+
+  n >= log_2(N)
+
+Supposons que l'on ne dispose pas de la fonction *log()*, le calcul de *n* peut
+se faire itérativement en calculant la puissance de 2 solution du problème. La
+fonction suivante prend comme paramètre le nombre d'informations à coder et
+retourne le nombre de bits pour le codage. Le calcul de la puissance se fait de
+manière itérative en multipliant par 2 la variable **puissance**.
+
+.. literalinclude:: Python/INFO501/FonctionNombreBits.py
+    :language: python
+    :lines: 1,7-  
+
+L'utilisation dans un interpréteur de commande donne les résultats suivants. 
+
+.. code-block:: python
+
+  In [1]: nombreBits(32)
+  Out[1]: 5
+  
+  In [2]: nombreBits(125)
+  Out[2]: 7  
+
+
+.. note::
+
+  Python permet, comme en C, une écriture plus concise du corps de la
+  répétition en utilisant la syntaxe suivante :
+
+  .. code::
+
+     n += 1
+     puissance *= 2
+
+
+.. include:: References.rst

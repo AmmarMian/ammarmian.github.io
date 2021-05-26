@@ -1,0 +1,72 @@
+.. -*- coding: utf-8 -*-
+
+.. _anaconda: https://www.anaconda.com/download/
+.. _append(): https://docs.python.org/3/tutorial/datastructures.html
+.. _Algèbre des intervalles d'Allen: https://fr.wikipedia.org/wiki/Alg%C3%A8bre_des_intervalles_d%27Allen
+.. _Apprendre à programmer avec Python 3: http://inforef.be/swi/download/apprendre_python3_5.pdf
+.. _botanique algorithmique: http://algorithmicbotany.org/papers/
+.. _break: https://docs.python.org/3/reference/simple_stmts.html#the-break-statement
+.. _classe abstraite des nombres: https://docs.python.org/3/library/numbers.html
+.. _codage des caractères: https://fr.wikipedia.org/wiki/Codage_des_caract%C3%A8res
+.. _complexité: https://fr.wikipedia.org/wiki/Complexit%C3%A9_en_temps
+.. _cryptanalyse du chiffre de Vigenère : https://fr.wikipedia.org/wiki/Cryptanalyse_du_chiffre_de_Vigen%C3%A8re
+.. _chr(): https://docs.python.org/3/library/functions.html#chr
+.. _dictionnaires: https://docs.python.org/3/library/stdtypes.html#mapping-types-dict
+.. _dir(): https://docs.python.org/3/library/functions.html#dir
+.. _docstring: https://www.python.org/dev/peps/pep-0257/
+.. _Docutils: http://docutils.sourceforge.net/index.html
+.. _ensembles: https://docs.python.org/3/library/stdtypes.html#set-types-set-frozenset
+.. _enumerate(): https://docs.python.org/3/library/functions.html#enumerate
+.. _eval(): https://docs.python.org/3/library/functions.html#eval
+.. _except: https://docs.python.org/3/reference/compound_stmts.html#try
+.. _exception: https://docs.python.org/3/library/exceptions.html#
+.. _expression régulière: https://docs.python.org/3/library/re.html
+.. _extend(): https://docs.python.org/3/tutorial/datastructures.html
+.. _for: https://docs.python.org/3/reference/compound_stmts.html#the-for-statement
+.. _format(): https://docs.python.org/3/library/functions.html#format
+.. _histoire des nombres négatifs: http://www.maths-et-tiques.fr/index.php/histoire-des-maths/nombres/les-negatifs
+.. _if: https://docs.python.org/3/reference/compound_stmts.html#the-if-statement
+.. _injection de dépendances: https://fr.wikipedia.org/wiki/Injection_de_d%C3%A9pendances
+.. _input(): https://docs.python.org/3/library/functions.html#input
+.. _isinstance(): https://docs.python.org/3/library/functions.html#isinstance
+.. _Le langage: https://docs.python.org/3/reference/index.html#reference-index
+.. _La librairie standard: https://docs.python.org/3/library/index.html
+.. _len(): https://docs.python.org/3/library/functions.html#len
+.. _list(): https://docs.python.org/3.7/library/functions.html#func-list
+.. _listes et tuples: https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range
+.. _liste des méthodes spéciales de base: https://docs.python.org/3/reference/datamodel.html#basic-customization
+.. _liste des opérateurs numériques surchargeables:
+.. _liste de ces opérateurs: https://docs.python.org/3/reference/datamodel.html#emulating-numeric-types
+.. _méthode format(): https://docs.python.org/3/library/stdtypes.html#str.format
+.. _méthodes qui ont un nom spécifique: https://docs.python.org/3/reference/datamodel.html#special-method-names
+.. _nombres en virgule flottante: https://fr.wikipedia.org/wiki/Virgule_flottante
+.. _numpy: http://www.numpy.org/
+.. _objet: https://fr.wikipedia.org/wiki/Objet_%28informatique%29
+.. _ord(): https://docs.python.org/3/library/functions.html#ord
+.. _page de Gérard Swinnen: http://inforef.be/swi/python.htm
+.. _pop(): https://docs.python.org/3/tutorial/datastructures.html
+.. _persistance d'un nombre: https://fr.wikipedia.org/wiki/Persistance_d%27un_nombre
+.. _print(): https://docs.python.org/3/library/functions.html#print
+.. _pygame: https://www.pygame.org/docs/
+.. _Python(x,y): https://code.google.com/p/pythonxy/
+.. _range(): https://docs.python.org/3/library/functions.html#func-range
+.. _Rapport Allen 1983: https://urresearch.rochester.edu/fileDownloadForInstitutionalItem.action?itemId=10182&itemFileId=22361
+.. _récursivité: https://fr.wikipedia.org/wiki/R%C3%A9cursivit%C3%A9
+.. _spécification de format: https://docs.python.org/3/library/string.html#formatspec
+.. _slicing: https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range
+.. _Sphinx: http://sphinx-doc.org/
+.. _str(): https://docs.python.org/3/library/functions.html#func-str
+.. _structure de données: https://docs.python.org/3/tutorial/datastructures.html
+.. _suite de Fibonacci: https://fr.wikipedia.org/wiki/Suite_de_Fibonacci
+.. _tkinter: https://docs.python.org/3/library/tkinter.html
+.. _The Algorithmic Beauty of Plants: http://algorithmicbotany.org/papers/abop/abop.pdf
+.. _try: https://docs.python.org/3/reference/compound_stmts.html#try
+.. _turtle: https://docs.python.org/3/library/turtle.html
+.. _type(): https://docs.python.org/3/library/functions.html#type
+.. _upper(): https://docs.python.org/3/library/stdtypes.html#str.upper
+.. _while: https://docs.python.org/3/reference/compound_stmts.html#the-while-statement
+.. _zip(): https://docs.python.org/3.7/library/functions.html#zip
+
+
+
+

@@ -1,0 +1,541 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Recherche" href="search.html" /><link rel="next" title="Définir des classes" href="DefinirClasses.html" /><link rel="prev" title="Exemples de fonction" href="ExemplesFonction.html" />
+
+    <meta name="generator" content="sphinx-3.4.3, furo 2021.04.11.beta34"/>
+        <title>Notion d’objet - Documentation INFO501 2.0.0</title>
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
+    <link rel="stylesheet" href="_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="Index.html"><div class="brand">Documentation INFO501 2.0.0</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="Index.html">
+  
+  
+  <span class="sidebar-brand-text">Documentation INFO501 2.0.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html">
+  <input class="sidebar-search" placeholder=Recherche name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Numeration.html">Notion de représentation des données</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ProgrammerEnPython.html">Programmer en Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ExemplesFonction.html">Exemples de fonction</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Notion d’objet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DefinirClasses.html">Définir des classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ExemplesObjet.html">Exemples de classe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Recursivite.html">La récursivité</a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <div class="section" id="notion-d-objet">
+<h1>Notion d’objet<a class="headerlink" href="#notion-d-objet" title="Lien permanent vers ce titre">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Lien permanent vers ce titre">¶</a></h2>
+<p>En programmation orientée objet, un <a class="reference external" href="https://fr.wikipedia.org/wiki/Objet_%28informatique%29">objet</a> est créé à partir d’un modèle appelé
+classe ou prototype, duquel il hérite les comportements et les caractéristiques.</p>
+<ul class="simple">
+<li><p>Un objet créé à partir d’une classe est une instance de cette classe.</p></li>
+<li><p>Une propriété est une caractéristique propre à un objet.</p></li>
+<li><p>Une méthode est une suite d’instructions qui manipule les caractéristiques et l’état d’un objet.</p></li>
+</ul>
+<p>Par exemple, un entier est l’instance d’une classe dont la valeur est un attribut.</p>
+<p>En Python, la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#type">type()</a> permet de connaître le type d’un objet.
+L’exemple suivant illustre la création d’une variable <em>a</em> de type entier puis l’affichage du type de
+cette variable à l’aide de la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#type">type()</a>. Comme tout est objet en python la valeur retournée par
+la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#type">type()</a> est elle-même un objet « type» dont la valeur est “int”.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">a</span> <span class="o">=</span>  <span class="mi">6</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">int</span>
+</pre></div>
+</div>
+<p>De manière logique, si l’on s’intéresse au type de l’information retournée par <em>type(a)</em>, on obtient
+un objet « type » dont la valeur est “type”.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="nb">type</span>
+</pre></div>
+</div>
+<p>En plus du type entier, Python permet de travailler avec les objets de base suivants :</p>
+<ul class="simple">
+<li><p>Les flottants</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="n">c</span> <span class="o">=</span> <span class="mf">6.0</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="nb">float</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Les chaînes de caractères</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="n">d</span> <span class="o">=</span> <span class="s1">'une chaîne contenant des caractères dont ceux formant le nombre 6.0'</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">7</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">7</span><span class="p">]:</span> <span class="nb">str</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Les listes</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">8</span><span class="p">]:</span> <span class="n">e</span> <span class="o">=</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">9</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">9</span><span class="p">]:</span> <span class="nb">list</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Les ensembles</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">10</span><span class="p">]:</span> <span class="n">f</span> <span class="o">=</span> <span class="p">{</span><span class="mi">6</span><span class="p">}</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">11</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">11</span><span class="p">]:</span> <span class="nb">set</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Les dictionnaires</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">12</span><span class="p">]:</span> <span class="n">g</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'a'</span> <span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s1">'b'</span> <span class="p">:</span> <span class="mi">9</span><span class="p">}</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">13</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">13</span><span class="p">]:</span> <span class="nb">dict</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Les tuple</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">12</span><span class="p">]:</span> <span class="n">h</span> <span class="o">=</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">13</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">13</span><span class="p">]:</span> <span class="nb">tuple</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="attributs-et-methodes">
+<h2>Attributs et méthodes<a class="headerlink" href="#attributs-et-methodes" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Pour connaître les méthodes et attributs associés à un objet on utilise la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#dir">dir()</a>.
+L’exemple suivant illustre l’application de cette fonction à une variable <em>a</em> de type entier.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">6</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">dir</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+<span class="p">[</span><span class="s1">'__abs__'</span><span class="p">,</span>
+ <span class="s1">'__add__'</span><span class="p">,</span>
+ <span class="s1">'__and__'</span><span class="p">,</span>
+ <span class="s1">'__bool__'</span><span class="p">,</span>
+ <span class="s1">'__ceil__'</span><span class="p">,</span>
+ <span class="s1">'__class__'</span><span class="p">,</span>
+ <span class="s1">'__delattr__'</span><span class="p">,</span>
+ <span class="s1">'__dir__'</span><span class="p">,</span>
+ <span class="s1">'__divmod__'</span><span class="p">,</span>
+ <span class="s1">'__doc__'</span><span class="p">,</span>
+ <span class="s1">'__eq__'</span><span class="p">,</span>
+ <span class="s1">'__float__'</span><span class="p">,</span>
+ <span class="s1">'__floor__'</span><span class="p">,</span>
+ <span class="s1">'__floordiv__'</span><span class="p">,</span>
+ <span class="s1">'__format__'</span><span class="p">,</span>
+ <span class="s1">'__ge__'</span><span class="p">,</span>
+ <span class="s1">'__getattribute__'</span><span class="p">,</span>
+ <span class="s1">'__getnewargs__'</span><span class="p">,</span>
+ <span class="s1">'__gt__'</span><span class="p">,</span>
+ <span class="s1">'__hash__'</span><span class="p">,</span>
+ <span class="s1">'__index__'</span><span class="p">,</span>
+ <span class="s1">'__init__'</span><span class="p">,</span>
+ <span class="s1">'__init_subclass__'</span><span class="p">,</span>
+ <span class="s1">'__int__'</span><span class="p">,</span>
+ <span class="s1">'__invert__'</span><span class="p">,</span>
+ <span class="s1">'__le__'</span><span class="p">,</span>
+ <span class="s1">'__lshift__'</span><span class="p">,</span>
+ <span class="s1">'__lt__'</span><span class="p">,</span>
+ <span class="s1">'__mod__'</span><span class="p">,</span>
+ <span class="s1">'__mul__'</span><span class="p">,</span>
+ <span class="s1">'__ne__'</span><span class="p">,</span>
+ <span class="s1">'__neg__'</span><span class="p">,</span>
+ <span class="s1">'__new__'</span><span class="p">,</span>
+ <span class="s1">'__or__'</span><span class="p">,</span>
+ <span class="s1">'__pos__'</span><span class="p">,</span>
+ <span class="s1">'__pow__'</span><span class="p">,</span>
+ <span class="s1">'__radd__'</span><span class="p">,</span>
+ <span class="s1">'__rand__'</span><span class="p">,</span>
+ <span class="s1">'__rdivmod__'</span><span class="p">,</span>
+ <span class="s1">'__reduce__'</span><span class="p">,</span>
+ <span class="s1">'__reduce_ex__'</span><span class="p">,</span>
+ <span class="s1">'__repr__'</span><span class="p">,</span>
+ <span class="s1">'__rfloordiv__'</span><span class="p">,</span>
+ <span class="s1">'__rlshift__'</span><span class="p">,</span>
+ <span class="s1">'__rmod__'</span><span class="p">,</span>
+ <span class="s1">'__rmul__'</span><span class="p">,</span>
+ <span class="s1">'__ror__'</span><span class="p">,</span>
+ <span class="s1">'__round__'</span><span class="p">,</span>
+ <span class="s1">'__rpow__'</span><span class="p">,</span>
+ <span class="s1">'__rrshift__'</span><span class="p">,</span>
+ <span class="s1">'__rshift__'</span><span class="p">,</span>
+ <span class="s1">'__rsub__'</span><span class="p">,</span>
+ <span class="s1">'__rtruediv__'</span><span class="p">,</span>
+ <span class="s1">'__rxor__'</span><span class="p">,</span>
+ <span class="s1">'__setattr__'</span><span class="p">,</span>
+ <span class="s1">'__sizeof__'</span><span class="p">,</span>
+ <span class="s1">'__str__'</span><span class="p">,</span>
+ <span class="s1">'__sub__'</span><span class="p">,</span>
+ <span class="s1">'__subclasshook__'</span><span class="p">,</span>
+ <span class="s1">'__truediv__'</span><span class="p">,</span>
+ <span class="s1">'__trunc__'</span><span class="p">,</span>
+ <span class="s1">'__xor__'</span><span class="p">,</span>
+ <span class="s1">'bit_length'</span><span class="p">,</span>
+ <span class="s1">'conjugate'</span><span class="p">,</span>
+ <span class="s1">'denominator'</span><span class="p">,</span>
+ <span class="s1">'from_bytes'</span><span class="p">,</span>
+ <span class="s1">'imag'</span><span class="p">,</span>
+ <span class="s1">'numerator'</span><span class="p">,</span>
+ <span class="s1">'real'</span><span class="p">,</span>
+ <span class="s1">'to_bytes'</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>On notera que le résultat est exprimé sous la forme d’une liste (les informations
+sont encadrées par [ ]) de chaînes
+de caractères (chaque information est encadrée par des guillemets simples). Comme tout est objet
+en python, la valeur retournée est un objet «list»,
+ce que l’on peut vérifier en demandant le type de <em>dir(a)</em>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="nb">dir</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="nb">list</span>
+</pre></div>
+</div>
+<p>Cette liste est propre à chaque objet. Elle contient les méthodes et attributs définis par
+le concepteur de la classe associée à l’objet. Les méthodes de la classe définissent les manières offertes
+à un utilisateur pour manipuler l’objet. On peut les voir comme les services rendus à l’utilisateur.
+Les attributs sont, en quelque sorte, des variables internes à l’objet.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>La présentation utilisée ici n’est pas usuelle et est un parti pris de l’équipe pédagogique. Nous pensons
+que cette vision permet une compréhension plus fine des mécanismes qui seront ensuite utilisés.</p>
+</div>
+<p>L’accès à une méthode ou un attribut s’effectue en utilisant le symbole “.” après le nom de la variable. Utilisons
+la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#type">type()</a> sur quelques éléments de la liste afin d’analyser les différences.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">numerator</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="nb">int</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">denominator</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="nb">int</span>
+</pre></div>
+</div>
+<p>Comme on peut le constater, ces deux attributs sont de type “int”. Ces attributs viennent du principe de construction
+de la classe des entiers qui hérite des propriétés d’autres classes. L’héritage est un mécanisme important en
+programmation orientée objet qui permet de réutiliser et d’adapter facilement des classes existantes pour en créer
+de nouvelles. En Python la classe des entiers hérite de plusieurs autres classes du module <em>numbers</em> comme
+la classe des rationnels (<em>Rational</em>) ou celle des complexes (<em>Complex</em>). Ainsi les attributs <em>numerator</em> et
+<em>denominator</em> sont issus de la classe de rationnels et les attributs <em>real</em> et <em>imag</em> de la classe des complexes.
+On pourra consulter la partie de la documentation consacrée à la <a class="reference external" href="https://docs.python.org/3/library/numbers.html">classe abstraite des nombres</a>. Les instructions
+suivantes permettent de mieux comprendre cette notion en utilisant la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#isinstance">isinstance()</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="kn">import</span> <span class="nn">numbers</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">7</span><span class="p">]:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Rational</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">7</span><span class="p">]:</span> <span class="kc">True</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">8</span><span class="p">]:</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Complex</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">8</span><span class="p">]:</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p>On pourra aussi vérifier les valeurs que prennent ces attributs pour la variable <em>a</em>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">9</span><span class="p">]:</span> <span class="n">a</span><span class="o">.</span><span class="n">numerator</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">9</span><span class="p">]:</span> <span class="mi">6</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">10</span><span class="p">]:</span> <span class="n">a</span><span class="o">.</span><span class="n">denominator</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">10</span><span class="p">]:</span> <span class="mi">1</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">11</span><span class="p">]:</span> <span class="n">a</span><span class="o">.</span><span class="n">real</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">11</span><span class="p">]:</span> <span class="mi">6</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">12</span><span class="p">]:</span> <span class="n">a</span><span class="o">.</span><span class="n">imag</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">12</span><span class="p">]:</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p>L’attribut <em>bit_length</em> est relatif à une méthode s’appliquant à l’entier.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">13</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">bit_length</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">13</span><span class="p">]:</span> <span class="n">builtin_function_or_method</span>
+</pre></div>
+</div>
+<p>Cette méthode permet de connaître le nombre de bits nécessaire au codage de l’entier.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">14</span><span class="p">]:</span> <span class="n">a</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">14</span><span class="p">]:</span> <span class="mi">3</span>
+</pre></div>
+</div>
+<p>L’entier <em>a</em> est codable avec 3 bits.</p>
+<p>Enfin, la liste comprend un certain nombre d’attributs encadrés par le symbole “__”. Il s’agit de méthodes permettant de surcharger
+certains opérateurs (voir la <a class="reference external" href="https://docs.python.org/3/reference/datamodel.html#emulating-numeric-types">liste de ces opérateurs</a>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">15</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="fm">__add__</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">15</span><span class="p">]:</span> <span class="n">method</span><span class="o">-</span><span class="n">wrapper</span>
+</pre></div>
+</div>
+<p>Cette méthode permet d’ajouter un entier à l’objet <em>a</em>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">16</span><span class="p">]:</span> <span class="n">a</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">16</span><span class="p">]:</span> <span class="mi">13</span>
+</pre></div>
+</div>
+<p>Elle surcharge l’opérateur “+” de sorte que a + 7 est équivalent à a.__add__(7).</p>
+<div class="admonition-exercice admonition">
+<p class="admonition-title">Exercice</p>
+<p>A quelle expression arithmétique est équivalente l’instruction suivante ?</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">17</span><span class="p">]:</span> <span class="n">a</span><span class="o">.</span><span class="fm">__floordiv__</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="fm">__rfloordiv__</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Quelle est l’instruction équivalente à l’expression arithmétique suivante dans
+laquelle l’opérateur // est la division entière
+?</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">18</span><span class="p">]:</span> <span class="p">(</span><span class="mi">5</span><span class="o">*</span><span class="n">a</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="listes-ensembles-tuples-dictionnaires">
+<h2>Listes, ensembles, tuples, dictionnaires<a class="headerlink" href="#listes-ensembles-tuples-dictionnaires" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Ce sont des types de base du langage Python dont les méthodes applicables
+sont définies dans la documentation (voir <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range">listes et tuples</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set-types-set-frozenset">ensembles</a>
+et <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#mapping-types-dict">dictionnaires</a>.</p>
+<p>On lira aussi avec attention le chapitre consacré aux structures de données
+dans la documentation du langage Python afin de comprendre certains
+aspects dans l’utilisation des objets de ce type (voir
+<a class="reference external" href="https://docs.python.org/3/tutorial/datastructures.html">structure de données</a>).</p>
+<p>A titre d’exemple, on s’intéresse à la représentation d’une pile de livres. Une pile
+en informatique est, comme dans la vie courante, une structure de données avec un seul
+point d’accès (le haut de la pile) et deux mécanismes d’accès : <em>empiler</em> et <em>dépiler</em>. Par
+principe l’accès est donc de type dernier entré - premier sorti (Last In First Out - LIFO).</p>
+<p>En représentant notre pile à l’aide d’une liste, les méthodes <a class="reference external" href="https://docs.python.org/3/tutorial/datastructures.html">append()</a> et <a class="reference external" href="https://docs.python.org/3/tutorial/datastructures.html">pop()</a> permettent
+respectivement d’implémenter <em>empiler</em> et <em>dépiler</em>. En effet, <em>append()</em> insère un élément à la
+fin de la liste tandis que <em>pop()</em> retire un élément en fin de liste.</p>
+<p>Il nous reste à représenter un livre. On peut considérer qu’un livre est un objet caractérisé par plusieurs
+attributs comme le titre, le nom de l’auteur et l’année de parution et des méthodes qui permettent d’effectuer
+des opérations sur ce livre. Dans une bibliothèque il serait, par exemple, associé au dispositif de prêt.
+Cependant, pour le moment, nous n’avons pas encore introduit la construction de nos propres classes (voir le
+chapitre suivant). Nous allons donc nous limiter à utiliser les structures de données de base de Python pour représenter
+notre livre et, pour cela, les dictionnaires sont un outil intéressant. En effet, les dictionnaires permettent d’associer
+des valeurs, par exemple le titre du livre, le nom de l’auteur, à des clés, par exemple <em>titre</em> et <em>auteur</em>.</p>
+<p>L’exemple suivant définit la variable <em>livre</em> comme un dictionnaire comportant trois couples clés-valeurs
+pour représenter le livre <em>1984</em> écrit par <em>George Orwel</em> et publié en <em>1949</em>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Les valeurs associées aux clés peuvent être de types différents. Ainsi, l’année est un entier
+alors que l’auteur et le titre sont des chaînes de caractères.</p>
+<p>On retrouve la valeur associée à un attribut en indexant la variable par cet attribut comme
+le montre l’exemple suivant.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">livre</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'auteur'</span><span class="p">:</span> <span class="s1">'George Orwel'</span><span class="p">,</span> <span class="s1">'titre'</span><span class="p">:</span> <span class="s1">'1984'</span><span class="p">,</span> <span class="s1">'annee'</span><span class="p">:</span> <span class="mi">1949</span><span class="p">}</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">livre</span><span class="p">[</span><span class="s1">'annee'</span><span class="p">])</span>
+<span class="mi">1949</span>
+</pre></div>
+</div>
+</div>
+<p>Le programme suivant illustre la gestion d’une pile de livres. Deux fonctions <em>empiler()</em>
+et <em>depiler()</em> sont définies pour opérer sur la variable <em>pile</em>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+
+<span class="k">def</span> <span class="nf">empiler</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">pile</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    
+<span class="k">def</span> <span class="nf">depiler</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">pile</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+<span class="c1"># Création d'une pile vide</span>
+<span class="n">pile</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Empilage de 3 livres</span>
+<span class="n">empiler</span><span class="p">({</span><span class="s1">'auteur'</span><span class="p">:</span> <span class="s1">'George Orwel'</span><span class="p">,</span> <span class="s1">'titre'</span><span class="p">:</span> <span class="s1">'1984'</span><span class="p">,</span> <span class="s1">'annee'</span><span class="p">:</span> <span class="mi">1949</span><span class="p">})</span>
+<span class="n">empiler</span><span class="p">({</span><span class="s1">'auteur'</span><span class="p">:</span> <span class="s1">'Isaac Asimov'</span><span class="p">,</span> <span class="s1">'titre'</span><span class="p">:</span> <span class="s1">'I, Robot'</span><span class="p">,</span> <span class="s1">'annee'</span><span class="p">:</span> <span class="mi">1950</span><span class="p">})</span>
+<span class="n">empiler</span><span class="p">({</span><span class="s1">'auteur'</span><span class="p">:</span> <span class="s1">'Jules Verne'</span><span class="p">,</span> <span class="s1">'titre'</span><span class="p">:</span> <span class="s1">'Vingt mille lieues sous les mers'</span><span class="p">,</span> <span class="s1">'annee'</span><span class="p">:</span> <span class="mi">1869</span><span class="p">})</span> 
+
+<span class="c1"># Affichage de la pile</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pile</span><span class="p">)</span>
+
+<span class="c1"># Dépilage d'un livre et affichage du titre</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">depiler</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">'titre'</span><span class="p">])</span>
+
+<span class="c1"># Affichage de la pile</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pile</span><span class="p">)</span>
+
+<span class="c1"># Empilage d'un nouveau livre</span>
+<span class="n">empiler</span><span class="p">({</span><span class="s1">'auteur'</span><span class="p">:</span> <span class="s1">'Frank Herbert'</span><span class="p">,</span> <span class="s1">'titre'</span><span class="p">:</span> <span class="s1">'Dune'</span><span class="p">,</span> <span class="s1">'annee'</span><span class="p">:</span> <span class="mi">1965</span><span class="p">})</span>
+
+<span class="c1"># Affichage de la pile</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pile</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="DefinirClasses.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Définir des classes</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="ExemplesFonction.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Exemples de fonction</div>
+                
+              </div>
+            </a>
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2020, Laurent Foulloy
+            |
+            <a class="muted-link" href="_sources/NotionObjet.rst.txt"
+               rel="nofollow">
+              Montrer le code source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contenu
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Notion d’objet</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#attributs-et-methodes">Attributs et méthodes</a></li>
+<li><a class="reference internal" href="#listes-ensembles-tuples-dictionnaires">Listes, ensembles, tuples, dictionnaires</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </main>
+</div>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/translations.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+</html>

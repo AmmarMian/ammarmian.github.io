@@ -1,0 +1,733 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Recherche" href="search.html" /><link rel="next" title="Exemples de fonction" href="ExemplesFonction.html" /><link rel="prev" title="Notion de représentation des données" href="Numeration.html" />
+
+    <meta name="generator" content="sphinx-3.4.3, furo 2021.04.11.beta34"/>
+        <title>Programmer en Python - Documentation INFO501 2.0.0</title>
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
+    <link rel="stylesheet" href="_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="Index.html"><div class="brand">Documentation INFO501 2.0.0</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="Index.html">
+  
+  
+  <span class="sidebar-brand-text">Documentation INFO501 2.0.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html">
+  <input class="sidebar-search" placeholder=Recherche name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Numeration.html">Notion de représentation des données</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Programmer en Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ExemplesFonction.html">Exemples de fonction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="NotionObjet.html">Notion d’objet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DefinirClasses.html">Définir des classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ExemplesObjet.html">Exemples de classe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Recursivite.html">La récursivité</a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <div class="section" id="programmer-en-python">
+<h1>Programmer en Python<a class="headerlink" href="#programmer-en-python" title="Lien permanent vers ce titre">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Lien permanent vers ce titre">¶</a></h2>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Dans ce document les exemples apparaissent dans des blocs en vert.</p>
+<ul>
+<li><p>Si vous entrez les mêmes lignes dans la partie console de Spider, les instructions
+saisies sont identifiées par In[xxx] où xxx est un entier croissant représentant le numéro de la
+saisie. Les sorties seront identifiées par Out[xxx], comme c’est le cas lorsque l’on demande la
+valeur de <em>x</em> à l’interpréteur. On notera la différence avec l’affichage
+la valeur de <em>x</em> avec la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#print">print()</a> qui n’est pas précédé par Out[xxx].</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/InterpreteurSpyder.png"><img alt="_images/InterpreteurSpyder.png" src="_images/InterpreteurSpyder.png" style="width: 524.0px; height: 230.4px;"/></a>
+</div>
+</li>
+</ul>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<ul>
+<li><p>Lorsque les lignes sont saisies dans un interpréteur python comme le montre la figure suivante,
+les entrées sont précédées par « &gt;&gt;&gt; ».</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/InterpreteurPython.png"><img alt="_images/InterpreteurPython.png" src="_images/InterpreteurPython.png" style="width: 540.0px; height: 269.6px;"/></a>
+</div>
+</li>
+<li><p>Lorsqu’il n’y a rien devant les lignes, il s’agit d’instructions qui ont été
+saisies dans un éditeur de texte (par exemple celui de Spyder). Le fichier doit alors être exécuté
+soit dans un interpréteur python (python monFichier.py) soit en cliquant sur le bouton d’exécution si
+vous travaillez dans l’environnement Spyder.</p></li>
+</ul>
+</div>
+<p>Ecrire un programme consiste à écrire une suite d’instructions. Dans
+les langages « évolués » on peut distinguer quatre grandes classes d’intructions :</p>
+<ul class="simple">
+<li><p>L’affectation ;</p></li>
+<li><p>Le choix ;</p></li>
+<li><p>La répétition ;</p></li>
+<li><p>Le regroupement d’instructions.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>On pourra consulter les documents du cours IGI501 pour approfondir les
+notions de cette partie à l’aide d’un langage d’analyse et de son transcodage
+en C. Ce document est situé dans le répertoire <em>Documents complémentaires</em> des supports
+de cours.</p>
+</div>
+</div>
+<div class="section" id="affectation">
+<h2>Affectation<a class="headerlink" href="#affectation" title="Lien permanent vers ce titre">¶</a></h2>
+<p>L’affectation consiste à donner un contenu à une variable. La syntaxe change
+selon les langages mais le symbole <code class="docutils literal notranslate"><span class="pre">=</span></code> est très souvent utilisé à cet effet.
+Ainsi dans l’exemple suivant la valeur 3 est placée dans la variable <em>x</em>. Elle
+est ensuite affichée à l’aide la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#print">print()</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="mi">3</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Contrairement à d’autres langages, comme le langage C par exemple, on ne
+déclare pas le type des variables. Lors de l’affectation, le
+type de la partie droite définit le type de la variable. La fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#type">type()</a>
+permet de connaître le type de la variable <em>x</em>. On reverra ce point dans
+la partie consacrée à la notion d’objets, observons simplement que <em>x</em> change de type
+selon que l’on place 3 ou 3.0 à droite de l’affectation.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">int</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">x</span> <span class="o">=</span> <span class="mf">3.0</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="nb">float</span>
+</pre></div>
+</div>
+</div>
+<p>Pour affecter une variable avec une information saisie au clavier, on utilise la fonction
+<a class="reference external" href="https://docs.python.org/3/library/functions.html#input">input()</a>.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>En Python 3, la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#input">input()</a> retourne toujours une chaine de caractères comme le montre
+l’exemple suivant :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">x</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s1">'Entrer une valeur : '</span><span class="p">)</span>
+
+<span class="n">Entrer</span> <span class="n">une</span> <span class="n">valeur</span> <span class="p">:</span> <span class="mi">3</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">str</span>
+</pre></div>
+</div>
+<p>Pour que le type de l’information saisie soit affecté à la variable, il faut utiliser en plus
+la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#eval">eval()</a> comme suit :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">x</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">'Entrer une valeur : '</span><span class="p">))</span>
+
+<span class="n">Entrer</span> <span class="n">une</span> <span class="n">valeur</span> <span class="p">:</span> <span class="mi">3</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">int</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">x</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">'Entrer une valeur : '</span><span class="p">))</span>
+
+<span class="n">Entrer</span> <span class="n">une</span> <span class="n">valeur</span> <span class="p">:</span> <span class="mf">3.0</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="nb">float</span>
+</pre></div>
+</div>
+</div>
+<p>Nous avons vu que l’affichage des variables s’effectuait avec la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#print">print()</a>. Les affichages ont souvent besoin
+d’être mis en forme, comme par exemple l’affichage d’un entier en base 2, 8 ou 16 ou encore l’affichage d’un flottant
+avec un nombre de décimales donné. Ce formatage est réalisé par la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#format">format()</a> selon des règles de
+<a class="reference external" href="https://docs.python.org/3/library/string.html#formatspec">spécification de format</a>. L’exemple suivant illustre l’affichage d’un entier en base 10, 2, 8 et 16 ainsi que d’un flottant
+avec deux décimales après la virgule.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="mi">45</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mf">12.5678</span>
+
+<span class="c1"># Affichage avec la fonction format()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'L</span><span class="se">\'</span><span class="s1">entier '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' vaut '</span> <span class="o">+</span> <span class="nb">format</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' en base 2'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'L</span><span class="se">\'</span><span class="s1">entier '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' vaut '</span> <span class="o">+</span> <span class="nb">format</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">'o'</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' en base 8'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'L</span><span class="se">\'</span><span class="s1">entier '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' vaut '</span> <span class="o">+</span> <span class="nb">format</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">'x'</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' en base 16'</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'Le flottant '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' vaut '</span> <span class="o">+</span> <span class="nb">format</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="s1">'.2f'</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' avec deux décimales'</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>L’exécution de ce programme produit l’affichage suivant.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>L'entier 45 vaut 101101 en base 2
+L'entier 45 vaut 55 en base 8
+L'entier 45 vaut 2d en base 16
+Le flottant 12.5678 vaut 12.57 avec deux décimales
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>On notera que la concaténation de chaînes de caractères s’effectue avec l’opérateur <code class="docutils literal notranslate"><span class="pre">+</span></code>. Comme la variable <em>x</em>
+est de type entier, il faut la convertir explicitement en chaîne de caractères grâce à la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#func-str">str()</a>.
+On notera aussi que pour afficher le caractère <code class="docutils literal notranslate"><span class="pre">'</span></code>, qui est un caractère spécial, on utilise le caractère d’échappement <code class="docutils literal notranslate"><span class="pre">\</span></code>.</p>
+</div>
+<p>En utilisant la <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str.format">méthode format()</a> associée aux objets de type string, on peut effectuer des formatages plus complexes. L’exemple suivant
+illustre cette utilisation. On reverra la notion de méthode dans la partie consacrée aux objets.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="mi">45</span>
+<span class="n">y</span> <span class="o">=</span> <span class="mf">12.5678</span>
+
+<span class="c1"># Affichage avec la méthode format() des objets string</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'L</span><span class="se">\'</span><span class="s1">entier </span><span class="si">{0}</span><span class="s1"> vaut </span><span class="si">{0:b}</span><span class="s1"> en base 2, </span><span class="si">{0:o}</span><span class="s1"> en base 8, </span><span class="si">{0:x}</span><span class="s1"> </span><span class="se">\</span>
+<span class="s1">en base 16.</span><span class="se">\n</span><span class="s1">Le flottant </span><span class="si">{1}</span><span class="s1"> vaut </span><span class="si">{1:.2f}</span><span class="s1"> avec 2 décimales'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>L’exécution de ce programme produit l’affichage suivant.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>L'entier 45 vaut 101101 en base 2, 55 en base 8, 2d en base 16.
+Le flottant 12.5678 vaut 12.57 avec 2 décimales
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>On notera l’utilisation de la syntaxe {<em>n</em>:<em>z</em>} où <em>n</em> est le numéro du paramètre dans la <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str.format">méthode format()</a> et z est le format.
+Ainsi, 0 indique que l’on considère le premier paramètre, soit la variable <em>x</em>, et 1 le second paramètre, soit la variable <em>y</em>.
+On notera aussi l’utilisation de <code class="docutils literal notranslate"><span class="pre">\</span></code> pour écrire la chaîne sur deux lignes et de <code class="docutils literal notranslate"><span class="pre">\n</span></code> qui permet
+le passage à la ligne suivante pour l’affichage.</p>
+</div>
+</div>
+<div class="section" id="choix">
+<h2>Choix<a class="headerlink" href="#choix" title="Lien permanent vers ce titre">¶</a></h2>
+<p>L’instruction <a class="reference external" href="https://docs.python.org/3/reference/compound_stmts.html#the-if-statement">if</a> permet de coder l’alternative sur la base d’une <strong>expression
+booléenne</strong>.</p>
+<p>L’expression booléenne peut être construite à l’aide d’opérateurs de comparaison
+comme suit :</p>
+<ul class="simple">
+<li><p>x == y        est vraie si x est égal à y ;</p></li>
+<li><p>x != y        est vraie si x est différent de y ;</p></li>
+<li><p>x &gt; y   est vraie si x est plus grand que y ;</p></li>
+<li><p>x &lt; y   est vraie si x est plus petit que y ;</p></li>
+<li><p>x &gt;= y        est vraie si x est plus grand que, ou égal à y ;</p></li>
+<li><p>x &lt;= y        est vraie si x est plus petit que, ou égal à y.</p></li>
+</ul>
+<div class="section" id="exemple-racine-de-l-equation-du-second-degre">
+<h3>Exemple : racine de l’équation du second degré<a class="headerlink" href="#exemple-racine-de-l-equation-du-second-degre" title="Lien permanent vers ce titre">¶</a></h3>
+<p>On va construire un programme qui permet la saisie au clavier des trois
+paramètres <em>a</em>, <em>b</em>, <em>c</em> de l’équation du second degré et qui affiche ses
+racines.</p>
+<p>Les racines de l’équation seront placées dans une liste. En Python, une liste
+est une structure de données sur laquelle nous reviendrons plus tard dans ce
+cours. On crée une liste en plaçant ses éléments entre [] et en les séparant
+par une virgule (on rappelle que la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#type">type()</a>  permet de connaître le type de la
+variable <em>x</em>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">list</span>
+</pre></div>
+</div>
+<p>Trois solutions sont possibles pour l’équation du second degré. Soit les racines
+sont deux nombres réels différents, soit les racines sont deux nombres
+imaginaires différents, soit il y a une racine double. Le type complexe existe en
+Python, ce que l’on peut vérifier en utilisant la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#type">type()</a>. La notion
+est proche de celle utilisée en mathématiques. La partie imaginaire s’obtient
+en ajoutant <em>j</em> après une valeur numérique comme dans l’exemple suivant.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">3</span><span class="n">j</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">complex</span>
+</pre></div>
+</div>
+<p>Pour résoudre ce problème nous allons utiliser une structure de type
+<em>if elif else</em>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">'Entrer a : '</span><span class="p">))</span>
+<span class="n">b</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">'Entrer b : '</span><span class="p">))</span>
+<span class="n">c</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">'Entrer c : '</span><span class="p">))</span>
+<span class="n">delta</span> <span class="o">=</span> <span class="n">b</span><span class="o">*</span><span class="n">b</span><span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">a</span><span class="o">*</span><span class="n">c</span>
+<span class="k">if</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+  <span class="n">solution</span> <span class="o">=</span> <span class="p">[(</span><span class="o">-</span><span class="n">b</span> <span class="o">-</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">delta</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="n">b</span> <span class="o">+</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">delta</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">)]</span>
+<span class="k">elif</span> <span class="n">delta</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+  <span class="n">solution</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">)]</span>
+<span class="k">else</span><span class="p">:</span>
+  <span class="n">solution</span> <span class="o">=</span> <span class="p">[(</span><span class="o">-</span><span class="n">b</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="n">delta</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="n">b</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="n">delta</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">)]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>On fera bien attention à respecter l’indentation, c’est-à-dire le décalage
+dans la structure <em>if elif else</em>. C’est grâce à ce décalage que Python
+connaît la séquence d’instructions à exécuter.</p>
+<p>On fera aussi bien attention de ne pas oublier les <cite>:</cite> à la fin de chaque
+partie de la structure <em>if elif else</em>.</p>
+</div>
+<p>Lorsque l’on écrit des programmes, on peut admettre qu’il
+revient à l’utilisateur d’utiliser correctement le code fourni. Ainsi, dans
+cet exemple on fait l’hypothèse que l’utilisateur ne manipulera que des
+équations du second degré et, par conséquent, qu’il n’entrera pas une valeur
+nulle pour <em>a</em>. On peut aussi gérer ce type d’erreur, dans notre cas une division par 0,
+en utilisant la syntaxe <a class="reference external" href="https://docs.python.org/3/reference/compound_stmts.html#try">try</a> … <a class="reference external" href="https://docs.python.org/3/reference/compound_stmts.html#try">except</a> pour capturer une <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#">exception</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">'Entrer a : '</span><span class="p">))</span>
+<span class="n">b</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">'Entrer b : '</span><span class="p">))</span>
+<span class="n">c</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">'Entrer c : '</span><span class="p">))</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">b</span><span class="o">*</span><span class="n">b</span><span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">a</span><span class="o">*</span><span class="n">c</span>
+    <span class="k">if</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="n">solution</span> <span class="o">=</span> <span class="p">[(</span><span class="o">-</span><span class="n">b</span> <span class="o">-</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">delta</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="n">b</span> <span class="o">+</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">delta</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">)]</span>
+    <span class="k">elif</span> <span class="n">delta</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="n">solution</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">solution</span> <span class="o">=</span> <span class="p">[(</span><span class="o">-</span><span class="n">b</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="n">delta</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="n">b</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="n">delta</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">)]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">solution</span><span class="p">)</span>
+    
+<span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Erreur: a ne doit pas être égal à 0'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="regroupement-dinstructions">
+<h2>Regroupement d’instructions<a class="headerlink" href="#regroupement-dinstructions" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Si le code précédent répond au problème posé, son utilisation pour tester
+plusieurs cas n’est pas des plus aisées. Les langages informatiques permettent
+le regroupement d’instructions en les englobant dans une structure qui permet
+une réutilisation facile. En Python, le regroupement s’effectue à l’aide des
+<em>fonctions</em> auxquelles il est possible de fournir des paramètres. Dans l’exemple
+précédent, on peut penser à fournir les trois paramètres <em>a</em>, <em>b</em> et <em>c</em> à une
+fonction <em>racine()</em> comme suit.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Importation de toutes les fonctions du module math</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c1"># Définition de la fonction</span>
+<span class="k">def</span> <span class="nf">racines</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+  <span class="k">try</span><span class="p">:</span>
+      <span class="n">delta</span> <span class="o">=</span> <span class="n">b</span><span class="o">*</span><span class="n">b</span><span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">a</span><span class="o">*</span><span class="n">c</span>
+      <span class="k">if</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">solution</span> <span class="o">=</span> <span class="p">[(</span><span class="o">-</span><span class="n">b</span> <span class="o">-</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">delta</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="n">b</span> <span class="o">+</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">delta</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">)]</span>
+      <span class="k">elif</span> <span class="n">delta</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">solution</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">)]</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">solution</span> <span class="o">=</span> <span class="p">[(</span><span class="o">-</span><span class="n">b</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="n">delta</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="n">b</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="n">delta</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="p">)]</span>
+      <span class="k">return</span> <span class="n">solution</span>
+  
+  <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'Erreur: a ne doit pas être égal à 0'</span><span class="p">)</span>
+    
+</pre></div>
+</div>
+<p>Après importation de ce code, on peut utiliser la fonction assez simplement
+dans l’interpréteur de commande.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">racines</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">racines</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">racines</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="p">,</span> <span class="mi">1</span><span class="n">j</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Lors de la définition d’une fonction, ne pas oublier les <em>:</em> à la fin de
+l’instruction <em>def</em>.</p>
+<p>L’utilisation de <em>return</em> permet de préciser la valeur retournée par la
+fonction.</p>
+</div>
+<p>Supposons que la fonction soit dans le fichier <em>FonctionRacines.py</em>. Il est alors possible de l’utiliser
+dans un programme en l’important comme le montre l’exemple suivant.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1"># Importation de la fonction racines depuis le module FonctionRacines</span>
+<span class="kn">from</span> <span class="nn">FonctionRacines</span> <span class="kn">import</span> <span class="n">racines</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">'Entrer a : '</span><span class="p">))</span>
+<span class="n">b</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">'Entrer b : '</span><span class="p">))</span>
+<span class="n">c</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s1">'Entrer c : '</span><span class="p">))</span>
+
+<span class="c1"># Utilisation de la fonction dans un affichage formaté</span>
+<span class="n">resultat</span> <span class="o">=</span> <span class="n">racines</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">resultat</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="c1"># Racine double</span>
+    <span class="nb">print</span><span class="p">(</span>
+      <span class="s1">'L</span><span class="se">\'</span><span class="s1">équation </span><span class="si">{0}</span><span class="s1">x^2 + </span><span class="si">{1}</span><span class="s1">x + </span><span class="si">{2}</span><span class="s1"> a une racine double </span><span class="si">{3}</span><span class="s1"> '</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">resultat</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="c1"># Deux racines</span>
+    <span class="nb">print</span><span class="p">(</span>
+      <span class="s1">'L</span><span class="se">\'</span><span class="s1">équation </span><span class="si">{0}</span><span class="s1">x^2 + </span><span class="si">{1}</span><span class="s1">x + </span><span class="si">{2}</span><span class="s1"> a pour racines </span><span class="si">{3:.4f}</span><span class="s1"> et </span><span class="si">{4:.4f}</span><span class="s1">'</span>\
+      <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">resultat</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">resultat</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="p">)</span>    
+</pre></div>
+</div>
+<p>Ce programme demande la saisie des coefficients de l’équation puis calcule les racines dans la variable <em>resultat</em>.
+On rappelle que la fonction <em>racines()</em> retourne une liste. la variable  <em>resultat</em> est donc elle-même une liste.
+La fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#len">len()</a> détermine le nombre d’éléments dans
+cette liste. Si ce nombre vaut 1 on a une racine double. Dans le cas contraire, on a deux racines.
+Le premier élément de la liste est à l’indice 0, soit <em>resultat[0]</em>, le second, s’il existe, est à l’indice 1, soit <em>resultat[1]</em>.
+On notera l’affichage formaté du résultat dans les deux cas.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Entrer a : 1
+
+Entrer b : 1
+
+Entrer c : 1
+L'équation 1x^2 + 1x + 1 a pour racines -0.5000-0.8660j et -0.5000+0.8660j
+</pre></div>
+</div>
+</div>
+<div class="section" id="repetitions">
+<h2>Répétitions<a class="headerlink" href="#repetitions" title="Lien permanent vers ce titre">¶</a></h2>
+<p>On peut considérer qu’il y a deux grandes classes de répétitions :</p>
+<ul class="simple">
+<li><p>Les répétitions un nombre de fois connu a priori, comme par exemple la
+moyenne des éléments d’une liste. Dans ce cas, on utilisera l’instruction
+<a class="reference external" href="https://docs.python.org/3/reference/compound_stmts.html#the-for-statement">for</a> ;</p></li>
+<li><p>Les répétitions dont le nombre n’est pas connu a priori, comme par exemple
+la position dans une liste d’un certain élément. Dans ce cas, on utilisera
+l’instruction <a class="reference external" href="https://docs.python.org/3/reference/compound_stmts.html#the-while-statement">while</a>.</p></li>
+</ul>
+<p>Pour être complet, l’instruction <a class="reference external" href="https://docs.python.org/3/reference/simple_stmts.html#the-break-statement">break</a> permet de « rompre » une instruction
+<a class="reference external" href="https://docs.python.org/3/reference/compound_stmts.html#the-for-statement">for</a> sur une condition et, de ce fait, d’avoir un comportement proche de
+l’instruction <a class="reference external" href="https://docs.python.org/3/reference/compound_stmts.html#the-while-statement">while</a>.</p>
+<div class="section" id="instruction-for">
+<h3>Instruction for<a class="headerlink" href="#instruction-for" title="Lien permanent vers ce titre">¶</a></h3>
+<p>Elle permet de parcourir les éléments d’une chaîne (tous les caractères), d’une
+liste, d’un tuple ou de tout objet itérable.</p>
+<p>Par exemple, supposons que nous disposons d’une liste contenant des nombres et que nous
+souhaitons calculer la moyenne de ces nombres. Il suffit pour cela de sommer les éléments de la liste et
+de diviser par le nombre d’éléments de cette liste. En Python, l’instruction <a class="reference external" href="https://docs.python.org/3/reference/compound_stmts.html#the-for-statement">for</a> permet d’obtenir directement
+les éléments de la liste sans avoir besoin de passer par leur indice comme dans d’autres langages.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">moyenne</span><span class="p">(</span><span class="n">liste</span><span class="p">):</span>
+    <span class="n">resultat</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">liste</span><span class="p">:</span>
+        <span class="n">resultat</span> <span class="o">=</span> <span class="n">resultat</span> <span class="o">+</span> <span class="n">x</span>
+    <span class="n">resultat</span> <span class="o">=</span> <span class="n">resultat</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">liste</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">resultat</span>
+</pre></div>
+</div>
+<p>Après importation, on peut utiliser cette fonction dans l’interpréteur de commande.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">moyenne</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="mf">4.25</span>
+</pre></div>
+</div>
+<p>Supposons maintenant que nous disposons d’une seconde liste de poids et que nous souhaitons calculer
+la moyenne pondérée de la première liste par les poids de la seconde liste. Le principe est similaire au calcul
+précédent mais nous devons multiplier les éléments de la première liste par leur poids respectif dans
+la seconde liste. Dans un premier temps nous allons effectuer ce calcul en utilisant l’indice des éléments comme on
+le ferait naturellement avec d’autres langages, comme le langage C.
+Pour cela nous allons utiliser la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#func-range">range()</a> qui produit une séquence de nombres que l’on peut visualiser
+en créant explicitement une liste avec la fonction <a class="reference external" href="https://docs.python.org/3.7/library/functions.html#func-list">list()</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Le code de la fonction <em>moyennePondere()</em> est alors le suivant :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">moyennePonderee</span><span class="p">(</span><span class="n">liste</span><span class="p">,</span> <span class="n">poids</span><span class="p">):</span>
+    <span class="n">numerateur</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">denominateur</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">liste</span><span class="p">)):</span>
+        <span class="n">numerateur</span> <span class="o">=</span> <span class="n">numerateur</span> <span class="o">+</span> <span class="n">liste</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">poids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">denominateur</span> <span class="o">=</span> <span class="n">denominateur</span> <span class="o">+</span> <span class="n">poids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">numerateur</span> <span class="o">/</span> <span class="n">denominateur</span>
+    
+</pre></div>
+</div>
+<p>Après importation, on peut utiliser cette fonction dans l’interpréteur de commande.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">moyennePonderee</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="mf">5.0</span>
+</pre></div>
+</div>
+<p>Le langage Python permet, grâce à la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#enumerate">enumerate()</a>, de récupérer à la fois l’indice et le contenu des éléments
+d’un objet itérable comme le montre le code suivant de la fonction <em>moyennePondere()</em>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">moyennePonderee</span><span class="p">(</span><span class="n">liste</span><span class="p">,</span> <span class="n">poids</span><span class="p">):</span>
+    <span class="n">numerateur</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">denominateur</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">liste</span><span class="p">):</span>
+        <span class="n">numerateur</span> <span class="o">=</span> <span class="n">numerateur</span> <span class="o">+</span> <span class="n">x</span> <span class="o">*</span> <span class="n">poids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">denominateur</span> <span class="o">=</span> <span class="n">denominateur</span> <span class="o">+</span> <span class="n">poids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">numerateur</span> <span class="o">/</span> <span class="n">denominateur</span>
+    
+</pre></div>
+</div>
+<p>Le langage Python permet aussi, grâce à la fonction <a class="reference external" href="https://docs.python.org/3.7/library/functions.html#zip">zip()</a>, d’agréger des éléments itérables et de récupérer leur contenu
+dans une instruction <a class="reference external" href="https://docs.python.org/3/reference/compound_stmts.html#the-for-statement">for</a> comme le montre le code suivant de la fonction <em>moyennePondere()</em>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">moyennePonderee</span><span class="p">(</span><span class="n">liste</span><span class="p">,</span> <span class="n">poids</span><span class="p">):</span>
+    <span class="n">numerateur</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">denominateur</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">liste</span><span class="p">,</span> <span class="n">poids</span><span class="p">):</span>
+        <span class="n">numerateur</span> <span class="o">=</span> <span class="n">numerateur</span> <span class="o">+</span> <span class="n">x</span> <span class="o">*</span> <span class="n">p</span>
+        <span class="n">denominateur</span> <span class="o">=</span> <span class="n">denominateur</span> <span class="o">+</span> <span class="n">p</span>
+    <span class="k">return</span> <span class="n">numerateur</span> <span class="o">/</span> <span class="n">denominateur</span>
+    
+</pre></div>
+</div>
+</div>
+<div class="section" id="instruction-while">
+<h3>Instruction while<a class="headerlink" href="#instruction-while" title="Lien permanent vers ce titre">¶</a></h3>
+<p>Elle permet de répéter une séquence d’instructions tant qu’une condition est
+vraie.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Il convient de toujours vérifier que la séquence d’instructions fait évoluer
+la condition de sorte à ce qu’elle devienne fausse à un moment.</p>
+</div>
+<p>Illustrons cette instruction avec le calcul du nombre de bits nécessaires pour coder des informations.
+Dans la partie consacrée à la numération, nous avons vu que le nombre de bits
+nécessaires pour associer un code binaire à un nombre <em>N</em> d’informations était
+l’entier <em>n</em> tel que :</p>
+<div class="math-wrapper"><div class="math notranslate nohighlight">
+\[n &gt;= log_2(N)\]</div></div>
+<p>Supposons que l’on ne dispose pas de la fonction <em>log()</em>, le calcul de <em>n</em> peut
+se faire itérativement en calculant la puissance de 2 solution du problème. La
+fonction suivante prend comme paramètre le nombre d’informations à coder et
+retourne le nombre de bits pour le codage. Le calcul de la puissance se fait de
+manière itérative en multipliant par 2 la variable <strong>puissance</strong>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">nombreBits</span><span class="p">(</span><span class="n">nombreInformations</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span> 
+    <span class="n">puissance</span> <span class="o">=</span> <span class="mi">1</span> 
+    <span class="k">while</span> <span class="n">puissance</span> <span class="o">&lt;</span> <span class="n">nombreInformations</span><span class="p">:</span>
+      <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span> 
+      <span class="n">puissance</span> <span class="o">=</span> <span class="n">puissance</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="n">n</span>
+</pre></div>
+</div>
+<p>L’utilisation dans un interpréteur de commande donne les résultats suivants.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">nombreBits</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="mi">5</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">nombreBits</span><span class="p">(</span><span class="mi">125</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="mi">7</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Python permet, comme en C, une écriture plus concise du corps de la
+répétition en utilisant la syntaxe suivante :</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="n">puissance</span> <span class="o">*=</span> <span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ExemplesFonction.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Exemples de fonction</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="Numeration.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Notion de représentation des données</div>
+                
+              </div>
+            </a>
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2020, Laurent Foulloy
+            |
+            <a class="muted-link" href="_sources/ProgrammerEnPython.rst.txt"
+               rel="nofollow">
+              Montrer le code source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contenu
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Programmer en Python</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#affectation">Affectation</a></li>
+<li><a class="reference internal" href="#choix">Choix</a><ul>
+<li><a class="reference internal" href="#exemple-racine-de-l-equation-du-second-degre">Exemple : racine de l’équation du second degré</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#regroupement-dinstructions">Regroupement d’instructions</a></li>
+<li><a class="reference internal" href="#repetitions">Répétitions</a><ul>
+<li><a class="reference internal" href="#instruction-for">Instruction for</a></li>
+<li><a class="reference internal" href="#instruction-while">Instruction while</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </main>
+</div>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/translations.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+</html>

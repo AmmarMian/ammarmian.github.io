@@ -1,0 +1,706 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Recherche" href="search.html" /><link rel="next" title="Programmer en Python" href="ProgrammerEnPython.html" /><link rel="prev" title="Introduction" href="Introduction.html" />
+
+    <meta name="generator" content="sphinx-3.4.3, furo 2021.04.11.beta34"/>
+        <title>Notion de représentation des données - Documentation INFO501 2.0.0</title>
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
+    <link rel="stylesheet" href="_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="Index.html"><div class="brand">Documentation INFO501 2.0.0</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="Index.html">
+  
+  
+  <span class="sidebar-brand-text">Documentation INFO501 2.0.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html">
+  <input class="sidebar-search" placeholder=Recherche name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Notion de représentation des données</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ProgrammerEnPython.html">Programmer en Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ExemplesFonction.html">Exemples de fonction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="NotionObjet.html">Notion d’objet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DefinirClasses.html">Définir des classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ExemplesObjet.html">Exemples de classe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Recursivite.html">La récursivité</a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <div class="section" id="notion-de-representation-des-donnees">
+<h1>Notion de représentation des données<a class="headerlink" href="#notion-de-representation-des-donnees" title="Lien permanent vers ce titre">¶</a></h1>
+<p>Ce chapitre aborde de manière rapide quelques notions importantes
+pour la représentation des données. Un travail personnel est nécessaire
+pour approfondir les différentes notions traitées.</p>
+<div class="section" id="notion-de-codage">
+<h2>Notion de codage<a class="headerlink" href="#notion-de-codage" title="Lien permanent vers ce titre">¶</a></h2>
+<p>En informatique, toute information est représentée par une suite de 0 ou 1.
+Un élément <span class="math notranslate nohighlight">\(x \in \{0,1\}\)</span> est appelé un « bit » (contraction de binary digit).
+Un bit prend donc deux valeurs différentes.</p>
+<p>Un codage est un processus qui permet de passer d’une représentation d’informations à une autre, de manière
+bijective pour ce cours (il existe des codage non bijectifs comme ceux qui servent à crypter les mots de passe).</p>
+<p>Avec un code sur un bit on peut représenter deux informations différentes.
+A titre d’exemple la <a class="reference internal" href="#codage1bit"><span class="std std-numref">Fig. 1</span></a> représente deux informations que nous allons appeler « On » et « Off ».</p>
+<div class="figure align-center" id="id2">
+<span id="codage1bit"></span><a class="reference internal image-reference" href="_images/Codage1bit.png"><img alt="_images/Codage1bit.png" src="_images/Codage1bit.png" style="width: 72.0px; height: 72.0px;"/></a>
+<p class="caption"><span class="caption-number">Fig. 1 </span><span class="caption-text">Deux voyants lumineux - source : <a class="reference external" href="https://pixabay.com">https://pixabay.com</a></span><a class="headerlink" href="#id2" title="Lien permanent vers cette image">¶</a></p>
+</div>
+<p>On peut définir une fonction de codage <span class="math notranslate nohighlight">\(f: \{On, Off\} \rightarrow \{0, 1\}\)</span> telle que
+<span class="math notranslate nohighlight">\(f(Off) = 0\)</span> et <span class="math notranslate nohighlight">\(f(On) = 1\)</span>.
+La fonction de décodage est <span class="math notranslate nohighlight">\(f^{-1}: \{0, 1\} \rightarrow \{Off, On\}\)</span> telle que
+<span class="math notranslate nohighlight">\(f^{-1}(0) = Off\)</span> et <span class="math notranslate nohighlight">\(f^{-1}(1) = On\)</span>.</p>
+<p>Avec 2 bits, on peut représenter 2x2 informations.</p>
+<p>Avec trois 3 bits, on peut représenter 2x2x2 informations.</p>
+<p>D’une manière générale, un code sur <span class="math notranslate nohighlight">\(n\)</span> bits permet de représenter <span class="math notranslate nohighlight">\(2^n\)</span> informations.</p>
+<p>De manière réciproque, pour représenter <span class="math notranslate nohighlight">\(m\)</span> informations il faut au moins <span class="math notranslate nohighlight">\(\lceil log_2(m) \rceil\)</span> bits où la notation <span class="math notranslate nohighlight">\(\lceil x \rceil\)</span> représente l’entier
+immédiatement supérieur à <span class="math notranslate nohighlight">\(x\)</span> et <span class="math notranslate nohighlight">\(log_2(m)\)</span> est le logarithme en base 2 de <span class="math notranslate nohighlight">\(m\)</span> soit <span class="math notranslate nohighlight">\(log_2(m) = log(m) / log(2)\)</span>.</p>
+<div class="admonition-exemple admonition">
+<p class="admonition-title">Exemple</p>
+<p>Soit <span class="math notranslate nohighlight">\(m = 223\)</span> informations différentes à représenter.</p>
+<p><span class="math notranslate nohighlight">\(log_2(223) = 7.8008 …\)</span></p>
+<p><span class="math notranslate nohighlight">\(\lceil log_2(223) \rceil = 8\)</span>.</p>
+<p>Il faut donc au minimum 8 bits.</p>
+</div>
+<div class="admonition-exercice admonition">
+<p class="admonition-title">Exercice</p>
+<p>Depuis 2009, la France utilise un nouveau système de numérotation des véhicules.</p>
+<div class="figure align-center" id="id3">
+<a class="reference internal image-reference" href="_images/CodagePlaqueImmatriculation.png"><img alt="_images/CodagePlaqueImmatriculation.png" src="_images/CodagePlaqueImmatriculation.png" style="width: 181.20000000000002px; height: 37.6px;"/></a>
+<p class="caption"><span class="caption-number">Fig. 2 </span><span class="caption-text">Spécimen de plaque - source Wikipédia</span><a class="headerlink" href="#id3" title="Lien permanent vers cette image">¶</a></p>
+</div>
+<p>Actuellement, les lettres I, O, U ne sont pas utilisées pour éviter les confusions avec,
+respectivement, 1, 0 et V. Le couple de lettres SS n’est ni utilisé à gauche,
+ni à droite. Le couple de lettres WW n’est pas utilisé à droite.</p>
+<ul class="simple">
+<li><p>Avec ce système, combien de véhicules peut-on immatriculer ?</p></li>
+<li><p>Si l’on affectait un code binaire à chaque véhicule pouvant être représenté selon ce code,
+combien de bits seraient nécessaires ?</p></li>
+<li><p>En choisissant un code binaire pour chaque lettre et un code binaire pour le nombre,
+combien de bits seraient nécessaires ?</p></li>
+<li><p>Sachant qu’il y avait environ 37 millions de véhicules immatriculés en 2009 et
+qu’il y a environ 3 millions de nouvelles immatriculations chaque année,
+quelle est la durée approximative de ce codage ?</p></li>
+</ul>
+</div>
+<div class="admonition-exercice admonition">
+<p class="admonition-title">Exercice</p>
+<p>Soit <span class="math notranslate nohighlight">\(A\)</span> une partie (sous-ensemble) d’un ensemble fini <span class="math notranslate nohighlight">\(E\)</span>.
+Proposer une représentation simple de <span class="math notranslate nohighlight">\(A\)</span> qui permette, de vérifier si <span class="math notranslate nohighlight">\(B\)</span>,
+une autre partie de <span class="math notranslate nohighlight">\(E\)</span>, est incluse dans <span class="math notranslate nohighlight">\(A\)</span>.</p>
+<p><strong>Conseil</strong> :  faire une analogie entre le nombre de parties possibles d’un ensemble <span class="math notranslate nohighlight">\(E\)</span> à <span class="math notranslate nohighlight">\(n\)</span> éléments et
+le nombre d’informations représentables sur <span class="math notranslate nohighlight">\(n\)</span> bits. En déduire un codage pour représenter un sous-ensemble de <span class="math notranslate nohighlight">\(E\)</span>.</p>
+<p>L’intersection des deux ensembles permet de savoir si une partie est incluse dans une autre.
+Avec le codage précédent, déterminer l’opération logique entre les codes des deux sous-ensembles
+qui permette de répondre au problème.</p>
+</div>
+</div>
+<div class="section" id="representation-des-nombres-entiers-non-signes">
+<h2>Représentation des nombres entiers non signés<a class="headerlink" href="#representation-des-nombres-entiers-non-signes" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Un nombre est représenté par une suite de chiffres lus de gauche à droite. Pour un
+nombre exprimé en base <span class="math notranslate nohighlight">\(B\)</span>, chaque chiffre appartient à un ensemble de <span class="math notranslate nohighlight">\(B\)</span> symboles distincts.</p>
+<ul class="simple">
+<li><p>En base 2 (système binaire) : <span class="math notranslate nohighlight">\(x \in \{0,1\}\)</span></p></li>
+<li><p>En base 8 (système octal) : <span class="math notranslate nohighlight">\(x \in \{0,1,2,3,4,5,6,7\}\)</span></p></li>
+<li><p>En base 10 (système décimal) : <span class="math notranslate nohighlight">\(x \in \{0,1,2,3,4,5,6,7,8,9\}\)</span></p></li>
+<li><p>En base 16 (système hexadécimal) : <span class="math notranslate nohighlight">\(x \in \{0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F\}\)</span></p></li>
+</ul>
+<p>On notera <span class="math notranslate nohighlight">\(N_B\)</span> un nombre exprimé en base <span class="math notranslate nohighlight">\(B\)</span>. Lorsqu’il n’y a pas d’ambiguïté, on
+écrira <span class="math notranslate nohighlight">\(N\)</span> lorsque <span class="math notranslate nohighlight">\(N\)</span> est exprimé en base 10. Ainsi, <span class="math notranslate nohighlight">\(11_{10} = 11\)</span>.</p>
+<p>On écrira <span class="math notranslate nohighlight">\((N_A)_B\)</span> la conversion du nombre <span class="math notranslate nohighlight">\(N\)</span> exprimé en base <span class="math notranslate nohighlight">\(A\)</span> vers la base <span class="math notranslate nohighlight">\(B\)</span>.</p>
+<div class="admonition-exemples admonition">
+<p class="admonition-title">Exemples</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\((9_{10})_2 = 1001_2\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\((11_2)_{10} = 3\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\((11101_2)_{16} = 1D_{16}\)</span></p></li>
+</ul>
+</div>
+<p>Soit <span class="math notranslate nohighlight">\(N_B\)</span> un nombre en base <span class="math notranslate nohighlight">\(B\)</span> sur <span class="math notranslate nohighlight">\(n\)</span> chiffres notés <span class="math notranslate nohighlight">\(x_i, i\in\{0, n-1\}\)</span>.</p>
+<p><span class="math notranslate nohighlight">\(N_B = x_{n-1}...x_2x_1x_0\ _B\)</span>.</p>
+<p>La conversion de ce nombre en base 10 s’effectue en affectant à chaque <span class="math notranslate nohighlight">\(x_i\)</span> son poids <span class="math notranslate nohighlight">\(p_i\)</span> en base 10 multiplié par <span class="math notranslate nohighlight">\(B^i\)</span>. Ainsi :</p>
+<p><span class="math notranslate nohighlight">\((N_B)_{10} = p_{n-1}.B^{n-1} +...+ p_2.B^2+p_1.B^1+p_0.B^0\)</span>.</p>
+<p>En suppposant que les chiffres de la base soient placés dans une liste ordonnée, le poids du chiffre est la position du chiffre dans cette liste.
+Ainsi, en base 2, en base 8 et de façon plus générale dans les bases inférieures ou égale à 10, le poids d’un chiffre en base 10 est le chiffre lui-même.</p>
+<p>En base 16, les poids des chiffres de 0 à 9 sont les mêmes qu’en base 10. Les chiffres <span class="math notranslate nohighlight">\(A, B, C, D, E, F\)</span> ont respectivement les poids
+10, 11, 12, 13, 14 et 15.</p>
+<div class="admonition-exercice admonition">
+<p class="admonition-title">Exercice</p>
+<ul class="simple">
+<li><p>Soient <span class="math notranslate nohighlight">\(T = 323_8, U = 323_{16}, V = 1AF_{16}, W = 323_3\)</span>,
+comment s’écrivent respectivement ces nombres en base 10 ?</p></li>
+<li><p>Soit <span class="math notranslate nohighlight">\(X = 111011_2\)</span> , comment s’écrit ce nombre en base 10 et en base 16 ?</p></li>
+</ul>
+</div>
+<div class="admonition-exercice admonition">
+<p class="admonition-title">Exercice</p>
+<p>On a vu que si <span class="math notranslate nohighlight">\(N_B = x_{n-1}...x_2x_1x_0\ _B\)</span> sa conversion en base 10 est <span class="math notranslate nohighlight">\((N_B)_{10} = p_{n-1}.B^{n-1} +...+ p_2.B^2+p_1.B^1+p_0.B^0\)</span>.</p>
+<ul class="simple">
+<li><p>Quelle information fournit la division euclidienne de <span class="math notranslate nohighlight">\((N_B)_{10}\)</span> par <span class="math notranslate nohighlight">\(B\)</span>?</p></li>
+<li><p>En déduire un principe général de conversion d’un nombre en base 10 vers une base quelconque.</p></li>
+<li><p>Convertir le nombre 125 en base 2, en base 8 et en base 16 selon ce principe.</p></li>
+<li><p>Retrouver les conversions en base 8 et en base 16 précédentes directement à partir de la conversion en base 2.</p></li>
+</ul>
+</div>
+<p>On écrira <span class="math notranslate nohighlight">\(^P(N_A)_B\)</span> la conversion du nombre <span class="math notranslate nohighlight">\(N\)</span> exprimé en base <span class="math notranslate nohighlight">\(A\)</span> vers la base <span class="math notranslate nohighlight">\(B\)</span> sur <span class="math notranslate nohighlight">\(P\)</span> chiffres.</p>
+<div class="admonition-exemples admonition">
+<p class="admonition-title">Exemples</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(^8(9_{10})_2 = 00001001_2\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(^4(11_2)_{10} = 0003\)</span></p></li>
+</ul>
+</div>
+<p>Dans de nombreux langages de programmation, la représentation d’un nombre entier repose
+sur un codage exprimé sur un nombre de bits donné.</p>
+<ul class="simple">
+<li><p>Entier sur 8 bits : le codage est <span class="math notranslate nohighlight">\(^8(N_{10})_2\)</span></p></li>
+<li><p>Entier sur 16 bits : le codage est <span class="math notranslate nohighlight">\(^{16}(N_{10})_2\)</span></p></li>
+<li><p>Entier sur 32 bits : le codage est <span class="math notranslate nohighlight">\(^{32}(N_{10})_2\)</span></p></li>
+</ul>
+<div class="section" id="addition-de-nombres-non-signes">
+<h3>Addition de nombres non signés<a class="headerlink" href="#addition-de-nombres-non-signes" title="Lien permanent vers ce titre">¶</a></h3>
+<p>D’une manière générale, dans une base quelconque, l’addition s’effectue
+dans la base, chiffres par chiffres, en commençant par le chiffre de plus faible poids et en propageant la retenue.
+On notera <span class="math notranslate nohighlight">\(+_B\)</span> l’addition dans la base <span class="math notranslate nohighlight">\(B\)</span>.</p>
+<div class="admonition-exemples admonition">
+<p class="admonition-title">Exemples</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(81_{10} +_{10} 89_{10} = 170_{10}\)</span> ;</p></li>
+<li><p><span class="math notranslate nohighlight">\(81_{16} +_{16} 89_{16} = 10A_{16}\)</span>;</p></li>
+<li><p><span class="math notranslate nohighlight">\(00101_{2} +_{2} 01110_{2} = 10011_{2}\)</span>.</p></li>
+</ul>
+</div>
+<p>Lorsque la représentation s’effectue sur un nombre de chiffres donné, l’existence d’une retenue finale indique un débordement, c’est-à-dire l’impossibilité
+de représenter correctement le résultat dans le format donné.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Les unités arithmétiques et logiques des microprocesseurs intègrent ce processus de détection en positionnant un indicateur, souvent noté C, lorsque ce cas arrive.
+Il revient au programmeur, selon les langages de programmation qu’il utilise de veiller à ces problèmes de débordement.</p>
+</div>
+<div class="admonition-exemples admonition">
+<p class="admonition-title">Exemples</p>
+<ul>
+<li><p>Soient <span class="math notranslate nohighlight">\(U = 28\)</span> et <span class="math notranslate nohighlight">\(V = 5\)</span> deux nombres dont on calcule la somme sur une machine informatique sur 8 bits.
+L’opération est représentée <a class="reference internal" href="#additionnonsignesansdebordement"><span class="std std-numref">Fig. 3</span></a>. Le calcul conduit à une retenue finale non positionnée. Il n’y a donc pas de débordement.
+Effectivement, le décodage du résultat donne <span class="math notranslate nohighlight">\(00100001_2 = 33_{10}\)</span> qui est bien la somme de 28 et 5.</p>
+<div class="figure align-center" id="id4">
+<span id="additionnonsignesansdebordement"></span><a class="reference internal image-reference" href="_images/AdditionNonSigneSansDebordement.png"><img alt="_images/AdditionNonSigneSansDebordement.png" src="_images/AdditionNonSigneSansDebordement.png" style="width: 162.0px; height: 90.80000000000001px;"/></a>
+<p class="caption"><span class="caption-number">Fig. 3 </span><span class="caption-text">Addition de deux nombres non signés sans débordement</span><a class="headerlink" href="#id4" title="Lien permanent vers cette image">¶</a></p>
+</div>
+</li>
+<li><p>On effectue maintenant la même opération avec les nombres <span class="math notranslate nohighlight">\(U = 128\)</span> et <span class="math notranslate nohighlight">\(V = 129\)</span>.
+Le calcul, illustré <a class="reference internal" href="#additionnonsigneavecdebordement"><span class="std std-numref">Fig. 4</span></a>, conduit à une retenue finale positionnée. Il y a donc débordement et le résultat sera incorrect.
+En effet, le résultat s’exprime dans le format donné, c’est-à-dire sur 8 bits.
+Ainsi, son décodage donne <span class="math notranslate nohighlight">\(00000001_2 = 1_{10}\)</span> qui n’est pas la somme de 128 et 129.</p>
+<p>On rappelle qu’avec 8 bits, le nombre de codes possibles est <span class="math notranslate nohighlight">\(2^8 = 256\)</span>. La fonction de codage choisie permet de représenter les entiers positifs entre
+0 et 255. La somme de 128 et 129 vaut 257 qui n’est pas représentable dans ce format.</p>
+<div class="figure align-center" id="id5">
+<span id="additionnonsigneavecdebordement"></span><a class="reference internal image-reference" href="_images/AdditionNonSigneAvecDebordement.png"><img alt="_images/AdditionNonSigneAvecDebordement.png" src="_images/AdditionNonSigneAvecDebordement.png" style="width: 165.20000000000002px; height: 91.2px;"/></a>
+<p class="caption"><span class="caption-number">Fig. 4 </span><span class="caption-text">Addition de deux nombres non signés avec débordement</span><a class="headerlink" href="#id5" title="Lien permanent vers cette image">¶</a></p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="nombres-entiers-signes">
+<h2>Nombres entiers signés<a class="headerlink" href="#nombres-entiers-signes" title="Lien permanent vers ce titre">¶</a></h2>
+<div class="section" id="introduction">
+<h3>Introduction<a class="headerlink" href="#introduction" title="Lien permanent vers ce titre">¶</a></h3>
+<p>Si aujourd’hui les notions de nombres positifs et nombres négatifs sont familières, il n’en a pas toujours été de même
+(voir <a class="reference external" href="http://www.maths-et-tiques.fr/index.php/histoire-des-maths/nombres/les-negatifs">histoire des nombres négatifs</a>).</p>
+<p>Usuellement on distingue un nombre positif d’un nombre négatif par l’utilisation de deux symboles supplémentaires, respectivement + et -.
+En cas d’omission du signe + le nombre est considéré comme positif.</p>
+<p>Une idée simple consiste à considérer ces deux symboles supplémentaires comme deux informations à coder.  On peut donc penser à ajouter un bit
+à la valeur absolue pour coder le signe. Supposons une représentation de la valeur absolue des nombres sur 3 bits. On peut donc représenter
+<span class="math notranslate nohighlight">\(2^3\)</span> nombres soit les entiers de 0 à 7. L’ajout d’un bit pour le signe conduit à un codage sur 4 bits. On dispose de 16 codes pour représenter les
+nombres de -7 à +7 avec deux représentations possibles du 0, c’est-à-dire -0 et +0.</p>
+<p>Choisissons pour ce bit, par exemple, la valeur 0 pour coder un nombre positif et la valeur 1 pour un nombre négatif.
+Le nombre +3 et -3 s’écriraient respectivement <span class="math notranslate nohighlight">\({\color{red}0}011_2\)</span> et <span class="math notranslate nohighlight">\({\color{red}1}011_2\)</span>.</p>
+<p>Cette représentation présente deux inconvénients :</p>
+<ul class="simple">
+<li><p>le nombre 0 a deux codes différents (+0 et 0). En reprenant le codage précédent, les deux codes seraient <span class="math notranslate nohighlight">\({\color{red}0}000_2\)</span> et <span class="math notranslate nohighlight">\({\color{red}1}000_2\)</span>.</p></li>
+<li><p>l’utilisation de nombres négatifs dans une opération d’addition donne des résultats incorrects. Ainsi l’addition du nombre +3 (code <span class="math notranslate nohighlight">\({\color{red}0}011_2\)</span>) et
+du nombre -2 (code <span class="math notranslate nohighlight">\({\color{red}1}010_2\)</span>) donne le code <span class="math notranslate nohighlight">\({\color{red}1}101_2\)</span> dont le décodage serait -5.</p></li>
+</ul>
+</div>
+<div class="section" id="utilisation-du-code-complement">
+<h3>Utilisation du code complément<a class="headerlink" href="#utilisation-du-code-complement" title="Lien permanent vers ce titre">¶</a></h3>
+<p>L’idée du code complément repose sur un autre principe. Considérons que nous disposons toujours de 4 bits, soit 16 codes possibles. On réserve la moitié des codes
+pour les nombres positifs en utilisant la fonction de codage des nombres entiers non signés soit <span class="math notranslate nohighlight">\(^4(N_{10})_2\)</span>. Les nombres positifs vont donc de 0 à 7.
+Ainsi le nombre +3 est codé 0011<sub>2</sub>.</p>
+<p>Les 8 codes restants sont utilisés pour représenter les nombres strictement négatifs. On ira donc de -8 à -1. L’avantage de cette représentation est d’éviter
+d’avoir deux codes pour 0, l’inconvénient est de désymétriser les échelles (-8 pour le plus petit nombre négatif et +7 pour le plus grand nombre positif).</p>
+<p>Les huit codes restants sont tels que l’opération d’addition donne un décodage correct.
+On peut formaliser ce principe dans une base paire <span class="math notranslate nohighlight">\(B\)</span> sur <span class="math notranslate nohighlight">\(P\)</span> chiffres en posant :</p>
+<p><span class="math notranslate nohighlight">\(^P(N)_B +_B {^P(-N)_B} = {^P(0)_B}\)</span> où <span class="math notranslate nohighlight">\(+_B\)</span> représente l’addition dans la base <span class="math notranslate nohighlight">\(B\)</span>.</p>
+<div class="admonition-exemple admonition">
+<p class="admonition-title">Exemple</p>
+<p>Illustrons ce principe en base 10 sur 4 chiffres. Sur les <span class="math notranslate nohighlight">\(10^4\)</span> codes disponibles, la moitié servent à coder les nombres positifs ou nul en utilisant
+la fonction de codage <span class="math notranslate nohighlight">\(^4(N)\)</span> : le nombre 0 s’écrit 0000, le nombre 3 s’écrit 0003 et le plus grand nombre positif représentable est 4999 qui s’écrit 4999.</p>
+<p>Le codage des nombres négatifs s’effectue en résolvant l’équation précédente. Ainsi le code du nombre -3 est tel que :</p>
+<p><span class="math notranslate nohighlight">\(^4(3) + {^4(-3)} = {^4(0)}\)</span> soit <span class="math notranslate nohighlight">\(0003 + {^4(-3)} = 0000\)</span>.</p>
+<p>Le code de -3 est donc la valeur qu’il faut ajouter à 3 pour que les quatre derniers chiffres de l’opération d’addition valent 0000.
+Ainsi, <span class="math notranslate nohighlight">\(^4(-3) = 9997\)</span>. En effet dans l’opération d’addition 3 + 9997 donne 10000 dont les quatre derniers chiffres sont bien 0000.</p>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Il est impératif de respecter l’écriture sur <span class="math notranslate nohighlight">\(P\)</span> chiffres. On rappelle que l’on peut omettre la base 10 dans l’écriture lorsqu’il n’y a pas d’ambiguïté.</p>
+</div>
+<p>L’exemple intuitif précédent permet de formuler la propriété suivante :</p>
+<p>Pour une base <span class="math notranslate nohighlight">\(B\)</span> paire et <span class="math notranslate nohighlight">\(P\)</span> chiffres, <span class="math notranslate nohighlight">\(^P(-N)_B = {^P(B^P - N)_B}\)</span>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Dans le codage des nombres négatifs :</p>
+<ul class="simple">
+<li><p>Le résultat du calcul <span class="math notranslate nohighlight">\(B^P - N\)</span> est toujours supérieur ou égal à <span class="math notranslate nohighlight">\(B^P / 2\)</span> et s’écrit, par conséquent, sur <span class="math notranslate nohighlight">\(P\)</span> chiffres.</p></li>
+<li><p>La valeur du chiffre de plus fort poids est toujours supérieure ou égale à <span class="math notranslate nohighlight">\(B/2\)</span>. Cette propriété permet de distinguer facilement
+le codage d’un nombre positif de celui d’un nombre négatif.
+Ceci est particulièrement simple en base 2 où le bit de poids fort du code vaudra 0 pour les nombres positifs et 1 pour les nombres négatifs.
+On appelle ce bit, le bit de signe. Il est important de bien comprendre la différence entre ce codage et la représentation signe + valeur absolue vue au
+paragraphe précédent.</p></li>
+</ul>
+</div>
+<div class="admonition-exercice admonition">
+<p class="admonition-title">Exercice</p>
+<ul class="simple">
+<li><p>Dans une représentation en base 2 sur 8 bits, donner le code de 3 puis le code de -3.</p></li>
+<li><p>Dans une représentation en base 4 sur 3 chiffres, donner le code de 3 puis de -3.</p></li>
+</ul>
+</div>
+<p>Revenons à notre formulation précédente qui présente l’inconvénient de nécessiter une opération de soustraction alors que nous avions souhaité n’utiliser
+que des additions. Afin d’aboutir à un résultat facilement réalisable sur une machine informatique, il nous faut introduire la notion de complément.</p>
+<p>Soit <span class="math notranslate nohighlight">\(x_B\)</span> un chiffre exprimé d’une base <span class="math notranslate nohighlight">\(B\)</span>. On appelle complément en base <span class="math notranslate nohighlight">\(B\)</span> de  <span class="math notranslate nohighlight">\(x_B\)</span>, que l’on notera <span class="math notranslate nohighlight">\(x^*_B\)</span>, le chiffre tel que :</p>
+<p><span class="math notranslate nohighlight">\(x_B +_B x^*_B = (B - 1)_B\)</span>.</p>
+<div class="admonition-exemples admonition">
+<p class="admonition-title">Exemples</p>
+<ul class="simple">
+<li><p>en base 2, <span class="math notranslate nohighlight">\(1^*_2 = 0_2\)</span> car <span class="math notranslate nohighlight">\(1_2 +_2 0_2 = 1_2 = 1\)</span>;</p></li>
+<li><p>en base 8, <span class="math notranslate nohighlight">\(1^*_8 = 6_8\)</span> car <span class="math notranslate nohighlight">\(1_8 +_8 6_8 = 7_8 = 7\)</span> ;</p></li>
+<li><p>en base 16, <span class="math notranslate nohighlight">\(1^*_{16} = E_{16}\)</span> car <span class="math notranslate nohighlight">\(1_{16} +_{16} E_{16} = F_{16} = 15\)</span>.</p></li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Le complément est involutif, c’est-à-dire <span class="math notranslate nohighlight">\(x_B^{**} = x_B\)</span>.</p>
+</div>
+<p>Soit <span class="math notranslate nohighlight">\(^P(N)_B\)</span> un nombre en base <span class="math notranslate nohighlight">\(B\)</span> sur <span class="math notranslate nohighlight">\(P\)</span> chiffres, le complément de <span class="math notranslate nohighlight">\(^P(N)_B\)</span>, noté <span class="math notranslate nohighlight">\(^P(N)_B^*\)</span>,
+est obtenu en calculant le complément en base <span class="math notranslate nohighlight">\(B\)</span> de chaque chiffre de <span class="math notranslate nohighlight">\(^P(N)_B\)</span>.</p>
+<div class="admonition-exemples admonition">
+<p class="admonition-title">Exemples</p>
+<ul class="simple">
+<li><p>en base 2 sur 8 bits, <span class="math notranslate nohighlight">\(01011000_2^* = 10100111_2\)</span></p></li>
+<li><p>en base 10 sur 3 chiffres, <span class="math notranslate nohighlight">\(108^* = 891\)</span></p></li>
+</ul>
+</div>
+<p>Soit <span class="math notranslate nohighlight">\(N_B\)</span> un nombre en base <span class="math notranslate nohighlight">\(B\)</span> et <span class="math notranslate nohighlight">\(P\)</span> un nombre de chiffres alors <span class="math notranslate nohighlight">\(^P(N)_B +_B {^P(N)_B^*} = {^P(B^P - 1)_B}\)</span>.</p>
+<div class="admonition-exemples admonition">
+<p class="admonition-title">Exemples</p>
+<ul class="simple">
+<li><p>en base 2 sur 8 bits, <span class="math notranslate nohighlight">\(01011000_2 +_2 01011000_2^* = 01011000_2 +_2 10100111_2 = 11111111_2 = 255 = 2^8 - 1\)</span></p></li>
+<li><p>en base 10 sur 3 chiffres, <span class="math notranslate nohighlight">\(108 + 108^* = 108 + 891 = 999 = 10^3 - 1\)</span></p></li>
+</ul>
+</div>
+<p>De la propriété précédente on déduit <span class="math notranslate nohighlight">\(B^P = (^P(N)_B +_B {^P(N)_B^*)_{10}} + 1\)</span>.
+Nous pouvons maintenant utiliser <span class="math notranslate nohighlight">\(B^P\)</span> dans l’expression du calcul de <span class="math notranslate nohighlight">\(^P(-N)_B = {^P((^P(N)_B} +_B {^P(N)_B^*)_{10}} + 1 - N)_B\)</span>.
+L’expression <span class="math notranslate nohighlight">\((^P(N)_B +_B {^P(N)_B^*)_{10}}\)</span> peut s’écrire <span class="math notranslate nohighlight">\((^P(N)_B)_{10} +_{10} (^P(N)_B^*)_{10} = N + (^P(N)_B^*)_{10}\)</span>.
+On obtient donc <span class="math notranslate nohighlight">\(^P(-N)_B = {^P((^P(N)_B^*)_{10} + 1)_B}\)</span>.</p>
+<p>Notons que <span class="math notranslate nohighlight">\((^P(N)_B^*)_{10} + 1 &lt; B^P\)</span> et s’écrit donc sur <span class="math notranslate nohighlight">\(P\)</span> chiffres, ce qui permet de simplifier l’écriture.
+En repassant en base <span class="math notranslate nohighlight">\(B\)</span> on obtient :</p>
+<p><span class="math notranslate nohighlight">\(^P(-N)_B = {^P(N)_B^*} +_B 1\)</span>.</p>
+<p>Ce code est appelé code complément à <span class="math notranslate nohighlight">\(B\)</span>.</p>
+<div class="admonition-exemple admonition">
+<p class="admonition-title">Exemple</p>
+<ul>
+<li><p>Retrouvons, par ce nouveau calcul, le code de -3 en base 10 sur 4 chiffres que nous avions trouvé de manière
+plus intuitive. On a donc :</p>
+<p><span class="math notranslate nohighlight">\(^4(-3) = {^4(3)^*} + 1\)</span></p>
+<p><span class="math notranslate nohighlight">\(^4(3)^* = 0003^* = 9996\)</span> donc</p>
+<p><span class="math notranslate nohighlight">\(^4(-3) = 9996 + 1 = 9997\)</span>.</p>
+</li>
+<li><p>Effectuons le même calcul en base 2 sur 8 bits, soit :</p>
+<p><span class="math notranslate nohighlight">\(^8(-3)_2 = {^8(3)_2^*} +_2 1\)</span>.</p>
+<p><span class="math notranslate nohighlight">\(^8(3)_2^* = 00000011_2^* = 11111100_2\)</span> donc</p>
+<p><span class="math notranslate nohighlight">\(^8(-3)_2 = 11111100_2 +_2 1 = 11111101_2\)</span>.</p>
+</li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>La complémentation d’un bit est une opération qui ne nécessite qu’un seul transistor. Le code complément à deux est donc
+un moyen peu coûteux pour représenter les nombres négatifs sur une machine informatique.</p>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Avec nos notations, la fonction de codage d’un nombre entier signé <span class="math notranslate nohighlight">\(N\)</span> dans une base <span class="math notranslate nohighlight">\(B\)</span> paire sur <span class="math notranslate nohighlight">\(P\)</span> chiffres
+est la suivante :</p>
+<ul class="simple">
+<li><p>si <span class="math notranslate nohighlight">\(0 \leq N &lt; B^N/2\)</span> alors <span class="math notranslate nohighlight">\(f(N) = {^P(N)_B}\)</span> ;</p></li>
+<li><p>si <span class="math notranslate nohighlight">\(-B^N/2 \leq N &lt;0\)</span> alors <span class="math notranslate nohighlight">\(f(N) = {^P(-N)_B^*} +_B 1\)</span>.</p></li>
+</ul>
+</div>
+<div class="admonition-exercice admonition">
+<p class="admonition-title">Exercice</p>
+<ul class="simple">
+<li><p>Calculer le code de -128 en base 2 sur 8 bits.</p></li>
+<li><p>Calculer le code de -3 en base 16 sur 4 chiffres.</p></li>
+<li><p>Si <span class="math notranslate nohighlight">\(X\)</span> est la conversion d’un nombre négatif, c’est-à-dire <span class="math notranslate nohighlight">\(X = {^P(-N)_B} = {^P(N)_B^*} +_B 1\)</span>,
+que vaut <span class="math notranslate nohighlight">\(X^* +_B\ 1\)</span> ? Vérifier le résultat sur la question précédente.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="addition-de-nombres-signes">
+<h3>Addition de nombres signés<a class="headerlink" href="#addition-de-nombres-signes" title="Lien permanent vers ce titre">¶</a></h3>
+<p>L’addition de deux nombres signés s’effectuent en additionnant ces nombres dans la base dans laquelle ils sont représentés.
+Nous utiliserons la base 2 sur 8 bits dans la suite de cette partie.</p>
+<p>Comme pour l’addition entre nombres non signés, l’addition de deux nombres signés peut donner un résultat incorrect dans
+la représentation choisie, c’est-à-dire sur le nombre de bits donné. On parle alors de débordement (overflow).</p>
+<p>La règle de détection de ces débordements est simple et repose sur l’observation du signe des opérandes et du résultat.
+Ainsi, si l’on effectue la somme deux nombres positifs et que le résultat est négatif ou si l’on effectue la somme deux nombres négatifs
+et que le résultat est positif, il y débordement.</p>
+<div class="admonition-exemple admonition">
+<p class="admonition-title">Exemple</p>
+<p>soient <span class="math notranslate nohighlight">\(U = 7\)</span> et <span class="math notranslate nohighlight">\(V = 123\)</span> deux nombres. Leur représentation respective en base 2 sur 8 bits est
+<span class="math notranslate nohighlight">\(^8(U)_2 = {\color{red}0} 0000111_2\)</span> et <span class="math notranslate nohighlight">\(^8(V)_2 = {\color{red}0} 1111011_2\)</span>. Les bits de signe de ces deux nombres, représentés
+en rouge, valent 0 indiquant que les nombres sont positifs, comme nous l’avons vu précédemment.</p>
+<p>La somme de ces deux nombres est <span class="math notranslate nohighlight">\(^8(U)_2 +_2 {^8(V)_2} = {\color{red}1}0000010_2= -126_{10}\)</span>. Le bit de signe du résultat est négatif, il y a
+donc débordement car la somme de deux nombres positifs devrait être un nombre positif. Si l’on fait le calcul en base 10 la somme est
+<span class="math notranslate nohighlight">\(U + V = 130\)</span> qui n’est pas représentable dans le format choisi. En effet, la plus grande valeur positive représentable en base 2 sur 8 bits est <span class="math notranslate nohighlight">\(2^8 -1 = 127\)</span>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Les unités arithmétiques et logiques des microprocesseurs intègrent ce processus de détection en positionnant un indicateur, souvent noté V ou OV, lorsque ce cas arrive.
+Il revient au programmeur, selon les langages de programmation qu’il utilise de veiller à ces problèmes de débordement.</p>
+</div>
+<div class="admonition-exercice admonition">
+<p class="admonition-title">Exercice</p>
+<ul>
+<li><p>En base 2 sur 8 bits, on souhaite calculer les sommes <span class="math notranslate nohighlight">\(S_1 = -2 + 5, S_2 = 4 + 7, S_3 = - 4 - 3,  S_4 = -125 - 9\)</span>. Pour chaque somme :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>effectuer le calcul en base 2 ;</p></li>
+<li><p>donner la valeur de l’indicateur de débordement (on utilisera la valeur 1 s’il y a débordement, 0 dans le cas contraire) ;</p></li>
+<li><p>décoder le résultat en base 10 et comparer au résultat attendu.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Soient deux nombres signés <span class="math notranslate nohighlight">\(U\)</span> et <span class="math notranslate nohighlight">\(V\)</span>. Soit <span class="math notranslate nohighlight">\(W =  U + V\)</span>. En notant <span class="math notranslate nohighlight">\(S_U\)</span> et <span class="math notranslate nohighlight">\(S_V\)</span> les signes respectifs des deux opérandes et <span class="math notranslate nohighlight">\(S_W\)</span>
+le signe du résultat, donner l’équation logique de l’indicateur de débordement.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="nombres-en-virgule-fixe">
+<h2>Nombres en virgule fixe<a class="headerlink" href="#nombres-en-virgule-fixe" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Ce paragraphe a pour vocation d’effectuer une transition vers la représentation des nombres flottants dans le format IEEE 754. L’idée de la représentation en virgule fixe consiste
+à considérer un code de <span class="math notranslate nohighlight">\(n\)</span> chiffres composé de deux parties : une partie de <span class="math notranslate nohighlight">\(p\)</span> chiffres pour coder la partie entière et une partie de <span class="math notranslate nohighlight">\(q\)</span> chiffres pour coder
+la partie fractionnaire avec <span class="math notranslate nohighlight">\(n = p + q\)</span>.</p>
+<div class="admonition-exemples admonition">
+<p class="admonition-title">Exemples</p>
+<ul class="simple">
+<li><p>En base 10, avec <span class="math notranslate nohighlight">\(p = 5\)</span> et <span class="math notranslate nohighlight">\(q = 3\)</span>, le nombre N = 123,45 a pour code <span class="math notranslate nohighlight">\({\color{blue}{00123}}{\color{red}{450}}\)</span>. La partie en couleur
+bleue représente la partie entière, celle en couleur rouge la partie fractionnaire.</p></li>
+<li><p>En base 2, avec les mêmes valeurs de <span class="math notranslate nohighlight">\(p\)</span> et <span class="math notranslate nohighlight">\(q\)</span>, le code <span class="math notranslate nohighlight">\({\color{blue}{01110}}{\color{red}{010}}\)</span> représente le nombre <span class="math notranslate nohighlight">\(1110,01_2\)</span>.</p></li>
+</ul>
+</div>
+<p>Supposons que le code en virgule fixe, d’un nombre <span class="math notranslate nohighlight">\(N_B\)</span> en base <span class="math notranslate nohighlight">\(B\)</span>, avec <span class="math notranslate nohighlight">\(p\)</span> chiffres pour la partie entière et <span class="math notranslate nohighlight">\(q\)</span> chiffres pour
+la partie fractionnaire s’écrive :</p>
+<p><span class="math notranslate nohighlight">\(N^{p,q}_B = {{\color{blue}{x_{p-1}...x_1x_0}}{\color{red}{x_{-1}x_{-2}...x_{-q}}}}_B\)</span></p>
+<p>La conversion en base 10 du code d’un nombre en base <span class="math notranslate nohighlight">\(B\)</span> en virgule fixe s’effectue de la manière suivante :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>la décodage de la partie entière <span class="math notranslate nohighlight">\({\color{blue}{x_{p-1}...x_1x_0}}\)</span> s’effectue selon le même principe que pour un nombre entier non signé ;</p></li>
+<li><p>le décodage de la partie fractionnaire <span class="math notranslate nohighlight">\({\color{red}{x_{-1}x_{-2}...x_{-q}}}\)</span> s’effectue en affectant à chaque <span class="math notranslate nohighlight">\(x_{-j}, j \in \{1, q\}\)</span>
+son poids <span class="math notranslate nohighlight">\(p_{-j}\)</span> en base 10  multiplié par <span class="math notranslate nohighlight">\(B^{-j}\)</span>.</p></li>
+</ul>
+</div></blockquote>
+<p>Les deux principes étant similaires, la fonction de décodage est :</p>
+<p><span class="math notranslate nohighlight">\(N = p_{p-1}.B^{p-1} +...+ p_2.B^2+p_1.B^1+p_0.B^0+p_{-1}.B^{-1}+p_{-2}.B^{-2}+...p_{-q}.B^{-q}\)</span>.</p>
+<div class="admonition-exemple admonition">
+<p class="admonition-title">Exemple</p>
+<ul>
+<li><p>Soit le code en base 2 <span class="math notranslate nohighlight">\(N^{5,3}_2 = {\color{blue}{01110}}{\color{red}{010}}\)</span> d’un nombre en virgule fixe, son décodage en base 10 est :</p>
+<p><span class="math notranslate nohighlight">\(N = 0.2^4 + 1.2^3 + 1.2^2 + 1.2^1 + 0.2^0 + 0.2^{-1} + 1.2^{-2} + 0.2^{-3} = 14,25.\)</span></p>
+</li>
+</ul>
+</div>
+<div class="admonition-exercice admonition">
+<p class="admonition-title">Exercice</p>
+<p>La valeur en base 10 d’un nombre fractionnaire écrit en base <span class="math notranslate nohighlight">\(B\)</span> sur <span class="math notranslate nohighlight">\(q\)</span> chiffres est <span class="math notranslate nohighlight">\(F = p_{-1}.B^{-1}+p_{-2}.B^{-2}+...p_{-q}.B^{-q}\)</span>.</p>
+<ul class="simple">
+<li><p>Quelle information apporte la multiplication de <span class="math notranslate nohighlight">\(F\)</span> par <span class="math notranslate nohighlight">\(B\)</span> ?</p></li>
+<li><p>En déduire un principe général pour convertir un nombre fractionnaire de la base 10 vers une base quelconque.</p></li>
+<li><p>En utilisant ce principe, convertir le nombre 17,625 en virgule fixe en base 2 avec <span class="math notranslate nohighlight">\(p = 5\)</span> et <span class="math notranslate nohighlight">\(q = 3\)</span>.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="nombres-en-virgule-flottante">
+<h2>Nombres en virgule flottante<a class="headerlink" href="#nombres-en-virgule-flottante" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Ce paragraphe ne présente qu’une approche réduite de la représentation des <a class="reference external" href="https://fr.wikipedia.org/wiki/Virgule_flottante">nombres en virgule flottante</a>. Le format le plus souvent
+utilisé dans les machines informatiques est la norme IEEE 754. Ce format et les opérations arithmétiques associées sont aujourd’hui
+implémentés dans la majorité des processeurs des ordinateurs afin de grantir leur exécution rapide.</p>
+<p>La représentation flottante repose sur la décomposition d’un mot de 32 bits (« simple précision ») ou de 64 bits (« double précision »)
+en trois champs repectivement appelés Signe, Exposant et Mantisse.</p>
+<p>Les deux formats fixés par la norme IEEE 754 sont résumés à la <a class="reference internal" href="#normeieee754"><span class="std std-numref">Fig. 5</span></a>.</p>
+<blockquote>
+<div><div class="figure align-center" id="id6">
+<span id="normeieee754"></span><a class="reference internal image-reference" href="_images/NormeIEEE754.png"><img alt="_images/NormeIEEE754.png" src="_images/NormeIEEE754.png" style="width: 588.0px; height: 74.19999999999999px;"/></a>
+<p class="caption"><span class="caption-number">Fig. 5 </span><span class="caption-text">Formats de la norme IEEE 754 - source Wikipedia</span><a class="headerlink" href="#id6" title="Lien permanent vers cette image">¶</a></p>
+</div>
+</div></blockquote>
+<p>La <a class="reference internal" href="#normeieee754simpleprecision"><span class="std std-numref">Fig. 6</span></a> représente la répartition des champs pour le format simple précision.</p>
+<blockquote>
+<div><div class="figure align-center" id="id7">
+<span id="normeieee754simpleprecision"></span><a class="reference internal image-reference" href="_images/NormeIEEE754SimplePrecision.png"><img alt="_images/NormeIEEE754SimplePrecision.png" src="_images/NormeIEEE754SimplePrecision.png" style="width: 362.5px; height: 51.5px;"/></a>
+<p class="caption"><span class="caption-number">Fig. 6 </span><span class="caption-text">Format de la norme IEEE 754 en simple précision</span><a class="headerlink" href="#id7" title="Lien permanent vers cette image">¶</a></p>
+</div>
+</div></blockquote>
+<div class="section" id="decodage-d-un-nombre-en-virgule-flottante-sur-32-bits">
+<h3>Décodage d’un nombre en virgule flottante sur 32 bits<a class="headerlink" href="#decodage-d-un-nombre-en-virgule-flottante-sur-32-bits" title="Lien permanent vers ce titre">¶</a></h3>
+<p>Avec nos notations, pour un code normalisé sur 32 bits, le décodage est :</p>
+<p><span class="math notranslate nohighlight">\(N_{10} = -1^S . (1,M_2 . 2^{(E_2)_{10} - 127})_{10}\)</span>.</p>
+<div class="admonition-exemple admonition">
+<p class="admonition-title">Exemple</p>
+<p>Soit <span class="math notranslate nohighlight">\(N_{IEEE754} = \color{green}{1}\color{orange}{10001001}\color{red}{00000000001100000000000}\)</span> le code d’un nombre en virgule flottante au format IEEE 754 sur 32 bits. On a :</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(S = \color{green}{1}\)</span> ;</p></li>
+<li><p><span class="math notranslate nohighlight">\(E = \color{orange}{10001001}_2 = 137_{10}\)</span> ;</p></li>
+<li><p><span class="math notranslate nohighlight">\(M = \color{red}{00000000001100000000000}_2\)</span></p></li>
+</ul>
+<p>En appliquant la fonction de décodage on obtient :</p>
+<p><span class="math notranslate nohighlight">\(N = -1^1 . ({1, 00000000001100000000000}_2 . 2^{137 - 127} )_{10}\)</span></p>
+<p><span class="math notranslate nohighlight">\(N = -({1, 00000000001100000000000}_2 . 2^{10})_{10}\)</span></p>
+<p><span class="math notranslate nohighlight">\(N = -({10000000000,1100000000000}_2)_{10}\)</span></p>
+<p><span class="math notranslate nohighlight">\(N = -1024,75\)</span>.</p>
+</div>
+</div>
+<div class="section" id="codage-d-un-nombre-en-format-flottant-sur-32-bits">
+<h3>Codage d’un nombre en format flottant sur 32 bits<a class="headerlink" href="#codage-d-un-nombre-en-format-flottant-sur-32-bits" title="Lien permanent vers ce titre">¶</a></h3>
+<p>Le principe est assez simple :</p>
+<ul class="simple">
+<li><p>on détermine le signe S ;</p></li>
+<li><p>on convertit le nombre en binaire (partie entière et partie décimale) ;</p></li>
+<li><p>on détermine la mantisse en décalant à droite ou à gauche pour faire apparaitre 1,… ;</p></li>
+<li><p>on termine en calculant l’exposant.</p></li>
+</ul>
+<div class="admonition-exemple admonition">
+<p class="admonition-title">Exemple</p>
+<p>On cherche la représentation au format IEEE 754 sur 32 bits du nombre <span class="math notranslate nohighlight">\(N = 12,625\)</span>.</p>
+<ul class="simple">
+<li><p>Le nombre est positif donc <span class="math notranslate nohighlight">\(S = \color{green}{0}\)</span></p></li>
+<li><p>La conversion en binaire du nombre est <span class="math notranslate nohighlight">\(N = 12,625_{10} = 1100,101_2\)</span></p></li>
+<li><p>Le décalage de la virgule s’effectue à gauche dans ce cas.
+<span class="math notranslate nohighlight">\(N = 1100,101_2 = 1,100101_2.2^3\)</span>. On exprime ensuite le résultat sur 23 bits <span class="math notranslate nohighlight">\(M = {^{23}(100101_2)} =  \color{red}{10010100000000000000000}_2\)</span>.</p></li>
+<li><p>L’exposant <span class="math notranslate nohighlight">\(E\)</span> est obtenu en résolvant <span class="math notranslate nohighlight">\(2^{E-127} = 2^3\)</span> et en convertissant sur 8 bits, soit <span class="math notranslate nohighlight">\(E = {^8(130)_2} =  \color{orange}{10000010}_2\)</span>.</p></li>
+</ul>
+<p>N = 12,625 est représenté par  <span class="math notranslate nohighlight">\(\color{green}{0}\color{orange}{10000010}\color{red}{10010100000000000000000}_{IEEE754}\)</span></p>
+</div>
+</div>
+</div>
+<div class="section" id="caracteres">
+<h2>Caractères<a class="headerlink" href="#caracteres" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Cette partie du cours repose sur un travail personnel. Comme point de départ, on pourra lire l’article sur le
+<a class="reference external" href="https://fr.wikipedia.org/wiki/Codage_des_caract%C3%A8res">codage des caractères</a> de Wikipedia. On pourra aussi approfondir en lisant les articles sur l’ASCII, l’ASCII étendu, l’Unicode, le Art ASCII.</p>
+<div class="admonition-exercice admonition">
+<p class="admonition-title">Exercice</p>
+<p>Si un caractère est codé en ASCII :</p>
+<ul class="simple">
+<li><p>comment passer du caractère “3” au chiffre 3 ?</p></li>
+<li><p>comment récupérer la position d’une lettre dans l’alphabet ?</p></li>
+<li><p>comment convertir une majuscule en minuscule ?</p></li>
+</ul>
+<p>Si l’on saisit la suite de caractères 123 au clavier, quelle est la représentation de cette saisie dans la mémoire de l’ordinateur ?</p>
+</div>
+</div>
+</div>
+
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ProgrammerEnPython.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Programmer en Python</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="Introduction.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Introduction</div>
+                
+              </div>
+            </a>
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2020, Laurent Foulloy
+            |
+            <a class="muted-link" href="_sources/Numeration.rst.txt"
+               rel="nofollow">
+              Montrer le code source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contenu
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Notion de représentation des données</a><ul>
+<li><a class="reference internal" href="#notion-de-codage">Notion de codage</a></li>
+<li><a class="reference internal" href="#representation-des-nombres-entiers-non-signes">Représentation des nombres entiers non signés</a><ul>
+<li><a class="reference internal" href="#addition-de-nombres-non-signes">Addition de nombres non signés</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#nombres-entiers-signes">Nombres entiers signés</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#utilisation-du-code-complement">Utilisation du code complément</a></li>
+<li><a class="reference internal" href="#addition-de-nombres-signes">Addition de nombres signés</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#nombres-en-virgule-fixe">Nombres en virgule fixe</a></li>
+<li><a class="reference internal" href="#nombres-en-virgule-flottante">Nombres en virgule flottante</a><ul>
+<li><a class="reference internal" href="#decodage-d-un-nombre-en-virgule-flottante-sur-32-bits">Décodage d’un nombre en virgule flottante sur 32 bits</a></li>
+<li><a class="reference internal" href="#codage-d-un-nombre-en-format-flottant-sur-32-bits">Codage d’un nombre en format flottant sur 32 bits</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#caracteres">Caractères</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </main>
+</div>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/translations.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+</html>

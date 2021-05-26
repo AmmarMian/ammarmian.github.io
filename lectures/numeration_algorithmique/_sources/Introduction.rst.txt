@@ -1,0 +1,84 @@
+.. -*- coding: utf-8 -*-
+
+************
+Introduction
+************
+
+Ce document est le support du cours INFO501. Il commence par des notions sur 
+la représentation des données avant d'aborder certains concepts de la programmation.
+Il n'est pas exhaustif et doit être **complété par un travail personnel**. 
+
+.. note:: A l’issue du cours INFO501, vous devez :
+
+  - Comprendre la notion de codage, de décodage et de représentation d'un nombre dans différentes bases
+  - Etre capable d’effectuer des additions entre entiers non signés puis entiers signés
+  - Etre capable de convertir un nombre flottant dans sa représentation IEEE et réciproquement
+  - Etre capable d’utiliser des structures algorithmiques de choix et de répétitions ;
+  - Comprendre la notion d’objet ;
+  - Savoir déclarer une classe avec ses attributs et méthodes.
+  
+  Le document comprend aussi une partie consacrée à la récursivité. Elle
+  illustre les avantages et limites de cette technique de programmation.
+  Il a été décidé de sortir du cours cette partie à la rentrée 2019-2020 mais
+  de la conserver dans le support de cours pour permettre aux élèves intéressés
+  d'approfondir leurs compétences.
+
+Il existe de nombreux langages de programmation et en choisir un est toujours délicat.
+Après Pascal et C l’équipe pédagogique a fait le choix de Python pour plusieurs raisons :
+
+- Il existe de nombreux modules qui permettent de développer rapidement des applications
+  dans des domaines très variés ;
+
+- Il existe des environnements de programmation multi-plateforme ;
+
+- Ce langage est utilisé dans de nombreux cycles préparatoires post-bac, y compris en
+  classes préparatoires ;
+
+- Python est un langage impératif, orienté objet, mais permet aussi la
+  programmation fonctionnelle ;
+
+- Python permet une initiation facile à la programmation et facilite le passage
+  vers des langages comme C, PHP ou MATLAB.
+
+Nous avons fait le choix de ne pas couvrir tous les aspects du langage Python, ni
+d'utiliser massivement des formes syntaxiques condensées que ce langage permet,
+afin de conserver une certaine généralité et faciliter la transposition de ces
+concepts dans d'autres langages de programmation.
+
+Pour progresser dans l'acquisition des compétences en programmation, des exercices
+sont proposés dans les différents chapitres. Si ce document fournit les notions
+essentielles pour une initiation à la programmation, il est très utile de
+compléter ses connaissances sur le langage Python avec le livre de Gérard Swinnen
+`Apprendre à programmer avec Python 3`_ en diffusion libre et
+déposé sur l’EAD de Polytech Annecy-Chambéry.
+
+Il est très difficile d'apprendre à programmer sans pratiquer
+sur une machine informatique. Pour cela, vous pouvez télécharger librement et installer
+`anaconda`_.
+
+.. note::
+
+  La plateforme `anaconda`_ contient, entre autres, l'environnement de développement scientifique interactif Spyder
+  utilisé pour ce cours.
+
+Comme pour tout langage de programmation, le recours à la documentation est
+souvent nécessaire pour vérifier une syntaxe ou approfondir une notion. Ce document
+contient des hyperliens renvoyant vers les parties utiles de la documentation.
+D'une manière générale, on pourra consulter :
+
+- `Le langage`_ ;
+
+- `La librairie standard`_.
+
+Afin d'être cohérent et de montrer la richesse des applications écrites en
+Python, ce document a été écrit en utilisant `Sphinx`_ qui est un outil de
+génération de documents écrit avec Python.
+
+.. admonition:: Remerciements
+
+  Je tiens à remercier toute l'équipe pédagogique intervenant en INFO501 et INFO502 
+  pour son implication dans l'évolution des enseignements d'informatique de base
+  et plus particulièrement S. Galichet, P. Lambert, P. Moreaux et F. Vernier 
+  pour les discussions et les améliorations apportées à ce document.  
+  
+.. include:: References.rst

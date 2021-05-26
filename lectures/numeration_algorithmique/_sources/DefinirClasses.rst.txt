@@ -1,0 +1,435 @@
+.. -*- coding: utf-8 -*-
+
+*******************
+Définir des classes
+*******************
+
+La définition d'une classe s'effectue avec le mot-clé *class*. Afin d'illustrer
+les différents principes nous allons créer une classe pour représenter des vecteurs. Commençons par définir
+une classe *Vecteur* sans méthode.
+
+.. code-block:: python
+
+    class Vecteur:
+        pass
+
+Pour créer un objet, il suffit d'utiliser le nom de la classe avec des parenthèses.
+
+.. code-block:: python
+
+    In [1]: x = Vecteur()
+
+Une fois l'objet créé, il devient possible de donner des valeurs à des attributs
+sans que ceux-ci aient besoin d'être déclarés, contrairement à la plupart des autres
+langages orientés objets.
+
+Par exemple, on peut décider de représenter les valeurs du vecteur sous la forme
+d'une liste et de les affecter à l'attribut *valeur*, ce qui donne :
+
+.. code-block:: python
+
+    In [2]: x.valeur = [1, 4, 5]
+
+.. important::
+
+  Attention, bien que cette écriture soit possible en Python, l'ajout dynamique d'un attribut
+  à l'instance d'une classe n'est pas recommandé. Il est préférable de définir les attributs dans
+  la classe et d'instancier ensuite celle-ci. Nous verrons au paragraphe suivant comment
+  réaliser cette opération à l'aide d'un constructeur. 
+
+Constructeur
+============
+
+L'affectation de l'attribut de manière externe, c'est-à-dire à partir de l'objet,
+présente des risques d'erreur pour le programmeur et il est préférable d'utiliser
+un *constructeur*. Le constructeur est une méthode appelée lors de la création de
+l'objet. En Python, le constructeur est la méthode *__init__()* (voir la `liste
+des méthodes spéciales de base`_). Elle peut recevoir
+des paramètres qui vont servir à initialiser les attributs de l'objet. On accède
+à ces derniers en utilisant le mot-clé *self*.
+
+Dans notre exemple, nous souhaitons pouvoir initialiser le vecteur lors de sa
+création, c'est-à-dire passer la liste avec les coordonnées du vecteur au
+constructeur. Dit autrement, on souhaite que l'expression suivante initialise
+l'attribut valeur avec la liste [1, 4, 5].
+
+.. code-block:: python
+
+    In [1]: x = Vecteur([1, 4, 5])
+
+Pour que cette opération soit possible, on ajoute donc le constructeur
+à la classe.
+
+.. literalinclude:: Python/INFO501/ClasseVecteurConstructeur.py
+    :language: python
+    :lines: 1,7- 
+
+On notera l'ajout de commentaires dans la définition de la classe (Attention,
+il faut trois guillemets double pour ouvrir et fermer le commentaire). On parle de
+*document string* ou plus simplement de `docstring`_ pour ces commentaires.
+Ils sont maintenant accessibles par l'intermédiaire de l'attribut *__doc__*.
+
+.. code-block:: python
+
+    In [1]: x = Vecteur([1, 2 , 3])
+    
+    In [2]: print(x.__doc__)
+    
+            Classe permettant de faire des calculs avec des vecteurs    
+
+    In [3]: print(x.__init__.__doc__)
+    
+            Constructeur de la classe
+
+.. note::
+
+    Ce mécanisme permet de récupérer les commentaires inclus dans un programme et de construire
+    ensuite de manière automatique la documentation. Ainsi en tapant *help(Vecteur)* 
+    dans la console Python on obtient une présentation structurée des informations saisies, dont une partie 
+    est représentée ci-dessous.
+    
+    .. code-block:: python
+    
+        In [1]: help(Vecteur)
+        Help on class Vecteur in module __main__:
+        
+        class Vecteur(builtins.object)
+         |  Classe permettant de faire des calculs avec des vecteurs
+         |  
+         |  Methods defined here:
+         |  
+         |  __init__(self, valeur)
+         |      Constructeur de la classe
+         |      
+         |      :param valeur: Liste contenant les composantes du vecteur
+         |
+    
+    Il est aussi possible d'engendrer une documentation au format HTML à l'aide de la commande *pydoc* dans une 
+    fenêtre de commande du système d'exploitation. Supposons que la classe *Vecteur*
+    soit dans un fichier *ClasseVecteur.py*, la commande *pydoc -w ClasseVecteur* engendrera le fichier 
+    *ClasseVecteur.html* de documentation de la classe.
+    
+    .. figure:: Images/Pydoc.png
+        :align: center
+  
+        Commande pour engendrer automatiquement la documentation de la classe Vecteur
+
+Pour définir une méthode dans une classe, on utilise le mot-clé *def*. Comme
+on peut le constater le constructeur a deux paramètres *self* et *valeur*.
+Le premier représente l'objet lui-même et va permettre d'accéder aux attributs
+et méthodes. Le second va contenir l'information passée lors de la création de
+l'objet, c'est-à-dire notre liste [1, 4, 5].
+
+Le code contenu dans le constructeur est très simple et consiste à affecter à
+l'attribut *valeur* de l'objet, i.e. *self.valeur*, l'information passée à l'aide
+du paramètre *valeur*.
+
+.. admonition:: Exercice
+
+  Interpréter le résultat des informations suivantes.
+
+  In [1]: x = Vecteur([1, 4, 5])
+  
+  In [2]: type(x)
+  Out[2]: __main__.Vecteur
+  
+  In [3]: print(x)
+  <__main__.Vecteur object at 0x00000000089DE208>
+  
+  In [4]: print(x.valeur)
+  [1, 4, 5]
+
+
+Ajout de méthodes
+=================
+
+L'ajout de méthodes dans la classe s'effectue à l'aide du mot-clé *def*, comme
+pour le constructeur.
+
+Afin d'illustrer le principe nous allons nous intéresser, dans un premier temps,
+à l'ajout d'une méthode permettant de calculer la norme euclidienne d'un vecteur.
+On rappelle que si *x* est un vecteur de dimension *n* dont les composantes sont
+notées *x*:sub:`i` alors :
+
+.. math::
+
+  ||x|| = \sqrt{\sum_{i=1}^{n}{x_i}^2}
+
+|
+
+Le principe du calcul consiste à accumuler les carrés des composantes du vecteur
+puis à extraire la racine carrée du résultat grâce à la fonction *sqrt()*. Pour
+utiliser cette dernière il est nécessaire d'importer le module mathématique à
+l'aide de l'instruction *import*. L'accumulation des composantes du vecteur
+est réalisée à l'aide d'une répétition *for* opérant sur l'attribut valeur de
+la classe.
+
+.. literalinclude:: Python/INFO501/ClasseVecteurMethodeNorme.py
+    :language: python
+    :lines: 1,7- 
+
+L'appel de la méthode s'effectue comme suit :
+
+.. code-block:: python
+
+    In [1]: x = Vecteur([1, 4, 5])
+
+    In [2]: x.norme()
+    Out[2]: 6.48074069840786
+    
+    In [3]: print(x.norme.__doc__)
+    
+            Méthode qui retourne la norme du vecteur    
+
+Ajoutons maintenant une deuxième méthode *addition()* qui retourne la somme du
+vecteur défini par la classe et du vecteur passé en paramètre. Dit autrement, on
+souhaite pouvoir écrire :
+
+.. code-block:: python
+
+    In [1]: x = Vecteur([1, 4, 5])
+    
+    In [2]: y = Vecteur([1, 2, 3])
+    
+    In [3]: z = x.addition(y))   
+
+Le résultat fourni dans la variable *z* doit être un objet de type *Vecteur*
+dont l'attribut *valeur* est la somme du vecteur x et du vecteur y. Ainsi
+on obtient :
+
+.. code-block:: python
+
+    In [4]: print(z.valeur)
+    [2, 6, 8]
+
+Cette méthode est un peu plus compliquée que la précédente dans la mesure où elle
+fait appel à plusieurs notions.
+
+- L'addition des deux vecteurs suppose qu'ils soient de même dimension. On obtient
+  cette information en utilisant la fonction `len()`_. Si les deux vecteurs ne
+  sont pas de même dimension, la méthode retournera la valeur *None*.
+
+- Les composantes du vecteur résultat sont la somme des composantes de chacun
+  des vecteurs. Pour cela il nous faudra parcourir la liste afin de récupérer les
+  composantes des vecteurs. On utilisera la fonction `range()`_ à cet effet.
+  L'accès à la composante d'indice *i* s'effectue en plaçant cet indice entre [].
+  Par exemple self.valeur[i] fournit la composante d'indice *i* de l'attribut
+  *valeur* de l'objet.
+
+- Les composantes du vecteur résultat seront placées dans une liste. Pour cela,
+  à partir d'une liste vide les composantes seront ajoutées grâce à la méthode
+  `append()`_ opérant sur les listes.
+
+- Le résultat doit être un nouvel objet dont l'attribut *valeur* contient la
+  somme des deux vecteurs. On créera donc dans la méthode un nouvel objet en passant
+  le résultat en paramètre laissant ainsi le soin au constructeur d'affecter
+  l'attribut *valeur*.
+
+Le code de la classe incluant la méthode *addition()* est le suivant :
+
+.. literalinclude:: Python/INFO501/ClasseVecteurMethodeAddition.py
+    :language: python
+    :lines: 1,7- 
+    
+On peut vérifier que si les vecteurs ne sont pas de même dimension, *z* prend la
+valeur *None*. Dans ce cas, l'attribut valeur n'existe pas et son affichage
+produit une erreur d'exécution.
+
+.. code-block:: python
+
+    In [1]: x = Vecteur([1, 4, 5, 8])
+    
+    In [2]: y = Vecteur([1, 2, 3])
+    
+    In [3]: z = x.addition(y)
+    
+    In [4]: print(z)
+    None
+    
+    In [5]: print(z.valeur)
+    Traceback (most recent call last):
+    
+      File "<ipython-input-16-ecb97f5d4f46>", line 1, in <module>
+        print(z.valeur)
+    
+    AttributeError: 'NoneType' object has no attribute 'valeur'
+
+.. important::
+
+  Attention de bien faire la différence entre une fonction, qui peut être appelée
+  simplement comme *range()* ou *len()*, et la méthode d'une classe qui ne peut
+  être appelée qu'à partir d'un objet instancié d'une classe, comme dans
+  *addition()* ou *norme()*.
+
+Surcharge d'opérateurs
+======================
+
+Dans l'exemple précédent nous avons décomposé l'utilisation de la méthode *addition()*.
+Il est cependant possible d'écrire les choses sans passer par la variable
+intermédiaire *y* en utilisant directement la création du second vecteur dans le
+paramètre de la méthode *addition()* :
+
+.. code-block:: python
+
+    In [1]: x = Vecteur([1, 4, 5])
+    
+    In [2]: z = x.addition(Vecteur([1, 2, 3]))
+    
+    In [3]: print(z.valeur)
+    [2, 6, 8]        
+
+On peut même être encore plus direct en écrivant :
+
+.. code-block:: python
+
+    In [1]: z = Vecteur([1, 4, 5]).addition(Vecteur([1, 2, 3]))
+    
+    In [2]: print(z.valeur)
+    [2, 6, 8]            
+
+Il serait cependant encore plus simple de pouvoir écrire *z* = *x* + *y* ou
+*z* =  Vecteur([1, 4, 5]) + Vecteur([1, 2, 3]). De la même manière, il serait plus
+simple de pouvoir écrire directement print(z) pour afficher la valeur du vecteur.
+
+En Python ces écritures sont possibles grâce à la surcharge d'opérateurs à l'aide
+de `méthodes qui ont un nom spécifique`_. Avec ce mécanisme, on peut associer
+l'addition des vecteurs à l'opérateur +. Il faut pour cela utiliser la méthode
+*__add()__* afin de surcharger l'opérateur + lorsqu'il est utilisé avec des
+objets de type *Vecteur* (voir la `liste des opérateurs numériques surchargeables`_).
+
+La modification de code est très simple puisqu'il suffit de remplacer
+la méthode *addition()* par la méthode *__add__()*. 
+
+Pour l'affichage, on utilise la méthode *__str__()* (voir la `liste
+des méthodes spéciales de base`_), cette dernière utilise simplement la fonction
+standard `str()`_ qui transforme la liste en une chaîne de caractères.
+
+.. literalinclude:: Python/INFO501/ClasseVecteurMethodeAdd.py
+    :language: python
+    :lines: 1,7- 
+
+Avec ce code il devient possible d'effectuer très simplement des calculs avec
+des vecteurs.
+
+.. code-block:: python
+
+    In [1]: x = Vecteur([1, 4, 5])
+    
+    In [2]: y = Vecteur([1, 2, 3])
+    
+    In [3]: print(x + y)    
+    [2, 6, 8]
+    
+    In [4]: print(Vecteur([1, 2, 3]) + Vecteur([3, 2, 1]))
+    [4, 4, 4]     
+
+.. note:: Exercice
+
+  Ajouter à la classe *Vecteur* les méthodes qui permettraient de faire :
+
+  - la soustraction de deux vecteurs en utilisant l'opérateur - ;
+
+  - le produit scalaire de deux vecteurs en utilisant l'opérateur \*.
+
+Accesseurs (getters) et mutateurs (setters)
+===========================================
+
+Nous avons vu que le concept d'objet permet de regrouper des données, les attributs, et des
+fonctions pour les manipuler, les méthodes. Ce principe est un des piliers de la
+programmation objets et est appelé *encapsulation*. La visibilité des attributs et des méthodes
+dépend du langage utilisé. Dans les langages dérivés de C++ on distingue trois types de visibilité :
+
+- public - les attributs et méthodes sont toujours accessibles ;
+- protégé - les attributs et méthodes sont accessibles à la classe dans laquelle ils sont définis
+  et aux classes dérivées ;
+- privée - les attributs et méthodes ne sont accessibles qu'à la classe dans laquelle ils sont définis.
+
+D'une manière générale, on évite la définition d'attributs de type public, qui seraient donc 
+directement accessibles depuis une instance de l'objet, et on préfére définir des attributs de type
+protégé ou privé et en contrôler l'accès par deux méthodes de type public : un accesseur (getter) pour récupérer
+l'attribut ou un mutateur (setter) pour en fixer la valeur.
+
+En Python la visibilité des attributs et méthodes est de type public. Toutefois, il est recommandé de prendre l'habitude
+d'utiliser des accesseurs et mutateurs. L'exemple suivant illustre ce principe sur une classe **Counter**
+
+.. literalinclude:: Python/INFO501/ClasseCounter.py
+    :language: python
+    :lines: 1,7- 
+        
+Chaînage de méthodes (Method Chaining)
+======================================
+
+Le chaînage de méthodes permet d'appliquer successivement des méthodes dans une même instruction, sans avoir besoin de
+séparer les appels ou de passer par une étape intermédiaire.
+
+Dans l'exemple précédent, l'affichage de la valeur du compteur après avoir défini sa valeur par le mutateur et l'avoir
+décrémenté nécessite trois instructions.    
+
+.. literalinclude:: Python/INFO501/ClasseCounter.py
+    :language: python 
+    :lines: 52-54 
+    
+A la place on aimerait pouvoir écrire :
+
+.. code-block:: python
+
+	print(x.setCount(10).decrease().getCount())  
+	
+Analysons le chaînage en le décomposant. Le début *x.setCount(10)* ne pose pas 
+de difficulté, il s'agit, comme précédemment, de l'appel de la méthode *setCount()*
+de l'objet *x* mais cette méthode ne retourne aucune valeur car il n'y
+a pas d'instruction **return**. On ne peut donc pas enchaîner avec la méthode
+*decrease()*. Pour que cela devienne possible, il suffit que la méthode *setCount()*
+retourne un objet pour lequel la méthode *decrease()* est valide. 
+Dans notre cas, il suffit que la méthode *setCount()* retourne l'objet considéré,
+c'est-à-dire *self*. Il en va de même pour la méthode *decrease()* afin que l'on 
+puisse enchaîner avec la méthode *getCount()*. Ainsi la transformation du code est 
+assez simple pour permettre le chaînage de méthodes. 
+	 
+.. literalinclude:: Python/INFO501/ClasseChainedCounter.py
+    :language: python 
+    :lines: 1,7- 
+        
+.. note::
+	
+	Les deux premiers chaînages sont appliqués sur l'instance
+	*x* mais on peut directement opérer sur l'instance de la classe
+	engendrée par *Counter()*. Dans ce cas, il s'agit évidemment
+	d'un nouvel objet différent de *x*.    
+ 
+Injection de dépendances (Dependency injection)
+===============================================
+ 
+Un objet de type *A* peut dépendre d'un objet de type *B* de plusieurs façons (voir `injection de dépendances`_).
+Par exemple, un objet *a* de type *A* peut avoir besoin d'un compteur, i.e. un objet de type *Counter*,
+éventuellement initialisé à une certaine valeur qui dépendra du contexte. 
+Plutôt que de laisser à l'objet *a* le soin de créer l'instance de la classe *Counter*, on peut préférer créer un objet
+*x* de type *Counter* en dehors de cette classe et *injecter* l'objet *x* dans l'objet *a*.
+
+Pour ce faire on pourra utiliser une injection par constructeur, l'objet *x* est passé alors en paramètre 
+lors de la création de l'objet *a*.
+
+.. literalinclude:: Python/INFO501/ClasseAvecInjectionParConstructeur.py
+    :language: python 
+    :lines: 1,7-     
+
+On peut bien sûr remplacer les trois dernières lignes par le code suivant.
+
+.. code-block:: python
+     
+    print(A(Counter().setCount(10)).traitement()) 
+    
+On peut aussi réaliser l'injection par un mutateur (setter) spécifique.
+
+.. literalinclude:: Python/INFO501/ClasseAvecInjectionParSetter.py
+    :language: python 
+    :lines: 1,7-      
+    
+Comme le mutateur renvoie *self*, on peut remplacer les quatre dernières lignes par
+le code suivant.
+
+.. code-block:: python
+     
+	print(A().setCompteur(Counter().setCount(10)).traitement()) 
+
+.. include:: References.rst

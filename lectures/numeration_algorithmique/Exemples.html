@@ -1,0 +1,816 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Exemples &#8212; Documentation INFO501 2.0.0</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/translations.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Recherche" href="search.html" />
+    <link rel="next" title="Notion d’objet" href="NotionObjet.html" />
+    <link rel="prev" title="Programmer en Python" href="ProgrammerEnPython.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Index général"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="NotionObjet.html" title="Notion d’objet"
+             accesskey="N">suivant</a> |</li>
+        <li class="right" >
+          <a href="ProgrammerEnPython.html" title="Programmer en Python"
+             accesskey="P">précédent</a> |</li>
+        <li class="nav-item nav-item-0"><a href="Index.html">Documentation INFO501 2.0.0</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="exemples">
+<span id="id1"></span><h1>Exemples<a class="headerlink" href="#exemples" title="Lien permanent vers ce titre">¶</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Cette partie contient des exemples de fonctions qui illustrent les principes vus dans les chapitres précédents.
+Ils permettent de progresser en les analysant et en les testant sur machine.</p>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>On rappelle que le livre de Gérard Swinnen <a class="reference external" href="http://inforef.be/swi/download/apprendre_python3_5.pdf">Apprendre à programmer avec Python 3</a> est en diffusion libre.
+Il contient de nombreux exercices dont les corrigés sont téléchargeables sur la
+<a class="reference external" href="http://inforef.be/swi/python.htm">page de Gérard Swinnen</a>.</p>
+</div>
+<div class="section" id="somme-des-n-premiers-entiers">
+<h2>Somme des <em>n</em> premiers entiers<a class="headerlink" href="#somme-des-n-premiers-entiers" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Le principe de cet algorithme consiste à accumuler la somme dans une variable.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">somme</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+  <span class="n">result</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="n">i</span>
+  <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">somme</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+<span class="mi">0</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">somme</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="mi">15</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="suite">
+<h2>Suite<a class="headerlink" href="#suite" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Le programme suivant calcule la suite <span class="math notranslate nohighlight">\(u_n = 4 u_{n-1} - 1\)</span> avec <span class="math notranslate nohighlight">\(u_0 = 1/3\)</span>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">suite</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+  <span class="n">result</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">result</span> <span class="o">-</span> <span class="mi">1</span>
+  <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+<div class="admonition-exercice admonition">
+<p class="admonition-title">Exercice</p>
+<p>Quelles sont les valeurs affichées pour <em>suite(0)</em>, <em>suite(10)</em>, <em>suite(100)</em> ?</p>
+<p>Expliquer ce résultat.</p>
+</div>
+</div>
+<div class="section" id="calcul-de-n">
+<h2>Calcul de <em>n</em>!<a class="headerlink" href="#calcul-de-n" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Le calcul de <em>n</em>! est, dans le principe, similaire au calcul de la somme des <em>n</em> premiers entiers.
+A la place d’accumuler la somme, on accumule le produit dans la variable <em>result</em>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">factorielle</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+  <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">*</span> <span class="n">i</span>
+  <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+<p>Contrairement à beaucoup d’autres langages, Python permet de faire des calculs
+en entier sans problème de débordement.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">factorielle</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+<span class="mi">1</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">factorielle</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+<span class="mi">6</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">factorielle</span><span class="p">(</span><span class="mi">300</span><span class="p">))</span>
+<span class="mi">30605751221644063603537046129726862938858880417357699941677674125947653317671686</span>
+<span class="mi">74655152914224775733499391478887017263688642639077590031542268429279069745598412</span>
+<span class="mi">25476930271954604008012215776252176854255965356903506788725264321896264299365204</span>
+<span class="mi">57644883038890975394348962543605322598077652127082243763944912012867867536830571</span>
+<span class="mi">22936819436499564604981664502277165001851765464693401122260347297240663332585835</span>
+<span class="mi">06870150169794168850353752137554910289126407157154830282284937952636580145235233</span>
+<span class="mi">15693648223343679925459409527682060806223281238738388081704960000000000000000000</span>
+<span class="mi">0000000000000000000000000000000000000000000000000000000</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="suite-de-fibonacci">
+<h2>Suite de Fibonacci<a class="headerlink" href="#suite-de-fibonacci" title="Lien permanent vers ce titre">¶</a></h2>
+<p>La <a class="reference external" href="https://fr.wikipedia.org/wiki/Suite_de_Fibonacci">suite de Fibonacci</a> est définie par :</p>
+<div class="math notranslate nohighlight">
+\[y_n = y_{n-1} + y_{n-2} \; avec \;  y_0 = 0 \;  et \;  y_1 = 1.\]</div>
+<p>Le principe de l’algorithme consiste à utiliser trois variables, par exemple
+<em>a</em>, <em>b</em> et <em>c</em>. Pour calculer le terme <em>y</em><sub>2</sub>, on place dans les
+variables <em>a</em> et <em>b</em> les valeurs de <em>y</em><sub>0</sub> et <em>y</em><sub>1</sub> puis on effectue
+la somme que l’on place dans <em>c</em>. Pour que ce principe puisse être itéré, il
+reste à décaler correctement les variables. Si nous calculions <em>y</em><sub>3</sub>, il
+faudrait que les variables <em>a</em> et <em>b</em> contiennent respectivement les valeurs de
+<em>y</em><sub>1</sub> et <em>y</em><sub>2</sub>. On en déduit que la variable <em>b</em>, qui contient
+<em>y</em><sub>1</sub>, doit être transférée dans la variable <em>a</em> et que la variable <em>c</em>,
+qui contient <em>y</em><sub>2</sub>, doit être transférée dans la variable <em>b</em>. Ce
+principe est illustré <a class="reference internal" href="#fibonacci"><span class="std std-numref">Fig. 7</span></a>.</p>
+<div class="figure align-center" id="id3">
+<span id="fibonacci"></span><a class="reference internal image-reference" href="_images/Fibonacci.png"><img alt="_images/Fibonacci.png" src="_images/Fibonacci.png" style="width: 160.0px; height: 160.8px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 7 </span><span class="caption-text">Principe des décalages à effectuer</span><a class="headerlink" href="#id3" title="Lien permanent vers cette image">¶</a></p>
+</div>
+<p>Le code de la fonction qui calcule la <em>n</em>-ième valeur de la suite de Fibonacci
+découle de ce principe. Un test est ajouté pour traiter les cas où la fonction
+serait appelée avec les valeurs 0 ou 1 en paramètre.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+  <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">n</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+      <span class="n">c</span> <span class="o">=</span> <span class="n">b</span> <span class="o">+</span> <span class="n">a</span>
+      <span class="n">a</span> <span class="o">=</span> <span class="n">b</span>
+      <span class="n">b</span> <span class="o">=</span> <span class="n">c</span>
+  <span class="k">return</span> <span class="n">c</span>
+</pre></div>
+</div>
+<p>L’appel à la fonction s’effectue sans difficulté.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">fibonacci</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+<span class="mi">0</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">fibonacci</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+<span class="mi">8</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">fibonacci</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+<span class="mi">354224848179261915075</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="persistance-dun-nombre">
+<h2>Persistance d’un nombre<a class="headerlink" href="#persistance-dun-nombre" title="Lien permanent vers ce titre">¶</a></h2>
+<p>On appelle persistance multiplicative d’un nombre, le nombre d’itérations pour le réduire à un seul chiffre
+en multipliant tous ceux qui le composent. Par exemple, le nombre 963 a une persistance de 3 car 9*6*3=162,
+1*6*2=12, 1*2=2 (voir <a class="reference external" href="https://fr.wikipedia.org/wiki/Persistance_d%27un_nombre">persistance d’un nombre</a> pour plus de détails).</p>
+<p>On effectue une itération que si le nombre est supérieur à 10. L’itération consiste à multiplier tous les
+chiffres entre eux. On les obtient en calculant le reste de la division entière par 10, opération que l’on effectue
+tant que le nombre est strictement positif. Les produits sont accumulés dans la variable <em>x</em> qui devient le nouveau nombre à traiter
+à la fin de l’itération. On a donc deux itérations imbriquées dont le nombre n’est pas connu <em>a priori</em>, ce que l’on
+code par deux instructions <em>while</em>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">persistanceMultiplicative</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">compteur</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="k">while</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">%</span> <span class="mi">10</span><span class="p">)</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">//</span> <span class="mi">10</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="n">compteur</span> <span class="o">=</span> <span class="n">compteur</span> <span class="o">+</span> <span class="mi">1</span>        
+    <span class="k">return</span> <span class="n">compteur</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">persistanceMultiplicative</span> <span class="p">(</span><span class="mi">963</span><span class="p">))</span>
+<span class="mi">3</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">persistanceMultiplicative</span><span class="p">(</span><span class="mi">277777788888899</span><span class="p">))</span>
+<span class="mi">11</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="palindrome">
+<h2>Palindrome<a class="headerlink" href="#palindrome" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Un palindrome est un mot ou un texte qui reste identique si on le lit de gauche à droite ou de droite à gauche.
+Le programme suivant vérifie si un mot est un palindrome. Le principe consiste à comparer le <em>i</em>-ème caractère de la
+chaîne avec le (<em>longueur - i</em>)-ème caractère. On itère cette comparaison tant qu’elle est valide et que l’on n’a pas
+atteint la moitié de la chaîne.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">palindrome</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">indiceDernierCaractere</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">indiceDernierCaractere</span><span class="o">//</span><span class="mi">2</span> <span class="ow">and</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span><span class="n">indiceDernierCaractere</span> <span class="o">-</span> <span class="n">i</span><span class="p">]:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> 
+        
+    <span class="k">return</span> <span class="n">i</span> <span class="o">==</span> <span class="n">indiceDernierCaractere</span><span class="o">//</span><span class="mi">2</span>
+
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">palindrome</span><span class="p">(</span><span class="s1">&#39;kayak&#39;</span><span class="p">))</span>
+<span class="kc">True</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">palindrome</span><span class="p">(</span><span class="s1">&#39;kabuki&#39;</span><span class="p">))</span>
+<span class="kc">False</span>
+</pre></div>
+</div>
+<p>Le langage Python permet de couper simplement certains types de données (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range">slicing</a>). L’algorithme suivant exploite cette
+spécificité du langage où <em>s[::-1]</em> est la chaîne <em>s</em> à l’envers. Il ne faut cependant pas oublier que, derrière la simplicité de l’écriture,
+le test d’égalité <em>==</em> cache une répétion.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">palindrome</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">s</span> <span class="o">==</span> <span class="n">s</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Notons que l’algoritme précédent compare toute la chaîne <em>s</em> avec toute la chaîne <em>s</em> inversée. Dans le cas où l’on a un palindrome, on effectue
+donc <em>longueur//2</em> comparaisons inutiles avec <em>longueur</em> la longueur de la chaîne <em>s</em>. L’algorithme suivant utilise le même principe en évitant ces
+comparaisons inutiles.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">palindrome</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="n">longueur</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">s</span><span class="p">[:</span> <span class="n">longueur</span><span class="o">//</span><span class="mi">2</span> <span class="p">:]</span> <span class="o">==</span> <span class="n">s</span><span class="p">[</span><span class="n">longueur</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">:</span> <span class="p">(</span><span class="n">longueur</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span> <span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>La notation <em>s[: longueur//2 :]</em> retourne la chaîne commençant à l’indice 0 et se terminant à l’indice <em>longueur//2 - 1</em>.
+De la même manière, <em>s[longueur - 1 : (longueur - 1)//2 : -1]</em> retourne la chaîne commençant à l’indice <em>longueur - 1</em> et se terminant à
+l’indice <em>(longueur - 1)//2 + 1</em>. Le pas étant -1, la chaîne est obtenue à l’envers.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;azertyu&#39;</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">longueur</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="p">[:</span> <span class="n">longueur</span><span class="o">//</span><span class="mi">2</span> <span class="p">:])</span>
+<span class="n">aze</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">longueur</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">:</span> <span class="p">(</span><span class="n">longueur</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span> <span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">uyt</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="conversion-de-la-base-10-vers-une-autre-base-par-divisions-successives">
+<h2>Conversion de la base 10 vers une autre base par divisions successives<a class="headerlink" href="#conversion-de-la-base-10-vers-une-autre-base-par-divisions-successives" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Le principe de l’algorithme est le suivant :</p>
+<ul class="simple">
+<li><p>On divise le nombre par la base tant qu’il est plus grand ou égal à celle-ci ;</p></li>
+<li><p>Le reste de la division (modulo) est inséré à gauche d’une chaine ;</p></li>
+<li><p>Le dividende devient le nouveau nombre à traiter ;</p></li>
+<li><p>A la fin, on ajoute à gauche le nombre restant.</p></li>
+</ul>
+<div class="figure align-center" id="id4">
+<a class="reference internal image-reference" href="_images/ChangementBase.png"><img alt="_images/ChangementBase.png" src="_images/ChangementBase.png" style="width: 272.5px; height: 120.0px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 8 </span><span class="caption-text">Conversion du nombre 11 en base 2</span><a class="headerlink" href="#id4" title="Lien permanent vers cette image">¶</a></p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">decimalToBase</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">while</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="n">b</span><span class="p">:</span>
+      <span class="n">modulo</span> <span class="o">=</span> <span class="n">x</span> <span class="o">%</span> <span class="n">b</span>
+      <span class="n">result</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">modulo</span><span class="p">)</span> <span class="o">+</span> <span class="n">result</span>
+      <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">//</span> <span class="n">b</span> <span class="c1"># Pour forcer la division entière</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">result</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">decimalToBase</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="mi">1011</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">decimalToBase</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="mi">13</span>
+</pre></div>
+</div>
+<p>L’algorithme précédent ne fonctionne toujours correctement que si la base
+est inférieure ou égale à 10. Si la base est plus grande, les digits
+supérieurs à 9 ne sont pas convertis. Ainsi, dans l’exemple suivant la première
+conversion est correcte alors que la seconde affiche 115 à la place de 1F.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">decimalToBase</span><span class="p">(</span><span class="mi">33</span><span class="p">,</span><span class="mi">16</span><span class="p">))</span>
+<span class="mi">21</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">decimalToBase</span><span class="p">(</span><span class="mi">31</span><span class="p">,</span><span class="mi">16</span><span class="p">))</span>
+<span class="mi">115</span>
+</pre></div>
+</div>
+<p>On peut améliorer l’algorithme en ne fournissant plus la base mais une chaine
+de caractères formée des digits de la base comme, par exemple :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'01'</span></code> pour la base 2 ;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'01234567'</span></code> pour la base 8 ;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'0123456789ABCDEF'</span></code> pour la base 16.</p></li>
+</ul>
+<p>La longueur de cette chaine, obtenue grâce à la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#len">len()</a>, est la base.
+Ainsi, len(<code class="docutils literal notranslate"><span class="pre">'01234567'</span></code>) retourne 8.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">decimalToBaseWithDigits</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">digits</span><span class="p">):</span>
+  <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+  <span class="n">b</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span>
+  <span class="k">while</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="n">b</span><span class="p">:</span>
+    <span class="n">modulo</span> <span class="o">=</span> <span class="n">x</span> <span class="o">%</span> <span class="n">b</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">digits</span><span class="p">[</span><span class="n">modulo</span><span class="p">]</span> <span class="o">+</span> <span class="n">result</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">//</span> <span class="n">b</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">digits</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">+</span> <span class="n">result</span>
+  <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">decimalToBaseWithDigits</span><span class="p">(</span><span class="mi">31</span><span class="p">,</span><span class="s1">&#39;01&#39;</span><span class="p">))</span>
+<span class="mi">11111</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">decimalToBaseWithDigits</span><span class="p">(</span><span class="mi">31</span><span class="p">,</span><span class="s1">&#39;0123456789ABCDEF&#39;</span><span class="p">))</span>
+<span class="mi">1</span><span class="n">F</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cryptage-par-le-chiffrement-de-cesar">
+<h2>Cryptage par le chiffrement de César<a class="headerlink" href="#cryptage-par-le-chiffrement-de-cesar" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Un des chiffrements les plus simples consiste à remplacer les lettres d’un texte
+par d’autres lettres en utilisant une permutation circulaire de l’alphabet. Par
+exemple on remplace le A par le D, le B par le E, le C par le F et ainsi de
+suite. La longueur du décalage, ici 3, constitue la clé du chiffrement qui est
+l’information à transmettre pour décrypter le message.
+Ce chiffrement par décalage est connu sous le nom de chiffre de
+César car Jules César l’utilisait pour crypter ses correspondances.</p>
+<div class="figure align-center" id="id5">
+<a class="reference internal image-reference" href="_images/Cesar.png"><img alt="_images/Cesar.png" src="_images/Cesar.png" style="width: 220.0px; height: 93.0px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 9 </span><span class="caption-text">Chiffrement de César (source Wikipédia)</span><a class="headerlink" href="#id5" title="Lien permanent vers cette image">¶</a></p>
+</div>
+<p>Ce chiffrement par substitution mono-alphabétique dans
+lequel on remplace un alphabet par un autre alphabet n’offre aucune
+sécurité car une analyse fondée sur la fréquence d’apparition des lettres permet
+de trouver rapidement la clé.</p>
+<p>On rappelle que les caractères sont représentés par leur code ASCII. Le caractère A a comme code 65. En
+python, on obtient le code ASCII d’un caractère grâce à la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#ord">ord()</a>. Pour obtenir la position d’un
+caractère dans l’alphabet à partir de 0, il suffit donc de soustraire 65 à son code ASCII.
+La fonction <em>charToPos()</em> ci-après réalise le passage du caractère à sa position.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">charToPos</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">-</span> <span class="mi">65</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">charToPos</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">))</span>
+<span class="mi">0</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">charToPos</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">))</span>
+<span class="mi">25</span>
+</pre></div>
+</div>
+<p>De manière réciproque, connaissant la position d’une lettre dans l’alphabet en comptant à partir de 0, le code ASCII
+du caractère s’obtient en ajoutant 65. En Python, pour engendrer un caractère dont le code ASCII est connu, on utilise
+la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#chr">chr()</a>. La fonction <em>posToChar()</em> ci-après réalise le passage de la position au caractère.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">posToChar</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">chr</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">65</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">posToChar</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">A</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">posToChar</span><span class="p">(</span><span class="mi">25</span><span class="p">))</span>
+<span class="n">Z</span>
+</pre></div>
+</div>
+<p>Le cryptage d’une lettre par le chiffrement de César consite à ajouter le décalage à la position de la lettre à coder.
+On effectue cette somme modulo 26 pour obtenir une nouvelle position que l’on convertit en caractère.
+La fonction <em>crypt()</em> réalise cette opération où <em>key</em> est le décalage.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">crypt</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">posToChar</span><span class="p">((</span><span class="n">charToPos</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">+</span> <span class="n">key</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">crypt</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">D</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">crypt</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">C</span>
+</pre></div>
+</div>
+<p>Finalement, le cryptage d’un message consiste simplement à crypter toutes les lettres du message. Pour cela, on utilise
+une variable <em>result</em> initialisée par une chaîne vide et on effectue une répétition pour traiter chaque caractère.
+Pour que cette opération soit possible, il est nécessaire que le caractère à crypter soit en majuscule et entre A et Z.
+Dans ce cas, on accumule dans la variable <em>result</em> les concaténations des caractères cryptés.
+On notera, dans l’algorithme suivant que le langage Python permet d’introduire des fonctions locales à une fonction.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">cesarCrypt</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+
+    <span class="c1"># Fonctions locales à la fonction cesarCrypt()    </span>
+    <span class="k">def</span> <span class="nf">charToPos</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">-</span> <span class="mi">65</span>
+
+    <span class="k">def</span> <span class="nf">posToChar</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">chr</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">65</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">crypt</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">posToChar</span><span class="p">((</span><span class="n">charToPos</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">+</span> <span class="n">key</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">)</span>
+  
+    <span class="c1"># Corps de la fonction cesarCrypt()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">message</span><span class="p">:</span>
+        <span class="n">upperChar</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;A&#39;</span> <span class="o">&lt;=</span> <span class="n">upperChar</span> <span class="o">&lt;=</span> <span class="s1">&#39;Z&#39;</span><span class="p">:</span>        
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="n">crypt</span><span class="p">(</span><span class="n">upperChar</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> 
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="n">c</span>
+            
+    <span class="k">return</span> <span class="n">result</span>
+
+        
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">cesarCrypt</span><span class="p">(</span><span class="s1">&#39;Polytech Annecy-Chambery&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">SROBWHFK</span> <span class="n">DQQHFB</span><span class="o">-</span><span class="n">FKDPEHUB</span>
+</pre></div>
+</div>
+<p>Pour décrypter un message crypté, on procède comme pour le cryptage mais, bien sûr, en décrpytant chaque caractère.
+Pour décrypter un caractère, on retire le décalage à la position de la lettre à coder. On notera l’ajout de 26 qui
+garantit d’obtenir un résultat positif.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">uncrypt</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">posToChar</span><span class="p">((</span><span class="n">charToPos</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">-</span> <span class="n">key</span> <span class="o">+</span> <span class="mi">26</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">uncrypt</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">A</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">uncrypt</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">Z</span>
+</pre></div>
+</div>
+<p>Finalement, l’algorithme de décryptage est le suivant.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">cesarUncrypt</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+
+    <span class="c1"># Fonctions locales à la fonction cesarUncrypt()    </span>
+    <span class="k">def</span> <span class="nf">charToPos</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">-</span> <span class="mi">65</span>
+
+    <span class="k">def</span> <span class="nf">posToChar</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">chr</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">65</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">uncrypt</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">posToChar</span><span class="p">((</span><span class="n">charToPos</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">-</span> <span class="n">key</span> <span class="o">+</span> <span class="mi">26</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">)</span>
+  
+    <span class="c1"># Corps de la fonction cesarUncrypt()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">message</span><span class="p">:</span>
+        <span class="n">upperChar</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;A&#39;</span> <span class="o">&lt;=</span> <span class="n">upperChar</span> <span class="o">&lt;=</span> <span class="s1">&#39;Z&#39;</span><span class="p">:</span>          
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="n">uncrypt</span><span class="p">(</span><span class="n">upperChar</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="n">c</span>
+            
+    <span class="k">return</span> <span class="n">result</span>
+
+        
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">cesarUncrypt</span><span class="p">(</span><span class="s1">&#39;SROBWHFK DQQHFB-FKDPEHUB&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">POLYTECH</span> <span class="n">ANNECY</span><span class="o">-</span><span class="n">CHAMBERY</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cryptage-par-le-chiffrement-de-vigenere">
+<h2>Cryptage par le chiffrement de Vigenère<a class="headerlink" href="#cryptage-par-le-chiffrement-de-vigenere" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Le chiffrement de Vigenère est un chiffrement poly-alphabétique par substitution
+dont le principe est illustré à la figure suivante. Les trois premières lettres du texte et
+de la clé sont mises en correspondance à l’aide de la table. Ainsi, le couple (<code class="docutils literal notranslate"><span class="pre">'M'</span></code>, <code class="docutils literal notranslate"><span class="pre">'C'</span></code>) donne
+la lettre <code class="docutils literal notranslate"><span class="pre">'O'</span></code>, le couple (<code class="docutils literal notranslate"><span class="pre">'E'</span></code>, <code class="docutils literal notranslate"><span class="pre">'L'</span></code>) donne <code class="docutils literal notranslate"><span class="pre">'P'</span></code> et le couple (<code class="docutils literal notranslate"><span class="pre">'S'</span></code>, <code class="docutils literal notranslate"><span class="pre">'E'</span></code>) donne <code class="docutils literal notranslate"><span class="pre">'W'</span></code>.
+Pour la quatrième lettre du texte on reprend la première lettre de la clé.
+Le couple (<code class="docutils literal notranslate"><span class="pre">'S'</span></code>, <code class="docutils literal notranslate"><span class="pre">'C'</span></code>) donne la lettre <code class="docutils literal notranslate"><span class="pre">'U'</span></code> et ainsi de suite pour le reste du message.</p>
+<div class="figure align-center" id="id6">
+<a class="reference internal image-reference" href="_images/Vigenere.png"><img alt="_images/Vigenere.png" src="_images/Vigenere.png" style="width: 310.0px; height: 268.0px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 10 </span><span class="caption-text">Illustration du principe de chiffrement</span><a class="headerlink" href="#id6" title="Lien permanent vers cette image">¶</a></p>
+</div>
+<p>On peut formaliser l’obtention de la lettre codée. En effet, en comptant les
+positions à partir de 0, la lettre codée  a
+comme position dans l’alphabet la somme des positions du caractère du message
+et du carctère de la clé modulo 26.</p>
+<p>Exemples :</p>
+<ul>
+<li><p>Pour le couple (<code class="docutils literal notranslate"><span class="pre">'M'</span></code>, <code class="docutils literal notranslate"><span class="pre">'C'</span></code>) :</p>
+<div class="line-block">
+<div class="line">charToPos(<code class="docutils literal notranslate"><span class="pre">'M'</span></code>) = 12,</div>
+<div class="line">charToPos(<code class="docutils literal notranslate"><span class="pre">'C'</span></code>) = 2,</div>
+<div class="line">(12 + 2) % 26 = 14</div>
+<div class="line">posToChar(14) = <code class="docutils literal notranslate"><span class="pre">'O'</span></code></div>
+</div>
+</li>
+<li><p>Pour le couple (<code class="docutils literal notranslate"><span class="pre">'M'</span></code>, <code class="docutils literal notranslate"><span class="pre">'T'</span></code>) :</p>
+<div class="line-block">
+<div class="line">charToPos(<code class="docutils literal notranslate"><span class="pre">'M'</span></code>) = 12,</div>
+<div class="line">charToPos(<code class="docutils literal notranslate"><span class="pre">'T'</span></code>) = 19,</div>
+<div class="line">(12 + 19) % 26  = 5</div>
+<div class="line">posToChar(5) = <code class="docutils literal notranslate"><span class="pre">'F'</span></code></div>
+</div>
+</li>
+</ul>
+<p>On en déduit la fonction de cryptage d’un caractère du message
+connaissant un caractère de la clé.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">crypt</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">keyChar</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">posToChar</span><span class="p">((</span><span class="n">charToPos</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">+</span> <span class="n">charToPos</span><span class="p">(</span><span class="n">keyChar</span><span class="p">))</span> <span class="o">%</span> <span class="mi">26</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>En supposant que le message à traduire et la clé sont dans des chaînes de
+caractères, le principe de l’algorithme est assez simple.</p>
+<div class="line-block">
+<div class="line">Initialiser un compteur pour la clé</div>
+<div class="line"><strong>Pour</strong> chaque caractère de la chaine</div>
+<div class="line-block">
+<div class="line">Convertir en majuscule le caractère à crypter</div>
+<div class="line">Convertir en majuscule le caractère de la clé dont la position est fournie par le compteur</div>
+<div class="line"><strong>Si</strong> le caractère à crypter est entre <code class="docutils literal notranslate"><span class="pre">'A'</span></code> et <code class="docutils literal notranslate"><span class="pre">'Z'</span></code></div>
+<div class="line-block">
+<div class="line">Crypter le caractère</div>
+</div>
+<div class="line"><strong>Sinon</strong></div>
+<div class="line-block">
+<div class="line">Utiliser le caractère tel quel</div>
+</div>
+<div class="line">Mettre à jour le compteur pour la clé (compteur modulo la taille de la clé)</div>
+</div>
+</div>
+<p>Le code en Python est le suivant.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">vigenereCrypt</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    
+    <span class="c1"># Fonctions locales à la fonction vigenereCrypt()    </span>
+    <span class="k">def</span> <span class="nf">charToPos</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">-</span> <span class="mi">65</span>
+
+    <span class="k">def</span> <span class="nf">posToChar</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">chr</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">65</span><span class="p">)</span>  
+
+    <span class="k">def</span> <span class="nf">crypt</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">keyChar</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">posToChar</span><span class="p">((</span><span class="n">charToPos</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">+</span> <span class="n">charToPos</span><span class="p">(</span><span class="n">keyChar</span><span class="p">))</span> <span class="o">%</span> <span class="mi">26</span><span class="p">)</span>
+
+    <span class="c1"># Corps de la fonction vigenereCrypt()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">keyCounter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">message</span><span class="p">:</span>
+      <span class="n">upperChar</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+      <span class="n">keyChar</span> <span class="o">=</span> <span class="n">key</span><span class="p">[</span><span class="n">keyCounter</span><span class="p">]</span>
+      <span class="n">upperKeyChar</span> <span class="o">=</span> <span class="n">keyChar</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+      <span class="k">if</span> <span class="s1">&#39;A&#39;</span> <span class="o">&lt;=</span> <span class="n">upperChar</span> <span class="o">&lt;=</span> <span class="s1">&#39;Z&#39;</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="n">crypt</span><span class="p">(</span><span class="n">upperChar</span><span class="p">,</span> <span class="n">upperKeyChar</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="n">c</span>
+      <span class="n">keyCounter</span> <span class="o">=</span> <span class="p">(</span><span class="n">keyCounter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+      
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">vigenereCrypt</span><span class="p">(</span><span class="s1">&#39;Polytech Annecy-Chambery&#39;</span><span class="p">,</span> <span class="s1">&#39;azerty&#39;</span><span class="p">))</span>
+<span class="n">PNPPMCCG</span> <span class="n">RGLEBC</span><span class="o">-</span><span class="n">VFALFVKW</span>
+</pre></div>
+</div>
+<p>L’algorithme de décryptage repose sur le même principe. Un ajout de 26 dans le
+calcul de la position de la nouvelle position permet de gérer le décalage
+négatif de la position du caractère de la clé.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">uncrypt</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">keyChar</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">posToChar</span><span class="p">((</span><span class="n">charToPos</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">-</span> <span class="n">charToPos</span><span class="p">(</span><span class="n">keyChar</span><span class="p">)</span> <span class="o">+</span> <span class="mi">26</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Le code en Python de l’algorithme de décryptage est le suivant.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">vigenereUncrypt</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    
+    <span class="c1"># Fonctions locales à la fonction vigenereUncrypt()    </span>
+    <span class="k">def</span> <span class="nf">charToPos</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">-</span> <span class="mi">65</span>
+
+    <span class="k">def</span> <span class="nf">posToChar</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">chr</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">65</span><span class="p">)</span>  
+
+    <span class="k">def</span> <span class="nf">uncrypt</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">keyChar</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">posToChar</span><span class="p">((</span><span class="n">charToPos</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">-</span> <span class="n">charToPos</span><span class="p">(</span><span class="n">keyChar</span><span class="p">)</span> <span class="o">+</span> <span class="mi">26</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">)</span>
+
+    <span class="c1"># Corps de la fonction vigenereUncrypt()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">keyCounter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">message</span><span class="p">:</span>
+      <span class="n">upperChar</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+      <span class="n">keyChar</span> <span class="o">=</span> <span class="n">key</span><span class="p">[</span><span class="n">keyCounter</span><span class="p">]</span>
+      <span class="n">upperKeyChar</span> <span class="o">=</span> <span class="n">keyChar</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+      <span class="k">if</span> <span class="s1">&#39;A&#39;</span> <span class="o">&lt;=</span> <span class="n">upperChar</span> <span class="o">&lt;=</span> <span class="s1">&#39;Z&#39;</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="n">uncrypt</span><span class="p">(</span><span class="n">upperChar</span><span class="p">,</span> <span class="n">upperKeyChar</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="o">+</span> <span class="n">c</span>
+      <span class="n">keyCounter</span> <span class="o">=</span> <span class="p">(</span><span class="n">keyCounter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+      
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">vigenereUncrypt</span><span class="p">(</span><span class="s1">&#39;PNPPMCCG LG JNYI, PNPPMCCG KHSJNYIL&#39;</span><span class="p">,</span> <span class="s1">&#39;azerty&#39;</span><span class="p">))</span>
+<span class="n">POLYTECH</span> <span class="n">UN</span> <span class="n">JOUR</span><span class="p">,</span> <span class="n">POLYTECH</span> <span class="n">TOUJOURS</span>
+</pre></div>
+</div>
+<p>Le chiffrement de Vigenère peut paraître plus sûr que le chiffrement de César.
+Cependant si l’on connait la longueur de la clé, une analyse fréquentielle devient
+possible. A ce titre, on pourra consulter la <a class="reference external" href="https://fr.wikipedia.org/wiki/Cryptanalyse_du_chiffre_de_Vigen%C3%A8re">cryptanalyse du chiffre de Vigenère</a>.</p>
+</div>
+<div class="section" id="tri-a-bulles">
+<h2>Tri à bulles<a class="headerlink" href="#tri-a-bulles" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Le tri à bulles est un algorithme de tri essentiellement utilisé
+à des fins pédagogiques car il est l’un des plus lents. Son principe consiste
+à comparer les éléments deux à deux et à faire une permutation afin de déplacer
+les éléments les plus petits vers le début du tableau. Les éléments les « plus
+légers » remontent comme des bulles d’air d’où le nom de ce tri.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Principe de l’algorithme</p>
+<div class="line-block">
+<div class="line"><strong>Itération 0 :</strong></div>
+<div class="line"><span class="math notranslate nohighlight">\(\color{red}{5\ 4}\)</span> 6 3 2 1 =&gt; 4 5 6 3 2 1</div>
+<div class="line">4 <span class="math notranslate nohighlight">\(\color{red}{5\ 6}\)</span> 3 2 1</div>
+<div class="line">4 5 <span class="math notranslate nohighlight">\(\color{red}{6\ 3}\)</span> 2 1 =&gt; 4 5 3 6 2 1</div>
+<div class="line">4 5 3 <span class="math notranslate nohighlight">\(\color{red}{6\ 2}\)</span> 1 =&gt; 4 5 3 2 6 1</div>
+<div class="line">4 5 3 2 <span class="math notranslate nohighlight">\(\color{red}{6\ 1}\)</span> =&gt; 4 5 3 2 1 <span class="math notranslate nohighlight">\(\color{magenta}{6\ Bien\ plac\acute e}\)</span></div>
+<div class="line"><br /></div>
+<div class="line"><strong>Itération 1 :</strong></div>
+<div class="line"><span class="math notranslate nohighlight">\(\color{red}{4\ 5}\)</span> 3 2 1 6</div>
+<div class="line">4 <span class="math notranslate nohighlight">\(\color{red}{5\ 3}\)</span> 2 1 6 =&gt; 4 3 5 2 1 6</div>
+<div class="line">4 3 <span class="math notranslate nohighlight">\(\color{red}{5\ 2}\)</span> 1 6 =&gt; 4 3 2 5 1 6</div>
+<div class="line">4 3 2 5 <span class="math notranslate nohighlight">\(\color{red}{1\ 6}\)</span> =&gt; 4 3 2 1 <span class="math notranslate nohighlight">\(\color{magenta}{5\ 6\ Bien\ plac\acute es}\)</span></div>
+<div class="line"><br /></div>
+<div class="line"><strong>Itération 2 :</strong></div>
+<div class="line"><span class="math notranslate nohighlight">\(\color{red}{4\ 3}\)</span> 2 1 5 6 =&gt; 3 4 2 1 5 6</div>
+<div class="line">3 <span class="math notranslate nohighlight">\(\color{red}{4\ 2}\)</span> 1 5 6 =&gt; 3 2 4 1 5 6</div>
+<div class="line">3 2 <span class="math notranslate nohighlight">\(\color{red}{4\ 1}\)</span> 5 6 =&gt; 3 2 1 <span class="math notranslate nohighlight">\(\color{magenta}{4\ 5\ 6\ Bien\ plac\acute es}\)</span></div>
+<div class="line"><br /></div>
+<div class="line"><strong>Itération 3 :</strong></div>
+<div class="line"><span class="math notranslate nohighlight">\(\color{red}{3\ 2}\)</span> 1 4 5 6 =&gt; 2 3 1 4 5 6</div>
+<div class="line">2 <span class="math notranslate nohighlight">\(\color{red}{3\ 1}\)</span> 4 5 6 =&gt; 2 1 <span class="math notranslate nohighlight">\(\color{magenta}{3\ 4\ 5\ 6\ Bien\ plac\acute es}\)</span></div>
+<div class="line"><br /></div>
+<div class="line"><strong>Itération 4 :</strong></div>
+<div class="line"><span class="math notranslate nohighlight">\(\color{red}{2\ 1}\)</span> 3 4 5 6 =&gt; <span class="math notranslate nohighlight">\(\color{magenta}{1\ 2\ 3\ 4\ 5\ 6\ Bien\ plac\acute es}\)</span></div>
+</div>
+</div>
+<p>Le code Python se déduit de cette analyse.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">triBulle</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+    <span class="n">endIndex</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">endIndex</span><span class="p">):</span>
+      <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">endIndex</span><span class="o">-</span><span class="n">i</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">t</span><span class="p">[</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]:</span>
+          <span class="n">tempo</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+          <span class="n">t</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+          <span class="n">t</span><span class="p">[</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tempo</span>
+          
+    <span class="k">return</span> <span class="n">t</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">triBulle</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Le principe proposé dans cet exemple n’est pas le plus optimisé mais il présente
+l’intérêt de mettre facilement en évidence le nombre de tests.</p>
+<p>En effet, on effectue 5 tests à l’itération 0, puis 4 à
+l’itération 1, puis 3 à l’itération 2… Pour un tableau de 6 éléments on a donc
+1 + 2 + 3 + 4 + 5 tests. Dans le cas général, pour un tableau de <em>n</em> éléments
+le nombre de tests est donc la somme des <em>n</em>-1 premiers entiers soit <em>n</em> (<em>n</em>-1)/2.</p>
+<p>Même dans les versions « optimisées », en moyenne ce tri a une <a class="reference external" href="https://fr.wikipedia.org/wiki/Complexit%C3%A9_en_temps">complexité</a> O(<em>n</em><sup>2</sup>).</p>
+<p>La figure suivante représente le temps moyen du tri bulle sur des séries de données tirées aléatoirement.</p>
+<div class="figure align-center" id="id7">
+<img alt="_images/TriBulleComplexite.png" src="_images/TriBulleComplexite.png" />
+<p class="caption"><span class="caption-number">Fig. 11 </span><span class="caption-text">Temps moyen du tri bulle en fonction du nombre d’éléments à trier</span><a class="headerlink" href="#id7" title="Lien permanent vers cette image">¶</a></p>
+</div>
+</div>
+<div class="section" id="fusion-de-deux-listes-triees">
+<span id="fusion"></span><h2>Fusion de deux listes triées<a class="headerlink" href="#fusion-de-deux-listes-triees" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Etant données deux listes <em>liste1</em> et <em>liste2</em> triées par ordre croissant, l’objectif de cet exemple est d’écrire
+une fonction <em>fusion(liste1, liste2)</em> qui fusionne deux listes passées en paramètre en  une nouvelle liste triée.
+Cette fonction sera réutilisée dans la partie consacrée à la récursivité dans l’algorithme du tri fusion.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">fusion</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">]))</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Une solution consiste à utiliser deux compteurs <em>compteur1</em> et <em>compteur2</em> pour indexer respectivement <em>liste1</em> et <em>liste2</em>.
+On part d’une liste fusionnée vide <em>listeFusionnee</em>. Si l’un des compteurs a atteint la longueur de sa liste associée,
+on ajoute à <em>listeFusionnee</em> tous les éléments de l’autre liste avec la méthode <a class="reference external" href="https://docs.python.org/3/tutorial/datastructures.html">extend()</a>, terminant ainsi l’algorithme.
+Dans le cas contraire, <em>compteur1</em> et <em>compteur2</em> sont donc respectivement inférieurs à la longueur de leur liste associée. Dans
+ce cas, on vient ajouter à <em>listeFusionnee</em> le plus petit des éléments <em>liste1[compteur1]</em> et <em>liste2[compteur2]</em> avec la méthode <a class="reference external" href="https://docs.python.org/3/tutorial/datastructures.html">append()</a>
+et on incrémente le compteur associé. On répète ceci tant que l’on n’a pas terminé.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">def</span> <span class="nf">fusion</span><span class="p">(</span><span class="n">liste1</span><span class="p">,</span> <span class="n">liste2</span><span class="p">):</span>
+    <span class="n">listeFusionnee</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">compteur1</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">compteur2</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">longueur1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">liste1</span><span class="p">)</span>
+    <span class="n">longueur2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">liste2</span><span class="p">)</span>
+    <span class="n">fini</span> <span class="o">=</span> <span class="kc">False</span>
+    
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">fini</span><span class="p">:</span>
+       <span class="k">if</span> <span class="n">compteur1</span> <span class="o">&lt;</span> <span class="n">longueur1</span> <span class="ow">and</span> <span class="n">compteur2</span> <span class="o">&lt;</span> <span class="n">longueur2</span><span class="p">:</span>
+           <span class="k">if</span> <span class="n">liste1</span><span class="p">[</span><span class="n">compteur1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">liste2</span><span class="p">[</span><span class="n">compteur2</span><span class="p">]:</span>
+               <span class="n">listeFusionnee</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">liste1</span><span class="p">[</span><span class="n">compteur1</span><span class="p">])</span>
+               <span class="n">compteur1</span> <span class="o">=</span> <span class="n">compteur1</span> <span class="o">+</span> <span class="mi">1</span>
+           <span class="k">else</span><span class="p">:</span>
+               <span class="n">listeFusionnee</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">liste2</span><span class="p">[</span><span class="n">compteur2</span><span class="p">])</span>
+               <span class="n">compteur2</span> <span class="o">=</span> <span class="n">compteur2</span> <span class="o">+</span> <span class="mi">1</span>
+       <span class="k">elif</span> <span class="n">compteur1</span> <span class="o">==</span> <span class="n">longueur1</span><span class="p">:</span>
+           <span class="n">listeFusionnee</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">liste2</span><span class="p">[</span><span class="n">compteur2</span><span class="p">:])</span>
+           <span class="n">fini</span> <span class="o">=</span> <span class="kc">True</span>
+       <span class="k">else</span><span class="p">:</span>
+           <span class="n">listeFusionnee</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">liste1</span><span class="p">[</span><span class="n">compteur1</span><span class="p">:])</span>
+           <span class="n">fini</span> <span class="o">=</span> <span class="kc">True</span>          
+    <span class="k">return</span> <span class="n">listeFusionnee</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="Index.html">Table des matières</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Exemples</a><ul>
+<li><a class="reference internal" href="#somme-des-n-premiers-entiers">Somme des <em>n</em> premiers entiers</a></li>
+<li><a class="reference internal" href="#suite">Suite</a></li>
+<li><a class="reference internal" href="#calcul-de-n">Calcul de <em>n</em>!</a></li>
+<li><a class="reference internal" href="#suite-de-fibonacci">Suite de Fibonacci</a></li>
+<li><a class="reference internal" href="#persistance-dun-nombre">Persistance d’un nombre</a></li>
+<li><a class="reference internal" href="#palindrome">Palindrome</a></li>
+<li><a class="reference internal" href="#conversion-de-la-base-10-vers-une-autre-base-par-divisions-successives">Conversion de la base 10 vers une autre base par divisions successives</a></li>
+<li><a class="reference internal" href="#cryptage-par-le-chiffrement-de-cesar">Cryptage par le chiffrement de César</a></li>
+<li><a class="reference internal" href="#cryptage-par-le-chiffrement-de-vigenere">Cryptage par le chiffrement de Vigenère</a></li>
+<li><a class="reference internal" href="#tri-a-bulles">Tri à bulles</a></li>
+<li><a class="reference internal" href="#fusion-de-deux-listes-triees">Fusion de deux listes triées</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Sujet précédent</h4>
+  <p class="topless"><a href="ProgrammerEnPython.html"
+                        title="Chapitre précédent">Programmer en Python</a></p>
+  <h4>Sujet suivant</h4>
+  <p class="topless"><a href="NotionObjet.html"
+                        title="Chapitre suivant">Notion d’objet</a></p>
+  <div role="note" aria-label="source link">
+    <h3>Cette page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Exemples.rst.txt"
+            rel="nofollow">Montrer le code source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Recherche rapide</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Index général"
+             >index</a></li>
+        <li class="right" >
+          <a href="NotionObjet.html" title="Notion d’objet"
+             >suivant</a> |</li>
+        <li class="right" >
+          <a href="ProgrammerEnPython.html" title="Programmer en Python"
+             >précédent</a> |</li>
+        <li class="nav-item nav-item-0"><a href="Index.html">Documentation INFO501 2.0.0</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Laurent Foulloy.
+      Créé avec <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+    </div>
+  </body>
+</html>
