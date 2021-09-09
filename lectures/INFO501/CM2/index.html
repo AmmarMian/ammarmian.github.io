@@ -1,0 +1,479 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Introduction à la numération et l'algorithmique</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="css/theme/metropolis.css" id="theme">
+		<link rel="stylesheet" href="plugin/title-footer/title-footer.css">
+		<link rel="stylesheet" href="plugin/chalkboard/style.css">
+		<link rel="stylesheet" href="css/flexbox/flexboxgrid.css" type="text/css">
+		<link rel="stylesheet" href="plugin/presentable/presentable.min.css">
+		<link rel="stylesheet" href="css/custom.css" type="text/css">
+
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+		<link rel="stylesheet" href="plugin/verticator/verticator.css">
+	</head>
+	<body>
+
+		<div class="reveal">
+			<div class="slides">
+
+<!-- --------------------------------------------------------------------------------------------- -->
+<!-- -------------------------- THE PRESENTATION ELEMENTS GO UNDER HERE -------------------------- -->
+<!-- --------------------------------------------------------------------------------------------- -->
+				
+				<!-- First horizontal slide -->
+				<section>
+
+					<h1 class="talk-title" style="font-weight: bolder;">Numération et algorithmique</h1>
+					<h2>Introduction et notions de représentation de nombres</h2>
+					<p style="margin-bottom: 10%;">Cours Magistral 2/7</p>
+
+					<img class="plain" height="75px" src="assets/logos/USMB.svg" style="margin-right: 3%;">
+					<img class="plain" height="75px" src="assets/logos/Polytech.svg" style="margin-right: 3%;">
+					<img class="plain" height="75px" src="assets/logos/IAE.png">
+
+					<aside class="notes">
+						<ul>
+							<li>Speech de bienvenue (Feuille d'appel, discours (soirée d'hier), Retour sur Anaconda, moodle et Github)</li>
+							<li>Suite de l'a dernière fois</li>
+						</ul>
+					</aside>
+				</section>
+				<!-- End of first horizontal slide -->
+
+				<!-- Second horizontal slide -->
+				<section>
+					<h1>Table of Contents</h1>
+					<nav id="presentable-toc" class="revealjs"></nav>
+				</section>
+
+				<!-- Third horizontal slide -->
+				<section>
+					<section data-background-color="rgba(248,202,124, 1)">
+						<h1>Retours du CM1</h1>
+						<h2>Questions sur le contenu ?</h2>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Encodings--Number-Systems_Watermarked.906d62e907dc.jpg">
+						</div>
+	
+					</section>
+
+					<section>
+						<h2>Retour exercice plaque immatriculation</h2>
+						<p>
+							On a vu que $N = (23^2-1)\times 1000\times (23^2-2)$.</br>
+							Sachant qu’il y avait environ 37 millions de véhicules immatriculés en 2009 et qu’il y a environ 3 millions de nouvelles immatriculations chaque année, quelle est la durée approximative de ce codage ?
+						</p>
+
+		
+					</section>
+
+					<section>
+						<h2>Conversion de base $10$ à base $B$</h2>
+						<div>
+						<h3><b>Exemple avec $N_{10} = 783$ :</b></h3></div>
+						<div class="row">
+							<div class="col-xs">
+								<ol>
+									<li class="fragment">$783 = 2 \times 391 + 1$</li>
+									<li class="fragment">$391 = 2 \times 195 + 1$</li>
+									<li class="fragment">$195 = 2 \times 94 + 1$</li>
+									<li class="fragment">$97 = 2 \times 48 + 1$</li>
+									<li class="fragment">$48 = 2 \times 24 + 0$</li>
+									<li class="fragment">$24 = 2 \times 12 + 0$</li>
+									<li class="fragment">$12 = 2 \times 6 + 0$</li>
+									<li class="fragment">$6 = 2 \times 3 + 0$</li>
+									<li class="fragment">$3 = 2 \times 1 + 1$</li>
+									<li class="fragment">$1 = 2 \times 0 + 1$</li>
+								</ol>
+							</div>
+							<div class="col-xs">
+								<p class="fragment">$N_2 = 1100001111$</p>
+							</div>
+					</div>
+
+
+					</section>
+
+				</section>
+
+				<section>
+					<section data-background-color="rgba(248,202,124, 1)">
+						<h1>Opérations sur les nombres en machine: Addition</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Interactive-Visualization-w-Bokeh-Watermark.cf07569335d5.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>Principe d'addition en base $B$</h2>
+						<blockquote>
+							D’une manière générale, dans une base quelconque, l’addition s’effectue dans la base, chiffres par chiffres, en commençant par le chiffre de plus faible poids et en propageant la retenue. On notera $+_B$, l’addition dans la base $B$.
+						</blockquote>
+						<ul class>
+							<li class="fragment">$81_{10}+_{10}89_{10}=170_{170}$</li>
+							<li class="fragment">$81_{16} +_{16} 89_{16} = 10A_{16}$</li>
+							<li class="fragment">$00101_{2} +_{2} 01110_{2} = 10011_{2}$</li>
+						</ul>
+
+						<p class="fragment"><b>Problème du débordement en programmation !</b></p>
+					</section>
+
+					<section>
+						<h2>Principe du débordement (1/2)</h2>
+						Soient $U = 28$ et $V=5$ représentés sur $8$ bits: 
+								<img src="./assets/AdditionNonSigneSansDebordement.png">
+		
+
+						<aside class="notes">
+							<ul>
+								<li>$C$ est un indicateur dans le microprocesseur qui permet de détecter si ça arrive</li>
+								<li>Il faut ainsi faire attention au nombres de bits qu'on assigne pour représenter un truc.</li>
+							</ul>
+						</aside>
+					</section>
+
+					<section>
+						<h2>Principe du débordement (2/2)</h2>
+						Soient $U = 128$ et $V=129$ représentés sur $8$ bits: 
+								<img src="./assets/AdditionNonSigneAvecDebordement.png">
+		
+
+						<aside class="notes">
+							<ul>
+								<li>$C$ est un indicateur dans le microprocesseur qui permet de détecter si ça arrive</li>
+								<li>Il faut ainsi faire attention au nombres de bits qu'on assigne pour représenter un truc.</li>
+							</ul>
+						</aside>
+					</section>
+
+					<section>
+						<h2>Conséquences du débordement: le cas Ariane...</h2>
+						<iframe width="560" height="315" src="https://www.youtube.com/embed/PK_yguLapgA?start=78" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+					</section>
+
+				</section>
+
+				<section>
+					<section data-background-color="rgba(254, 126, 115, 1)">
+						<h1>Nombres signés</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Building-and-Documenting-Python-REST-APIs-With-Flask-and-Connexion_Watermarked.4f126f60be3f.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>Nombre signés</h2>
+						<blockquote>
+							Jusque maintenant, nos avons considéré des nombres <b>non-signés</b> (cad positifs). On peut se poser la question de comment représenter les nombres <b>signés</b>
+						</blockquote>
+
+						<p class="fragment">Imaginons que je veux représenter $N=-5$, comment obtenir un code qui le différentie de $M=5$ ?</p>
+					</section>
+
+					<section>
+						<h2>Une solution imparfaite</h2>
+						<b>Idée :</b>
+						<blockquote>
+							On utilise un <b>bit supplémentaire</b> pour coder le signe !
+						</blockquote>
+						Exemple : </br>
+						<ul>
+							<li>$^8(5_{10})_2 = $ <span style="color: red;">$0$</span> $0000$ $0101_2$</li>
+							<li>$^8(-5_{10})_2 = $ <span style="color: red;">$1$</span> $0000$ $0101_2$</li>
+						</ul>
+						<p class="fragment">&rarr; Quels sont les inconvénients de cette approche ?</p>
+
+						<blockquote class="fragment">
+							<ul>
+								<li>Un bit supplémentaire nécéssaire</li>
+								<li>Addition ne se fait pas naturellement : $^8(5_{10} + -5_{10})_2 = 0$ $0000$ $0000_2$, mais</br>$^8(5_{10})_2$ + $^8(-5_{10})_2 = $ $1$ $0000$ $1010_2$. </li>
+							</ul>
+						</blockquote>
+					</section>
+
+					<section>
+						<h2>Le code complément</h2>
+						<blockquote>
+							Considérons que nous disposons de 4 bits, soit 16 codes possibles. On réserve la moitié des codes pour les nombres positifs en utilisant la fonction de codage des nombres entiers non signés soit $^4(N_{10})_2$.
+							<ul>
+								<li>Les nombres positifs vont donc de $0$ à $7$.</li>
+								<li>Les 8 codes restants sont utilisés pour représenter les nombres strictement négatifs. On ira donc de -8 à -1.</li>
+							</ul>
+							 
+						</blockquote>
+
+						Quels avantages ?
+						<ul class="fragment">
+							<li>Une représentation pour le $0$.</li>
+							<li>Addition naturelle conservée... <span class="fragment">grâce au débordement</span></li>
+						</ul>
+
+						<aside class="notes">
+							Faire une liste au tableau des nombres positifs et négatifs
+						</aside>
+					</section>
+
+					<section>
+						<h2>Exemple pratique en base $B=10$</h2>
+						
+						<blockquote>
+							Considérons des nombres écrits sur $4$ chiffres en base $10$ : 
+							<ul>
+								<li>le nombre 0 s’écrit 0000</li>
+								<li>le nombre 3 s’écrit 0003</li>
+								<li>le plus grand nombre positif représentable est 4999 qui s’écrit 4999.</li>
+							</ul>
+						</blockquote>
+
+						<p class="fragment">
+							Soit $^4(3_{10})$, comment obtenir $^4(-3_{10})$ ?
+						</p>
+						<p class="fragment">&rarr; Il faut résoudre l'équation : $^4(3) + {^4(-3)} = {^4(0)}$</p>
+						<p class="fragment">&rarr; Soit ${^4(-3)}=9997$</p>
+					</section>
+
+					<section>
+						<h2>Exercice :</h2>
+						<blockquote>
+							<ul>
+								<li>Dans une représentation en base 2 sur 8 bits, donner le code de 3 puis le code de -3.</li>
+								<li>Dans une représentation en base 4 sur 3 chiffres, donner le code de 3 puis de -3.</li>
+							</ul>
+						</blockquote>
+
+							<p class="fragment">De manière générale : $^P(-N)_B = {^P(B^P - N)_B}$ </p>
+							
+							<aside class="notes">
+								Si manque de temps, laisser à la maison...
+							</aside>
+						
+					</section>
+
+					<section>
+						<h2>Obtenir le code de l'opposé en pratique : le complément</h2>
+						<blockquote>
+						<p class="fragment">
+						<b>Chiffre :</b>
+						Soit $x_B$ un chiffre en base $B$, on définit son complément à la base $B$ avec la notation $x_B^*$ par:</br>
+						$x_B +_B x^*_B = (B - 1)_B$
+						</p>
+
+						<p class="fragment">
+						<b>Nombre :</b> Soit $^P(N)_B=x_{n-1}\dots x_{0}$ en base $B$ sur $P$ chiffres. On définit le complément à la base $B$ par :</br>
+						$^P(N)_B^* = x_{n-1}^*\dots x_{0}^*$</p>
+						</blockquote>	
+						
+						Exemple en base 2 : 
+						<ul>
+							<li>Code complément de $^8(5_{10})_2$ ?</li>
+							<li>En déduire comment obtenir l'opposé en base 2 rapidement</li>
+						</ul>
+						<p class="fragment">$^P(-N)_B = {^P(N)_B^*} +_B 1$</p>
+
+						<aside class="notes">
+							$^8(5)_2 = 00000101$</br>
+							$^8(5)_2^* = 11111010$</br>
+							Faire (-5 "naturellement" avec $^8(2^8-5)_2=11111011$)</br>
+							Laisser la démonstration de la formule dans le cours
+						</aside>
+					</section>
+
+					<section>
+						<h2>Exercice à la maison</h2>
+						<blockquote>
+							<ul>
+								<li>Calculer le code de $-128$ en base $2$ sur $8$ bits.</li>
+								<li>Calculer le code de $-3$ en base $16$ sur $4$ chiffres.</li>
+								<li>Si $X$ est la conversion d'un nombre négatif, c'est-à-dire $X = ^P(-N)_B=^P(N)_B^* +_B $, que vaut $X^* +_B 1$ ? Vérifier le résultat sur la question précédente.</li>
+							</ul>
+						</blockquote>
+					</section>
+					
+				</section>
+
+				<section>
+					<section data-background-color="rgba(161,214, 221, 1)">
+						<h1>Nombres flottants</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Python-Basics-Chapter-Numbers-in-Python_Watermarked.f90ea9a4afd7.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>Nombre à virgule en base $B$</h2>
+
+						<blockquote>
+							Soit $N_B=x_n\dots x_1x_0.x_{-1}\dots x_{-m}$, on a :</br>
+							$(N_B)_{10}=\displaystyle\sum_{k=-m}^{n}p_kB^k$ où $p_k$ est le poids de $x_k$ dans la base $B$.
+						</blockquote>
+
+
+
+						Exemple d'un nombre en base 10 :</br></br>
+
+						Exemple d'un nombre en base 2 :</br></br>
+
+						Exemple d'un nombre en base 16 :</br></br>
+
+
+						<aside class="notes">
+							Le poids c'est pour les bases en alphabet ou autre symboles surtout quand on dépasse les 10 chiffres.</br>
+							Donner des exemples dans les bases au tableau
+						</aside>
+					</section>
+
+					<section>
+						<h2>Format IEEE 754</h2>
+
+						Format le plus couremment utilisé:
+						<img src="./assets/NormeIEEE754.png"></br>
+
+						&rarr; Géré par la pluspart des processeurs pour faire des calculs. </br></br>
+						En simple précision, ce qui est codé dans la machine :
+						<img src="./assets/NormeIEEE754SimplePrecision.png">
+
+
+
+						<aside class="notes">
+							Principe de conversion sera vu en TD1.
+						</aside>
+					</section>
+
+				</section>
+
+
+				<section>
+					<section data-background-color="rgba(156, 209, 215, 1)">
+						<h1>Nombres flottants</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Strings-and-Character-Data-in-Python_Watermarked.296b2b518ae5.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>Représentation ASCII</h2>
+						Acronyme pour American Standard Code for Information Interchange. On code les caractères avec un code sur 7 bits :</br>
+
+						<figure>
+							<img height="300" src="https://upload.wikimedia.org/wikipedia/commons/c/cf/USASCII_code_chart.png">
+							<caption><p style="font-size: smaller;">ASCII chart from a pre-1972 printer manual @Wikipedia</p></caption>
+						</figure>
+						
+						Autre format : Unicode
+					</section>
+
+
+				</section>
+			
+				<section>
+					<section data-background-color="rgba(254, 126, 115, 1)">
+						<h1>En pratique</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/UPDATE-First-Steps-With-Python_Watermarked.256721df5607.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>
+							Types natifs en pythons
+						</h2>
+
+						<ul>
+							<li>Booléens : bool</li>
+							<li>Nombre entiers signés : int</li>
+							<li>Nombre flottants : float (double précision)</li>
+							<li>Chaines de caractères (séquence de codes pour chaque lettre): str</li>
+						</ul>
+
+						D'autres types peuvent être obtenus à l'aide de librairies externes.
+					</section>
+
+					<section>
+						<h2>Essayons sur l'interpréteur python</h2>
+						<iframe src="http://brython.info/console.html" width="800" height="400"></iframe>
+					</section>
+				</section>
+
+<!-- --------------------------------------------------------------------------------------------- -->
+<!-- -------------------------- IT ENDS HERE -------------------------- -->
+<!-- --------------------------------------------------------------------------------------------- -->
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script src="plugin/math/math.js"></script>
+		<script src="plugin/menu/menu.js"></script>
+		<script src="plugin/chalkboard/plugin.js"></script>
+		<script src="plugin/verticator/verticator.js"></script>
+		<script src="plugin/presentable/presentable.min.js"></script>
+		
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				backgroundTransition: 'slide',
+				hash: true,
+				touch: true,
+				controls: true,
+				transition: 'slide',
+				dependencies: [
+					{ src: 'plugin/reveald3js/reveald3.js' },
+					// { src: 'plugin/title-footer/title-footer.js', async: true, callback: function() { title_footer.initialize(); } },
+					// { src: 'plugin/typed/typed.js', async: false , callback: function() { callTypedJs(); }}
+				],
+				math: {
+					mathjax: 'https://cdn.jsdelivr.net/gh/mathjax/mathjax@2.7.8/MathJax.js',
+					config: 'TeX-AMS_HTML-full',
+					},
+				menu: {
+					numbers: true,
+					width: 'wide',
+					themes: false,
+					transitions: false,
+					openSlideNumber: true,
+				},
+				chalkboard: {
+					toggleChalkboardButton: { left: "80px" },
+					toggleNotesButton: { left: "130px" },
+					colorButtons: true,
+					boardHandle: true,
+					eraser: { src: path + 'img/sponge.png', radius: 40},
+					storage: './notes'
+				},
+				verticator: {
+					darktheme: false,
+					skipuncounted: false,
+					clickable: true
+				},
+				slideNumber: "c/t",
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMath, RevealMarkdown, RevealHighlight, RevealNotes, RevealMenu, RevealChalkboard, Verticator ]
+			});
+
+			presentable.toc({
+				framework: "revealjs",
+				hideNoTitle: true,
+				titles: "h1,.presentable-title"
+			});
+		</script>
+	</body>
+</html>
