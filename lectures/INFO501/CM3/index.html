@@ -1,0 +1,1008 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Programmer en Python</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="css/theme/metropolis.css" id="theme">
+		<link rel="stylesheet" href="plugin/title-footer/title-footer.css">
+		<link rel="stylesheet" href="plugin/chalkboard/style.css">
+		<link rel="stylesheet" href="css/flexbox/flexboxgrid.css" type="text/css">
+		<link rel="stylesheet" href="plugin/presentable/presentable.min.css">
+		<link rel="stylesheet" href="css/custom.css" type="text/css">
+
+		<style>
+			.container{
+					display: flex;
+			}
+			.col{
+					flex: 1;
+					margin: auto;
+			}
+		</style>
+
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+		<link rel="stylesheet" href="plugin/verticator/verticator.css">
+
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+
+					<h1 class="talk-title" style="font-weight: bolder;">Programmer en Python</h1>
+					<h3>Un aperçu des fondamentaux</h3>
+					<p style="margin-bottom: 10%;">Cours Magistral 3/7</p>
+
+					<img class="plain" height="75px" src="../../assets/logos/USMB.svg" style="margin-right: 3%;">
+					<img class="plain" height="75px" src="../../assets/logos/Polytech.svg" style="margin-right: 3%;">
+					<img class="plain" height="75px" src="../../assets/logos/IAE.png">
+				</section>
+
+				<section>
+					<h1>Table of Contents</h1>
+					<nav id="presentable-toc" class="revealjs" style="font-size:large;"></nav>
+				</section>
+
+				<section>
+					<section data-background-color="rgba(254, 126, 116, 1)">
+						<h1>Python et les autres langages de programmation</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://robocrop.realpython.net/?url=https%3A//files.realpython.com/media/Switching_Watermarked.7780b18d1990.jpg&w=960&sig=d7f1c66c1db8cfdd5fe415989230d78db623ec4d">
+						</div>
+					</section>
+
+					<section>
+						<h2>Module INFO501</h2>
+						<div class="row">
+							<div class="col-xs-4">
+								<img width='400' src="./images/python-3d-pixel.svg">
+							</div>
+							<div class="col-xs-8">
+								<ul>
+									<li class="fragment">
+										Dans ce cours, nous utiliserons Python
+									</li>
+									<li class="fragment">
+										Mais il est très important de savoir qu'il existe de nombreux langages différents :
+									</li>
+								</ul>
+								<figure class="fragment">
+									<img src='./images/programming-languages.png'>
+									<caption><p style="font-size: xx-small;">Credit : https://lambdasec.github.io/The-Most-In-Demand-Programming-Languages-of-2018/</p></caption>
+								</figure>
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h2>Mais pourquoi étudier Python ?</h2>
+						<div class="row">
+							<div class="col-xs-6">
+								<ul>
+									<li class="fragment" data-fragment-index="1">
+										L'un des plus utilisés (indice PyPL)
+									</li>
+									<li class="fragment" data-fragment-index="3">
+										A BEAUCOUP de "libraries" disponibles
+									</li>
+									<li class="fragment" data-fragment-index="4">
+										Surtout en science des données
+									</li>
+									<li class="fragment" data-fragment-index="5">
+										Permet une mise en œuvre rapide des idées (au prix de la performance)
+									</li>
+								</ul>
+							</div>
+							<div class="col-xs">
+								<span class="fragment" data-fragment-index="2">
+									<iframe width='600' height="110%" data-src="./images/stats.html"></iframe>
+								</span>
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h2>Qu'est-ce qui différencie les langages de programmation?</h2>
+						<ul>
+							<li class="fragment">
+								Niveau d'abstraction de la machine 
+							</li>
+							<li class="fragment">
+								Le paradigme de programmation
+							</li>
+							<li class="fragment">
+								Le type de "run time execution"
+							</li>
+							<li class="fragment">
+								Les types de données built-in
+							</li>
+							<li class="fragment">
+								Et beaucoup d'autres choses...
+							</li>
+						</ul>
+					</section>
+				</section>
+
+				<section>
+					<section data-background-color="rgba(171, 229, 178, 1)">
+						<h1>Travailler avec Python</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/building_with_python_watermark.2ebe5beb5b1e.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>Lignes de commandes ?</h2>
+						<blockquote>
+							Historiquement, pas d'interface graphique...</br>
+							Intéragir avec un ordinateur se faisait sur ce qu'on appelle un terminal et en ligne de commandes..
+						</blockquote>
+						
+
+							<img width='30%' src="https://devblogs.microsoft.com/wp-content/uploads/sites/33/2019/02/command-line-backgrounder-vt100-terminal.jpg">
+
+							<img width='30%' src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Dnd8won.png"><span style="font-size: smaller;">Dnd (1974/75) sur PLATO</span>
+
+
+					</section>
+
+					<section>
+						<h2>Interpréteur et programme</h2>
+						<iframe frameborder="0" width="100%" height="500px" data-preload data-src="https://replit.com/@fallingtree/RevolvingCoralRule?lite=false"></iframe>
+					</br>
+						À la maison : Utiliser Spyder (voir démo)
+						<aside class="notes">
+							Faire des exemples avec la console et montrer la différence avec l'éxécution d'un fichier.
+						</aside>
+
+					</section>
+
+					<section>
+						<h2>L'indentation est importante en Python !</h2>
+						<img class="r-stretch" src="images/200.gif">
+					</section>
+
+					<section>
+						<h2>Un exemple d'application pratique : Jeu des bâtonnets (ou de Nim)</h2>
+						<div class="row">
+							<div class="col-xs-4">
+								<figure>
+									<img src="https://www.fan-fortboyard.fr/medias/images/fort-boyard-conseil-batonnets-v1-01.jpg">
+									<caption style="font-size: smaller;">Jeu de Nim version... Fort Boyard</caption>
+								</figure>
+							</div>
+
+							<div class="col-xs-8">
+								<blockquote>
+									<b>Règles du jeu :</b>
+									<ul>
+										<li>On commence avec $12$ bâtonnets.</li>
+										<li>Chaque joueur prends entre $1$ et $3$ bâtonnets tour par tour.</li>
+										<li>Le joueur qui prend le dernier bâtonnet gagne.</li>
+									</ul>
+								</blockquote>
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h2>Implémentation du jeu : essayons de jouer !</h2>
+						<iframe frameborder="0" width="100%" height="500px" data-preload data-src="https://replit.com/@fallingtree/Nim?lite=true"></iframe>
+					</section>
+
+					<section>
+						<h2>Pour ceux qui maîtrisent :</h2>
+						<blockquote>
+							<ul>
+								<li>À partir de l'exécution et sans regarder le code, essayer de proposer un implémentation du jeu</li>
+								<li>Remplacer le joueur 2 par la machine (il existe une façon qu'elle gagne toujours...)</li>
+								<li>Faire une fenêtre graphique (Tkinter ou pygame) pour jouer au jeu</li>
+							</ul>
+							
+						</blockquote>
+					</section>
+
+
+					<section>
+						<h2>But de l'exercice 1 : implémenter une fonction pour jouer au jeu de nim</h2>
+						<li class="fragment">
+							Parameters of the function: 
+							<ul>
+								<li>
+									<em>tokens</em> : le nombre de jetons restants sur la table
+								</li>
+								<li>
+									<em>name</em> : le nom du prochain joueur
+								</li>
+							</ul>
+						</li>
+						<li class="fragment">
+							Contenu de la fonction:
+							<ul>
+								<li>
+									La fonction doit demander au joueur (par son nom) combien de jetons il veut prendre
+								</li>
+								<li>
+									Ensuite, il devrait vérifier combien ont été prises. Les nombres valides sont des entiers compris entre 1 et 3 (inclus)
+								</li>
+								<li>
+									La fonction ne doit se terminer qu'une fois qu'une valeur valide a été fournie
+								</li>
+							</ul>
+						</li>
+						<li class="fragment">
+							Valeur retournée : le nombre (mises à jour) des jetons restants
+						</li>
+					</section>
+				</section>
+
+				<section>
+					<section data-background-color="rgba(171,224, 230, 1)">
+						<h1>Affichage de texte à l'écran</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/The-Python-Print-Function_Watermarked.26066d64ad82.jpg">
+						</div>
+					</section>
+
+
+					<section>
+						<h2>Jeu de Nim</h2>
+						<blockquote>
+							<b>Problème :</b></br>
+							On a besoin de pouvoir afficher du texte à l'écran pour faire jouer les gens...
+						</blockquote>
+					</section>
+
+					<section>
+						<h2>L'instruction <b>print</b></h2>
+						<blockquote>
+							Elle permet d'afficher une chaine de caractère à l'écran.
+						</blockquote>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> print("Hello world!")
+Hello world!
+>>> print("Hello", " World", "!")
+Hello world!
+						</code></pre>
+
+					</section>
+				</section>
+
+				<section>
+					<section data-background-color="rgba(255, 189, 115, 1)">
+						<h1>L'affectation</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Variables-in-Python_Watermarked.e1578a030053.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>Jeu de Nim</h2>
+						<blockquote>
+							<b>Problème :</b></br>
+							On a besoin de gérer le nombre de batonnets qui change à chaque tour...
+						</blockquote>
+					</section>
+
+					<section>
+						<h2>L’affectation consiste à donner un contenu à une variable</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> x = 3
+>>> x
+3
+						</code></pre>
+						<h2 class="fragment">x est appelé <b>variable</b></h2>
+					</section>
+
+
+					<section>
+						<ul>
+							<li class="fragment">
+								La syntaxe change selon les langages, e.g., Golang utilise à la fois = et := 
+							</li>
+							<li class="fragment">
+								Contrairement à d’autres langages, en Python on ne déclare pas le type des variables
+							</li>
+							<li class="fragment">
+								Lors de l’affectation, le type de la partie à droite du symbole <b>=</b> définit le type de la variable
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<p class="fragment"> Nous pouvons utiliser la fonction type() pour vérifier le type de la variable :</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> x = 3
+>>> type(x)
+< class 'int' >
+						</code></pre>
+						<p class="fragment" style="color: red;">Nous verrons une définition de ce qu'est une fonction plus tard !</p>
+					</section>
+
+					<section>
+						<p class="fragment"> Le type d'une variables peuvent changer au fil du temps..</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> x = 3
+>>> type(x)
+< class 'int' >
+>>> x = 'ciao'
+>>> type(x)
+< class 'str' >
+						</code></pre>
+					</section>
+
+
+
+					<section>
+						<p class="fragment">Possible d'affecter une variable avec une information saisie au clavier: fonction input()</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> x = input('Entrer une valeur : ')
+Entrer une valeur : 3
+>>> print(x)
+3
+						</code></pre>
+					</section>
+
+					<section>
+						<p class="fragment">Dans l'exemple précédent, quel est le type de la variable <b>x</b> selon vous ?</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> type(x)
+						</code></pre>
+
+						<span class="fragment">
+						Vérifions :
+						<pre><code class="language-python" style="font-size:20px;"">
+>>> type(x)
+< class 'str' >
+						</code></pre>
+
+					</span>
+					</section>
+
+					<section>
+						<p class="fragment">Nous pouvons utiliser la fonction eval() pour changer le type afin d'obtenir celui qu'on attend :</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> x = eval(x)
+>>> type(x)
+< class 'int' >
+						</code></pre>
+					</section>
+
+					<section>
+						<p class="fragment">Vous pouvez également décider vers quel type convertir une variable en utilisant ce qu'on appelle le casting</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> x = int(x)
+>>> type(x)
+< class 'int' >
+						</code></pre>
+					</section>
+
+					<section>
+						<ul>
+							<li class="fragment">
+								Les affichages ont souvent besoin d’être mis en forme, comme par exemple l’affichage d’un entier en base 2, 8 ou 16 ou encore l’affichage d’un flottant avec un nombre de décimales donné. 
+							</li>
+							<li class="fragment">
+								Ce formatage est réalisé par la fonction format() selon des règles de spécification de format. 
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<p class="fragment">L’exemple suivant illustre l’affichage d’un entier en base 10, 2, 8 et 16 ainsi que d’un flottant avec deux décimales après la virgule</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> x = 45
+>>> y = 12.5678
+
+>>> # Affichage avec la fonction format()
+>>> print('L\'entier ' + str(x) + ' vaut ' + format(x, 'b') + ' en base 2')
+>>> print('L\'entier ' + str(x) + ' vaut ' + format(x, 'o') + ' en base 8')
+>>> print('L\'entier ' + str(x) + ' vaut ' + format(x, 'x') + ' en base 16')
+>>> print('Le flottant ' + str(y) + ' vaut ' + format(y, '.2f') + ' avec deux décimales')
+						</code></pre>
+					</section>
+
+					<section>
+						<p class="fragment">L’exécution de ce programme produit l’affichage suivant</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+L'entier 45 vaut 101101 en base 2
+L'entier 45 vaut 55 en base 8
+L'entier 45 vaut 2d en base 16
+Le flottant 12.5678 vaut 12.57 avec deux décimales
+						</code></pre>
+					</section>
+
+					<section>
+						<ul>
+							<li class="fragment">
+								Avec Python, vous pouvez spécifier des strings à la fois avec <b>"</b> et <b>'</b>
+							</li>
+							<li class="fragment">
+								Pour avoir un de ces symboles dans votre string, vous avez deux options
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> print("Ci'ao")
+Ci'ao
+>>> print("Ci\"ao")
+Ci"ao
+						</code></pre>
+					</section>
+
+					<section>
+						<p class="fragment">Nous pouvons utiliser la fonction format() pour créer des chaînes complexes à partir de paramètres</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> x = 45
+>>> y = 12.5678
+
+>>> # Affichage avec la méthode format() des objets string
+>>> print('L\'entier {0} vaut {0:b} en base 2, {0:o} en base 8, {0:x} \
+en base 16.\nLe flottant {1} vaut {1:.2f} avec 2 décimales'.format(x, y))
+L'entier 45 vaut 101101 en base 2, 55 en base 8, 2d en base 16.
+Le flottant 12.5678 vaut 12.57 avec 2 décimales
+						</code></pre>
+						<p class="fragment" style="color: red;">On appelle paramètres les variables passées dans une fonction</p>
+					</section>
+
+					<section>
+						<p class="fragment">Vous avez peut-être remarqué des lignes de code qui commencent par un #</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> # Affichage avec la méthode format() des objets string
+						</code></pre>
+						<p class="fragment" style="color: red;">Tout ce qui vient après un # s'appelle un commentaire. A quoi pensez-vous qu'ils sont utiles ?</p>
+					</section>
+
+					<section>
+						<h2>Jeu de Nim</h2>
+						<blockquote>
+							Proposer une instruction pour affecter le nombre de batonnets à partir de l'entrée utilisateur et afficher à l'écran le nombre rentré.
+						</blockquote>
+					</section>
+
+				</section>
+
+				<section>
+					<section data-background-color="rgba(154, 212, 161, 1)">
+						<h1>Les choix</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Conditional-Statements-in-Python_Watermarked.9fe9d98a8558.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>Jeu de Nim</h2>
+						<blockquote>
+							<b>Problème :</b></br>
+							On a besoin de pouvoir vérifier que le nombre entré par l'utilisateur est correct..</br>
+							Mais aussi que le nombre restant de batonnets est $0$ ou non...
+						</blockquote>
+					</section>
+
+					<section>
+						<ul>
+							<li class="fragment">
+								Vous pouvez définir des conditions pour exécuter uniquement des parties du code si les conditions sont vraies
+							</li>
+							<li class="fragment">
+								Les instruction "if" permet de coder des alternatives sur la base d’expressions booléennes
+							</li>
+							<li class="fragment" style="color: red;">
+								REMARQUE : L'indentation est utilisée pour séparer le code à l'intérieur d'un choix
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<p>L’expression booléenne peut être construite à l’aide d’opérateurs de comparaison</p>
+						<ul>
+							<li class="fragment">
+								x == y est vraie si x est égal à y
+							</li>
+							<li class="fragment">
+								x != y est vraie si x est différent de y
+							</li>
+							<li class="fragment">
+								x > y est vraie si x est plus grand que y
+							</li>
+							<li class="fragment">
+								x < y est vraie si x est plus petit que y
+							</li>
+							<li class="fragment">
+								x >= y est vraie si x est plus grand que, ou égal à y
+							</li>
+							<li class="fragment">
+								x <= y est vraie si x est plus petit que, ou égal à y
+							</li>
+							<li class="fragment">
+								Il y a aussi l'opérateur "is", mais nous verrons cela plus tard
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<p class="fragment">Regardons un exemple</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> x = eval("Choisissez un entier positif: ")
+>>> if x < 0:
+>>>   print("C'est pas positif !")
+						</code></pre>
+					</section>
+
+					<section>
+						<p>Et si vous voulez vérifier plusieurs conditions alternatives ?</p>
+						<ul>
+							<li class="fragment">
+								Les booléens peuvent être combinés à l'aide d'opérateurs logiques
+							</li>
+							<li class="fragment">
+								or pour des conditions alternatives
+							</li>
+							<li class="fragment">
+								and pour des conditions qui doivent être à la fois vraies
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> x = eval("Choisissez un entier positif mais pas plus de 10: ")
+>>> if x < 0 or x > 10:
+>>>   print("C'est pas positif et moins de 10!")
+						</code></pre>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> if x >= 0 or x <= 10:
+>>>   print("C'est un bon choix")
+						</code></pre>
+					</section>
+
+					<section>
+						<ul>
+							<li class="fragment">
+								La deuxième condition est-elle nécessaire ?
+							</li>
+							<li class="fragment">
+								C'est toujours vrai si la première ne l'est pas...
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<p class="fragment">On peut utiliser <b>elif</b> ou <b>else</b> pour combiner plusieurs solutions alternatives</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> x = eval("Choisissez un entier positif: ")
+>>> if x < 0:
+>>>   print("C'est pas positif !")
+>>> elif x > 10:
+>>>   print("C'est trop grand !")
+>>> else:
+>>>   print("C'est un bon choix")
+						</code></pre>
+						<p class="fragment" style="color: red;">REMARQUE : Une seule de ces branches s'exécutera !</p>
+					</section>
+
+					<section>
+						<h2>Jeu de Nim</h2>
+						<blockquote>
+							Proposer une instruction pour vérifier que le chiffre entré par l'utilisateur est compris entre 1 et 3.
+						</blockquote>
+					</section>
+
+				</section>
+				
+				<section>
+					<section data-background-color="rgba(255, 201, 115, 1)">
+						<h1>Exceptions et erreurs</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Python_Exceptions_Watermark.47f814fbeced.jpg">
+						</div>
+					</section>
+
+					<section>
+						
+					<ul>
+						<li class="fragment">
+							Les erreurs, ça arrive assez souvent dans la vie !
+						</li>
+						<li class="fragment">
+							Aussi en programmation (en général même très souvent &#128522; )
+						</li>
+						<li class="fragment">
+							Les erreurs peuvent être dues à des distractions (l'indentation par exemple...)
+						</li>
+						<li class="fragment">
+							Ou à cause d'erreurs dans les instructions doonées à l'interpréteur
+						</li>
+						<li class="fragment">
+							Ou de fausses hypothèses
+						</li>
+					</ul>
+					</section>
+
+					<section>
+						<p class="fragment">L'exemple le plus simple</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> print(y)
+Traceback (most recent call last):
+  File "< stdin >", line 1, in < module >
+NameError: name 'y' is not defined
+						</code></pre>
+					</section>
+
+					<section>
+						<p class="fragment">Peut-être que vous n'avez pas considéré les valeurs possibles d'une variable</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> 1/0
+Traceback (most recent call last):
+	File "< stdin >", line 1, in < module >
+ZeroDivisionError: division by zero
+						</code></pre>
+					</section>
+
+					<section>
+						<p class="fragment">Ou simplement vous avez un problème avec votre algorithme</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> a = []
+>>> a[1]
+Traceback (most recent call last):
+	File "< stdin >", line 1, in < module >
+IndexError: list index out of range
+						</code></pre>
+					</section>
+
+					<section>
+						<ul>
+							<li class="fragment">
+								Lorsqu'une erreur se produit, Python arrête toute exécution de code en cours
+							</li>
+							<li class="fragment">
+								Mais aussi, il fournit des outils pour permettre à un programmeur de récupérer d'une erreur sans arrêter son programme
+							</li>
+							<li class="fragment">
+								En utilisant la syntaxe try ... except pour capturer une exception
+							</li>
+							<li class="fragment">
+								Les exceptions sont des parties de code qui ne sont exécutées que lorsqu'une erreur se produit
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<p class="fragment">Vous spécifiez avec try la partie du code que vous souhaitez couvrir en capturant une exception, et except la partie du code qui sera exécutée si l'erreur se produit</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> x = eval("Choisissez un entier positif qui ce n'est pas 0 : ")
+>>> try:
+>>>   result = 1/x
+>>> except ZeroDivisionError:
+>>>   print('Erreur: a ne doit pas être égal à 0')
+						</code></pre>
+					</section>
+
+					<section>
+						<ul>
+							<li class="fragment">
+								Que se passe-t-il si vous êtes dans un try mais un autre type d'erreur se produit ?
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<p class="fragment">Vous pouvez utiliser une condition générale</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> x = eval("Choisissez un entier positif qui ce n'est pas 0 : ")
+>>> try:
+>>>   result = y/x
+>>> except Exception:
+>>>   print("Je l'ai capturée :)")
+						</code></pre>
+						<p class="fragment" style="color: red;">REMARQUE : Les exceptions générales ne sont normalement pas utilisées car elles ne vous permettent pas de savoir quel problème s'est produit !</p>
+					</section>
+
+				</section>
+
+				<section>
+					<section data-background-color="rgba(217, 185, 160, 1)">
+						<h1>Regroupement d'instructions</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Defining-Your-Own-Python-Function_Watermarked.d5b07e88ece4.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>Jeu de Nim</h2>
+						<blockquote>
+							<b>Problème :</b></br>
+							Pour chaque joueur on doit faire la même chose. Doit on ré-écrire deux fois exactement le même code ?
+						</blockquote>
+					</section>
+					<section>
+						<ul>
+							<li class="fragment">
+								Parfois, une partie du code doit être réutilisée plusieurs fois
+							</li>
+							<li class="fragment">
+								Par exemple, pour tester différentes valeurs dans l'exemple précédent
+							</li>
+							<li class="fragment">
+								En Python, le regroupement s’effectue à l’aide des fonctions auxquelles il est possible de fournir des paramètres
+							</li>
+							<li class="fragment">
+								Une fonction est un bloc de code qui est "appelé" ou "invoqué" en écrivant son nom et en spécifiant les paramètres dont il a besoin
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<p class="fragment">Une fonction est définie à l'aide du mot clé def suivi du nom de la fonction et d'une liste de paramètres</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> def check_value(x):
+>>>   if x < 0:
+>>>     print("C'est pas positif !")
+>>>   elif x > 10:
+>>>     print("C'est trop grand !")
+>>>   else:
+>>>     print("C'est un bon choix")
+						</code></pre>
+						<p class="fragment" style="color: red;">REMARQUE : N'oubliez pas l'indentation !</p>
+					</section>
+
+					<section>
+						<p class="fragment">On peut utiliser la fonction assez simplement dans l’interpréteur de commande</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> check_value(1)
+>>> check_value(-1)
+>>> check_value(100)
+>>> check_value("ciao")
+						</code></pre>
+						<p class="fragment" style="color: red;">REMARQUE : N'oubliez pas l'indentation !</p>
+					</section>
+
+					<section>
+						<ul>
+							<li class="fragment">
+								Les fonctions peuvent également produire un résultat à utiliser après leur appel
+							</li>
+							<li class="fragment">
+								Ce résultat est "renvoyé" en utilisant le mot-clé return suivi de la valeur à retourner
+							</li>
+							<li class="fragment">
+								Une valeur peut être spécifiée directement ou nous pouvons utiliser le contenu d'une variable
+							</li>
+						</ul>
+					</section>
+
+					<section>
+						<p class="fragment">L’utilisation de return permet de préciser la valeur retournée par la fonction</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> def check_value(x):
+>>>   if x < 0:
+>>>     print("C'est pas positif !")
+>>>     return False
+>>>   elif x > 10:
+>>>     print("C'est trop grand !")
+>>>     return False
+>>>   else:
+>>>     print("C'est un bon choix")
+>>>     return True
+>>>
+>>> if check_value(10):
+>>>   print("La valeur était ok")
+						</code></pre>
+						<p class="fragment" style="color: red;">REMARQUE : N'oubliez pas l'indentation !</p>
+					</section>
+
+					<section>
+						<h2>Jeu de Nim</h2>
+						<blockquote>
+							Proposer deux fonctions :
+							<ul>
+								<li>Une pour prendre le choix de l'utilisateur et afficher une erreur si non</li>
+								<li>Une pour calculer le nombre de batonnets restant après le tour et vérifier si le joueur a gagné ou non</li>
+							</ul>
+						</blockquote>
+					</section>
+
+				</section>
+
+				<section>
+					<section data-background-color="rgba(185, 171, 230, 1)">
+						<h1>Proposition</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/PyGame-Update_Watermarked.bb0aa2dfe80b.jpg">
+						</div>
+					</section>
+
+					<section>
+						<pre><code class="language-python" style="font-size:20px;"">
+'''
+File: nim_step_by_step.py
+Created Date: Monday September 13th 2021 - 01:22pm
+Author: Ammar Mian
+Contact: ammar.mian@univ-smb.fr
+-----
+Last Modified: Mon Sep 13 2021
+Modified By: Ammar Mian
+-----
+Copyright (c) 2021 Université Savoie Mont-Blanc
+-----
+Ce programme illustre une implémentation petit à petit du jeu de Nim dans le cadre 
+d'un cours d'introduction à la programmation donné à Polytech Annecy-Chambéry.
+Il ne s'agit pas d'un programme fonctionnel en tant que tel mais donne des exemples
+de code qui sont les briques de base nécéssaire à la construction d'un programme qui
+permettrait de jouer au jeu de Nim en pratique.
+'''
+
+
+# -----------------------------------------------
+# 1 - Stocker le nombre de batonnets restants
+# -----------------------------------------------
+nombre_batonnets = 12
+
+# -------------------------------------------------
+# 2 - Affichage du nombre de batonnets restants v1
+# -------------------------------------------------
+print("Il y a ", nombre_batonnets, "restants")
+
+# -----------------------------------------------
+# 3 - Prendre un nombre de batonnets du joueur
+# -----------------------------------------------
+nombre_pris = int(input("Entrez un nombre de bâtonnets : "))
+
+# -----------------------------------------------
+# 4 - Vérifier que le nombre bâtonners est le bon
+# -----------------------------------------------
+if nombre_pris <=0 or nombre_pris>3:
+	print("Le nombre de bâtonnets à prendre n'est pas correct !")
+	print('Choisir une valeur entre 1 et 3.')
+	nombre_pris = int(input("Entrez un nombre de bâtonnets : "))
+
+# ------------------------------------------------------------------------
+# 5 - Enlever le nombre de batonnets demandé au nombre de batonnets total
+# ------------------------------------------------------------------------
+nombre_batonnets = nombre_batonnets - nombre_pris
+# OU plus court : nombre_batonnets -= nombre_pris
+
+# -----------------------------
+# 6 - Condition d'arrêt du jeu
+# -----------------------------
+if nombre_batonnets <= 0:
+	print("Félicitations !! Vous avez gagné !")
+
+# ------------------------------------------------------------------------
+# 7 - Vérifier que le nombre bâtonners est le bon v2 avec prise en 
+# compte du nombre de bâtonnets restant
+# ------------------------------------------------------------------------
+if (nombre_pris <=0 or nombre_pris>min(3, nombre_batonnets)):
+	print("Le nombre de bâtonnets à prendre n'est pas correct !")
+	print('Choisir une valeur entre 1 et ', min(3, nombre_batonnets), '.')
+	nombre_pris = int(input("Entrez un nombre de bâtonnets :"))
+
+nombre_batonnets -= nombre_pris
+
+if nombre_batonnets == 0:
+	print("Félicitations !! Vous avez gagné !")
+
+# ------------------------------------------------------------------------
+# 7 - Fonction pour prendre le choix et vérifier les condiitons sans 
+# prise en compte du numéro du joueur
+# ------------------------------------------------------------------------
+def choix_joueur(nombre_batonnets):
+	nombre_pris = int(input("Entrez un nombre de bâtonnets : "))
+
+	# Il faudrait une répétition mais ça on verra après !
+	if (nombre_pris <=0 or nombre_pris>min(3, nombre_batonnets)):
+		print("Le nombre de bâtonnets à prendre n'est pas correct !")
+		print('Choisir une valeur entre 1 et ', min(3, nombre_batonnets), '.')
+		nombre_pris = int(input("Entrez un nombre de bâtonnets :"))
+
+	return nombre_pris
+
+# ------------------------------------------------------------------------
+# 8 - Fonction pour faire un tour de jeu avec prise en compte joueur
+# ------------------------------------------------------------------------
+def tour_jeu(no_joueur, nombre_batonnets):
+	print("Joueur no.", no_joueur)
+	nombre_pris = choix_joueur(nombre_batonnets)
+
+	nombre_batonnets -= nombre_pris
+	if nombre_batonnets == 0:
+		print("Félicitations !! Vous avez gagné !")
+		return 0
+	else:
+		print("Il reste ", nombre_batonnets, "batonnets.")
+		return nombre_batonnets
+
+
+nombre_batonnets = 12
+nombre_batonnets = tour_jeu(1, nombre_batonnets)
+nombre_batonnets = tour_jeu(2, nombre_batonnets)
+							
+													</code></pre>
+					</section>
+				</section>
+
+
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script src="plugin/math/math.js"></script>
+		<script src="plugin/menu/menu.js"></script>
+		<script src="plugin/chalkboard/plugin.js"></script>
+		<script src="plugin/verticator/verticator.js"></script>
+		<script src="plugin/presentable/presentable.min.js"></script>
+		
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+				controls: true,
+				transition: 'slide',
+				dependencies: [
+					{ src: 'plugin/reveald3js/reveald3.js' },
+					// { src: 'plugin/title-footer/title-footer.js', async: true, callback: function() { title_footer.initialize(); } },
+					// { src: 'plugin/typed/typed.js', async: false , callback: function() { callTypedJs(); }}
+				],
+				math: {
+					mathjax: 'https://cdn.jsdelivr.net/gh/mathjax/mathjax@2.7.8/MathJax.js',
+					config: 'TeX-AMS_HTML-full',
+					},
+				menu: {
+					numbers: true,
+					width: 'wide',
+					themes: false,
+					transitions: false,
+					openSlideNumber: true,
+				},
+				chalkboard: {
+					toggleChalkboardButton: { left: "80px" },
+					toggleNotesButton: { left: "130px" },
+					colorButtons: true,
+					boardHandle: true,
+					storage: "Notes",
+					eraser: { src: path + 'img/sponge.png', radius: 40}
+				},
+				verticator: {
+					darktheme: false,
+					skipuncounted: false,
+					clickable: true
+				},
+				slideNumber: "c/t",
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMath, RevealMarkdown, RevealHighlight, RevealNotes, RevealMenu, RevealChalkboard, Verticator ]
+			});
+
+			presentable.toc({
+				framework: "revealjs",
+				hideNoTitle: true,
+				titles: "h1,.presentable-title"
+			});
+		</script>
+	</body>
+</html>
