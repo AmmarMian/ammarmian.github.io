@@ -1,0 +1,738 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Programmer en Python</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="css/theme/metropolis.css" id="theme">
+		<link rel="stylesheet" href="plugin/title-footer/title-footer.css">
+		<link rel="stylesheet" href="plugin/chalkboard/style.css">
+		<link rel="stylesheet" href="css/flexbox/flexboxgrid.css" type="text/css">
+		<link rel="stylesheet" href="plugin/presentable/presentable.min.css">
+		<link rel="stylesheet" href="css/custom.css" type="text/css">
+
+		<style>
+			.container{
+					display: flex;
+			}
+			.col{
+					flex: 1;
+					margin: auto;
+			}
+		</style>
+
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+		<link rel="stylesheet" href="plugin/verticator/verticator.css">
+
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+
+					<h1 class="talk-title" style="font-weight: bolder;">Numération et Algorithmique</h1>
+					<h2>Structure de données</h2>
+					<p style="margin-bottom: 10%;">Cours Magistral 5/7</p>
+
+					<img class="plain" height="75px" src="./assets/logos/USMB.svg" style="margin-right: 3%;">
+					<img class="plain" height="75px" src="./assets/logos/Polytech.svg" style="margin-right: 3%;">
+					<img class="plain" height="75px" src="./assets/logos/IAE.png">
+				</section>
+
+				<section>
+					<h1>Table of Contents</h1>
+					<nav id="presentable-toc" class="revealjs" style="font-size:large;"></nav>
+				</section>
+
+				<section>
+					<section><h1>Retour sur le jeu de nim</h1></section>
+
+					<section>
+						<h2>Une proposition de solution commentée</h2>
+
+						<pre><code data-line-numbers class="language-python" style="font-size:20px; width: 950px;">
+'''
+File: nim_fr.py
+Created Date: Monday September 13th 2021 - 01:57pm
+Author: Ammar Mian
+Contact: ammar.mian@univ-smb.fr
+-----
+Last Modified: Mon Sep 13 2021
+Modified By: Ammar Mian
+-----
+Copyright (c) 2021 Université Savoie Mont-Blanc
+-----
+Ce programme illustre une implémentation du jeu de Nim dans le cadre 
+d'un cours d'introduction à la programmation donné à Polytech Annecy-Chambéry.
+Il s'agit ici d'un programme fonctionnel qui permet de faire une partie à 2 joueurs
+'''
+
+
+def choix_joueur(nombre_batonnets):
+	"""Fonction qui permet de prendre le choix du joueur et vérifie s'il est bon.
+	Répète tant que le choix est mauvais.
+
+	Parameters
+	----------
+	nombre_batonnets : int
+		Nombre de batonnets restant dans le jeu.
+
+	Returns
+	-------
+	int
+		Le nombre de batonnets que le joueur veur jouer.
+	"""
+	nombre_pris = int(input("Entrez un nombre de bâtonnets : "))
+
+	while (nombre_pris <=0 or nombre_pris>min(3, nombre_batonnets)):
+		print("Le nombre de bâtonnets à prendre n'est pas correct !")
+		print('Choisir une valeur entre 1 et ', min(3, nombre_batonnets), '.')
+		nombre_pris = int(input("Entrez un nombre de bâtonnets : "))
+
+	return nombre_pris
+
+
+def tour_jeu(no_joueur, nombre_batonnets):
+	"""Fonction qui permet de faire un tour de jeu en fonction du numéro du joueur actuel.
+
+	Parameters
+	----------
+	no_joueur : int
+		Numéro du joueur.
+	nombre_batonnets : int
+		Nombre de batonnets restant dans le jeu.
+
+	Returns
+	-------
+	int
+		Nombre de batonnets restant après tour du joueur.
+	"""
+	print("Joueur no.", no_joueur)
+	nombre_pris = choix_joueur(nombre_batonnets)
+
+	nombre_batonnets -= nombre_pris
+	if nombre_batonnets == 0:
+		print("Félicitations Joueur no. {}!! Vous avez gagné !".format(no_joueur))
+		return 0
+	else:
+		print("Il reste ", nombre_batonnets, "batonnets.")
+		print('|'*nombre_batonnets)
+		print("")
+		return nombre_batonnets
+
+
+if __name__ =='__main__':
+	print("Bienvenue dans le jeu de Nim avec batonnets !\n")
+
+	nombre_batonnets = 12
+	no_joueur = 1
+	print("Il reste ", nombre_batonnets, "batonnets.")
+	print('|'*nombre_batonnets)
+	print("")
+	while nombre_batonnets>0:
+		nombre_batonnets = tour_jeu(no_joueur, nombre_batonnets)
+		no_joueur = 1*(no_joueur==2) + 2*(no_joueur==1) 
+	print("Merci d'avoir joué !")
+</code></pre>
+
+					</section>
+					
+				</section>
+
+				<section>
+					<section data-background-color="rgba(177, 163, 222, 1)">
+						<h1>Notion de regroupement et Structures de données</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Python-Tricks-Chapter-on-Data-Structures_Watermarked.bafeb804a9db.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>Problématique</h2>
+						<blockquote>
+							De nombreux problèmes nécessitent le traitement de données « complexes » qui ne peuvent pas être représentées par une variable de type simple.
+						</blockquote>
+						
+						<p><b>Exemples:</b></p>
+						<ul>
+							<li class="fragment">Une couleur</li>
+							<li class="fragment">Une image</li>
+							<li class="fragment">Une date</li>
+							<li class="fragment">Une adresse</li>
+						</ul>
+					</section>
+
+
+					<section data-background-color="rgba(192, 192, 192, 1)">
+						<h2>Exemple 1 : représenter une couleur</h2>
+						<div class="row">
+							<div class="col-xs-7">
+								<img height="450" src="https://upload.wikimedia.org/wikipedia/commons/1/13/Color_solid_comparison_hsl_hsv_rgb_cone_sphere_cube_cylinder.png">
+							</div>
+							<div class="col-xs">
+								Exemple RGB:
+								<pre class="fragment"><code data-line-numbers class="language-python" style="font-size:20px;"">couleur1_rouge = 192
+couleur1_vert = 127
+couleur1_bleu = 77
+
+couleur2_rouge = 33
+couleur2_vert = 4
+couleur2_bleu = 77
+</code></pre>
+<p class="fragment">&rarr; Pas optimal !</p>
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h2>Exemple 2 : Une image noir et blanc</h2>
+						<div class="row">
+							<div class="col-xs-7">
+								<img height="450" src="./assets/mario.png">
+							</div>
+							<div class="col-xs">
+								Exemple avec variables :
+								<pre class="fragment"><code data-line-numbers class="language-python" style="font-size:20px;"">pixel_1_1 = 255
+pixle_1_2 = 255
+...
+pixel_24_"5 = 45 
+</code></pre>
+<p class="fragment">&rarr; Pas optimal !</p>
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h2>Exemple 3 : Une adresse</h2>
+						<div class="row">
+							<div class="col-xs-7">
+							<b>Adresse de personne 1 :</b></br>
+								Numero : 5</br>
+								Rue : Chemin de Bellevue</br>
+								Code postal : 74940</br>
+								Ville : Annecy-le-vieux</br>
+							</div>
+							<div class="col-xs">
+								<b>Exemple avec variables :</b>
+								<pre class="fragment"><code data-line-numbers class="language-python" style="font-size:20px;"">personne_1_numero = 5
+personne_2_rue = "Chemin de Bellevue"
+...
+</code></pre>
+	<p class="fragment">&rarr; Pas optimal !</p>
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h2>Types de regroupements</h2>
+
+						Il en existe 3 types :
+						<blockquote class="fragment">
+							<b>Regroupement d'informations de même types :</b> Images, couleur, etc</br>
+							&rarr; listes (en python ne force pas le même type), <b>numpy</b>
+						</blockquote>
+
+						<blockquote class="fragment">
+							<b>Regroupement d'informations de type différents sans attribut pour classer:</b> Adresse, date, etc</br>
+							&rarr; listes, tuples et sets
+						</blockquote>
+
+						<blockquote class="fragment">
+							<b>Regroupement d'informations de type différents avec attribut pour classer:</b> Adresse, date, etc</br>
+							&rarr; dictionnaires
+						</blockquote>
+					</section>
+				</section>
+
+
+
+				<section>
+					<section data-background-color="rgba(224, 192, 167, 1)">
+						<h1>Les listes (list)</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/How-to-Use-the-Python-append-Method_Watermarked.adcae9a19d5b.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>
+							Les listes sont utilisées pour stocker plusieurs éléments dans une seule variable de manière ordonnée<br/><br/>
+							<p>➡️ [1, 2, 3] est différent de [2, 3, 1]</p>
+						</h2>
+					</section>
+
+					<section>
+						<h2>
+							Les listes peuvent être créées de plusieurs manières
+						</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> my_list = list()
+>>> my_list = []
+>>> my_list = [1, 2, 3]
+>>> my_list = [x*2 for x in my_other_list]
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>Accéder aux éléments d'une liste</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> my_list = [1, 2, 3]
+>>> print(my_list[0])
+						</code></pre>
+						<p class="fragment" style="color: red;">NOTE : les indices commencent à 0 !</p>
+					</section>
+
+					<section>
+						<h2>Analogie avec les chaines de caractères</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">>>> my_string = "Hello world"
+>>> print(my_string[0])
+H
+</code></pre>
+						<p class="fragment" style="color: red;">NOTE : les indices commencent à 0 !</p>
+					</section>
+
+					<section>
+						<h2>Modifier une valeur dans une liste</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> my_list = [1, 2, 3]
+>>> my_list[0] = 10
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>
+							Ajouter des éléments à une liste
+						</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> my_list = [1]
+>>> my_list.append(2)
+						</code></pre>
+						<p class="fragment">Que se passe-t-il si vous essayez de faire cela ?</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> my_list[2] = 3
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>
+							Supprimer des éléments d'une liste
+						</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> my_list.pop()
+>>> my_list.pop(1)
+>>> del my_list[1]
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>
+							Boucle sur les éléments d'une liste
+						</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> for el in my_list:
+>>>   print(el)
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>
+							Sélectionnez un sous-ensemble de la liste
+						</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> my_list[start:end:step]
+>>> my_list[:end]
+>>> my_list[start:]
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>
+							Vérifiez la taille de la liste
+						</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> len(my_list)
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>NOTE : nous ne pouvons pas étudier ici toutes les fonctions disponibles. Vous devez apprendre à utiliser la documentation : </h2><br/>
+						<h2><a href="https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range">https://docs.python.org/3/library/stdtypes.html#sequence-types-list-tuple-range</a></h2>
+					</section>
+
+					<section>
+						<h2>Exercice</h2>
+						<blockquote>
+							<p>Écrire un programme qui demande à l'utilisateur de saisir une liste d'entiers, puis à l'aide de parcours successifs effectue les actions suivantes :</p>
+							<ul>
+								<li>Afficher la liste</li>
+								<li>Afficher la lsite en colonne de manière à afficher l'indice et son contenu</li>
+								<li>Additionner tous les éléments de la liste</li>
+								<li>Crée une nouvelle liste qui se le multiple par $3$ de tous les éléments de la liste</li>
+								<li>Obtenir le plus grand nombre de la liste</li>
+								<li>Calcule la somme des nombres impairs</li>
+							</ul>
+							(Faire des fontions)
+						</blockquote>
+					</section>
+				</section>
+				
+				<section>
+					<section data-background-color="rgba(224, 192, 167, 1)">
+						<h1>Les tuples (tuple)</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/How-to-Use-the-Python-append-Method_Watermarked.adcae9a19d5b.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>
+							Les tuples sont des listes immuables <br/><br/>
+							<p class="fragment">Qu'est-ce que ça veut dire?</p>
+						</h2>
+					</section>
+
+					<section>
+						<h2>
+							Un tuple ne peut pas être modifié après sa création
+						</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> my_tuple = (1, 2, 3)
+>>> my_tuple = t[1]
+2
+>>> my_tuple[1] = 1
+Traceback (most recent call last):
+	File "< stdin >", line 1, in < module >
+TypeError: 'tuple' object does not support item assignment
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>Quel est l'intérêt ?</h2>
+						<blockquote>
+							<b>Avantages :</b></br>
+							<ul>
+								<li class="fragment">Plus rapide d'accès</li>
+								<li class="fragment">Données sont protégés (couleur est fixée)</li>
+							</ul>
+						</blockquote>
+						<div class="fragment">
+							<style type="text/css">
+								.tg  {border-collapse:collapse;border-spacing:0;}
+								.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+									overflow:hidden;padding:10px 5px;word-break:normal;}
+								.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+									font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+								.tg .tg-wogk{border-color:inherit;color:#303133;font-weight:bold;text-align:left;vertical-align:top}
+								.tg .tg-0yd9{border-color:inherit;color:#303133;text-align:left;vertical-align:middle}
+								</style>
+								<table class="tg">
+								<thead>
+									<tr>
+									<th class="tg-wogk"><span style="font-weight:600">List</span></th>
+									<th class="tg-wogk"><span style="font-weight:600">Tuple</span></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+									<td class="tg-0yd9">It is mutable</td>
+									<td class="tg-0yd9">It is immutable</td>
+									</tr>
+									<tr>
+									<td class="tg-0yd9">The implication of iterations is time-consuming in the list.</td>
+									<td class="tg-0yd9">Implications of iterations are much faster in tuples.</td>
+									</tr>
+									<tr>
+									<td class="tg-0yd9">Operations like insertion and deletion are better performed.</td>
+									<td class="tg-0yd9">Elements can be accessed better.</td>
+									</tr>
+									<tr>
+									<td class="tg-0yd9">Consumes more memory.</td>
+									<td class="tg-0yd9">Consumes less memory.</td>
+									</tr>
+									<tr>
+									<td class="tg-0yd9">Many built-in methods are available.</td>
+									<td class="tg-0yd9">Does not have many built-in methods.</td>
+									</tr>
+									<tr>
+									<td class="tg-0yd9">Unexpected errors and changes can easily occur in lists.<br><br><span style="color:black"> </span></td>
+									<td class="tg-0yd9">Unexpected errors and changes rarely occur in tuples.</td>
+									</tr>
+								</tbody>
+								<caption style="font-size: x-small;">https://www.upgrad.com/blog/list-vs-tuple/</caption>
+								</table>
+						</div>
+						
+					</section>
+
+				</section>
+				
+				<section>
+					<section data-background-color="rgba(165, 151, 210, 1)">
+						<h1>Les ensembles (set)</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Sets-in-Python_Watermarked.468e77db4f92.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>
+							Les ensembles sont des listes non ordonnées <br/><br/>
+						</h2>
+						<p class="fragment">Qu'est-ce que ça veut dire ?</p>
+					</section>
+
+					<section>
+						<h2>
+							Les éléments ne sont pas accessibles par position
+						</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">>>> my_set = set([1,2,3])
+>>> my_set
+{1, 2, 3}
+>>> my_set[1]
+Traceback (most recent call last):
+	File "< stdin >", line 1, in < module >
+TypeError: 'set' object is not subscriptable
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>Ls ensembles ne possèdent pas d'éléments doubles</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">>>> ensemble = {5,6,5,6,5}
+>>> print(ensemble)
+{5, 6}
+</code></pre>
+					</section>
+
+				</section>
+
+				<section>
+					<section data-background-color="rgba(254, 126, 115, 1)">
+						<h1>Les dictionnaires (dict)</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Lists-and-Tuples-in-Python_Watermarked.4d655c81a78b.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>Problème</h2>
+						<blockquote>
+							On veut pouvoir avoir une organisation des données sous forme d'attributs. Par exemple pour l'adresse, pour avoir accès à la rue, le numéro, le code postal, etc.
+						</blockquote>
+					</section>
+
+
+					<section>
+						<h2>
+							Un dictionnaire est un objet de mappage, c'est-à-dire qu'il mappe des valeurs pouvant lier à des types arbitraires<br/><br/>
+							<p>&rarr; Les éléments d'un dictionnaire sont identifiés par une clé</p>
+						</h2>
+					</section>
+
+					<section>
+						<h2>
+							Les dictionnaires peuvent être créées de plusieurs manières
+						</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> my_dict = dict()
+>>> my_dict = {}
+>>> my_dict = {"key1": 1, "key2", 2}
+						</code></pre>
+
+						<p class="fragment">&rarr; Quel est le code pour créer un dictionnarie représentant une adresse ?</p>
+					</section>
+
+					<section>
+						<h2>Accéder aux éléments d'une dictionnaire</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> my_dict = {"key1": 1, "key2", 2}
+>>> print(my_dict["key1"])
+>>> print(my_dict.get("key1"]))
+						</code></pre>
+						<p class="fragment" style="color: red;">NOTE : Les index peuvent être tout ce qui est hachable !</p>
+					</section>
+
+					<section>
+						<h2>Modifier une valeur dans une dictionnaire</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> my_dict = {"key1": 1, "key2", 2}
+>>> my_dict["key1"] = 3
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>
+							Ajouter des éléments à une dictionnaire
+						</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> my_dict = {"key1": 1, "key2", 2}
+>>> my_dict["key3"] = 3
+						</code></pre>
+						<p class="fragment">Que se passe-t-il si vous essayez de faire cela ?</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> print(my_dict["key4"])
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>
+							Supprimer des éléments d'une dictionnaire
+						</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> my_list.pop("key1")
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>
+							Boucle sur les éléments d'une dictionnaire
+						</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> for el in my_dict:
+>>>   print(el)
+						</code></pre>
+						<p class="fragment">Qu'est-ce qu'il imprime ?</p>
+
+					</section>
+
+					<section>
+						<h2>
+							Boucle sur les éléments d'une dictionnaire
+						</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> for k in my_dict:
+>>>   print(k)
+>>> for v in my_dict.values():
+>>>   print(v)
+>>> for k, v in my_dict.items():
+>>>   print(k)
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>
+							Vérifiez la taille du dictionnaire
+						</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> len(my_dict)
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>NOTE : nous ne pouvons pas étudier ici toutes les fonctions disponibles. Vous devez apprendre à utiliser la documentation : </h2><br/>
+						<h2><a href="https://docs.python.org/3/library/stdtypes.html#mapping-types-dict">https://docs.python.org/3/library/stdtypes.html#mapping-types-dict</a></h2>
+					</section>
+
+					<section>
+						<h2>Exercice</h2>
+						<blockquote style="font-size: 15px">
+							On définit un QCM comme une liste de questions. Une question est un dictionnaire avec les clés :
+							<ul>
+								<li><b>libelle :</b> qui donne le libellé de la question.</li>
+								<li><b>choix :</b> qui est un tableau des différents choix de réponse.</li>
+								<li><b>reponse :</b> qui est un nombre correspondant à l’index de la bonne réponse.</li>
+							</ul> </br>
+							Complétez le programme suivant :
+						</blockquote>
+						<pre><code class="language-python" style="font-size:15px;"">qcm = [] # Le contenu du QCM à définir
+
+def poser_question(question) :
+	"""Une fonction qui affiche la question,
+		les choix possibles de réponse et qui demande à
+		l'utilisateur son choix.
+
+		La fonction retourne ``True`` si l'utilisateur a choisi
+		la bonne réponse
+	"""
+	pass
+
+score = 0
+# on parcourt la liste des questions et on calcule le score de l'utilisateur
+# ....
+
+# on affiche le score
+print("Vous avez obtenu un score de ", score)
+</code></pre>
+
+					</section>
+
+				</section>
+
+
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script src="plugin/math/math.js"></script>
+		<script src="plugin/menu/menu.js"></script>
+		<script src="plugin/chalkboard/plugin.js"></script>
+		<script src="plugin/verticator/verticator.js"></script>
+		<script src="plugin/presentable/presentable.min.js"></script>
+		
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+				controls: true,
+				transition: 'slide',
+				dependencies: [
+					{ src: 'plugin/reveald3js/reveald3.js' },
+					// { src: 'plugin/title-footer/title-footer.js', async: true, callback: function() { title_footer.initialize(); } },
+					// { src: 'plugin/typed/typed.js', async: false , callback: function() { callTypedJs(); }}
+				],
+				math: {
+					mathjax: 'https://cdn.jsdelivr.net/gh/mathjax/mathjax@2.7.8/MathJax.js',
+					config: 'TeX-AMS_HTML-full',
+					},
+				menu: {
+					numbers: true,
+					width: 'wide',
+					themes: false,
+					transitions: false,
+					openSlideNumber: true,
+				},
+				chalkboard: {
+					toggleChalkboardButton: { left: "80px" },
+					toggleNotesButton: { left: "130px" },
+					colorButtons: true,
+					boardHandle: true,
+					storage: "Notes",
+					eraser: { src: path + 'img/sponge.png', radius: 40}
+				},
+				verticator: {
+					darktheme: false,
+					skipuncounted: false,
+					clickable: true
+				},
+				slideNumber: "c/t",
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMath, RevealMarkdown, RevealHighlight, RevealNotes, RevealMenu, RevealChalkboard, Verticator ]
+			});
+
+			presentable.toc({
+				framework: "revealjs",
+				hideNoTitle: true,
+				titles: "h1,.presentable-title"
+			});
+		</script>
+	</body>
+</html>
