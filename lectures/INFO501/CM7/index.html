@@ -1,0 +1,611 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Programmer en Python</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="css/theme/metropolis.css" id="theme">
+		<link rel="stylesheet" href="plugin/title-footer/title-footer.css">
+		<link rel="stylesheet" href="plugin/chalkboard/style.css">
+		<link rel="stylesheet" href="css/flexbox/flexboxgrid.css" type="text/css">
+		<link rel="stylesheet" href="plugin/presentable/presentable.min.css">
+		<link rel="stylesheet" href="css/custom.css" type="text/css">
+
+		<style>
+			.container{
+					display: flex;
+			}
+			.col{
+					flex: 1;
+					margin: auto;
+			}
+		</style>
+
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+		<link rel="stylesheet" href="plugin/verticator/verticator.css">
+
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+
+					<h1 class="talk-title" style="font-weight: bolder;">Numération et Algorithmique</h1>
+					<h2>Concepts avancés sur les objets</h2>
+					<p style="margin-bottom: 10%;">Cours Magistral 7/7</p>
+
+					<img class="plain" height="75px" src="./assets/logos/USMB.svg" style="margin-right: 3%;">
+					<img class="plain" height="75px" src="./assets/logos/Polytech.svg" style="margin-right: 3%;">
+					<img class="plain" height="75px" src="./assets/logos/IAE.png">
+				</section>
+
+				<section>
+					<h1>Table of Contents</h1>
+					<nav id="presentable-toc" class="revealjs" style="font-size:large;"></nav>
+				</section>
+
+
+                <section>
+					<section data-background-color="rgba(171, 224, 230, 1)">
+						<h1>Un autre exemple : une classe Vecteur</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Object-Oriented-Programming-OOP-in-Python-3_Watermarked.0d29780806d5.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>Exercice : construction de la classe</h2>
+						<blockquote>
+							Faire une classe qui permet de représenter un vecteur de dimension quelconque à l'aide d'un attribut de liste qu'on définit à l'aide d'un constructeur.
+						</blockquote>
+						<pre class="fragment"><code data-line-numbers class="language-python">class Vecteur:
+	"""
+	Classe permettant de faire des calculs avec des vecteurs
+	"""      
+	def __init__(self, valeur):
+		"""
+		Constructeur de la classe
+		"""
+		self.valeur = valeur</code></pre>
+	<p class="fragment" style="color: red;">Note : les """ permettent de définir une documentation des classes et des méthodes (et aussi des fonctions)</p>
+	<p class="fragment" style="color: red;">On peut y accéder avec l'attribut <b>__doc__</b> qui est crée automatiquement:
+		<pre class="fragment"><code data-line-numbers class="language-python">v1 = Vecteur([3,6,7])
+print(v1.__doc__)
+>>>  '\n    Classe permettant de faire des calculs avec des vecteurs\n    '
+		</code></pre>
+	</p>
+					</section>
+
+					<section>
+						<h2>Exercice : Interprétation</h2>
+						<blockquote>
+							Interpréter le résultat des commandes suivantes :
+							<pre><code data-line-numbers class="language-python">In [1]: x = Vecteur([1, 4, 5])
+In [2]: type(x) Out[2]: __main__.Vecteur
+In [3]: print(x) <__main__.Vecteur object at 0x00000000089DE208>
+In [4]: print(x.valeur) [1, 4, 5]</code></pre>
+						</blockquote>
+					</section>
+
+					<section>
+						<h2>Exercice</h2>
+						<blockquote>
+							Ajouter une méthode à la classe Vecteur qui permet de calculer la norme du vecteur et donner un exemple d'utilisation.
+						</blockquote>
+						<pre class="fragment"><code data-line-numbers class="language-python">from math import sqrt
+class Vecteur:
+	...
+	def norme(self):
+		"""
+		Méthode qui retourne la norme du vecteur
+		"""
+		resultat = 0
+		for u in self.valeur:
+			resultat = resultat + u*u
+		return sqrt(resultat)</code></pre>
+	<p class="fragment" style="color: red;">Note : On utilise sqrt de la librairie math</p>
+
+					</section>
+
+					<section>
+						<h2>Exercice</h2>
+						<blockquote>
+							Ajouter une méthode qui permet d'additioner deux vecteurs. Le résultat est un objet de la classe Vecteur. Gérer le cas où les vecteurs sont de taille différentes.
+						</blockquote>
+						<pre class="fragment"><code data-line-numbers class="language-python">from math import sqrt
+class Vecteur:
+	...
+    def addition(self, x):
+        """
+        Méthode qui permet l'addition du vecteur x au vecteur représenté par
+        la classe
+        """                
+        resultat = []
+        n = len(self.valeur)
+        if n == len(x.valeur):
+            for i in range(n):
+                resultat.append(self.valeur[i] + x.valeur[i])
+            return Vecteur(resultat)
+        else:
+            return None</code></pre>
+					</section>
+				</section>
+
+
+                <section>
+					<section data-background-color="rgba(255, 189, 117, 1)">
+						<h1>La surcharge d'opérateur</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://robocrop.realpython.net/?url=https%3A//files.realpython.com/media/Operator-and-Function-Overloading-in-Custom-Python-Classes_Watermarked.3a8e3f4682bc.jpg&w=960&sig=4406d3d7caa54ec35a066896895e8c584b097265">
+						</div>
+					</section>
+
+					<section>
+						<h2>Problème</h2>
+						<blockquote>
+							On voudrait faire des opérations qui nous semblent naturelles telles que l'addition de vecteurs mais sans avoir la lourdeur la syntaxe:
+							<pre><code class="language-python">vecteur3 = vecteur1.addtion(vecteur2)</code></pre>
+						</blockquote>
+						<span class="fragment" style="color: red;">&rarr; On veut écrire plutôt : <pre><code class="language-python">vecteur3 = vecteur1 + vecteur2</code></pre></span> 
+						<span class="fragment"><b>Solution :</b> Utiliser la surcharge d'oérateurs</span>
+					</section>
+
+					<section>
+						<h2>Surcharger des opérateurs à l'aide de méthodes spéciales</h2>
+						<blockquote>
+							Lorsque l'on définit une classe, il est possible de définir des méthodes qui spécifient le comportement des objets de cette classe lorsque l'on utilise des opérateurs classiques en python.
+						</blockquote>
+						<p class="fragment">Par exemple la méthode <em>__add__(self, other)</em> spécifie ce qu'il se passe avec le signe "+"</p>
+						<p class="fragment">On a : objet1.__add__(objet2) $\iff$ objet1 + objet2</p>
+						<p class="fragment" style="color: red">Note: la méthode n'existe pas de base et il faut définir ce qu'elle fait. Elle doit aussi renvoyer un objet de la classe des deux qu'on additionne.</p>
+					</section>
+
+					<section>
+						<h2>Exemple avec Vecteur</h2>
+
+						<pre><code data-line-numbers class="language-python"># -*- coding: utf-8 -*-
+
+from math import sqrt
+
+class Vecteur:
+	"""
+	Classe permettant de faire des calculs avec des vecteurs
+	"""      
+	def __init__(self, valeur):
+		"""
+		Constructeur de la classe
+		
+		:param valeur: Liste contenant les composantes du vecteur
+		"""        
+		self.valeur = valeur
+
+	def norme(self):
+		"""
+		Méthode qui retourne la norme du vecteur
+		
+		:return: float
+		"""        
+		resultat = 0
+		for u in self.valeur:
+			resultat = resultat + u*u
+		return sqrt(resultat)
+
+	def addition(self, x):
+		"""
+		Méthode qui permet l'addition du vecteur x au vecteur représenté par
+		la classe
+		
+		:param x: Vecteur à ajouter
+		:return: Vecteur
+		"""         
+		resultat = []
+		n = len(self.valeur)
+		if n == len(x.valeur):
+			for i in range(n):
+				resultat.append(self.valeur[i] + x.valeur[i])
+			return Vecteur(resultat)
+		else:
+			return None
+
+	def __add__(self, x):
+		"""
+		Méthode qui surcharge l'opérateur +
+		
+		:param x: Vecteur à ajouter
+		:return: Vecteur        
+		"""          
+		resultat = []
+		n = len(self.valeur)
+		if n == len(x.valeur):
+			for i in range(n):
+				resultat.append(self.valeur[i] + x.valeur[i])
+			return Vecteur(resultat)
+		else:
+			return None</code></pre>
+					</section>
+
+                    <section>
+                        <h2>Autres opérateurs surchargeables : opérations </h2>
+                        <style type="text/css">
+                            .tg  {border-collapse:collapse;border-spacing:0;}
+                            .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+                              overflow:hidden;padding:10px 5px;word-break:normal;}
+                            .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+                              font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+                            .tg .tg-6itj{background-color:#F8FAFF;border-color:inherit;color:#25265E;text-align:left;vertical-align:top}
+                            .tg .tg-1rz1{background-color:#F8FAFF;border-color:inherit;color:rgba(37, 38, 94, 0.7);text-align:left;vertical-align:top}
+                            </style>
+                            <table class="tg">
+                            <thead>
+                              <tr>
+                                <th class="tg-6itj"><span style="font-weight:400">Operator</span></th>
+                                <th class="tg-6itj"><span style="font-weight:400">Expression</span></th>
+                                <th class="tg-6itj"><span style="font-weight:400">Internally</span></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td class="tg-1rz1"><span style="color:rgba(37, 38, 94, 0.7)">Addition</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1 + p2</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1.__add__(p2)</span></td>
+                              </tr>
+                              <tr>
+                                <td class="tg-1rz1"><span style="color:rgba(37, 38, 94, 0.7)">Subtraction</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1 - p2</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1.__sub__(p2)</span></td>
+                              </tr>
+                              <tr>
+                                <td class="tg-1rz1"><span style="color:rgba(37, 38, 94, 0.7)">Multiplication</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1 * p2</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1.__mul__(p2)</span></td>
+                              </tr>
+                              <tr>
+                                <td class="tg-1rz1"><span style="color:rgba(37, 38, 94, 0.7)">Power</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1 ** p2</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1.__pow__(p2)</span></td>
+                              </tr>
+                              <tr>
+                                <td class="tg-1rz1"><span style="color:rgba(37, 38, 94, 0.7)">Division</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1 / p2</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1.__truediv__(p2)</span></td>
+                              </tr>
+                              <tr>
+                                <td class="tg-1rz1"><span style="color:rgba(37, 38, 94, 0.7)">Floor Division</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1 // p2</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1.__floordiv__(p2)</span></td>
+                              </tr>
+                              <tr>
+                                <td class="tg-1rz1"><span style="color:rgba(37, 38, 94, 0.7)">Remainder (modulo)</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1 % p2</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1.__mod__(p2)</span></td>
+                              </tr>
+                              <tr>
+                                <td class="tg-1rz1"><span style="color:rgba(37, 38, 94, 0.7)">Bitwise Left Shift</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1 &lt;&lt; p2</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1.__lshift__(p2)</span></td>
+                              </tr>
+                              <tr>
+                                <td class="tg-1rz1"><span style="color:rgba(37, 38, 94, 0.7)">Bitwise Right Shift</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1 &gt;&gt; p2</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1.__rshift__(p2)</span></td>
+                              </tr>
+                              <tr>
+                                <td class="tg-1rz1"><span style="color:rgba(37, 38, 94, 0.7)">Bitwise AND</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1 &amp; p2</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1.__and__(p2)</span></td>
+                              </tr>
+                              <tr>
+                                <td class="tg-1rz1"><span style="color:rgba(37, 38, 94, 0.7)">Bitwise OR</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1 | p2</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1.__or__(p2)</span></td>
+                              </tr>
+                              <tr>
+                                <td class="tg-1rz1"><span style="color:rgba(37, 38, 94, 0.7)">Bitwise XOR</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1 ^ p2</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1.__xor__(p2)</span></td>
+                              </tr>
+                              <tr>
+                                <td class="tg-1rz1"><span style="color:rgba(37, 38, 94, 0.7)">Bitwise NOT</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">~p1</span></td>
+                                <td class="tg-1rz1"><span style="font-style:normal">p1.__invert__()</span></td>
+                              </tr>
+                            </tbody>
+                            </table>
+                    </section>
+
+                    <section>
+                        <h2>Autres opérateurs surchargeables : Comparaison</h2>
+                        Exemple :
+                        <pre><code data-line-numbers class="language-python"># overloading the less than operator
+class Point:
+    def __init__(self, x=0, y=0):
+        self.x = x
+        self.y = y
+
+    def __lt__(self, other):
+        self_mag = (self.x ** 2) + (self.y ** 2)
+        other_mag = (other.x ** 2) + (other.y ** 2)
+        return self_mag < other_mag
+
+p1 = Point(1,1)
+p2 = Point(-2,-3)
+p3 = Point(1,-1)
+
+# use less than
+print(p1< p2)
+print(p2< p3)
+print(p1< p3)</code> </pre>
+                    </section>
+
+                    <section>
+                        <h2>Un cas particulier : __str__</h2>
+                        <blockquote>
+                            Surcharger la méthode <em>__str__(self)</em> permet de spécifier le comportement lorsque l'on convertit un un objet avec la commande <em>str</em>. Et par conséquent, spécifie le comportent de print avec l'objet.
+                        </blockquote>
+                        <span class="fragment">
+                            Exemple avec vecteur :
+                            <pre><code data-line-numbers class="language-python" style="height: 300px;"># -*- coding: utf-8 -*-
+from math import sqrt
+
+class Vecteur:
+    """
+    Classe permettant de faire des calculs avec des vecteurs
+    """      
+    def __init__(self, valeur):
+        """
+        Constructeur de la classe
+        
+        :param valeur: Liste contenant les composantes du vecteur
+        """        
+        self.valeur = valeur
+...
+    def __str__(self):
+        """
+        Méthode qui permet l'affichage du vecteur
+        
+        :return: str
+        """
+        return str(self.valeur)
+
+>>> a = Vecteur([5,6,7,8,9])
+>>> str(a)
+'[5, 6, 7, 8, 9]'
+>>> print(a)
+[5, 6, 7, 8, 9]</code></pre>
+                        </span>
+                    </section>
+
+
+				</section>
+
+                <section>
+					<section data-background-color="rgba(171, 224, 230, 1)">
+						<h1>Le chainage de méthodes</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Object-Oriented-Programming-OOP-in-Python-3_Watermarked.0d29780806d5.jpg">
+						</div>
+					</section>
+
+                    <section>
+                        <h2>Partons d'un exemple avec la classe Vecteur:</h2>
+<p>
+<pre><code data-line-numbers class="language-python">a = Vecteur([5,6,7])
+b = Vecteur([7,8,9])
+c = a.addition(b).norme()
+</code></pre></p>
+                    </section>
+
+                    <section>
+                        <h2>Chainage de méthodes</h2>
+                        <blockquote>
+                            Lorsque le résultat d'une méthode est un objet, il est possible de chainer l'utilisation de la méthode avec une méthode de l'objet retourné:
+                            <pre><code class="language-python">objet.methode_objet().methode_objet_renvoye()</code></pre>
+                        </blockquote>
+                    </section>
+
+                    <section>
+                        <h2>Exercice avec une classe de compteur</h2>
+                        <blockquote>
+                            Modifier les méthodes <em>increase</em> et <em>decrease</em> de façon à pouvoir enchainer les méthodes sur un objet Counter.
+                        </blockquote>
+                        <pre><code data-line-numbers class="language-python" style="height: 300px;">class Counter:
+    """
+    Classe gérant un comtpeur
+    """      
+    def __init__(self):
+        """
+        Constructeur de la classe
+
+        """        
+        self.count = 0 
+
+    def increase(self):
+        """
+        Méthode qui incrémente le compteur
+        """        
+        self.count = self.count + 1
+        
+    def decrease(self):
+        """
+        Méthode qui décrémente le compteur
+        """        
+        self.count = self.count - 1   
+        
+    def getCount(self):
+        """
+        Getter pour l'attribut count
+        
+        :return: int
+        """   
+        return self.count
+    
+    def setCount(self, count):
+        """
+        Setter pour l'attribut count
+        """   
+        self.count = count</code></pre>
+                    </section>
+				</section>
+
+                <section>
+					<section data-background-color="rgba(171, 224, 230, 1)">
+						<h1>L'injection de dépendences</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Object-Oriented-Programming-OOP-in-Python-3_Watermarked.0d29780806d5.jpg">
+						</div>
+					</section>
+
+                    <section>
+                        <h2>Problématique</h2>
+                        <blockquote>On a parfois besoin de pouvoir avoir dans une classe, des objets d'autres classes pour effectuer des traitements complexes. On appelle cela, l'injection de dépendance.</blockquote>
+                        <p class="fragment">Exemple du jeu de plateforme !</p>
+                    </section>
+
+                    <section>
+                        <h2>Deux façons de faire cela : par constructeur</h2>
+                        <pre><code data-line-numbers class="language-python">from ClasseChainedCounter import Counter
+
+class A:
+    """
+    Classe permettant l'injection d'un compteur par le constructeur
+    """      
+    def __init__(self, compteur):
+        """
+        Constructeur de la classe
+
+        :param: Counter
+        """        
+        self.compteur = compteur   
+
+    def traitement(self):
+        """
+        Méthode qui décrémente deux fois le compteur et retourne sa valeur
+        
+        :return: int
+        """      
+        return self.compteur.decrease().decrease().getCount()
+        
+if __name__ == '__main__':
+    x = Counter().setCount(10)     
+    a = A(x)
+    print(a.traitement())  </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>Deux façons de faire cela : par setteur</h2>
+                        <pre><code data-line-numbers class="language-python"># -*- coding: utf-8 -*-
+from ClasseChainedCounter import Counter
+
+class A:
+    """
+    Classe permettant l'injection d'un compteur par un setter
+    """      
+    def setCompteur(self, compteur):
+        """
+        Injecteur pour le compteur
+
+        :param: Counter
+        """        
+        self.compteur = compteur   
+        return self
+
+    def traitement(self):
+        """
+        Méthode qui décrémente deux fois le compteur et retourne sa valeur
+        
+        :return: int
+        """      
+        return self.compteur.decrease().decrease().getCount()
+        
+if __name__ == '__main__':
+    x = Counter().setCount(10)     
+    a = A()
+    a.setCompteur(x)
+    print(a.traitement())  </code></pre>
+                    </section>
+
+                <section>
+                    <h2>Exercice :</h2>
+                    <blockquote>
+                        Faire une classe qui à partir d'objets Counter permet de compter les secondes, minutes et heures et qui affiche la durée compté sous un format HH:MM:SS. 
+                    </blockquote>
+                </section>
+				</section>
+
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script src="plugin/math/math.js"></script>
+		<script src="plugin/menu/menu.js"></script>
+		<script src="plugin/chalkboard/plugin.js"></script>
+		<script src="plugin/verticator/verticator.js"></script>
+		<script src="plugin/presentable/presentable.min.js"></script>
+		
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+				controls: true,
+				transition: 'slide',
+				dependencies: [
+					{ src: 'plugin/reveald3js/reveald3.js' },
+					// { src: 'plugin/title-footer/title-footer.js', async: true, callback: function() { title_footer.initialize(); } },
+					// { src: 'plugin/typed/typed.js', async: false , callback: function() { callTypedJs(); }}
+				],
+				math: {
+					mathjax: 'https://cdn.jsdelivr.net/gh/mathjax/mathjax@2.7.8/MathJax.js',
+					config: 'TeX-AMS_HTML-full',
+					},
+				menu: {
+					numbers: true,
+					width: 'wide',
+					themes: false,
+					transitions: false,
+					openSlideNumber: true,
+				},
+				chalkboard: {
+					toggleChalkboardButton: { left: "80px" },
+					toggleNotesButton: { left: "130px" },
+					colorButtons: true,
+					boardHandle: true,
+					storage: "Notes",
+					eraser: { src: path + 'img/sponge.png', radius: 40}
+				},
+				verticator: {
+					darktheme: false,
+					skipuncounted: false,
+					clickable: true
+				},
+				slideNumber: "c/t",
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMath, RevealMarkdown, RevealHighlight, RevealNotes, RevealMenu, RevealChalkboard, Verticator ]
+			});
+
+			presentable.toc({
+				framework: "revealjs",
+				hideNoTitle: true,
+				titles: "h1,.presentable-title"
+			});
+		</script>
+	</body>
+</html>
