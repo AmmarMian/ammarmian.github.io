@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Structured covariance | Ammar Mian</title>
+    <link>https://ammarmian.github.io/fr/tag/structured-covariance/</link>
+      <atom:link href="https://ammarmian.github.io/fr/tag/structured-covariance/index.xml" rel="self" type="application/rss+xml" />
+    <description>Structured covariance</description>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>fr</language><copyright>© 2021 Ammar Mian</copyright><lastBuildDate>Fri, 23 Jul 2021 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://ammarmian.github.io/media/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <title>Structured covariance</title>
+      <link>https://ammarmian.github.io/fr/tag/structured-covariance/</link>
+    </image>
+    
+    <item>
+      <title>On-line Kronecker Product Structured Covariance Estimation with Riemannian geometry for t-distributed data</title>
+      <link>https://ammarmian.github.io/fr/publication/eusipco_2021/</link>
+      <pubDate>Fri, 23 Jul 2021 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/fr/publication/eusipco_2021/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

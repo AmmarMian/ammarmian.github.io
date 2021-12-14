@@ -5,12 +5,20 @@
     <link>https://ammarmian.github.io/tag/riemannian-geometry/</link>
       <atom:link href="https://ammarmian.github.io/tag/riemannian-geometry/index.xml" rel="self" type="application/rss+xml" />
     <description>Riemannian geometry</description>
-    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>© 2021 Ammar Mian</copyright><lastBuildDate>Thu, 05 Nov 2020 15:00:00 +0000</lastBuildDate>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>© 2021 Ammar Mian</copyright><lastBuildDate>Fri, 23 Jul 2021 00:00:00 +0000</lastBuildDate>
     <image>
       <url>https://ammarmian.github.io/media/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Riemannian geometry</title>
       <link>https://ammarmian.github.io/tag/riemannian-geometry/</link>
     </image>
+    
+    <item>
+      <title>On-line Kronecker Product Structured Covariance Estimation with Riemannian geometry for t-distributed data</title>
+      <link>https://ammarmian.github.io/publication/eusipco_2021/</link>
+      <pubDate>Fri, 23 Jul 2021 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/eusipco_2021/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Learning with constraints : Geometry and sparsity</title>

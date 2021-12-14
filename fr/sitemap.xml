@@ -2,8 +2,21 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://ammarmian.github.io/fr/publication-type/6/</loc>
+    <lastmod>2021-12-03T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://ammarmian.github.io/publication-type/6/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://ammarmian.github.io/fr/publication-type/6/"
+                />
+  </url><url>
     <loc>https://ammarmian.github.io/fr/</loc>
-    <lastmod>2020-11-05T15:00:00+00:00</lastmod>
+    <lastmod>2021-12-03T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
@@ -13,6 +26,188 @@
                 rel="alternate"
                 hreflang="fr"
                 href="https://ammarmian.github.io/fr/"
+                />
+  </url><url>
+    <loc>https://ammarmian.github.io/fr/publication/book_wiley_2021/</loc>
+    <lastmod>2021-12-03T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://ammarmian.github.io/publication/book_wiley_2021/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://ammarmian.github.io/fr/publication/book_wiley_2021/"
+                />
+  </url><url>
+    <loc>https://ammarmian.github.io/fr/tag/change-detection/</loc>
+    <lastmod>2021-12-03T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://ammarmian.github.io/tag/change-detection/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://ammarmian.github.io/fr/tag/change-detection/"
+                />
+  </url><url>
+    <loc>https://ammarmian.github.io/fr/tag/covariance-estimation/</loc>
+    <lastmod>2021-12-03T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://ammarmian.github.io/tag/covariance-estimation/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://ammarmian.github.io/fr/tag/covariance-estimation/"
+                />
+  </url><url>
+    <loc>https://ammarmian.github.io/fr/publication_types/</loc>
+    <lastmod>2021-12-03T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://ammarmian.github.io/publication_types/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://ammarmian.github.io/fr/publication_types/"
+                />
+  </url><url>
+    <loc>https://ammarmian.github.io/fr/publication/</loc>
+    <lastmod>2021-12-03T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://ammarmian.github.io/publication/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://ammarmian.github.io/fr/publication/"
+                />
+  </url><url>
+    <loc>https://ammarmian.github.io/fr/tag/robust-statistics/</loc>
+    <lastmod>2021-12-03T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://ammarmian.github.io/tag/robust-statistics/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://ammarmian.github.io/fr/tag/robust-statistics/"
+                />
+  </url><url>
+    <loc>https://ammarmian.github.io/fr/tag/sar/</loc>
+    <lastmod>2021-12-03T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://ammarmian.github.io/tag/sar/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://ammarmian.github.io/fr/tag/sar/"
+                />
+  </url><url>
+    <loc>https://ammarmian.github.io/fr/tags/</loc>
+    <lastmod>2021-12-03T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://ammarmian.github.io/tags/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://ammarmian.github.io/fr/tags/"
+                />
+  </url><url>
+    <loc>https://ammarmian.github.io/fr/publication-type/1/</loc>
+    <lastmod>2021-07-23T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://ammarmian.github.io/publication-type/1/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://ammarmian.github.io/fr/publication-type/1/"
+                />
+  </url><url>
+    <loc>https://ammarmian.github.io/fr/tag/kronecker-structure/</loc>
+    <lastmod>2021-07-23T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://ammarmian.github.io/tag/kronecker-structure/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://ammarmian.github.io/fr/tag/kronecker-structure/"
+                />
+  </url><url>
+    <loc>https://ammarmian.github.io/fr/publication/eusipco_2021/</loc>
+    <lastmod>2021-07-23T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://ammarmian.github.io/publication/eusipco_2021/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://ammarmian.github.io/fr/publication/eusipco_2021/"
+                />
+  </url><url>
+    <loc>https://ammarmian.github.io/fr/tag/riemannian-geometry/</loc>
+    <lastmod>2021-07-23T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://ammarmian.github.io/tag/riemannian-geometry/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://ammarmian.github.io/fr/tag/riemannian-geometry/"
+                />
+  </url><url>
+    <loc>https://ammarmian.github.io/fr/tag/structured-covariance/</loc>
+    <lastmod>2021-07-23T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://ammarmian.github.io/tag/structured-covariance/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://ammarmian.github.io/fr/tag/structured-covariance/"
+                />
+  </url><url>
+    <loc>https://ammarmian.github.io/fr/publication/wccm_2021/</loc>
+    <lastmod>2021-01-01T00:00:00+00:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://ammarmian.github.io/publication/wccm_2021/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="fr"
+                href="https://ammarmian.github.io/fr/publication/wccm_2021/"
                 />
   </url><url>
     <loc>https://ammarmian.github.io/fr/talk/learning-with-constraints-geometry-and-sparsity/</loc>
@@ -54,19 +249,6 @@
                 href="https://ammarmian.github.io/fr/event/"
                 />
   </url><url>
-    <loc>https://ammarmian.github.io/fr/tag/riemannian-geometry/</loc>
-    <lastmod>2020-11-05T15:00:00+00:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://ammarmian.github.io/tag/riemannian-geometry/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://ammarmian.github.io/fr/tag/riemannian-geometry/"
-                />
-  </url><url>
     <loc>https://ammarmian.github.io/fr/tag/sparsity/</loc>
     <lastmod>2020-11-05T15:00:00+00:00</lastmod>
     <xhtml:link
@@ -78,32 +260,6 @@
                 rel="alternate"
                 hreflang="fr"
                 href="https://ammarmian.github.io/fr/tag/sparsity/"
-                />
-  </url><url>
-    <loc>https://ammarmian.github.io/fr/tags/</loc>
-    <lastmod>2020-11-05T15:00:00+00:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://ammarmian.github.io/tags/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://ammarmian.github.io/fr/tags/"
-                />
-  </url><url>
-    <loc>https://ammarmian.github.io/fr/publication-type/1/</loc>
-    <lastmod>2020-09-10T00:00:00+00:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://ammarmian.github.io/publication-type/1/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://ammarmian.github.io/fr/publication-type/1/"
                 />
   </url><url>
     <loc>https://ammarmian.github.io/fr/publication/mlsp_2020/</loc>
@@ -143,45 +299,6 @@
                 rel="alternate"
                 hreflang="fr"
                 href="https://ammarmian.github.io/fr/tag/linear-regression/"
-                />
-  </url><url>
-    <loc>https://ammarmian.github.io/fr/publication_types/</loc>
-    <lastmod>2020-09-10T00:00:00+00:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://ammarmian.github.io/publication_types/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://ammarmian.github.io/fr/publication_types/"
-                />
-  </url><url>
-    <loc>https://ammarmian.github.io/fr/publication/</loc>
-    <lastmod>2020-09-10T00:00:00+00:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://ammarmian.github.io/publication/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://ammarmian.github.io/fr/publication/"
-                />
-  </url><url>
-    <loc>https://ammarmian.github.io/fr/tag/robust-statistics/</loc>
-    <lastmod>2020-09-10T00:00:00+00:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://ammarmian.github.io/tag/robust-statistics/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://ammarmian.github.io/fr/tag/robust-statistics/"
                 />
   </url><url>
     <loc>https://ammarmian.github.io/fr/publication-type/2/</loc>
@@ -247,19 +364,6 @@
                 rel="alternate"
                 hreflang="fr"
                 href="https://ammarmian.github.io/fr/publication/eusipco_2020/"
-                />
-  </url><url>
-    <loc>https://ammarmian.github.io/fr/tag/change-detection/</loc>
-    <lastmod>2020-06-01T00:00:00+00:00</lastmod>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://ammarmian.github.io/tag/change-detection/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="fr"
-                href="https://ammarmian.github.io/fr/tag/change-detection/"
                 />
   </url><url>
     <loc>https://ammarmian.github.io/fr/tag/low-rank/</loc>

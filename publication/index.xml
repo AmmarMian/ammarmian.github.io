@@ -5,12 +5,36 @@
     <link>https://ammarmian.github.io/publication/</link>
       <atom:link href="https://ammarmian.github.io/publication/index.xml" rel="self" type="application/rss+xml" />
     <description>Publications</description>
-    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>© 2021 Ammar Mian</copyright><lastBuildDate>Thu, 10 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>© 2021 Ammar Mian</copyright><lastBuildDate>Fri, 03 Dec 2021 00:00:00 +0000</lastBuildDate>
     <image>
       <url>https://ammarmian.github.io/media/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Publications</title>
       <link>https://ammarmian.github.io/publication/</link>
     </image>
+    
+    <item>
+      <title>An Overview of Covariance-based Change Detection Methodologies in Multivariate SAR Image Time Series</title>
+      <link>https://ammarmian.github.io/publication/book_wiley_2021/</link>
+      <pubDate>Fri, 03 Dec 2021 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/book_wiley_2021/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>On-line Kronecker Product Structured Covariance Estimation with Riemannian geometry for t-distributed data</title>
+      <link>https://ammarmian.github.io/publication/eusipco_2021/</link>
+      <pubDate>Fri, 23 Jul 2021 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/eusipco_2021/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>A Comparative Study of Statistical-Based Change Detection Methods for Multidimensional and Multitemporal SAR Images</title>
+      <link>https://ammarmian.github.io/publication/wccm_2021/</link>
+      <pubDate>Fri, 01 Jan 2021 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/wccm_2021/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Block-wise Minimization-Majorization Algorithm for Huber&#39;s Criterion: Sparse learning and Applications</title>

@@ -5,12 +5,28 @@
     <link>https://ammarmian.github.io/tag/change-detection/</link>
       <atom:link href="https://ammarmian.github.io/tag/change-detection/index.xml" rel="self" type="application/rss+xml" />
     <description>Change detection</description>
-    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>© 2021 Ammar Mian</copyright><lastBuildDate>Mon, 01 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>© 2021 Ammar Mian</copyright><lastBuildDate>Fri, 03 Dec 2021 00:00:00 +0000</lastBuildDate>
     <image>
       <url>https://ammarmian.github.io/media/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Change detection</title>
       <link>https://ammarmian.github.io/tag/change-detection/</link>
     </image>
+    
+    <item>
+      <title>An Overview of Covariance-based Change Detection Methodologies in Multivariate SAR Image Time Series</title>
+      <link>https://ammarmian.github.io/publication/book_wiley_2021/</link>
+      <pubDate>Fri, 03 Dec 2021 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/book_wiley_2021/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>A Comparative Study of Statistical-Based Change Detection Methods for Multidimensional and Multitemporal SAR Images</title>
+      <link>https://ammarmian.github.io/publication/wccm_2021/</link>
+      <pubDate>Fri, 01 Jan 2021 00:00:00 +0000</pubDate>
+      <guid>https://ammarmian.github.io/publication/wccm_2021/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Robust Low-rank Change Detection for Multivariate SAR Image Time Series</title>
