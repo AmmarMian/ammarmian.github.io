@@ -2,63 +2,63 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Teaching on Ammar Mian</title>
-    <link>/teaching/</link>
+    <link>https://ammarmian.github.io/teaching/</link>
     <description>Recent content in Teaching on Ammar Mian</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>@2022, Ammar Mian. Background Images: [ESA](https://www.esa.int/ESA_Multimedia/Sets/Earth_observation_image_of_the_week/(result_type)/images)</copyright>
-    <lastBuildDate>Sat, 04 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="/teaching/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 04 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://ammarmian.github.io/teaching/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>DATA731 - Modélisation Stochastique</title>
-      <link>/teaching/data731/</link>
+      <link>https://ammarmian.github.io/teaching/data731/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/teaching/data731/</guid>
+      <guid>https://ammarmian.github.io/teaching/data731/</guid>
       <description>Description (in French) Description (in French) TODO</description>
     </item>
     
     <item>
       <title>DATA832 - Introduction au machine learning</title>
-      <link>/teaching/data832/</link>
+      <link>https://ammarmian.github.io/teaching/data832/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/teaching/data832/</guid>
+      <guid>https://ammarmian.github.io/teaching/data832/</guid>
       <description>Description (in French) Description (in French) TODO&amp;hellip;</description>
     </item>
     
     <item>
       <title>DATA931 - Machine learning avancé</title>
-      <link>/teaching/data931/</link>
+      <link>https://ammarmian.github.io/teaching/data931/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/teaching/data931/</guid>
+      <guid>https://ammarmian.github.io/teaching/data931/</guid>
       <description>Description (in French) Description (in French) TODO&amp;hellip;</description>
     </item>
     
     <item>
       <title>INFO501 - Numération et Algorithmique</title>
-      <link>/teaching/info501/</link>
+      <link>https://ammarmian.github.io/teaching/info501/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/teaching/info501/</guid>
+      <guid>https://ammarmian.github.io/teaching/info501/</guid>
       <description>Description (in French) Description (in French) TODO&amp;hellip;</description>
     </item>
     
     <item>
       <title>INFO942 - Theoretical aspects of Unsupervised learning</title>
-      <link>/teaching/info942/</link>
+      <link>https://ammarmian.github.io/teaching/info942/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/teaching/info942/</guid>
+      <guid>https://ammarmian.github.io/teaching/info942/</guid>
       <description>Description (in French) Description (in French) TODO&amp;hellip;</description>
     </item>
     
     <item>
       <title>ISOC931 - Introduciton à la recherche</title>
-      <link>/teaching/isoc931/</link>
+      <link>https://ammarmian.github.io/teaching/isoc931/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/teaching/isoc931/</guid>
+      <guid>https://ammarmian.github.io/teaching/isoc931/</guid>
       <description>Description (in French) Description (in French) TODO&amp;hellip;</description>
     </item>
     

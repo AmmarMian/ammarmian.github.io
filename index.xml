@@ -2,135 +2,135 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Ammar Mian</title>
-    <link>/</link>
+    <link>https://ammarmian.github.io/</link>
     <description>Recent content on Ammar Mian</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>@2022, Ammar Mian. Background Images: [ESA](https://www.esa.int/ESA_Multimedia/Sets/Earth_observation_image_of_the_week/(result_type)/images)</copyright>
-    <lastBuildDate>Sat, 04 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 04 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://ammarmian.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Contact</title>
-      <link>/contact/</link>
+      <link>https://ammarmian.github.io/contact/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/contact/</guid>
+      <guid>https://ammarmian.github.io/contact/</guid>
       <description>I am always open for collaborations on theoretical machine learning, statistical signal processing as well as remote sensins applicaitons especially in climate related studies.
 You can contact me by:
     mail: ammar.</description>
-      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="/contact/cover.jpg" />
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://ammarmian.github.io/contact/cover.jpg" />
     </item>
     
     <item>
       <title>DATA731 - Modélisation Stochastique</title>
-      <link>/teaching/data731/</link>
+      <link>https://ammarmian.github.io/teaching/data731/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/teaching/data731/</guid>
+      <guid>https://ammarmian.github.io/teaching/data731/</guid>
       <description>Description (in French) Description (in French) TODO</description>
       
     </item>
     
     <item>
       <title>DATA832 - Introduction au machine learning</title>
-      <link>/teaching/data832/</link>
+      <link>https://ammarmian.github.io/teaching/data832/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/teaching/data832/</guid>
+      <guid>https://ammarmian.github.io/teaching/data832/</guid>
       <description>Description (in French) Description (in French) TODO&amp;hellip;</description>
       
     </item>
     
     <item>
       <title>DATA931 - Machine learning avancé</title>
-      <link>/teaching/data931/</link>
+      <link>https://ammarmian.github.io/teaching/data931/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/teaching/data931/</guid>
+      <guid>https://ammarmian.github.io/teaching/data931/</guid>
       <description>Description (in French) Description (in French) TODO&amp;hellip;</description>
       
     </item>
     
     <item>
       <title>INFO501 - Numération et Algorithmique</title>
-      <link>/teaching/info501/</link>
+      <link>https://ammarmian.github.io/teaching/info501/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/teaching/info501/</guid>
+      <guid>https://ammarmian.github.io/teaching/info501/</guid>
       <description>Description (in French) Description (in French) TODO&amp;hellip;</description>
       
     </item>
     
     <item>
       <title>INFO942 - Theoretical aspects of Unsupervised learning</title>
-      <link>/teaching/info942/</link>
+      <link>https://ammarmian.github.io/teaching/info942/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/teaching/info942/</guid>
+      <guid>https://ammarmian.github.io/teaching/info942/</guid>
       <description>Description (in French) Description (in French) TODO&amp;hellip;</description>
       
     </item>
     
     <item>
       <title>ISOC931 - Introduciton à la recherche</title>
-      <link>/teaching/isoc931/</link>
+      <link>https://ammarmian.github.io/teaching/isoc931/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/teaching/isoc931/</guid>
+      <guid>https://ammarmian.github.io/teaching/isoc931/</guid>
       <description>Description (in French) Description (in French) TODO&amp;hellip;</description>
       
     </item>
     
     <item>
       <title>List of publications</title>
-      <link>/publications/</link>
+      <link>https://ammarmian.github.io/publications/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/publications/</guid>
+      <guid>https://ammarmian.github.io/publications/</guid>
       <description>This page regroups my articles ordered by type and date. If any file is missing, please contact me here.  Journal articles Journal articles   &amp;#xf0f6;F. Bouchard, A.</description>
-      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="/publications/cover.jpg" />
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://ammarmian.github.io/publications/cover.jpg" />
     </item>
     
     <item>
       <title>Open platform for robust geometric classification of EEG</title>
-      <link>/projects/elaborate/</link>
+      <link>https://ammarmian.github.io/projects/elaborate/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/projects/elaborate/</guid>
+      <guid>https://ammarmian.github.io/projects/elaborate/</guid>
       <description>Description (in French) Description (in French) Le projet opEn pLAtform for roBust geOmetRic clAssificaTion of Eeg (ELABORATE) considère le problème du traitement et de la classification de données d&amp;rsquo;électroencéphalographie (EEG) à l&amp;rsquo;aide de méthodes reposant sur les statistiques robustes et la géométrie riemannienne.</description>
       
     </item>
     
     <item>
       <title>Photography</title>
-      <link>/photography/</link>
+      <link>https://ammarmian.github.io/photography/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/photography/</guid>
+      <guid>https://ammarmian.github.io/photography/</guid>
       <description>Bee
       Mountains
       Sailboats
       Snowy field
       Starry night</description>
-      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="/photography/cover.jpg" />
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://ammarmian.github.io/photography/cover.jpg" />
     </item>
     
     <item>
       <title>Scientific Activities</title>
-      <link>/activities/</link>
+      <link>https://ammarmian.github.io/activities/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/activities/</guid>
+      <guid>https://ammarmian.github.io/activities/</guid>
       <description>Research interests Research interests My research interests are at the intersection between theoretical aspects of statistical signal processing, machine learning and their applications to remote sensing applications.
 From my Ph.d where I worked on change detection for time series of SAR images, I have interested myself as well to hyperspectral images, GPR signals and EEG measurements.</description>
-      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="/activities/cover.jpg" />
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="https://ammarmian.github.io/activities/cover.jpg" />
     </item>
     
     <item>
       <title>Stratigraphy de montagne aéroportée</title>
-      <link>/projects/smga/</link>
+      <link>https://ammarmian.github.io/projects/smga/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/projects/smga/</guid>
+      <guid>https://ammarmian.github.io/projects/smga/</guid>
       <description>Description (in French) Description (in French) Le projet SMGA porte sur le développement d’une technologie permettant la surveillance de pans de montagne par un système de géoradar aéroporté. Le géoradar est un système radar qui envoie une onde électromagnétique pénétrant le sol et se réfléchissant sur les différents éléments le constituant.</description>
       
     </item>

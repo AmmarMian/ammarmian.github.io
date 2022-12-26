@@ -2,10 +2,10 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Series on Ammar Mian</title>
-    <link>/series/</link>
+    <link>https://ammarmian.github.io/series/</link>
     <description>Recent content in Series on Ammar Mian</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <copyright>@2022, Ammar Mian. Background Images: [ESA](https://www.esa.int/ESA_Multimedia/Sets/Earth_observation_image_of_the_week/(result_type)/images)</copyright><atom:link href="/series/index.xml" rel="self" type="application/rss+xml" />
+    <copyright>@2022, Ammar Mian. Background Images: [ESA](https://www.esa.int/ESA_Multimedia/Sets/Earth_observation_image_of_the_week/(result_type)/images)</copyright><atom:link href="https://ammarmian.github.io/series/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

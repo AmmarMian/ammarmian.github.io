@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Recherche on Ammar Mian</title>
-    <link>/tags/recherche/</link>
+    <link>https://ammarmian.github.io/tags/recherche/</link>
     <description>Recent content in Recherche on Ammar Mian</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>@2022, Ammar Mian. Background Images: [ESA](https://www.esa.int/ESA_Multimedia/Sets/Earth_observation_image_of_the_week/(result_type)/images)</copyright>
-    <lastBuildDate>Sat, 04 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="/tags/recherche/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 04 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://ammarmian.github.io/tags/recherche/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>ISOC931 - Introduciton à la recherche</title>
-      <link>/teaching/isoc931/</link>
+      <link>https://ammarmian.github.io/teaching/isoc931/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
-      <guid>/teaching/isoc931/</guid>
+      <guid>https://ammarmian.github.io/teaching/isoc931/</guid>
       <description>Description (in French) Description (in French) TODO&amp;hellip;</description>
     </item>
     
