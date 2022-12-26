@@ -1,471 +1,138 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Ammar Mian</title>
-    <link>https://ammarmian.github.io/</link>
-      <atom:link href="https://ammarmian.github.io/index.xml" rel="self" type="application/rss+xml" />
-    <description>Ammar Mian</description>
-    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><copyright>© 2022 Ammar Mian</copyright><lastBuildDate>Fri, 03 Dec 2021 00:00:00 +0000</lastBuildDate>
-    <image>
-      <url>https://ammarmian.github.io/media/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_3.png</url>
-      <title>Ammar Mian</title>
-      <link>https://ammarmian.github.io/</link>
-    </image>
-    
+    <link>/</link>
+    <description>Recent content on Ammar Mian</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>@2022, Ammar Mian. Background Images: [ESA](https://www.esa.int/ESA_Multimedia/Sets/Earth_observation_image_of_the_week/(result_type)/images)</copyright>
+    <lastBuildDate>Sat, 04 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>An Overview of Covariance-based Change Detection Methodologies in Multivariate SAR Image Time Series</title>
-      <link>https://ammarmian.github.io/publication/book_wiley_2021/</link>
-      <pubDate>Fri, 03 Dec 2021 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/book_wiley_2021/</guid>
-      <description></description>
+      <title>Contact</title>
+      <link>/contact/</link>
+      <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/contact/</guid>
+      <description>I am always open for collaborations on theoretical machine learning, statistical signal processing as well as remote sensins applicaitons especially in climate related studies.
+You can contact me by:
+    mail: ammar.</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="/contact/cover.jpg" />
     </item>
     
     <item>
-      <title>On-line Kronecker Product Structured Covariance Estimation with Riemannian geometry for t-distributed data</title>
-      <link>https://ammarmian.github.io/publication/eusipco_2021/</link>
-      <pubDate>Fri, 23 Jul 2021 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/eusipco_2021/</guid>
-      <description></description>
+      <title>DATA731 - Modélisation Stochastique</title>
+      <link>/teaching/data731/</link>
+      <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/teaching/data731/</guid>
+      <description>Description (in French) Description (in French) TODO</description>
+      
+    </item>
+    
+    <item>
+      <title>DATA832 - Introduction au machine learning</title>
+      <link>/teaching/data832/</link>
+      <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/teaching/data832/</guid>
+      <description>Description (in French) Description (in French) TODO&amp;hellip;</description>
+      
+    </item>
+    
+    <item>
+      <title>DATA931 - Machine learning avancé</title>
+      <link>/teaching/data931/</link>
+      <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/teaching/data931/</guid>
+      <description>Description (in French) Description (in French) TODO&amp;hellip;</description>
+      
+    </item>
+    
+    <item>
+      <title>INFO501 - Numération et Algorithmique</title>
+      <link>/teaching/info501/</link>
+      <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/teaching/info501/</guid>
+      <description>Description (in French) Description (in French) TODO&amp;hellip;</description>
+      
+    </item>
+    
+    <item>
+      <title>INFO942 - Theoretical aspects of Unsupervised learning</title>
+      <link>/teaching/info942/</link>
+      <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/teaching/info942/</guid>
+      <description>Description (in French) Description (in French) TODO&amp;hellip;</description>
+      
+    </item>
+    
+    <item>
+      <title>ISOC931 - Introduciton à la recherche</title>
+      <link>/teaching/isoc931/</link>
+      <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/teaching/isoc931/</guid>
+      <description>Description (in French) Description (in French) TODO&amp;hellip;</description>
+      
+    </item>
+    
+    <item>
+      <title>List of publications</title>
+      <link>/publications/</link>
+      <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/publications/</guid>
+      <description>This page regroups my articles ordered by type and date. If any file is missing, please contact me here.  Journal articles Journal articles   &amp;#xf0f6;F. Bouchard, A.</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="/publications/cover.jpg" />
+    </item>
+    
+    <item>
+      <title>Open platform for robust geometric classification of EEG</title>
+      <link>/projects/elaborate/</link>
+      <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/projects/elaborate/</guid>
+      <description>Description (in French) Description (in French) Le projet opEn pLAtform for roBust geOmetRic clAssificaTion of Eeg (ELABORATE) considère le problème du traitement et de la classification de données d&amp;rsquo;électroencéphalographie (EEG) à l&amp;rsquo;aide de méthodes reposant sur les statistiques robustes et la géométrie riemannienne.</description>
+      
     </item>
     
     <item>
       <title>Photography</title>
-      <link>https://ammarmian.github.io/photography/</link>
-      <pubDate>Mon, 26 Apr 2021 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/photography/</guid>
-      <description>&lt;p&gt;I enjoy photography as a hobby. Here are some of them&amp;hellip;&lt;/p&gt;
-&lt;p&gt;You can find more at my &lt;a href=&#34;https://www.flickr.com/photos/187091423@N06/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Flickr page&lt;/a&gt;&lt;/p&gt;
-
-
-
-
-
-
-
-
-
-
-  
-  
-
-
-&lt;div class=&#34;gallery&#34;&gt;
-
-  
-  
-  
-    
-    
-    
-    
-    
-    &lt;a data-fancybox=&#34;gallery-album&#34; href=&#34;https://ammarmian.github.io/photography/album/Boats.jpg&#34; &gt;
-      &lt;img src=&#34;https://ammarmian.github.io/photography/album/Boats_hud168975c8233672b28fd1efe619ccb21_7325692_0x190_resize_q75_lanczos.jpg&#34; loading=&#34;lazy&#34; alt=&#34;Boats.jpg&#34; width=&#34;285&#34; height=&#34;190&#34;&gt;
-    &lt;/a&gt;
-  
-    
-    
-    
-    
-    
-    &lt;a data-fancybox=&#34;gallery-album&#34; href=&#34;https://ammarmian.github.io/photography/album/Dark.png&#34; &gt;
-      &lt;img src=&#34;https://ammarmian.github.io/photography/album/Dark_hu2d64c4232f544b31aa4e4243853fed22_17178799_0x190_resize_lanczos_3.png&#34; loading=&#34;lazy&#34; alt=&#34;Dark.png&#34; width=&#34;338&#34; height=&#34;190&#34;&gt;
-    &lt;/a&gt;
-  
-    
-    
-    
-    
-    
-    &lt;a data-fancybox=&#34;gallery-album&#34; href=&#34;https://ammarmian.github.io/photography/album/Etretat.jpg&#34; &gt;
-      &lt;img src=&#34;https://ammarmian.github.io/photography/album/Etretat_huaf05e6d47174fcc86b603201a2ed1fe2_19513467_0x190_resize_q75_lanczos.jpg&#34; loading=&#34;lazy&#34; alt=&#34;Etretat.jpg&#34; width=&#34;258&#34; height=&#34;190&#34;&gt;
-    &lt;/a&gt;
-  
-    
-    
-    
-    
-    
-    &lt;a data-fancybox=&#34;gallery-album&#34; href=&#34;https://ammarmian.github.io/photography/album/Fields.jpg&#34; &gt;
-      &lt;img src=&#34;https://ammarmian.github.io/photography/album/Fields_hu0a039736d5d274baba29ee9ec2028337_3266901_0x190_resize_q75_lanczos.jpg&#34; loading=&#34;lazy&#34; alt=&#34;Fields.jpg&#34; width=&#34;127&#34; height=&#34;190&#34;&gt;
-    &lt;/a&gt;
-  
-    
-    
-    
-    
-    
-    &lt;a data-fancybox=&#34;gallery-album&#34; href=&#34;https://ammarmian.github.io/photography/album/Helsinki.jpg&#34; &gt;
-      &lt;img src=&#34;https://ammarmian.github.io/photography/album/Helsinki_hu0d5cf71b21428027ea7d7aafededec3e_1000875_0x190_resize_q75_lanczos.jpg&#34; loading=&#34;lazy&#34; alt=&#34;Helsinki.jpg&#34; width=&#34;337&#34; height=&#34;190&#34;&gt;
-    &lt;/a&gt;
-  
-    
-    
-    
-    
-    
-    &lt;a data-fancybox=&#34;gallery-album&#34; href=&#34;https://ammarmian.github.io/photography/album/Lake%20and%20mountains.png&#34; &gt;
-      &lt;img src=&#34;https://ammarmian.github.io/photography/album/Lake%20and%20mountains_hue0d4a3c2556941c4537e9ce34400d691_20763675_0x190_resize_lanczos_3.png&#34; loading=&#34;lazy&#34; alt=&#34;Lake and mountains.png&#34; width=&#34;127&#34; height=&#34;190&#34;&gt;
-    &lt;/a&gt;
-  
-    
-    
-    
-    
-    
-    &lt;a data-fancybox=&#34;gallery-album&#34; href=&#34;https://ammarmian.github.io/photography/album/Mist.png&#34; &gt;
-      &lt;img src=&#34;https://ammarmian.github.io/photography/album/Mist_hu20a44b483ef57f01672e8d1f056d5e63_21225397_0x190_resize_lanczos_3.png&#34; loading=&#34;lazy&#34; alt=&#34;Mist.png&#34; width=&#34;143&#34; height=&#34;190&#34;&gt;
-    &lt;/a&gt;
-  
-    
-    
-    
-    
-    
-    &lt;a data-fancybox=&#34;gallery-album&#34; href=&#34;https://ammarmian.github.io/photography/album/Moon.jpg&#34; &gt;
-      &lt;img src=&#34;https://ammarmian.github.io/photography/album/Moon_hua44625efb8cec2295179a1d8c2b94559_3018885_0x190_resize_q75_lanczos.jpg&#34; loading=&#34;lazy&#34; alt=&#34;Moon.jpg&#34; width=&#34;253&#34; height=&#34;190&#34;&gt;
-    &lt;/a&gt;
-  
-    
-    
-    
-    
-    
-    &lt;a data-fancybox=&#34;gallery-album&#34; href=&#34;https://ammarmian.github.io/photography/album/Path.jpg&#34; &gt;
-      &lt;img src=&#34;https://ammarmian.github.io/photography/album/Path_hu6e896935499d49f9cc23d17a2d90a6a8_7515042_0x190_resize_q75_lanczos.jpg&#34; loading=&#34;lazy&#34; alt=&#34;Path.jpg&#34; width=&#34;285&#34; height=&#34;190&#34;&gt;
-    &lt;/a&gt;
-  
-    
-    
-    
-    
-    
-    &lt;a data-fancybox=&#34;gallery-album&#34; href=&#34;https://ammarmian.github.io/photography/album/Rebound.jpg&#34; &gt;
-      &lt;img src=&#34;https://ammarmian.github.io/photography/album/Rebound_huedcca3694a64e7ff25fb3d1c8d1b7b8d_9996944_0x190_resize_q75_lanczos.jpg&#34; loading=&#34;lazy&#34; alt=&#34;Rebound.jpg&#34; width=&#34;285&#34; height=&#34;190&#34;&gt;
-    &lt;/a&gt;
-  
-    
-    
-    
-    
-    
-    &lt;a data-fancybox=&#34;gallery-album&#34; href=&#34;https://ammarmian.github.io/photography/album/Snow.jpg&#34; &gt;
-      &lt;img src=&#34;https://ammarmian.github.io/photography/album/Snow_hu4f3b545489d4ee65227f92b697eb0db6_964563_0x190_resize_q75_lanczos.jpg&#34; loading=&#34;lazy&#34; alt=&#34;Snow.jpg&#34; width=&#34;285&#34; height=&#34;190&#34;&gt;
-    &lt;/a&gt;
-  
-    
-    
-    
-    
-    
-    &lt;a data-fancybox=&#34;gallery-album&#34; href=&#34;https://ammarmian.github.io/photography/album/Snowy%20mountain.png&#34; &gt;
-      &lt;img src=&#34;https://ammarmian.github.io/photography/album/Snowy%20mountain_huc107fc5e7392a56012680b9311b6368a_50952945_0x190_resize_lanczos_3.png&#34; loading=&#34;lazy&#34; alt=&#34;Snowy mountain.png&#34; width=&#34;143&#34; height=&#34;190&#34;&gt;
-    &lt;/a&gt;
-  
-    
-    
-    
-    
-    
-    &lt;a data-fancybox=&#34;gallery-album&#34; href=&#34;https://ammarmian.github.io/photography/album/Sunset.jpg&#34; &gt;
-      &lt;img src=&#34;https://ammarmian.github.io/photography/album/Sunset_hu912752fb52c34838f9ad901f19886480_8758634_0x190_resize_q75_lanczos.jpg&#34; loading=&#34;lazy&#34; alt=&#34;Sunset.jpg&#34; width=&#34;338&#34; height=&#34;190&#34;&gt;
-    &lt;/a&gt;
-  
-    
-    
-    
-    
-    
-    &lt;a data-fancybox=&#34;gallery-album&#34; href=&#34;https://ammarmian.github.io/photography/album/Tram.jpg&#34; &gt;
-      &lt;img src=&#34;https://ammarmian.github.io/photography/album/Tram_hu38705ad98ef09d9939843a0727190e40_2183120_0x190_resize_q75_lanczos.jpg&#34; loading=&#34;lazy&#34; alt=&#34;Tram.jpg&#34; width=&#34;205&#34; height=&#34;190&#34;&gt;
-    &lt;/a&gt;
-  
-    
-    
-    
-    
-    
-    &lt;a data-fancybox=&#34;gallery-album&#34; href=&#34;https://ammarmian.github.io/photography/album/col%20forclat.png&#34; &gt;
-      &lt;img src=&#34;https://ammarmian.github.io/photography/album/col%20forclat_hua191abd6fbeb28e81c9e08ffb1244024_22114228_0x190_resize_lanczos_3.png&#34; loading=&#34;lazy&#34; alt=&#34;col forclat.png&#34; width=&#34;127&#34; height=&#34;190&#34;&gt;
-    &lt;/a&gt;
-  
-    
-    
-    
-    
-    
-    &lt;a data-fancybox=&#34;gallery-album&#34; href=&#34;https://ammarmian.github.io/photography/album/snail.jpg&#34; &gt;
-      &lt;img src=&#34;https://ammarmian.github.io/photography/album/snail_huca7fdcf072c3c9212bc12dc14cd8db6f_253719_0x190_resize_q75_lanczos.jpg&#34; loading=&#34;lazy&#34; alt=&#34;snail.jpg&#34; width=&#34;190&#34; height=&#34;190&#34;&gt;
-    &lt;/a&gt;
-  
-    
-    
-    
-    
-    
-    &lt;a data-fancybox=&#34;gallery-album&#34; href=&#34;https://ammarmian.github.io/photography/album/tree.jpg&#34; &gt;
-      &lt;img src=&#34;https://ammarmian.github.io/photography/album/tree_hu3881d91dc6c28a28cce2a10595a7f9d0_127846_0x190_resize_q75_lanczos.jpg&#34; loading=&#34;lazy&#34; alt=&#34;tree.jpg&#34; width=&#34;190&#34; height=&#34;190&#34;&gt;
-    &lt;/a&gt;
-  
-
-&lt;/div&gt;
-</description>
+      <link>/photography/</link>
+      <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/photography/</guid>
+      <description>Bee
+      Mountains
+      Sailboats
+      Snowy field
+      Starry night</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="/photography/cover.jpg" />
     </item>
     
     <item>
-      <title>A Comparative Study of Statistical-Based Change Detection Methods for Multidimensional and Multitemporal SAR Images</title>
-      <link>https://ammarmian.github.io/publication/wccm_2021/</link>
-      <pubDate>Fri, 01 Jan 2021 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/wccm_2021/</guid>
-      <description></description>
+      <title>Scientific Activities</title>
+      <link>/activities/</link>
+      <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/activities/</guid>
+      <description>Research interests Research interests My research interests are at the intersection between theoretical aspects of statistical signal processing, machine learning and their applications to remote sensing applications.
+From my Ph.d where I worked on change detection for time series of SAR images, I have interested myself as well to hyperspectral images, GPR signals and EEG measurements.</description>
+      <media:content xmlns:media="http://search.yahoo.com/mrss/" url="/activities/cover.jpg" />
     </item>
     
     <item>
-      <title>Learning with constraints : Geometry and sparsity</title>
-      <link>https://ammarmian.github.io/talk/learning-with-constraints-geometry-and-sparsity/</link>
-      <pubDate>Thu, 05 Nov 2020 15:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/talk/learning-with-constraints-geometry-and-sparsity/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Block-wise Minimization-Majorization Algorithm for Huber&#39;s Criterion: Sparse learning and Applications</title>
-      <link>https://ammarmian.github.io/publication/mlsp_2020/</link>
-      <pubDate>Thu, 10 Sep 2020 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/mlsp_2020/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Riemannian geometry for compound Gaussian distributions: Application to recursive change detection</title>
-      <link>https://ammarmian.github.io/publication/sp_2020/</link>
-      <pubDate>Sat, 01 Aug 2020 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/sp_2020/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Exploiting robust statistics and Riemannian geometry for the Analysis of  multidimensional SAR Time Series</title>
-      <link>https://ammarmian.github.io/talk/exploiting-robust-statistics-and-riemannian-geometry-for-the-analysis-of-multidimensional-sar-time-series/</link>
-      <pubDate>Fri, 19 Jun 2020 09:30:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/talk/exploiting-robust-statistics-and-riemannian-geometry-for-the-analysis-of-multidimensional-sar-time-series/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>A Comparative Study of Supervised Learning Algorithms for Symmetric Positive Definite Features</title>
-      <link>https://ammarmian.github.io/publication/eusipco_2020/</link>
-      <pubDate>Mon, 01 Jun 2020 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/eusipco_2020/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Robust Low-rank Change Detection for Multivariate SAR Image Time Series</title>
-      <link>https://ammarmian.github.io/publication/jstars_2020/</link>
-      <pubDate>Mon, 01 Jun 2020 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/jstars_2020/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Contributions to SAR Image Time Series Analysis</title>
-      <link>https://ammarmian.github.io/publication/phd_thesis/</link>
-      <pubDate>Thu, 26 Sep 2019 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/phd_thesis/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Détection de Changement Robuste en Rang Faible pour les Séries Temporelles d&#39;Images SAR</title>
-      <link>https://ammarmian.github.io/publication/gretsi_2019/</link>
-      <pubDate>Tue, 27 Aug 2019 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/gretsi_2019/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Robust Low-rank Change Detection for SAR Image Time Series</title>
-      <link>https://ammarmian.github.io/publication/igarss_2019/</link>
-      <pubDate>Thu, 27 Jun 2019 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/igarss_2019/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Designing SAR Images Change-point Estimation Strategies Using an Mse Lower Bound</title>
-      <link>https://ammarmian.github.io/publication/icassp_2019/</link>
-      <pubDate>Sun, 12 May 2019 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/icassp_2019/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Change detection for SAR Images</title>
-      <link>https://ammarmian.github.io/talk/change-detection-for-sar-images/</link>
-      <pubDate>Thu, 11 Apr 2019 12:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/talk/change-detection-for-sar-images/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Robust statistics for testing the homogeneity of covariance scale and shape</title>
-      <link>https://ammarmian.github.io/talk/robust-statistics-for-testing-the-homogeneity-of-covariance-scale-and-shape/</link>
-      <pubDate>Wed, 10 Apr 2019 11:30:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/talk/robust-statistics-for-testing-the-homogeneity-of-covariance-scale-and-shape/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Detection Methods Based on Structured Covariance Matrices for Multivariate SAR Images Processing</title>
-      <link>https://ammarmian.github.io/publication/grsl_2019/</link>
-      <pubDate>Mon, 28 Jan 2019 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/grsl_2019/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Exploitation of SAR image time series</title>
-      <link>https://ammarmian.github.io/talk/exploitation-of-sar-image-time-series/</link>
-      <pubDate>Tue, 15 Jan 2019 11:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/talk/exploitation-of-sar-image-time-series/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Design of New Wavelet Packets Adapted to High-Resolution SAR Images With an Application to Target Detection</title>
-      <link>https://ammarmian.github.io/publication/tgrs_2019/</link>
-      <pubDate>Mon, 14 Jan 2019 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/tgrs_2019/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Robust statistics for testing the homogeneity of covariance scale and shape</title>
-      <link>https://ammarmian.github.io/talk/robust-statistics-for-testing-the-homogeneity-of-covariance-scale-and-shape/</link>
-      <pubDate>Fri, 07 Dec 2018 16:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/talk/robust-statistics-for-testing-the-homogeneity-of-covariance-scale-and-shape/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>New Robust Statistics for Change Detection in Time Series of Multivariate SAR Images</title>
-      <link>https://ammarmian.github.io/publication/tsp_2019/</link>
-      <pubDate>Tue, 27 Nov 2018 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/tsp_2019/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Robust Detection and Estimation of Change-Points in a Time Series of Multivariate Images</title>
-      <link>https://ammarmian.github.io/publication/eusipco_2018/</link>
-      <pubDate>Sat, 01 Sep 2018 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/eusipco_2018/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Change Detection for SAR Images in non-Gaussian Environment</title>
-      <link>https://ammarmian.github.io/talk/change-detection-for-sar-images-in-non-gaussian-environment/</link>
-      <pubDate>Fri, 10 Aug 2018 13:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/talk/change-detection-for-sar-images-in-non-gaussian-environment/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>A Robust Change Detector for Highly Heterogeneous Multivariate Images</title>
-      <link>https://ammarmian.github.io/publication/icassp_2018/</link>
-      <pubDate>Sun, 15 Apr 2018 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/icassp_2018/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Change Detection under Compound Gaussian Assumptions</title>
-      <link>https://ammarmian.github.io/talk/change-detection-under-compound-gaussian-assumptions/</link>
-      <pubDate>Fri, 15 Dec 2017 11:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/talk/change-detection-under-compound-gaussian-assumptions/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Multivariate Change Detection on High Resolution Monovariate SAR Image Using Linear Time-Frequency Analysis</title>
-      <link>https://ammarmian.github.io/publication/eusipco_2017/</link>
-      <pubDate>Sun, 27 Aug 2017 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/eusipco_2017/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Linear Time-Frequency Analysis in High Resolution SAR Images and Applications</title>
-      <link>https://ammarmian.github.io/talk/linear-time-frequency-analysis-in-high-resolution-sar-images-and-applications/</link>
-      <pubDate>Fri, 30 Jun 2017 18:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/talk/linear-time-frequency-analysis-in-high-resolution-sar-images-and-applications/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Détection de changement sur images SAR monovariées par analyse temps-fréquence linéaire</title>
-      <link>https://ammarmian.github.io/publication/gretsi_2017/</link>
-      <pubDate>Sun, 01 Jan 2017 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/gretsi_2017/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Analysis of GNSS reflectometry data of the space mission TechDemoSat-1</title>
-      <link>https://ammarmian.github.io/publication/master_thesis/</link>
-      <pubDate>Mon, 26 Sep 2016 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/publication/master_thesis/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Change detection on SAR Image Time Series</title>
-      <link>https://ammarmian.github.io/project/change-detection/</link>
-      <pubDate>Thu, 01 Sep 2016 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/project/change-detection/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Machine learning with Riemannian Geometry</title>
-      <link>https://ammarmian.github.io/project/riemannian-machine-learning/</link>
-      <pubDate>Thu, 01 Sep 2016 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/project/riemannian-machine-learning/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Stratigraphie de Montagne Aéroportée (SMGA)</title>
-      <link>https://ammarmian.github.io/project/smga/</link>
-      <pubDate>Thu, 01 Sep 2016 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/project/smga/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://ammarmian.github.io/admin/config.yml</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/admin/config.yml</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>https://ammarmian.github.io/contact/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/contact/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>CV</title>
-      <link>https://ammarmian.github.io/cv/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://ammarmian.github.io/cv/</guid>
-      <description></description>
+      <title>Stratigraphy de montagne aéroportée</title>
+      <link>/projects/smga/</link>
+      <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/projects/smga/</guid>
+      <description>Description (in French) Description (in French) Le projet SMGA porte sur le développement d’une technologie permettant la surveillance de pans de montagne par un système de géoradar aéroporté. Le géoradar est un système radar qui envoie une onde électromagnétique pénétrant le sol et se réfléchissant sur les différents éléments le constituant.</description>
+      
     </item>
     
   </channel>

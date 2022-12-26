@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>GPR on Ammar Mian</title>
+    <link>/tags/gpr/</link>
+    <description>Recent content in GPR on Ammar Mian</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>@2022, Ammar Mian. Background Images: [ESA](https://www.esa.int/ESA_Multimedia/Sets/Earth_observation_image_of_the_week/(result_type)/images)</copyright>
+    <lastBuildDate>Sat, 04 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="/tags/gpr/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Stratigraphy de montagne aéroportée</title>
+      <link>/projects/smga/</link>
+      <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/projects/smga/</guid>
+      <description>Description (in French) Description (in French) Le projet SMGA porte sur le développement d’une technologie permettant la surveillance de pans de montagne par un système de géoradar aéroporté. Le géoradar est un système radar qui envoie une onde électromagnétique pénétrant le sol et se réfléchissant sur les différents éléments le constituant.</description>
+    </item>
+    
+  </channel>
+</rss>
