@@ -5,8 +5,89 @@
     
       <url>
             <loc>https://ammarmian.github.io/</loc>
-            <lastmod>2021-09-04T00:00:00+00:00</lastmod>
+            <lastmod>2021-10-31T00:00:00+00:00</lastmod>
             <priority>0</priority>
+          </url>
+    
+  
+    
+      <url>
+            <loc>https://ammarmian.github.io/tags/domain-adaptation/</loc>
+            <lastmod>2021-10-31T00:00:00+00:00</lastmod>
+            <changefreq>daily</changefreq>
+            <priority>0.5</priority>
+          </url>
+    
+  
+    
+      <url>
+            <loc>https://ammarmian.github.io/tags/internship/</loc>
+            <lastmod>2021-10-31T00:00:00+00:00</lastmod>
+            <changefreq>daily</changefreq>
+            <priority>0.5</priority>
+          </url>
+    
+  
+    
+      <url>
+            <loc>https://ammarmian.github.io/news/internship_transfer_learning_2022/</loc>
+            <lastmod>2021-10-31T00:00:00+00:00</lastmod>
+            <changefreq>daily</changefreq>
+            <priority>0.5</priority>
+          </url>
+    
+  
+    
+      <url>
+            <loc>https://ammarmian.github.io/tags/machine-learning/</loc>
+            <lastmod>2021-10-31T00:00:00+00:00</lastmod>
+            <changefreq>daily</changefreq>
+            <priority>0.5</priority>
+          </url>
+    
+  
+    
+      <url>
+            <loc>https://ammarmian.github.io/news/</loc>
+            <lastmod>2021-10-31T00:00:00+00:00</lastmod>
+            <changefreq>daily</changefreq>
+            <priority>0.5</priority>
+          </url>
+    
+  
+    
+      <url>
+            <loc>https://ammarmian.github.io/tags/remote-sensing/</loc>
+            <lastmod>2021-10-31T00:00:00+00:00</lastmod>
+            <changefreq>daily</changefreq>
+            <priority>0.5</priority>
+          </url>
+    
+  
+    
+      <url>
+            <loc>https://ammarmian.github.io/tags/riemannian-geometry/</loc>
+            <lastmod>2021-10-31T00:00:00+00:00</lastmod>
+            <changefreq>daily</changefreq>
+            <priority>0.5</priority>
+          </url>
+    
+  
+    
+      <url>
+            <loc>https://ammarmian.github.io/tags/</loc>
+            <lastmod>2021-10-31T00:00:00+00:00</lastmod>
+            <changefreq>daily</changefreq>
+            <priority>0.5</priority>
+          </url>
+    
+  
+    
+      <url>
+            <loc>https://ammarmian.github.io/tags/transfer-learning/</loc>
+            <lastmod>2021-10-31T00:00:00+00:00</lastmod>
+            <changefreq>daily</changefreq>
+            <priority>0.5</priority>
           </url>
     
   
@@ -174,15 +255,6 @@
   
     
       <url>
-            <loc>https://ammarmian.github.io/tags/machine-learning/</loc>
-            <lastmod>2021-09-04T00:00:00+00:00</lastmod>
-            <changefreq>daily</changefreq>
-            <priority>0.5</priority>
-          </url>
-    
-  
-    
-      <url>
             <loc>https://ammarmian.github.io/tags/num%C3%A9ration/</loc>
             <lastmod>2021-09-04T00:00:00+00:00</lastmod>
             <changefreq>daily</changefreq>
@@ -264,15 +336,6 @@
   
     
       <url>
-            <loc>https://ammarmian.github.io/tags/remote-sensing/</loc>
-            <lastmod>2021-09-04T00:00:00+00:00</lastmod>
-            <changefreq>daily</changefreq>
-            <priority>0.5</priority>
-          </url>
-    
-  
-    
-      <url>
             <loc>https://ammarmian.github.io/tags/research/</loc>
             <lastmod>2021-09-04T00:00:00+00:00</lastmod>
             <changefreq>daily</changefreq>
@@ -337,15 +400,6 @@
     
       <url>
             <loc>https://ammarmian.github.io/tags/students/</loc>
-            <lastmod>2021-09-04T00:00:00+00:00</lastmod>
-            <changefreq>daily</changefreq>
-            <priority>0.5</priority>
-          </url>
-    
-  
-    
-      <url>
-            <loc>https://ammarmian.github.io/tags/</loc>
             <lastmod>2021-09-04T00:00:00+00:00</lastmod>
             <changefreq>daily</changefreq>
             <priority>0.5</priority>

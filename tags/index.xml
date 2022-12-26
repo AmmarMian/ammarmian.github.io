@@ -7,7 +7,61 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>@2022, Ammar Mian. Background Images: [ESA](https://www.esa.int/ESA_Multimedia/Sets/Earth_observation_image_of_the_week/(result_type)/images)</copyright>
-    <lastBuildDate>Sat, 04 Sep 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://ammarmian.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 31 Oct 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://ammarmian.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Domain adaptation</title>
+      <link>https://ammarmian.github.io/tags/domain-adaptation/</link>
+      <pubDate>Sun, 31 Oct 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/tags/domain-adaptation/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Internship</title>
+      <link>https://ammarmian.github.io/tags/internship/</link>
+      <pubDate>Sun, 31 Oct 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/tags/internship/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Machine learning</title>
+      <link>https://ammarmian.github.io/tags/machine-learning/</link>
+      <pubDate>Sun, 31 Oct 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/tags/machine-learning/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Remote Sensing</title>
+      <link>https://ammarmian.github.io/tags/remote-sensing/</link>
+      <pubDate>Sun, 31 Oct 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/tags/remote-sensing/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Riemannian geometry</title>
+      <link>https://ammarmian.github.io/tags/riemannian-geometry/</link>
+      <pubDate>Sun, 31 Oct 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/tags/riemannian-geometry/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Transfer Learning</title>
+      <link>https://ammarmian.github.io/tags/transfer-learning/</link>
+      <pubDate>Sun, 31 Oct 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/tags/transfer-learning/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>Activities</title>
       <link>https://ammarmian.github.io/tags/activities/</link>
@@ -99,15 +153,6 @@
     </item>
     
     <item>
-      <title>Machine Learning</title>
-      <link>https://ammarmian.github.io/tags/machine-learning/</link>
-      <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://ammarmian.github.io/tags/machine-learning/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Numération</title>
       <link>https://ammarmian.github.io/tags/num%C3%A9ration/</link>
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
@@ -158,15 +203,6 @@
       <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
       
       <guid>https://ammarmian.github.io/tags/recherche/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Remote Sensing</title>
-      <link>https://ammarmian.github.io/tags/remote-sensing/</link>
-      <pubDate>Sat, 04 Sep 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://ammarmian.github.io/tags/remote-sensing/</guid>
       <description></description>
     </item>
     

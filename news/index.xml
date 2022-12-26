@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>News on Ammar Mian</title>
+    <link>https://ammarmian.github.io/news/</link>
+    <description>Recent content in News on Ammar Mian</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>@2022, Ammar Mian. Background Images: [ESA](https://www.esa.int/ESA_Multimedia/Sets/Earth_observation_image_of_the_week/(result_type)/images)</copyright>
+    <lastBuildDate>Sun, 31 Oct 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://ammarmian.github.io/news/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Internship proposal on Riemannian domain adaptation for remote sensing application</title>
+      <link>https://ammarmian.github.io/news/internship_transfer_learning_2022/</link>
+      <pubDate>Sun, 31 Oct 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://ammarmian.github.io/news/internship_transfer_learning_2022/</guid>
+      <description>Context and application Context and application Domain Adaptation is a field of machine learning that consists of developing learning techniques with a different set of training and test data [Moreno-Torres et al.</description>
+    </item>
+    
+  </channel>
+</rss>
