@@ -1,0 +1,350 @@
+.. -*- coding: utf-8 -*-
+
+**************
+Notion d'objet
+**************
+
+Introduction
+============
+
+En programmation orientée objet, un `objet`_ est créé à partir d'un modèle appelé
+classe ou prototype, duquel il hérite les comportements et les caractéristiques.
+
+- Un objet créé à partir d’une classe est une instance de cette classe.
+
+- Une propriété est une caractéristique propre à un objet.
+
+- Une méthode est une suite d'instructions qui manipule les caractéristiques et l'état d'un objet.
+
+Par exemple, un entier est l’instance d’une classe dont la valeur est un attribut.
+
+En Python, la fonction `type()`_ permet de connaître le type d’un objet.
+L'exemple suivant illustre la création d'une variable *a* de type entier puis l'affichage du type de
+cette variable à l'aide de la fonction `type()`_. Comme tout est objet en python la valeur retournée par
+la fonction `type()`_ est elle-même un objet « type» dont la valeur est 'int'.
+
+.. code-block:: python
+
+    In [1]: a =  6
+
+    In [2]: type(a)
+    Out[2]: int
+
+De manière logique, si l'on s'intéresse au type de l'information retournée par *type(a)*, on obtient
+un objet « type » dont la valeur est 'type'.
+
+.. code-block:: python
+
+    In [3]: type(type(a))
+    Out[3]: type
+
+En plus du type entier, Python permet de travailler avec les objets de base suivants :
+
+- Les flottants
+
+.. code-block:: python
+
+    In [4]: c = 6.0
+
+    In [5]: type(c)
+    Out[5]: float
+
+- Les chaînes de caractères
+
+.. code-block:: python
+
+    In [6]: d = 'une chaîne contenant des caractères dont ceux formant le nombre 6.0'
+
+    In [7]: type(d)
+    Out[7]: str
+
+- Les listes
+
+.. code-block:: python
+
+    In [8]: e = [6, 9, 7]
+
+    In [9]: type(e)
+    Out[9]: list
+
+- Les ensembles
+
+.. code-block:: python
+
+    In [10]: f = {6}
+
+    In [11]: type(f)
+    Out[11]: set
+
+- Les dictionnaires
+
+.. code-block:: python
+
+    In [12]: g = {'a' : 6, 'b' : 9}
+
+    In [13]: type(g)
+    Out[13]: dict
+    
+- Les tuple
+
+.. code-block:: python
+
+    In [12]: h = (6, 9)
+
+    In [13]: type(h)
+    Out[13]: tuple
+
+Attributs et méthodes
+=====================
+
+Pour connaître les méthodes et attributs associés à un objet on utilise la fonction `dir()`_.
+L'exemple suivant illustre l'application de cette fonction à une variable *a* de type entier.
+
+.. code-block:: python
+
+    In [1]: a = 6
+    
+    In [2]: dir(a)
+    Out[2]: 
+    ['__abs__',
+     '__add__',
+     '__and__',
+     '__bool__',
+     '__ceil__',
+     '__class__',
+     '__delattr__',
+     '__dir__',
+     '__divmod__',
+     '__doc__',
+     '__eq__',
+     '__float__',
+     '__floor__',
+     '__floordiv__',
+     '__format__',
+     '__ge__',
+     '__getattribute__',
+     '__getnewargs__',
+     '__gt__',
+     '__hash__',
+     '__index__',
+     '__init__',
+     '__init_subclass__',
+     '__int__',
+     '__invert__',
+     '__le__',
+     '__lshift__',
+     '__lt__',
+     '__mod__',
+     '__mul__',
+     '__ne__',
+     '__neg__',
+     '__new__',
+     '__or__',
+     '__pos__',
+     '__pow__',
+     '__radd__',
+     '__rand__',
+     '__rdivmod__',
+     '__reduce__',
+     '__reduce_ex__',
+     '__repr__',
+     '__rfloordiv__',
+     '__rlshift__',
+     '__rmod__',
+     '__rmul__',
+     '__ror__',
+     '__round__',
+     '__rpow__',
+     '__rrshift__',
+     '__rshift__',
+     '__rsub__',
+     '__rtruediv__',
+     '__rxor__',
+     '__setattr__',
+     '__sizeof__',
+     '__str__',
+     '__sub__',
+     '__subclasshook__',
+     '__truediv__',
+     '__trunc__',
+     '__xor__',
+     'bit_length',
+     'conjugate',
+     'denominator',
+     'from_bytes',
+     'imag',
+     'numerator',
+     'real',
+     'to_bytes']
+
+On notera que le résultat est exprimé sous la forme d'une liste (les informations
+sont encadrées par [ ]) de chaînes
+de caractères (chaque information est encadrée par des guillemets simples). Comme tout est objet
+en python, la valeur retournée est un objet «list»,
+ce que l'on peut vérifier en demandant le type de *dir(a)*.
+
+.. code-block:: python
+
+    In [3]: type(dir(a))
+    Out[3]: list
+
+Cette liste est propre à chaque objet. Elle contient les méthodes et attributs définis par
+le concepteur de la classe associée à l'objet. Les méthodes de la classe définissent les manières offertes
+à un utilisateur pour manipuler l'objet. On peut les voir comme les services rendus à l’utilisateur.
+Les attributs sont, en quelque sorte, des variables internes à l'objet.
+
+.. note::
+
+  La présentation utilisée ici n'est pas usuelle et est un parti pris de l'équipe pédagogique. Nous pensons
+  que cette vision permet une compréhension plus fine des mécanismes qui seront ensuite utilisés.
+
+L'accès à une méthode ou un attribut s'effectue en utilisant le symbole '.' après le nom de la variable. Utilisons
+la fonction `type()`_ sur quelques éléments de la liste afin d'analyser les différences.
+
+.. code-block:: python
+
+    In [4]: type(a.numerator)
+    Out[4]: int
+    
+    In [5]: type(a.denominator)
+    Out[5]: int    
+
+Comme on peut le constater, ces deux attributs sont de type 'int'. Ces attributs viennent du principe de construction
+de la classe des entiers qui hérite des propriétés d'autres classes. L'héritage est un mécanisme important en 
+programmation orientée objet qui permet de réutiliser et d'adapter facilement des classes existantes pour en créer
+de nouvelles. En Python la classe des entiers hérite de plusieurs autres classes du module *numbers* comme
+la classe des rationnels (*Rational*) ou celle des complexes (*Complex*). Ainsi les attributs *numerator* et 
+*denominator* sont issus de la classe de rationnels et les attributs *real* et *imag* de la classe des complexes. 
+On pourra consulter la partie de la documentation consacrée à la `classe abstraite des nombres`_. Les instructions 
+suivantes permettent de mieux comprendre cette notion en utilisant la fonction `isinstance()`_.
+
+.. code-block:: python
+
+    In [6]: import numbers
+
+    In [7]: isinstance(a, numbers.Rational)
+    Out[7]: True   
+    
+    In [8]: isinstance(a, numbers.Complex)
+    Out[8]: True      
+
+On pourra aussi vérifier les valeurs que prennent ces attributs pour la variable *a*.
+
+.. code-block:: python
+
+    In [9]: a.numerator
+    Out[9]: 6
+
+    In [10]: a.denominator
+    Out[10]: 1
+    
+    In [11]: a.real
+    Out[11]: 6
+
+    In [12]: a.imag
+    Out[12]: 0
+
+L'attribut *bit_length* est relatif à une méthode s'appliquant à l'entier.
+
+.. code-block:: python
+
+    In [13]: type(a.bit_length)
+    Out[13]: builtin_function_or_method
+
+Cette méthode permet de connaître le nombre de bits nécessaire au codage de l'entier.
+
+.. code-block:: python
+
+    In [14]: a.bit_length()
+    Out[14]: 3
+    
+L'entier *a* est codable avec 3 bits.
+
+Enfin, la liste comprend un certain nombre d'attributs encadrés par le symbole '__'. Il s'agit de méthodes permettant de surcharger
+certains opérateurs (voir la `liste de ces opérateurs`_).
+
+.. code-block:: python
+
+    In [15]: type(a.__add__)
+    Out[15]: method-wrapper
+
+Cette méthode permet d'ajouter un entier à l'objet *a*.
+
+.. code-block:: python
+
+    In [16]: a.__add__(7)
+    Out[16]: 13
+
+Elle surcharge l'opérateur '+' de sorte que a + 7 est équivalent à a.__add__(7).
+
+.. admonition:: Exercice
+
+    A quelle expression arithmétique est équivalente l'instruction suivante ?
+  
+    .. code-block:: python
+
+        In [17]: a.__floordiv__(4).__add__(4).__rfloordiv__(12)  
+
+    Quelle est l'instruction équivalente à l'expression arithmétique suivante dans
+    laquelle l'opérateur // est la division entière
+    ?
+
+    .. code-block:: python
+
+        In [18]: (5*a + 2) // 2  
+
+Listes, ensembles, tuples, dictionnaires
+========================================
+
+Ce sont des types de base du langage Python dont les méthodes applicables
+sont définies dans la documentation (voir `listes et tuples`_, `ensembles`_
+et `dictionnaires`_.
+
+On lira aussi avec attention le chapitre consacré aux structures de données
+dans la documentation du langage Python afin de comprendre certains 
+aspects dans l'utilisation des objets de ce type (voir 
+`structure de données`_).
+
+A titre d'exemple, on s'intéresse à la représentation d'une pile de livres. Une pile
+en informatique est, comme dans la vie courante, une structure de données avec un seul 
+point d'accès (le haut de la pile) et deux mécanismes d'accès : *empiler* et *dépiler*. Par 
+principe l'accès est donc de type dernier entré - premier sorti (Last In First Out - LIFO).
+
+En représentant notre pile à l'aide d'une liste, les méthodes `append()`_ et `pop()`_ permettent
+respectivement d'implémenter *empiler* et *dépiler*. En effet, *append()* insère un élément à la 
+fin de la liste tandis que *pop()* retire un élément en fin de liste.
+
+Il nous reste à représenter un livre. On peut considérer qu'un livre est un objet caractérisé par plusieurs
+attributs comme le titre, le nom de l'auteur et l'année de parution et des méthodes qui permettent d'effectuer
+des opérations sur ce livre. Dans une bibliothèque il serait, par exemple, associé au dispositif de prêt. 
+Cependant, pour le moment, nous n'avons pas encore introduit la construction de nos propres classes (voir le
+chapitre suivant). Nous allons donc nous limiter à utiliser les structures de données de base de Python pour représenter
+notre livre et, pour cela, les dictionnaires sont un outil intéressant. En effet, les dictionnaires permettent d'associer
+des valeurs, par exemple le titre du livre, le nom de l'auteur, à des clés, par exemple *titre* et *auteur*. 
+
+L'exemple suivant définit la variable *livre* comme un dictionnaire comportant trois couples clés-valeurs 
+pour représenter le livre *1984* écrit par *George Orwel* et publié en *1949*. 
+
+.. note::
+
+	Les valeurs associées aux clés peuvent être de types différents. Ainsi, l'année est un entier 
+	alors que l'auteur et le titre sont des chaînes de caractères. 
+	
+	On retrouve la valeur associée à un attribut en indexant la variable par cet attribut comme
+	le montre l'exemple suivant.
+
+	.. code-block:: python
+
+		In [1]: livre = {'auteur': 'George Orwel', 'titre': '1984', 'annee': 1949}
+
+		In [2]: print(livre['annee'])
+		1949
+ 
+Le programme suivant illustre la gestion d'une pile de livres. Deux fonctions *empiler()*
+et *depiler()* sont définies pour opérer sur la variable *pile*. 
+
+.. literalinclude:: Python/INFO501/Pile.py
+    :language: python 
+    :lines: 1,7-    
+
+.. include:: References.rst

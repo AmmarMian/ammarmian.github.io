@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Change detection for SAR Images</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/sky.css" id="theme">
+		<link rel="stylesheet" href="css/flexboxgrid.min.css" type="text/css">
+		<link rel="stylesheet" href="css/reveal-override.css"/>
+
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<div class="slides">
+
+				<section>
+					<h2>Change detection for SAR Images</h2>
+					<p>An overview of recent techniques</p>
+					<p>Ammar Mian</p>
+					<img src="Figures/logo_sondra.svg" 
+					     width="200"
+					     height="100"
+					     style="border: 0;box-shadow: none !important;">
+					<img src="Figures/Ecole_Centrale_Supelec_logo.svg" 
+					     height="100"
+					     style="border: 0;box-shadow: none !important;">
+					<img src="Figures/logo_onera.svg" 
+					     height="100"
+					     style="border: 0;box-shadow: none !important;">
+					<img src="Figures/logo_nus.svg" 
+					     height="100"
+					     style="border: 0;box-shadow: none !important;">
+					<img src="Figures/logo_dso.png" 
+					     height="100"
+					     style="border: 0;box-shadow: none !important;">
+					<img src="Figures/logo_listic.png" 
+					     height="100"
+					     style="border: 0;box-shadow: none !important;">
+				</section>
+
+				<section>
+					<h3>What we will consider in this talk</h3>
+
+					<div class="row center-md">
+						<div class="col-md-8">
+						<div style="text-align: left;text-indent: 0em">
+							<ul>
+								<li>Pose the problem while highlighting sub-issues</li>
+								<li>Give approriate key-words for litterature searching</li>
+								<li>Explain and illustrate most popular and recent approaches</li>
+							</ul>
+						</div>
+
+						<p align="left">This is by no means a complete and systematic overview of all existing techniques (<i>Change detection SAR</i> research in IEEE Xplore database yields 1,172 results !).</p>
+						<p align="left"><b>Aim:</b> To gives key-points to consider for implementing SAR change-detection techniques from a <i>practical</i> stand-point.</p>
+
+						</div>
+					</div>
+					<p>Slides are available at: <a href="https://ammarmian.github.io/">https://ammarmian.github.io/</a></p>
+					<p><b>For questions:</b> <a href="mailto:ammar.mian@centralesupelec.fr">ammar.mian@centralesupelec.fr</a> </p>
+				</section>
+
+				<section>
+					<h3>Plan of the presentation</h3>
+
+					<div class="row center-md">
+						<div class="col-md-8">
+							<ol>
+								<li><a href="#/3">Introduction</a></li>
+								<li><a href="#/4">Change detection issues</a></li>
+								<li><a href="#/5">Issues encountered in SAR images</a></li>
+								<li><a href="#/6">A general framework for pixel-level methods</a></li>
+								<li><a href="#/7">A brief glimpse into supervised-methods at at pixel-level</a></li>
+								<li><a href="#/8">Unpervised methods overview at pixel-level</a></li>
+								<li><a href="#/9">Detailing covariance based methods</a></li>
+								<li><a href="#/10">Conclusions</a></li>
+							</ol>
+						</div>
+					</div>
+
+				</section>
+
+				<section>
+					
+					<section>
+						<h2>Introduction</h2>
+					</section>
+
+					<section>
+						<h3>SAR images</h3>
+
+						<div class="row center-md">
+							<div class="col-md-8">
+								<img src="Figures/SAR_concept.svg" 
+						     width="80%"
+						     style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-4">
+								<p>Active acquisition systems (compared to optical ones).</p>
+								<ul>
+									<li>All weather</li>
+									<li>All illuminations conditions</li>
+									<li>Possibility to control band</li>
+								</ul>
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h3>Big data</h3>
+
+						<div class="row center-md">
+							<div class="col-md-10">
+								<p align="left">Recent years have seen a huge increase in the number of SAR images of the earth available.</p>
+
+								<p align="left">
+									<ul>
+										<li>Sentinel-1:  12 days repeat cycle (1 satellite), 6 days for the constellation </li>
+										<li>TerraSAR-X: quick site access time of 2.5 days max. (2 days at 95% probability) to any point on Earth,</li>
+									</ul>
+									$\rightarrow$ Analysing this huge amount of data allows many applications (activity monitoring, land-cover study, etc)
+								</p>
+
+								<p align="left">Change detection techniques in this context is then of huge interest.</p>
+							</div>
+						</div>
+					</section>
+					
+
+				</section>
+
+				<section>
+					<section>
+						<h2>Change detection issues</h2>
+					</section>
+
+					<section>
+						<h3>Detection problem</h3>
+
+
+					    <div class="row center-md">
+						    <div class="col-md-4">
+						        <div class="box"><img src="Figures/DGOS_ERS2-ANIMATION_2013_L.gif" 
+						     width="70%"
+						     style="border: 0;box-shadow: none !important;"></div>
+						    </div>
+						    <div class="col-md-5">
+						    	<p align="left">Determining <i>places</i> where a <i>change</i> has occured over the time series.</p>
+
+						    	<p align="left">A place can be defined as:</p>
+						    	<div style="text-align: left;text-indent: 1em">
+						        	<ul style="list-style-type:square;">
+									  <li>pixels indices</li>
+									  <li>spatial coordinates</li>
+									</ul>
+								</div>
+						    	
+
+						    	<p align="left"> The detection can be seen as:</p>
+						    	<div style="text-align: left;text-indent: 1em">
+						        	<ul style="list-style-type:square;">
+									  <li>a binary mapping</li>
+									  <li>a continuous mapping</li>
+									</ul> 
+								</div>
+						    </div>
+
+						</div>
+
+					</section>
+
+					<section>
+						<h3>Binary versus continuous mapping</h3>
+						<img src="Figures/binary_pixel_cd.svg"
+						width="20%"
+						style="border: 0;box-shadow: none !important;">
+						<img src="Figures/color_pixel_cd.svg"
+						width="20%"
+						style="border: 0;box-shadow: none !important;">
+
+						<h3>Pixel versus object detection</h3>
+						<img src="Figures/binary_pixel_cd.svg"
+						width="20%"
+						style="border: 0;box-shadow: none !important;">
+						<img src="Figures/binary_object_cd.svg"
+						width="20%"
+						style="border: 0;box-shadow: none !important;">
+					</section>
+
+					<section>
+						<h3>Supervised versus unsupervised detection (1/2)</h3>
+
+						<div class="row center-md">
+						    <div class="col-md-8">
+								<p align="left">A technique is defined as <b>supervised</b> when its application needs the use of labeled examples $\{(\mathbf{x}_i,y_i)\}_{i=1,\dots,N}$ called <i>training samples</i> to work. It is a two-step procedure.</p>
+
+								<p align="left"><b>First step:</b> Training: find $\hat{\theta}=\mathrm{argmax}_\theta \, \frac{1}{N}\sum_{i=1}^N r(f(\mathbf{x}_i,\theta), \mathbf{y}_i)$</p>
+
+								<img src="Figures/supervised_training_chart.svg"
+								width="50%"
+								style="border: 0;box-shadow: none !important;">
+
+								<p align="left"><b>Second step:</b> Testing</p>
+
+								<img src="Figures/supervised_test_chart.svg"
+								width="32%"
+								style="border: 0;box-shadow: none !important;">
+						    </div>
+						</div>
+
+
+	
+
+					</section>
+
+					<section>
+						<h3>Supervised versus unsupervised detection (2/2)</h3>
+						<div class="row center-md">
+						    <div class="col-md-8">
+
+								<p align="left">A technique is defined as <b>unsupervised</b> when its application do not need any training sample. This is a one-step procedure.</p>
+
+								<p align="left">Only testing:</p>
+								<img src="Figures/unsupervised_test_chart.svg"
+								width="32%"
+								style="border: 0;box-shadow: none !important;">
+						    </div>
+						</div>
+					</section>
+
+					<section>
+						<h3>What type of change ?</h3>
+						
+						<div class="row center-md">
+							<div class="col-md-8">
+								<p>There is no <b>universal</b> definition of what a change is. It is an ill-defined problem !</p>
+								<p align="left"><b>From a practical standpoint:</b></p>
+								<ul>
+									<li><p>Man-made changes: appearance/disappearance of vechicles/buildings</p>
+										<p><b>But:</b> What if vehicle just rotated or if building finished its construction ?</p></li>
+									<li>Natural disasters: Floodings, fires</li>
+									<li>Small variations of terrain</li>
+								</ul>
+							
+							<p align="left">Depending on the definition, false alarms are not the same !</p>
+
+							
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h3>Measure of accuracy</h3>
+
+						<div class="row center-md">
+							<div class="col-md-10">
+								<p align="left">Depend on the problem: classificaiton or distance problem</p>
+								<p align="left"><b>Classification problem:</b> How many pixels have been accurately classified ?</p>
+
+								\[ \mathrm{GD} = \frac{\text{number px well detected}}{\text{number total px to be detected}},\, \mathrm{FP} =  \frac{\text{number px falsely detected}}{\text{number px with no change}} \]
+
+								<p align="left"><b>Distance problem:</b> How well the change dissociate from the no-change ?</p>
+
+								<p align="left">$\rightarrow$ ROC curve</p>
+								<img src="Figures/ROC.svg"
+								width="32%"
+								style="border: 0;box-shadow: none !important;">
+
+
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h3>Questions to answer when designing</br>a change detection system:</h3>
+
+						<div class="row center-md">
+							<div class="col-md-8">
+								<ul>
+									<li>Do I want a binary map (classification problem) or a continuous map (distance problem) ?</br><b>Note:</b> a binary one can be obtained by thresholding the continuous one</li>
+									<li>Do I want to the detection to be dependent of spatial coordinates or do I want a detection at the pixel-level ?</br><b>Note:</b> It is possible to obtain a segmentation after a pixel-level change detection</li>
+									<li>What type of changes do I want to detect ?</li>
+									<li>Do I have a large amount of training samples or not ?</li>
+								</ul>
+							</div>
+						</div>
+					</section>
+
+				</section>
+
+
+
+				<section>
+
+					<section>
+						<h2>Issues encountered in SAR images</h2>
+					</section>
+
+					<section>
+						<h3>Co-registration</h3>
+						<p>In order to detect change between several SAR acquistions, a co-registration phase has to be done.</p>
+						<p>Depending on the acquisition system (satellite vs plane), this phase can be difficult.</p>
+						<img src="Figures/co-registration.svg"
+								width="70%"
+								style="border: 0;box-shadow: none !important;">
+
+						<p>A poor co-registration will impact greatly the performance of change detection algorithms.</p>
+					</section>
+
+					<section>
+						<h3>Speckle noise and pre-processing</h3>
+
+						<div class="row center-md">
+							<div class="col-md-5">
+								<figure>
+								<img src="Figures/speckle_model.svg"
+								width="70%"
+								style="border: 0;box-shadow: none !important;">
+								<figcaption>Speckle model</figcaption>
+								</figure>
+							</div>
+
+							<div class="col-md-6">
+								<figure>
+								<img src="Figures/speckle_full.jpg"
+								width="70%"
+								style="border: 0;box-shadow: none !important;">
+								<figcaption>@ESA</figcaption>
+								</figure>
+							</div>
+						<div>
+
+					</section>
+
+
+					<section>
+						<h3>Lack of training samples</h3>
+
+						<div class="row center-md">
+							<div class="col-md-10">
+
+								<p align="left">SAR images:</p>
+								<div align="left">
+								<ul>
+									<li>are remotely sensed</li>
+									<li>cover large areas</li>
+									<li>can have a very high-resolution ($\approx$ 10cm)</li>
+								</ul>
+								</div>
+
+								
+
+								<p align="left">Some methods to obtain ground truth:</p>
+								<div align="left">
+								<ul>
+									<li>Comparison with optical data</li>
+									<li>Crossing with geography databases</li>
+									<li>Asking local authorities</li>
+								</ul>
+								</div>
+
+								<p align="left">$\rightarrow$ Obtaining reliable ground truth is extremely complicated: needs lots of human work and is time-consuming !</p>
+								<p>This means that supervised methodologies are limited in a very big-data context.</p>
+
+							</div>
+						</div>
+
+					</section>
+
+				</section>
+
+				<section>
+
+					<section>
+						<h2>A general framework for pixel-level methods</h2>
+					</section>
+
+					<section>
+						<h3>Illustration</h3>
+						<figure>
+								<img src="Figures/general_framework.svg"
+								width="70%"
+								style="border: 0;box-shadow: none !important;">
+						</figure>
+
+						<p align="left">Two steps:</p>
+						<div align="left">
+						<ul>
+							<li><b>Feature extraction:</b> Finding a transformation of data which allows to discriminate between changes we want to detect</li>
+							<li><b>Decision function:</b> Given a feature of interest, obtaining a function which allows to measure dissimilarity between these features.</li>
+						</ul>
+						</div>
+
+					</section>
+
+					<section>
+						<h3>Feature extraction (1/3)</h3>
+
+						<p align="left"><b>First query:</b> does the raw data allows to discern the changes we want to detect ? </br>$\rightarrow$If not, a transformation of the data is considered to be able to do it.</p>
+
+						<p align="left"><b>Raw data can be:</b></p>
+						<div align="left">
+						<ul>
+							<li>Amplitude, phase</li>
+							<li>Polarimetry</li>
+							<li>Interferometry</li>
+						</ul>
+						</div>
+
+					</section>
+
+					<section>
+						<h3>Feature extraction (2/3): Polarimetry based features</h3>
+
+						<p align="left">Polarimetry information consist in three complex values: $\mathbf{x} = [k_{HH}, k_{HV}, k_{VV}]^T$. </p>
+
+						<p align="left">Several decompositions have been considered to retrieve physical behaviors of scatterers:</p>
+						<div align="left">
+						<ul>
+							<li>Pauli decomposition</li>
+							<li>Krogager decomposition</li>
+							<li>Cameron Decomposition</li>
+							<li>H-$\alpha$ decomposition</li>
+							<li>An so on...</li>
+						</ul>
+						</div>
+
+						<p align="left">See: <a href="https://earth.esa.int/documents/653194/656796/Polarimetric_Decompositions.pdf">https://earth.esa.int/documents/653194/656796/Polarimetric_Decompositions.pdf</a> for an onverview.</p>
+
+					</section>
+
+					<section>
+						<h3>Feature extraction (3/3): Spectro-angular features</h3>
+
+						<p align="left">In high resolution SAR images, scatterers have dispersive and anisotropic behavior:</p>
+
+						<figure>
+								<img src="Figures/SAR_spectroangular.png"
+								width="60%"
+								style="border: 0;box-shadow: none !important;">
+						</figure>
+
+						<p align="left">$\rightarrow$ Using wavelet decomposition, it is possible to retrieve this behaviour as a feature vector$^1$.</p>
+
+						<p>$^1$ A. Mian, J. Ovarlez, A. M. Atto and G. Ginolhac, "Design of New Wavelet Packets Adapted to High-Resolution SAR Images With an Application to Target Detection," in IEEE Transactions on Geoscience and Remote Sensing.</p>
+
+
+
+					</section>
+
+				</section>
+
+				<section>
+
+					<section>
+						<h2>A brief glimpse into supervised methods (classification problem)</h2>
+					</section>
+
+					<section>
+						<h3>Deep learning methods</h3>
+
+						<p align="left">Recent works have started to try adapting deep learning methods from image processing litterature to SAR problems.</p>
+						<p align="left">Most notable paper is:</br>M. Gong, J. Zhao, J. Liu, Q. Miao and L. Jiao, "Change Detection in Synthetic Aperture Radar Images Based on Deep Neural Networks," in IEEE Transactions on Neural Networks and Learning Systems, vol. 27, no. 1, pp. 125-138, Jan. 2016.</p>
+
+						<div class="row center-md">
+							<div class="col-md-5">
+								<figure>
+								<img src="Figures/gong_model.png"
+								width="80%"
+								style="border: 0;box-shadow: none !important;">
+								<figcaption>Model used</figcaption>
+								</figure>
+							</div>
+							<div class="col-md-6">
+								<p align="left"><b>Pros:</b> we can learn the type of change we want to detect if we have enough data.</p>
+								<p align="left"><b>Cons:</b> amplitude, monovariate only and only bi-date + more validation needed (train and test on the same image?)</p>
+							</div>
+						</div>
+
+
+					</section>
+
+					<section>
+						<h3>Semi-supervised classification</h3>
+
+						<p align="left">When there is not enough labeled data, we can turn to semi-supervised methods.</p>
+						<p align="left"><b>Idea:</b> Idea: learn a classifier based on either geometrical constraints (SVM) or satistical ones (GMM for example).</p>
+
+						<p align="left">One example:</br>L. Jia, M. Li, Y. Wu, P. Zhang, H. Chen and L. An, "Semisupervised SAR Image Change Detection Using a Cluster-Neighborhood Kernel," in IEEE Geoscience and Remote Sensing Letters, vol. 11, no. 8, pp. 1443-1447, Aug. 2014.</p>
+
+						<figure>
+								<img src="Figures/svm_clustering.png"
+								width="80%"
+								style="border: 0;box-shadow: none !important;">
+								<figcaption>Pipeline used</figcaption>
+						</figure>
+					</section>
+
+				</section>	
+
+				<section>
+
+					<section>
+						<h2>An overview of unsupervised methods at pixel-level</h2>
+					</section>
+
+					<section>
+						<h3>Post-classification (classification problem) (1/2)</h3>
+
+						<p align="left"><b>Idea:</b> After obtaining vectors, rather than measuring dissimilarities we can apply classic clustering algorithms (k-means, spectral clustering, EM). Then check for each pixel if the class has changed.</p>
+
+						<figure>
+								<img src="Figures/post_classification.svg"
+								width="80%"
+								style="border: 0;box-shadow: none !important;">
+						</figure>
+
+						
+					</section>
+
+					<section>
+						<h3>Post-classification (classification problem) (2/2)</h3>
+
+						<p align="left">Classification of SAR images has been considered in works such as:</p>
+						<div align="left">
+						<ul>
+							<li>S. R. Cloude and E. Pottier, "An entropy based classification scheme for land applications of polarimetric SAR," in IEEE Transactions on Geoscience and Remote Sensing, vol. 35, no. 1, pp. 68-78, Jan. 1997.</li>
+							<li>P. Formont, F. Pascal, G. Vasile, J. Ovarlez and L. Ferro-Famil, "Statistical Classification for Heterogeneous Polarimetric SAR Images," in IEEE Journal of Selected Topics in Signal Processing, vol. 5, no. 3, pp. 567-576, June 2011.</li>
+							<li>P. R. Kersten, Jong-Sen Lee and T. L. Ainsworth, "Unsupervised classification of polarimetric synthetic aperture Radar images using fuzzy clustering and EM clustering," in IEEE Transactions on Geoscience and Remote Sensing, vol. 43, no. 3, pp. 519-527, March 2005.</li>
+							<li>M. Gong, L. Su, M. Jia and W. Chen, "Fuzzy Clustering With a Modified MRF Energy Function for Change Detection in Synthetic Aperture Radar Images," in IEEE Transactions on Fuzzy Systems, vol. 22, no. 1, pp. 98-109, Feb. 2014.</li>
+							<li>An so on...</li>
+						</ul>
+						</div>
+					</section>
+
+					<section>
+						<h3>Image rationing (distance problem)</h3>
+
+						<p align="left"><b>Idea:</b> Consider amplitude data for a pixel at date 1 $x_1$ and date 2 $x_2$. Since we know that the image is subject to speckle, consider the following distance:</p>
+
+						\[d(x_1,x_2) = \log(x_1/x_2)\]
+
+						<p align="left">The multiplicative nature of speckle is transformed to an additive one trough the $\log$ operator.</p>
+
+						<p align="left">For example used in:</br>Y. Bazi, L. Bruzzone and F. Melgani, "Automatic identification of the number and values of decision thresholds in the log-ratio image for change detection in SAR images," in IEEE Geoscience and Remote Sensing Letters, vol. 3, no. 3, pp. 349-353, July 2006.</p>
+
+					</section>
+
+					<section>
+						<h3>Coherent change detection (distance problem) (1/3)</h3>
+
+						<p align="left"><b>Idea:</b> Consider complex (amplitude + phase) data. Measure the coherence on a sliding windows between the two images.</p>
+
+						<p align="left">On a window around the pixel, we have :
+
+	$\left\{\begin{array}{c}
+	I_1 = \left [ \begin{array}{cccc} x_1 & x_2 & ... & x_n \end{array} \right ] \in \mathbb{C}^N \\ 
+
+	I_2 = \left [ \begin{array}{cccc}
+	y_1 & y_2 & ... & y_n \end{array}\right ] \in \mathbb{C}^N,
+	\end{array}\right.$</p>
+
+					<p align="left">The coherence is defined as follows: $d(I_1,I_2)  = \frac{2|\sum_{k=1}^Nx_ky_k^*|}{\sum_{k=1}^N(|x_k|^2 + |y_k|^2)}$</p>
+
+					<p align="left">$\rightarrow$ Allows to highlight fine changes in the phase between the acquisitions.</p>
+
+					</section>		
+
+					<section>
+						<h3>Coherent change detection (distance problem) (2/3)</h3>
+
+						<figure>
+								<img src="Figures/ccd_novak.png"
+								width="70%"
+								style="border: 0;box-shadow: none !important;">
+						</figure>
+						
+					</section>	
+
+					<section>
+						<h3>Coherent change detection (distance problem) (3/3)</h3>
+
+						<p align="left">The approach was extended to multivaraite (polarimetric data) in:</p>
+
+						<div align="left">
+						<ul>
+							<li>Leslie M. Novak, Change detection for multi-polarization, multi-pass SAR</li>
+							<li>J. Barber, "A Generalized Likelihood Ratio Test for Coherent Change Detection in Polarimetric SAR," in IEEE Geoscience and Remote Sensing Letters, vol. 12, no. 9, pp. 1873-1877, Sept. 2015.</li>
+						</ul>
+						</div>
+
+						<p align="left"><b>Pros:</b> Can find fine changes</p>
+						<p align="left"><b>Cons:</b> Sensible to phase variation over time, bi-date, no thresold results.</p>
+
+					</section>	
+
+					<section>
+						<h3>Statistical based techniques (1/2): information theory techniques</h3>
+
+						<p align="left"><b>Idea:</b> Assign a probability model $p_\mathbf{x}(\mathbf{x})$ to the pixels. Then given the observed pixels, compare the distributions of data.</p>
+
+						<p align="left">Comparing two distributions $p_1$, $p_2$: Kullback-Leibler divergence</p>
+
+						\[ d_{KL}(p_1,p_2) = \int p_1(\mathbf{x})\log ( \frac{p_1(\mathbf{x})}{p_2(\mathbf{x})} ) \mathrm{d}\mathbf{x} \]
+
+						<p align="left"><b>Pros:</b> Take into account the noise of the data, can be multivariate, some theoretical results to chose threshold.</p>
+						<p align="left"><b>Cons:</b> Bi-date, sometimes given model no analytical expression of the divergence.</p>
+
+						<p align="left">Used for example in:</br>A. D. C. Nascimento, A. C. Frery and R. J. Cintra, "Detecting Changes in Fully Polarimetric SAR Imagery With Statistical Information Theory," in IEEE Transactions on Geoscience and Remote Sensing, vol. 57, no. 3, pp. 1380-1392, March 2019.</p>
+					</section>	
+
+
+					<section>
+						<h3>Statistical based techniques (2/2): hypothesis testing techniques</h3>
+
+						<p align="left"><b>Idea:</b> Assign a parametric probability model $p_\mathbf{x}(\mathbf{x},\boldsymbol{\theta})$ to the pixels. Then test at each time if the parameters are equal (no change) or equal (change).</p>
+
+						<p align="center">	
+	\[
+	\left\{ \begin{array}{ll}
+	\mathrm{H}_{0}: & \boldsymbol{\theta}_{1} = \ldots = \boldsymbol{\theta}_{T} = \boldsymbol{\theta}_{0} \, ,\\  
+	\mathrm{H}_{1}: & \exists (t, t'),\, \boldsymbol{\theta}_t \neq \boldsymbol{\theta}_{t'} 
+	\end{array}\right. 
+	\]</p>
+
+	<p align="left"><b>Pros:</b> Multi-date, Take into account the noise of the data, can be multivariate, some theoretical results to chose threshold.</p>
+	<p align="left"><b>Cons:</b> Sometimes given model difficult to obtain a decision function.</p>
+
+	<p align="left">Example:</br>K. Conradsen, A. A. Nielsen, J. Schou and H. Skriver, "A test statistic in the complex Wishart distribution and its application to change detection in polarimetric SAR data," in IEEE Transactions on Geoscience and Remote Sensing, vol. 41, no. 1, pp. 4-19, Jan. 2003.</p>
+
+					</section>
+
+					
+
+				</section>		
+
+				<section>
+
+					<section>
+						<h2>Detailing covariance based techniques</h2>
+					</section>
+
+					<section>
+						<h3>Description of the approach</h3>
+
+						<div class="row center-md">
+						    <div class="col-md-6">
+						        <div class="box"><img src="Figures/sliding_windows.svg" 
+						     width="90%"
+						     style="border: 0;box-shadow: none !important;"></div>
+						    </div>
+						    <div class="col-md-4">
+						    	<p align="left">We consider a sliding windows approach to consider spatially local data.</p>
+
+						    	<p align="left">On this window, we assume i.i.d observations:</p>
+						    	\[ \forall (k,t)\, \mathbf{x}_k^t \sim \mathbb{C}\mathcal{N}(\mathbf{0}_p, \mathbf{\Sigma}_t)\]
+						    	
+						    </div>
+
+						 <p align="left"><b>Idea:</b> Compare the covariances $\mathbf{\Sigma}_t$ over time.</p>
+
+						</div>
+
+					</section>
+
+
+					<section>
+						<h3>Why consider this methodology ?</h3>
+
+						<div class="row center-md">
+							<div class="col-md-10">
+
+								<div style="text-align: left;text-indent: 0em">
+								<ul>
+									<li>The SAR data is typically <b>noisy</b> (speckle noise) and can be <b>multivariate</b> (polarimetric for example).</li>
+									<li>Covariance accounts for the local correlations between the observed noisy data. A change in the scene is likely to impact this matrix in a way.</li>
+									<li>Using statistical detection theory allow to have theoretical results on false alarms or detection performance.</li>
+								</ul>
+								</div>
+
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<h3>Covariance equality testing under Gaussian context (1/3)</h3>
+<p align="left">Denote by $\left\{\mathbf{X}_1,\dots,\mathbf{X}_T\right\}$ a collection of $T$ mutually independent  samples of i.i.d $p$-dimensional complex vectors: $\mathbf{X}_t = [\mathbf{x}_1^{t},\dots,\mathbf{x}_{N}^{t}]$.</p>
+
+						<p align="left">We assume $\forall (k,t),\,\mathbb{E}\{\mathbf{x}_k^{t}\}=\mathbf{0}_p$ and we denote $\mathbf{\Sigma}_t=\tau_t\boldsymbol{\xi}_t$ the shared covariance matrices among the elements of $\mathbf{X}_t$. $\boldsymbol{\xi}_t$ is the shape matrix ($Tr(\boldsymbol{\xi}_t) = p$) and $\tau_t$ is the scale.</p>
+
+						<div class="col-md-8">
+	<p align="left">	We want to choose between the following alternatives:	</p>
+	<p align="center">	
+	\[
+	\left\{ \begin{array}{ll}
+	\mathrm{H}_{0}: & \mathbf{\Sigma}_{1} = \ldots = \mathbf{\Sigma}_{T} = \mathbf{\Sigma}_{0} \, ,\\  
+	\mathrm{H}_{1}: & \exists (t, t'),\, \mathbf{\Sigma}_t \neq \mathbf{\Sigma}_{t'} 
+	\end{array}\right. 
+	\]</p>
+</div>
+
+					</section>
+
+					<section>
+						<h3>Covariance equality testing under Gaussian context (2/3)</h3>
+						<div class="row center-md">
+							<div class="col-md-12">
+						<p align=left> Suppose $\forall t,\, \forall k,\, \mathbf{x}_k^{t} \sim \mathbb{C}\mathcal{N}(\mathbf{0}_p,\mathbf{\Sigma}_t)$ so that $			p_{\mathbf{x}_k^{t};\mathbf{\Sigma}_t}(\mathbf{x}_k^{t};\mathbf{\Sigma}_t) = \dfrac{1}{\pi^p|\mathbf{\Sigma}_t|}\mathrm{exptr}\left\{\mathbf{S}_k^{t}\mathbf{\Sigma}_t^{-1} \right\}
+		$, where $\mathbf{S}_k^{t} = \mathbf{x}_k^{t}{\mathbf{x}_k^{t}}^{\mathrm{H}}$. </p>
+
+
+		
+		<p align="left">Many statistic exists but the options can be reduced to 3 different statistics$^1$. The most popular one is the Generalized Likelihood Ratio Test (GLRT) statistic:
+			<p>\begin{equation}
+			\hat{\Lambda}_\mathrm{G} = \frac{\left|{\hat{\mathbf{\Sigma}}_0^{\mathrm{SCM}}}\right|^{TN}}{\displaystyle\prod_{t=1}^{T} \left|{\hat{\mathbf{\Sigma}}_t^{\mathrm{SCM}}}\right|^N} \underset{\mathrm{H}_0}{\overset{\mathrm{H}_1}{\gtrless}} \lambda,\, \mathrm{where:}
+			\label{eq : GLRT Gaussian}
+			\end{equation}
+			
+			\begin{equation}
+			\begin{aligned}
+			\forall t, \hat{\mathbf{\Sigma}}_t^{\mathrm{SCM}}  = \frac{1}{N}\displaystyle\sum_{k=1}^N \mathbf{S}_k^{t} \text{ and }\hat{\mathbf{\Sigma}}_0^{\mathrm{SCM}}  = \frac{1}{T} \displaystyle\sum_{t=1}^T \hat{\mathbf{\Sigma}}_t^{\mathrm{SCM}}.
+			\end{aligned}
+			\end{equation}</p>
+
+						</div>
+					</div>
+
+					<p>$^1$ D. Ciuonzo, V. Carotenuto and A. De Maio, "On Multiple Covariance Equality Testing with Application to SAR Change Detection," in IEEE Transactions on Signal Processing, vol. 65, no. 19, pp. 5078-5091, 1 Oct.1, 2017.</p>
+
+					
+
+					</section>
+
+					<section>
+						<h3>Covariance equality testing under Gaussian context (3/3)</h3>
+						<div class="row center-md">
+							<div class="col-md-12">
+								<p align="left">Other approaches to compare covariance exists:</p>
+								<div align="left">
+								<ul>
+									<li>Information theory$^1$</li>
+									<li>Riemannian Geometry$^2$:</li>
+								</ul></div>
+								<img src="Figures/Riemannian.svg" 
+						     width="35%"
+						     style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+
+						<p>$^1$ A. D. C. Nascimento, A. C. Frery and R. J. Cintra, "Detecting Changes in Fully Polarimetric SAR Imagery With Statistical Information Theory," in IEEE Transactions on Geoscience and Remote Sensing, vol. 57, no. 3, pp. 1380-1392, March 2019.</p>
+						<p>$^2$ P.-A. Absil, R. Mahony, and R. Sepulchre, Optimization Algorithms on Matrix Manifolds</p>
+
+					</section>
+			
+
+					<section>
+						<h3>Non-Gaussianity high-resolution images</h3>
+
+						<div class="row center-md">
+							<div class="col-md-12">
+							<p align="left">Sometimes the Gaussian hypothesis is not accurate !</p>
+							</div>
+						</div>
+
+						<div class="row center-md">
+							<div class="col-md-4">
+							<img src="Figures/SDMS_FP0120.svg"
+								width="60%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+							<div class="col-md-8">
+							<img src="Figures/histogramSAR.png"
+								width="75%"
+								style="border: 0;box-shadow: none !important;">
+							</div>
+						</div>
+
+
+						<div class="row center-md">
+							<div class="col-md-12">
+							<p align="left">To model this kind of distribution the family of elliptical distributions have been introduced$^1$</p>
+							</div>
+						</div>
+
+						<p>$^1$E. Ollila, D. E. Tyler, V. Koivunen and H. V. Poor, "Complex Elliptically Symmetric Distributions: Survey, New Results and Applications," in IEEE Transactions on Signal Processing, vol. 60, no. 11, pp. 5597-5625, Nov. 2012.</p>
+
+
+
+							
+					</section>
+
+					<section>
+					<h3>Covariance testing in the Compound-Gaussian model (1/2)</h3>
+
+					We consider the Compound-Gaussian model: $\mathbf{x}_k^{t} \sim \sqrt{\tau_k^{t}}\mathbb{C}\mathcal{N}(\mathbf{0}_p, \boldsymbol{\xi}_{t}),$
+			where $\tau_k^{t}$ are assumed to be <b>deterministic</b> and $Tr(\boldsymbol{\xi})=p$.
+
+			$\rightarrow$ We derived the following statistic$^1$:
+				    \begin{equation}
+			\hat{\Lambda}_\mathrm{MT} = \frac{|{\hat{\mathbf{\Sigma}}_0^{\mathrm{MT}}}|^{TN}}{\displaystyle\prod_{t=1}^{T} |{\hat{\mathbf{\Sigma}}_t^{\mathrm{M}}}|^N}  \displaystyle\prod_{k=1}^N \dfrac{\left(\displaystyle\sum_{t=1}^T {\mathbf{x}_k^{t}}^{\mathrm{H}}\{\hat{\mathbf{\Sigma}}_t^{\mathrm{MT}}\}^{-1}\mathbf{x}_k^{t}\right)^{Tp}}{\displaystyle\prod_{t=1}^T\left({\mathbf{x}_k^{t}}^{\mathrm{H}}\{\hat{\mathbf{\Sigma}}_0^{\mathrm{M}}\}^{-1}\mathbf{x}_k^{t}\right)^p}\underset{\mathrm{H}_0}{\overset{\mathrm{H}_1}{\gtrless}} \lambda,\,\mathrm{where:}
+			\end{equation}
+			$\hat{\mathbf{\Sigma}}_t^{\mathrm{M}} = \frac{p}{N}\displaystyle\sum_{k=1}^N  \dfrac{\mathbf{x}_k^{t}{\mathbf{x}_k^{t}}^{\mathrm{H}}}{{\mathbf{x}_k^{t}}^{\mathrm{H}}\{\hat{\mathbf{\Sigma}}^{\mathrm{M}}\}^{-1}\mathbf{x}_k^{t}}$ and  $\hat{\mathbf{\Sigma}}_0^{\mathrm{MT}} = \frac{p}{N}\displaystyle\sum_{k=1}^N  \dfrac{\displaystyle\sum_{t=1}^T \mathbf{x}_k^{t}{\mathbf{x}_k^{t}}^{\mathrm{H}}}{\displaystyle\sum_{t=1}^T{\mathbf{x}_k^{t}}^{\mathrm{H}}\{\hat{\mathbf{\Sigma}}^{\mathrm{MT}}\}^{-1}\mathbf{x}_k^{t}} $ 
+
+			<p>$^1$ A. Mian, G. Ginolhac, J. Ovarlez and A. M. Atto, "New Robust Statistics for Change Detection in Time Series of Multivariate SAR Images," in IEEE Transactions on Signal Processing, vol. 67, no. 2, pp. 520-534, 15 Jan.15, 2019.</p>
+
+				</section>
+
+
+
+				</section>	
+
+				<section>
+					<h3>Thanks for your attention !</h3>
+
+
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="./lib/js/head.min.js"></script>
+		<script src="./js/reveal.js"></script>
+
+		<script>
+
+			Reveal.initialize({
+				width: 1900,
+				height: 1080,
+				history: true,
+				transition: 'linear',
+
+				slideNumber: true,
+
+				math: {
+					//mathjax: 'MathJax/MathJax.js',
+					config: 'TeX-AMS_HTML-full'
+				},
+
+				dependencies: [
+					{ src: './lib/js/classList.js' },
+					{ src: './plugin/math/math.js', async: true }
+				]
+			});
+
+		</script>
+		
+
+	</body>
+</html>

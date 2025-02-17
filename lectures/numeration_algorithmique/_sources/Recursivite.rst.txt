@@ -1,0 +1,504 @@
+.. -*- coding: utf-8 -*-
+
+**************
+La récursivité
+**************
+
+Définitions
+===========
+
+- Définition de Wikipédia de la `récursivité`_ en informatique et en logique
+
+    *En informatique et en logique, une fonction ou plus généralement un algorithme
+    qui contient un appel à elle-même est dite récursive. Deux fonctions peuvent
+    s'appeler l'une l'autre, on parle alors de récursivité croisée*.
+
+- Définition d'un dictionnaire imaginaire
+
+    *Récursivité*: Si vous n’avez pas compris voir *Récursivité*.
+
+    Cette définition met en évidence la nécessité d’une condition d’arrêt
+    pour une exécution correcte sur une machine informatique.
+
+Dans ce chapitre, nous illustrerons ce principe à partir de quelques exemples qui
+permettront de montrer la simplicité de codage mais aussi les limites de cette approche.
+
+Calcul de *n*!
+==============
+
+On a vu la version itérative dans un chapitre précédent.
+
+Le principe de l'algorithme récursif est le suivant :
+
+- 0! = 1, définit la condition d’arrêt.
+
+- *n*! = *n* * *n*-1!, définit récursivement ! puisque la définition comprend un appel à !.
+
+.. literalinclude:: Python/INFO501/FonctionFactorielleRecursif.py
+    :language: python
+    :lines: 1,7- 
+
+.. code-block:: python
+
+    In [1]: print(factorielleRecursif(20))
+    2432902008176640000
+
+Si l'on augmente progressivement la valeur du paramètre, il existe une valeur
+à partir de laquelle se produit une erreur d'exécution liée à l'atteinte de la
+profondeur maximale de récursion. C'est une première limite de cette approche.
+
+.. code-block:: python
+
+    In [2]: print(factorielleRecursif(2868))
+    ...
+    RecursionError: maximum recursion depth exceeded in comparison
+
+Suite de Fibonacci
+==================
+
+Nous avons vu au chapitre 2 la version itérative de la `suite de Fibonacci`_
+définie par :
+
+.. math::
+
+  y_n = y_{n-1} + y_{n-2} \; avec \;  y_0 = 0 \;  et \;  y_1 = 1.
+
+Dans cette expression :
+
+- :math:`y_0 = 0`  et :math:`y_1 = 1` sont les conditions d'arrêt ;
+
+- :math:`y_n = y_{n-1} + y_{n-2}` définit récursivement la suite
+  car la partie droite de l'égalité comprend deux appels à la définition de la suite.
+
+L'implémentation récursive du calcul de la *n*-ième valeur de la suite découle de
+cette définition.
+
+.. literalinclude:: Python/INFO501/FonctionFibonacciRecursif.py
+    :language: python
+    :lines: 1,7- 
+
+.. code-block:: python
+
+    In [1]: print(fibonacciRecursif(20))
+    6765
+
+.. note:
+
+Si cet exemple présente une simplicité dans l'écriture, on observera que le
+temps d'exécution croit avec l'augmentation de la valeur du
+paramètre, ce qui met en évidence une deuxième limite de l'approche
+récursive. Cette observation peut être analysée en mesurant le
+temps d'exécution. Pour cela, on utilise une fonction qui va calculer
+la durée d'exécution par différence de temps en utilisant le module *time*.
+
+.. code-block:: python
+
+    import time
+     
+    def duree(fonction, n):
+        """
+        Fonction pour le calcul du temps d'exécution
+        
+        :param fonction: nom de la fonction à exécuter
+        :param n: paramètre qui est passé à la fonction
+        """
+        t = time.process_time()
+        fonction(n)
+        return time.process_time() - t
+
+.. code-block:: python
+
+    In [1]: duree(fibonacciRecursif, 20)
+    Out[1]: 0.015600100000000339
+    
+    In [2]: duree(fibonacciRecursif, 32)
+    Out[2]: 1.0140065000000078
+    
+    In [3]: duree(fibonacciRecursif, 33)
+    Out[3]: 1.5756101000000058
+
+.. important::
+
+  Attention, la fonction *duree* reçoit deux paramètres, le nom de la fonction
+  dont on souhaite connaître la durée d'exécution et une information qui sera
+  passée en paramètre à cette fonction.
+
+
+.. admonition:: Exercice
+
+  A partir des exemples, quels seraient les temps d'exécution pour *n* = 34, 35, 36 ?
+  En décomposant l'exécution de *fibonacciRecursif(4)*, analyser la raison de
+  cette augmentation du temps d'exécution.
+
+
+On peut réduire de manière importante ce temps d'exécution en supprimant un des appels
+récursifs. Rappelons le principe que nous avons vu au chapitre 2.
+
+.. figure:: Images/Fibonacci.png
+  :scale: 40%
+  :align: center
+  
+  Principe des décalages à effectuer
+
+Deux opérations sont à effectuer :
+
+- le calcul de la somme de :math:`y_{n-1}` et de :math:`y_{n-2}`;
+- la propagation de l'information pour l'itération suivante.
+
+Une représentation matricielle permet de traiter ce problème :
+
+.. math::
+
+  \begin{pmatrix}
+  y_{n} \\
+  y_{n+1}
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+  0 & 1 \\
+  1 & 1
+  \end{pmatrix}
+  \cdot
+  \begin{pmatrix}
+  y_{n-1} \\
+  y_{n}
+  \end{pmatrix}
+  \; avec \; Y_0 = \begin{pmatrix}
+  0 \\
+  1
+  \end{pmatrix}.
+
+Ce que l'on peut écrire sous la forme :
+
+.. math::
+
+  Y_n = M.Y_{n-1} \; avec \; Y_0 = \begin{pmatrix}
+  0 \\
+  1
+  \end{pmatrix}.
+
+L'algorithme récursif découle de cette représentation. Utilisons dans
+un premier temps le module `numpy`_ pour l'implémenter.
+
+.. literalinclude:: Python/INFO501/FonctionFibonacciRecursifMatricielAvecNumpy.py
+    :language: python
+    :lines: 1,7- 
+
+Le résultat est une liste représentant le vecteur :math:`Y_n` dont la première composante est
+la *n*-ème valeur de la suite.
+
+.. code-block:: python
+
+    In [1]: print(fibonacciRecursifMatriciel(20))
+    [[ 6765]
+     [10946]]
+
+.. important::
+
+    Tester cet algorithme pour *n* = 50 et analyser le résultat. 
+    
+    Tester, avec la même valeur de *n*, l'algorithme suivant qui utilise le module Matrice créé en TD.
+    On rappelle que la surcharge de l'opérateur `*` est
+    utilisé pour la multiplication matricielle dans la classe *Matrice*.
+    
+    .. literalinclude:: Python/INFO501/FonctionFibonacciRecursifMatricielAvecClasseMatrice.py
+        :language: python
+        :lines: 1,7-   
+          
+    .. code-block:: python
+    
+        In [1]: print(fibonacciRecursifMatriciel(20))
+        6765
+        10946   
+    
+        In [2]: print(fibonacciRecursifMatriciel(50))        
+        12586269025
+        20365011074  
+
+
+Tri rapide
+==========
+
+Le principe du tri est le suivant :
+
+- Choisir un pivot.
+- Faire une partition de la liste à trier, i.e. trouver l’indice
+  tel que tous les éléments à gauche soient < au pivot et tous ceux à
+  droite soient >= au pivot.
+- Appeler récursivement l’algorithme avec la liste à gauche du pivot et
+  celle à droite du pivot.
+
+.. literalinclude:: Python/INFO501/FonctionTriRapide.py
+    :language: python
+    :lines: 1,7- 
+    
+
+Tri fusion
+==========   
+
+Le tri fusion est un autre tri récursif qui utilise la fonction *fusion()* vue au chapitre :ref:`Exemples`. 
+  
+Le principe est le suivant :
+
+- Si la liste à trier contient plus d'un élement, on fusionne l'appel récursif du tri sur la moitié gauche de la liste et 
+  l'appel récursif du tri sur la moitié droite de la liste.
+- Dans le cas contraire, on retourne la liste.
+
+.. literalinclude:: Python/INFO501/FonctionTriFusion.py
+    :language: python
+    :lines: 1,7- 
+    
+En supposant que les fonctions *triBulle()*, *triRapide()*, *triFusion()* soient dans le fichier *Tris.py*, 
+le programme ci-après permet de comparer les trois tris. On analysera la fonction *evalue()* qui
+retourne un dictionnaire contenant le résultat de l'évaluation de la focntion ainsi que son temps
+d'exécution.
+
+.. literalinclude:: Python/INFO501/ComparaisonTris.py
+    :language: python
+    :lines: 1,7-
+
+L'exécution de ce programme donne l'affichage suivant pour 10000 éléments :
+
+.. code:: text
+
+    Temps pour le tri bulle 8.596
+    Temps pour le tri rapide 0.047
+    Temps pour le tri fusion 0.047
+    
+.. important::
+
+   Python utilisant des références pour les objets de type liste, 
+   la liste non triée est un objet qu'il faut cloner avec la méthode
+   *copy* du module *copy* pour que chaque tri utilise une liste non
+   triée.
+
+.. note::
+
+   On pourra ajouter le tri par insertion vu en TD et faire évoluer
+   le nombre d'éléménts pour analyser qualitativement la complexité
+   des tris.
+   
+   Enlever le commentaire devant les impressions pour afficher les listes.
+         
+      
+Arbres binaires
+===============
+
+Dans ce paragraphe, on s'intéresse à la représentation des arbres binaires. Il
+s'agit d'une structure de données permettant de représenter des
+hiérarchies. Les éléments de l'arbre sont appelés des nœuds. Dans un arbre binaire
+chaque nœud a au plus deux descendants. Par analogie avec un arbre généalogique,
+on parle souvent de nœud père et de nœuds fils. Le premier nœud de l'arbre est
+appelé racine.
+
+Nous allons illustrer la création d'un arbre et les différents types de parcours
+en cherchant à représenter la généalogie de Bart Simpson.
+
+.. figure:: Images/GenealogieSimpson.png
+  :scale: 75%
+  :align: center
+  
+Dans notre exemple, nous proposons de coder un nœud sous la forme d'une liste
+contenant trois éléments : la personne à représenter, son père et sa mère.
+
+Pour cela nous définissons la classe Nœud de la manière suivante :
+
+.. literalinclude:: Python/INFO501/ClasseNoeudConstructeur.py
+    :language: python
+    :lines: 1,7- 
+
+.. note::
+
+    Cet exemple illustre l'insertion de code qui sera exécuté si le fichier est exécuté
+    mais pas s'il est importé. Cette insertion définit la généalogie de Bart Simpson  en créant
+    un nœud pour Bart dont le père et la mère sont eux-même des nœuds vers leurs
+    propres parents, c'est-à-dire les grands-parents de Bart. Chaque grand-parent est
+    lui-même un nœud qui ne contient aucun ascendant.
+
+Le parcours d'un arbre binaire consiste souvent à visiter tous les noeuds et à
+effectuer un traitement lors de cette visite. En partant de la
+racine, on visite ses fils et ceci récursivement. On obtient alors trois types
+de parcours selon que le traitement est effectué :
+
+- avant les appels récursifs (on parle de parcours préfixé) ;
+
+- entre les deux appels récursifs (on parle de parcours infixé) ;
+
+- après les deux appels récursifs (on parle de parcours postfixé).
+
+Ces trois types de parcours sont ajoutés à la classe Noeud sous la forme de
+trois méthodes. On obtient alors le code suivant :
+
+.. literalinclude:: Python/INFO501/ClasseNoeudMethodesParcours.py
+    :language: python
+    :lines: 1,7- 
+
+Avec la définition précédente de l'arbre, on obtient les affichages suivants lors
+de l'appel des trois méthodes.
+
+.. code-block:: python
+
+    In [1]: arbre.parcoursPrefixe()
+    Bart
+    Homer
+    Abraham
+    Mona
+    Marge
+    Clancy
+    Jacqueline
+
+    In [2]: arbre.parcoursInfixe()
+    Abraham
+    Homer
+    Mona
+    Bart
+    Clancy
+    Marge
+    Jacqueline
+
+    In [3]: arbre.parcoursPostfixe()
+    Abraham
+    Mona
+    Homer
+    Clancy
+    Jacqueline
+    Marge
+    Bart
+
+Générateur de fractales
+=======================
+
+Les formes fractales possèdent la propriété d’autosimilarité, 
+c’est-à-dire que leur aspect est le même quelle que soit l’échelle à laquelle on les observe. 
+Elles constituent un modèle théorique que l’on peut approcher 
+en ayant la propriété d’autosimilarité vraie jusqu’à un certain ordre.
+
+.. figure:: Images/Fractales.png
+  :scale: 75%
+  :align: center  
+  
+  Exemples de fractales à l'ordre 0, 1 et 2.
+  
+Dans la première fractale chaque segment est divisé en trois parties égales. 
+Le segment intermédiaire est remplacé par deux segments de même longueur. 
+Pour la seconde fractale, chaque segment est divisé en trois parties égales. 
+A chaque division, on engendre un segment du tiers de la longueur du segment 
+initial et formant un angle *a* ou -*a* avec le segment initial.  
+  
+Pour dessiner ces formes fractales on va utiliser le module `turtle`_. La tortue
+était l'interface du langage LOGO. Ses primitives simples permettent de déplacer
+la tortue. La trace laissée par la tortue constitue le dessin. 
+
+- turtle.forward(x) permet de faire avancer la tortue d'une distance *x* ;
+
+- turtle.left(x) permet de faire tourner la tortue à gauche de *x* degrés ;
+
+- turtle.right(x) permet de faire tourner la tortue à droite de *x* degrés ;
+
+- turtle.up() permet de relever la tortue ;
+
+- turtle.down() permet de descendre la tortue.
+  
+On va construire un petit générateur qui va utiliser une grammaire simple  
+constituée d'un axiome et d'une règle pour représenter la fractale. 
+
+.. note::
+
+  Ces grammaires, appelées L-Systèmes ou systèmes de Lindenmayer, ont été créées
+  pour fournir un modèle théorique de développement des plantes. On trouvera sur le 
+  site de l'université de Calgary consacré à la `botanique algorithmique`_ un ensemble 
+  d'informations très intéressantes sur ce sujet, en particulier le livre 
+  `The Algorithmic Beauty of Plants`_ de Przemyslaw Prusinkiewicz
+  et Aristid Lindenmayer en accès libre.
+
+On utilise le codage suivant :
+
+- Fx, où *x* est un nombre, représente un segment. Pour l'axiome,
+  *x* est la longueur du segment. Pour la règle, *x* représente 
+  la proportion du segment utilisé au moment de l'application de la règle ;
+  
+- Lx, où *x* est un nombre, définit une rotation à gauche de *x* degrés ;
+
+- Rx, où *x* est un nombre, définit une rotation à droite de *x* degrés ;
+
+- U relève la tortue ;
+
+- D descend la tortue ;
+
+- une expression entre [] définit une branche.
+
+En utilisant ce principe la première fractale peut être représentée par :
+
+- axiome : L30F300 (rotation à gauche de 30 degrés et segment de longueur
+  300 ;
+  
+- règle : F0.333L60F0.333R120F0.333L60F0.333 (segment d'un tiers de la longueur 
+  puis rotation à gauche de 60 degrés puis segment d'un tiers de la longueur ...).
+ 
+La seconde fractale s'exprime selon le même principe en introduisant deux branches.
+
+- axiome : L30F300
+
+- règle : F0.333[L30F0.333]F0.333[R30F0.333]F0.333
+
+Le code du générateur est le suivant :
+
+.. literalinclude:: Python/INFO501/ClasseTurtleFractale.py
+    :language: python
+    :lines: 1,7-104 
+
+.. note::
+   
+   L'analyse de l'axiome et de la règle est faite en utilisant une 
+   `expression régulière`_ et la méthode *findall()*. A titre d'exercice
+   on analysera l'expression régulière.
+   
+   Ce code utilise une récursivité croisée puisque la méthode
+   *analyse* appelle la méthode *recursion* qui appelle elle-même la
+   méthode *analyse*.
+   
+   Un mécanisme de pile, construit à partir d'une liste, permet de gérer les branches.
+
+A titre d'exemple le code suivant produit une simulation de brin d'herbe
+dont le résultat est représenté :numref:`Herbe`.
+
+.. code-block:: python 
+  
+    In [1]: turtle.setworldcoordinates(-50,-50,310,310)
+     ...: maTortue = turtleFractale(
+     ...:    '[L90F300][L80F200][L60F150]', 
+     ...:    'F0.333R5[L30F0.333]F0.333[R30F0.333]F0.333',
+     ...:    3
+     ...:)   
+     ...: maTortue.dessine()
+     ...: turtle.exitonclick()
+     ...: 
+     ...: # Pour une sortie sans erreur
+     ...: try:
+     ...:     turtle.bye()
+     ...: except turtle.Terminator:
+     ...:     pass
+     ...:  
+  
+.. _Herbe:
+   
+.. figure:: Images/Herbe.png
+  :scale: 75%
+  :align: center 
+    
+  Simulation d'un brin d'herbe
+
+.. admonition:: Exercice
+ 
+  Donner l'axiome et la règle permettant d'obtenir le triangle de
+  Sierpiński représenté :numref:`Sierpinski` à l'ordre 4.
+
+.. _Sierpinski:
+   
+.. figure:: Images/Sierpinski.png
+  :scale: 75%  
+  :align: center 
+    
+  Triangle de Sierpiński 
+     
+.. include:: References.rst

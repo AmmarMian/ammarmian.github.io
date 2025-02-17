@@ -1,0 +1,865 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Recherche" href="search.html" /><link rel="next" title="Exemples de classe" href="ExemplesObjet.html" /><link rel="prev" title="Notion d’objet" href="NotionObjet.html" />
+
+    <meta name="generator" content="sphinx-3.4.3, furo 2021.04.11.beta34"/>
+        <title>Définir des classes - Documentation INFO501 2.0.0</title>
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
+    <link rel="stylesheet" href="_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="Index.html"><div class="brand">Documentation INFO501 2.0.0</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="Index.html">
+  
+  
+  <span class="sidebar-brand-text">Documentation INFO501 2.0.0</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html">
+  <input class="sidebar-search" placeholder=Recherche name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Numeration.html">Notion de représentation des données</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ProgrammerEnPython.html">Programmer en Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ExemplesFonction.html">Exemples de fonction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="NotionObjet.html">Notion d’objet</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Définir des classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ExemplesObjet.html">Exemples de classe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Recursivite.html">La récursivité</a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <div class="section" id="definir-des-classes">
+<h1>Définir des classes<a class="headerlink" href="#definir-des-classes" title="Lien permanent vers ce titre">¶</a></h1>
+<p>La définition d’une classe s’effectue avec le mot-clé <em>class</em>. Afin d’illustrer
+les différents principes nous allons créer une classe pour représenter des vecteurs. Commençons par définir
+une classe <em>Vecteur</em> sans méthode.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Vecteur</span><span class="p">:</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>Pour créer un objet, il suffit d’utiliser le nom de la classe avec des parenthèses.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">x</span> <span class="o">=</span> <span class="n">Vecteur</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Une fois l’objet créé, il devient possible de donner des valeurs à des attributs
+sans que ceux-ci aient besoin d’être déclarés, contrairement à la plupart des autres
+langages orientés objets.</p>
+<p>Par exemple, on peut décider de représenter les valeurs du vecteur sous la forme
+d’une liste et de les affecter à l’attribut <em>valeur</em>, ce qui donne :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">x</span><span class="o">.</span><span class="n">valeur</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Attention, bien que cette écriture soit possible en Python, l’ajout dynamique d’un attribut
+à l’instance d’une classe n’est pas recommandé. Il est préférable de définir les attributs dans
+la classe et d’instancier ensuite celle-ci. Nous verrons au paragraphe suivant comment
+réaliser cette opération à l’aide d’un constructeur.</p>
+</div>
+<div class="section" id="constructeur">
+<h2>Constructeur<a class="headerlink" href="#constructeur" title="Lien permanent vers ce titre">¶</a></h2>
+<p>L’affectation de l’attribut de manière externe, c’est-à-dire à partir de l’objet,
+présente des risques d’erreur pour le programmeur et il est préférable d’utiliser
+un <em>constructeur</em>. Le constructeur est une méthode appelée lors de la création de
+l’objet. En Python, le constructeur est la méthode <em>__init__()</em> (voir la <a class="reference external" href="https://docs.python.org/3/reference/datamodel.html#basic-customization">liste
+des méthodes spéciales de base</a>). Elle peut recevoir
+des paramètres qui vont servir à initialiser les attributs de l’objet. On accède
+à ces derniers en utilisant le mot-clé <em>self</em>.</p>
+<p>Dans notre exemple, nous souhaitons pouvoir initialiser le vecteur lors de sa
+création, c’est-à-dire passer la liste avec les coordonnées du vecteur au
+constructeur. Dit autrement, on souhaite que l’expression suivante initialise
+l’attribut valeur avec la liste [1, 4, 5].</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">x</span> <span class="o">=</span> <span class="n">Vecteur</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Pour que cette opération soit possible, on ajoute donc le constructeur
+à la classe.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">class</span> <span class="nc">Vecteur</span><span class="p">:</span>
+    <span class="sd">"""</span>
+<span class="sd">    Classe permettant de faire des calculs avec des vecteurs</span>
+<span class="sd">    """</span>      
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">valeur</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Constructeur de la classe</span>
+<span class="sd">        """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valeur</span> <span class="o">=</span> <span class="n">valeur</span>
+</pre></div>
+</div>
+<p>On notera l’ajout de commentaires dans la définition de la classe (Attention,
+il faut trois guillemets double pour ouvrir et fermer le commentaire). On parle de
+<em>document string</em> ou plus simplement de <a class="reference external" href="https://www.python.org/dev/peps/pep-0257/">docstring</a> pour ces commentaires.
+Ils sont maintenant accessibles par l’intermédiaire de l’attribut <em>__doc__</em>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">x</span> <span class="o">=</span> <span class="n">Vecteur</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+
+        <span class="n">Classe</span> <span class="n">permettant</span> <span class="n">de</span> <span class="n">faire</span> <span class="n">des</span> <span class="n">calculs</span> <span class="n">avec</span> <span class="n">des</span> <span class="n">vecteurs</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="fm">__init__</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+
+        <span class="n">Constructeur</span> <span class="n">de</span> <span class="n">la</span> <span class="n">classe</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ce mécanisme permet de récupérer les commentaires inclus dans un programme et de construire
+ensuite de manière automatique la documentation. Ainsi en tapant <em>help(Vecteur)</em>
+dans la console Python on obtient une présentation structurée des informations saisies, dont une partie
+est représentée ci-dessous.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">help</span><span class="p">(</span><span class="n">Vecteur</span><span class="p">)</span>
+<span class="n">Help</span> <span class="n">on</span> <span class="k">class</span> <span class="nc">Vecteur</span> <span class="ow">in</span> <span class="n">module</span> <span class="n">__main__</span><span class="p">:</span>
+
+<span class="k">class</span> <span class="nc">Vecteur</span><span class="p">(</span><span class="n">builtins</span><span class="o">.</span><span class="n">object</span><span class="p">)</span>
+ <span class="o">|</span>  <span class="n">Classe</span> <span class="n">permettant</span> <span class="n">de</span> <span class="n">faire</span> <span class="n">des</span> <span class="n">calculs</span> <span class="n">avec</span> <span class="n">des</span> <span class="n">vecteurs</span>
+ <span class="o">|</span>
+ <span class="o">|</span>  <span class="n">Methods</span> <span class="n">defined</span> <span class="n">here</span><span class="p">:</span>
+ <span class="o">|</span>
+ <span class="o">|</span>  <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">valeur</span><span class="p">)</span>
+ <span class="o">|</span>      <span class="n">Constructeur</span> <span class="n">de</span> <span class="n">la</span> <span class="n">classe</span>
+ <span class="o">|</span>
+ <span class="o">|</span>      <span class="p">:</span><span class="n">param</span> <span class="n">valeur</span><span class="p">:</span> <span class="n">Liste</span> <span class="n">contenant</span> <span class="n">les</span> <span class="n">composantes</span> <span class="n">du</span> <span class="n">vecteur</span>
+ <span class="o">|</span>
+</pre></div>
+</div>
+<p>Il est aussi possible d’engendrer une documentation au format HTML à l’aide de la commande <em>pydoc</em> dans une
+fenêtre de commande du système d’exploitation. Supposons que la classe <em>Vecteur</em>
+soit dans un fichier <em>ClasseVecteur.py</em>, la commande <em>pydoc -w ClasseVecteur</em> engendrera le fichier
+<em>ClasseVecteur.html</em> de documentation de la classe.</p>
+<div class="figure align-center" id="id1">
+<img alt="_images/Pydoc.png" src="_images/Pydoc.png"/>
+<p class="caption"><span class="caption-number">Fig. 12 </span><span class="caption-text">Commande pour engendrer automatiquement la documentation de la classe Vecteur</span><a class="headerlink" href="#id1" title="Lien permanent vers cette image">¶</a></p>
+</div>
+</div>
+<p>Pour définir une méthode dans une classe, on utilise le mot-clé <em>def</em>. Comme
+on peut le constater le constructeur a deux paramètres <em>self</em> et <em>valeur</em>.
+Le premier représente l’objet lui-même et va permettre d’accéder aux attributs
+et méthodes. Le second va contenir l’information passée lors de la création de
+l’objet, c’est-à-dire notre liste [1, 4, 5].</p>
+<p>Le code contenu dans le constructeur est très simple et consiste à affecter à
+l’attribut <em>valeur</em> de l’objet, i.e. <em>self.valeur</em>, l’information passée à l’aide
+du paramètre <em>valeur</em>.</p>
+<div class="admonition-exercice admonition">
+<p class="admonition-title">Exercice</p>
+<p>Interpréter le résultat des informations suivantes.</p>
+<p>In [1]: x = Vecteur([1, 4, 5])</p>
+<p>In [2]: type(x)
+Out[2]: __main__.Vecteur</p>
+<p>In [3]: print(x)
+&lt;__main__.Vecteur object at 0x00000000089DE208&gt;</p>
+<p>In [4]: print(x.valeur)
+[1, 4, 5]</p>
+</div>
+</div>
+<div class="section" id="ajout-de-methodes">
+<h2>Ajout de méthodes<a class="headerlink" href="#ajout-de-methodes" title="Lien permanent vers ce titre">¶</a></h2>
+<p>L’ajout de méthodes dans la classe s’effectue à l’aide du mot-clé <em>def</em>, comme
+pour le constructeur.</p>
+<p>Afin d’illustrer le principe nous allons nous intéresser, dans un premier temps,
+à l’ajout d’une méthode permettant de calculer la norme euclidienne d’un vecteur.
+On rappelle que si <em>x</em> est un vecteur de dimension <em>n</em> dont les composantes sont
+notées <em>x</em><sub>i</sub> alors :</p>
+<div class="math-wrapper"><div class="math notranslate nohighlight">
+\[||x|| = \sqrt{\sum_{i=1}^{n}{x_i}^2}\]</div></div>
+<div class="line-block">
+<div class="line"><br/></div>
+</div>
+<p>Le principe du calcul consiste à accumuler les carrés des composantes du vecteur
+puis à extraire la racine carrée du résultat grâce à la fonction <em>sqrt()</em>. Pour
+utiliser cette dernière il est nécessaire d’importer le module mathématique à
+l’aide de l’instruction <em>import</em>. L’accumulation des composantes du vecteur
+est réalisée à l’aide d’une répétition <em>for</em> opérant sur l’attribut valeur de
+la classe.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
+
+<span class="k">class</span> <span class="nc">Vecteur</span><span class="p">:</span>
+    <span class="sd">"""</span>
+<span class="sd">    Classe permettant de faire des calculs avec des vecteurs</span>
+<span class="sd">    """</span>    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">valeur</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Constructeur de la classe</span>
+<span class="sd">        """</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">valeur</span> <span class="o">=</span> <span class="n">valeur</span>
+
+    <span class="k">def</span> <span class="nf">norme</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Méthode qui retourne la norme du vecteur</span>
+<span class="sd">        """</span>
+        <span class="n">resultat</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valeur</span><span class="p">:</span>
+            <span class="n">resultat</span> <span class="o">=</span> <span class="n">resultat</span> <span class="o">+</span> <span class="n">u</span><span class="o">*</span><span class="n">u</span>
+        <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">resultat</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>L’appel de la méthode s’effectue comme suit :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">x</span> <span class="o">=</span> <span class="n">Vecteur</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">x</span><span class="o">.</span><span class="n">norme</span><span class="p">()</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="mf">6.48074069840786</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">norme</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+
+        <span class="n">Méthode</span> <span class="n">qui</span> <span class="n">retourne</span> <span class="n">la</span> <span class="n">norme</span> <span class="n">du</span> <span class="n">vecteur</span>
+</pre></div>
+</div>
+<p>Ajoutons maintenant une deuxième méthode <em>addition()</em> qui retourne la somme du
+vecteur défini par la classe et du vecteur passé en paramètre. Dit autrement, on
+souhaite pouvoir écrire :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">x</span> <span class="o">=</span> <span class="n">Vecteur</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">y</span> <span class="o">=</span> <span class="n">Vecteur</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">z</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">addition</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Le résultat fourni dans la variable <em>z</em> doit être un objet de type <em>Vecteur</em>
+dont l’attribut <em>valeur</em> est la somme du vecteur x et du vecteur y. Ainsi
+on obtient :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">valeur</span><span class="p">)</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Cette méthode est un peu plus compliquée que la précédente dans la mesure où elle
+fait appel à plusieurs notions.</p>
+<ul class="simple">
+<li><p>L’addition des deux vecteurs suppose qu’ils soient de même dimension. On obtient
+cette information en utilisant la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#len">len()</a>. Si les deux vecteurs ne
+sont pas de même dimension, la méthode retournera la valeur <em>None</em>.</p></li>
+<li><p>Les composantes du vecteur résultat sont la somme des composantes de chacun
+des vecteurs. Pour cela il nous faudra parcourir la liste afin de récupérer les
+composantes des vecteurs. On utilisera la fonction <a class="reference external" href="https://docs.python.org/3/library/functions.html#func-range">range()</a> à cet effet.
+L’accès à la composante d’indice <em>i</em> s’effectue en plaçant cet indice entre [].
+Par exemple self.valeur[i] fournit la composante d’indice <em>i</em> de l’attribut
+<em>valeur</em> de l’objet.</p></li>
+<li><p>Les composantes du vecteur résultat seront placées dans une liste. Pour cela,
+à partir d’une liste vide les composantes seront ajoutées grâce à la méthode
+<a class="reference external" href="https://docs.python.org/3/tutorial/datastructures.html">append()</a> opérant sur les listes.</p></li>
+<li><p>Le résultat doit être un nouvel objet dont l’attribut <em>valeur</em> contient la
+somme des deux vecteurs. On créera donc dans la méthode un nouvel objet en passant
+le résultat en paramètre laissant ainsi le soin au constructeur d’affecter
+l’attribut <em>valeur</em>.</p></li>
+</ul>
+<p>Le code de la classe incluant la méthode <em>addition()</em> est le suivant :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
+
+<span class="k">class</span> <span class="nc">Vecteur</span><span class="p">:</span>
+    <span class="sd">"""</span>
+<span class="sd">    Classe permettant de faire des calculs avec des vecteurs</span>
+<span class="sd">    """</span>      
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">valeur</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Constructeur de la classe</span>
+<span class="sd">        """</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">valeur</span> <span class="o">=</span> <span class="n">valeur</span>
+
+    <span class="k">def</span> <span class="nf">norme</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Méthode qui retourne la norme du vecteur</span>
+<span class="sd">        """</span>        
+        <span class="n">resultat</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valeur</span><span class="p">:</span>
+            <span class="n">resultat</span> <span class="o">=</span> <span class="n">resultat</span> <span class="o">+</span> <span class="n">u</span><span class="o">*</span><span class="n">u</span>
+        <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">resultat</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">addition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Méthode qui permet l'addition du vecteur x au vecteur représenté par</span>
+<span class="sd">        la classe</span>
+<span class="sd">        """</span>                
+        <span class="n">resultat</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valeur</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">valeur</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">resultat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valeur</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="o">.</span><span class="n">valeur</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">Vecteur</span><span class="p">(</span><span class="n">resultat</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+</pre></div>
+</div>
+<p>On peut vérifier que si les vecteurs ne sont pas de même dimension, <em>z</em> prend la
+valeur <em>None</em>. Dans ce cas, l’attribut valeur n’existe pas et son affichage
+produit une erreur d’exécution.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">x</span> <span class="o">=</span> <span class="n">Vecteur</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">y</span> <span class="o">=</span> <span class="n">Vecteur</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="n">z</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">addition</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="kc">None</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">valeur</span><span class="p">)</span>
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+
+  <span class="n">File</span> <span class="s2">"&lt;ipython-input-16-ecb97f5d4f46&gt;"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">1</span><span class="p">,</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">valeur</span><span class="p">)</span>
+
+<span class="ne">AttributeError</span><span class="p">:</span> <span class="s1">'NoneType'</span> <span class="nb">object</span> <span class="n">has</span> <span class="n">no</span> <span class="n">attribute</span> <span class="s1">'valeur'</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Attention de bien faire la différence entre une fonction, qui peut être appelée
+simplement comme <em>range()</em> ou <em>len()</em>, et la méthode d’une classe qui ne peut
+être appelée qu’à partir d’un objet instancié d’une classe, comme dans
+<em>addition()</em> ou <em>norme()</em>.</p>
+</div>
+</div>
+<div class="section" id="surcharge-d-operateurs">
+<h2>Surcharge d’opérateurs<a class="headerlink" href="#surcharge-d-operateurs" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Dans l’exemple précédent nous avons décomposé l’utilisation de la méthode <em>addition()</em>.
+Il est cependant possible d’écrire les choses sans passer par la variable
+intermédiaire <em>y</em> en utilisant directement la création du second vecteur dans le
+paramètre de la méthode <em>addition()</em> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">x</span> <span class="o">=</span> <span class="n">Vecteur</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">z</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">addition</span><span class="p">(</span><span class="n">Vecteur</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]))</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">valeur</span><span class="p">)</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>On peut même être encore plus direct en écrivant :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">z</span> <span class="o">=</span> <span class="n">Vecteur</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span><span class="o">.</span><span class="n">addition</span><span class="p">(</span><span class="n">Vecteur</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]))</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">valeur</span><span class="p">)</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Il serait cependant encore plus simple de pouvoir écrire <em>z</em> = <em>x</em> + <em>y</em> ou
+<em>z</em> =  Vecteur([1, 4, 5]) + Vecteur([1, 2, 3]). De la même manière, il serait plus
+simple de pouvoir écrire directement print(z) pour afficher la valeur du vecteur.</p>
+<p>En Python ces écritures sont possibles grâce à la surcharge d’opérateurs à l’aide
+de <a class="reference external" href="https://docs.python.org/3/reference/datamodel.html#special-method-names">méthodes qui ont un nom spécifique</a>. Avec ce mécanisme, on peut associer
+l’addition des vecteurs à l’opérateur +. Il faut pour cela utiliser la méthode
+<em>__add()__</em> afin de surcharger l’opérateur + lorsqu’il est utilisé avec des
+objets de type <em>Vecteur</em> (voir la <a class="reference external" href="https://docs.python.org/3/reference/datamodel.html#emulating-numeric-types">liste des opérateurs numériques surchargeables</a>).</p>
+<p>La modification de code est très simple puisqu’il suffit de remplacer
+la méthode <em>addition()</em> par la méthode <em>__add__()</em>.</p>
+<p>Pour l’affichage, on utilise la méthode <em>__str__()</em> (voir la <a class="reference external" href="https://docs.python.org/3/reference/datamodel.html#basic-customization">liste
+des méthodes spéciales de base</a>), cette dernière utilise simplement la fonction
+standard <a class="reference external" href="https://docs.python.org/3/library/functions.html#func-str">str()</a> qui transforme la liste en une chaîne de caractères.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
+
+<span class="k">class</span> <span class="nc">Vecteur</span><span class="p">:</span>
+    <span class="sd">"""</span>
+<span class="sd">    Classe permettant de faire des calculs avec des vecteurs</span>
+<span class="sd">    """</span>      
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">valeur</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Constructeur de la classe</span>
+<span class="sd">        </span>
+<span class="sd">        :param valeur: Liste contenant les composantes du vecteur</span>
+<span class="sd">        """</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">valeur</span> <span class="o">=</span> <span class="n">valeur</span>
+
+    <span class="k">def</span> <span class="nf">norme</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Méthode qui retourne la norme du vecteur</span>
+<span class="sd">        </span>
+<span class="sd">        :return: float</span>
+<span class="sd">        """</span>        
+        <span class="n">resultat</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">valeur</span><span class="p">:</span>
+            <span class="n">resultat</span> <span class="o">=</span> <span class="n">resultat</span> <span class="o">+</span> <span class="n">u</span><span class="o">*</span><span class="n">u</span>
+        <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">resultat</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">addition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Méthode qui permet l'addition du vecteur x au vecteur représenté par</span>
+<span class="sd">        la classe</span>
+<span class="sd">        </span>
+<span class="sd">        :param x: Vecteur à ajouter</span>
+<span class="sd">        :return: Vecteur</span>
+<span class="sd">        """</span>         
+        <span class="n">resultat</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valeur</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">valeur</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">resultat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valeur</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="o">.</span><span class="n">valeur</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">Vecteur</span><span class="p">(</span><span class="n">resultat</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Méthode qui surcharge l'opérateur +</span>
+<span class="sd">        </span>
+<span class="sd">        :param x: Vecteur à ajouter</span>
+<span class="sd">        :return: Vecteur        </span>
+<span class="sd">        """</span>          
+        <span class="n">resultat</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valeur</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">valeur</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">resultat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valeur</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">x</span><span class="o">.</span><span class="n">valeur</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">Vecteur</span><span class="p">(</span><span class="n">resultat</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Méthode qui permet l'affichage du vecteur</span>
+<span class="sd">        </span>
+<span class="sd">        :return: str</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valeur</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Avec ce code il devient possible d’effectuer très simplement des calculs avec
+des vecteurs.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">x</span> <span class="o">=</span> <span class="n">Vecteur</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">y</span> <span class="o">=</span> <span class="n">Vecteur</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="nb">print</span><span class="p">(</span><span class="n">Vecteur</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span> <span class="o">+</span> <span class="n">Vecteur</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+<span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Exercice</p>
+<p>Ajouter à la classe <em>Vecteur</em> les méthodes qui permettraient de faire :</p>
+<ul class="simple">
+<li><p>la soustraction de deux vecteurs en utilisant l’opérateur - ;</p></li>
+<li><p>le produit scalaire de deux vecteurs en utilisant l’opérateur *.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="accesseurs-getters-et-mutateurs-setters">
+<h2>Accesseurs (getters) et mutateurs (setters)<a class="headerlink" href="#accesseurs-getters-et-mutateurs-setters" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Nous avons vu que le concept d’objet permet de regrouper des données, les attributs, et des
+fonctions pour les manipuler, les méthodes. Ce principe est un des piliers de la
+programmation objets et est appelé <em>encapsulation</em>. La visibilité des attributs et des méthodes
+dépend du langage utilisé. Dans les langages dérivés de C++ on distingue trois types de visibilité :</p>
+<ul class="simple">
+<li><p>public - les attributs et méthodes sont toujours accessibles ;</p></li>
+<li><p>protégé - les attributs et méthodes sont accessibles à la classe dans laquelle ils sont définis
+et aux classes dérivées ;</p></li>
+<li><p>privée - les attributs et méthodes ne sont accessibles qu’à la classe dans laquelle ils sont définis.</p></li>
+</ul>
+<p>D’une manière générale, on évite la définition d’attributs de type public, qui seraient donc
+directement accessibles depuis une instance de l’objet, et on préfére définir des attributs de type
+protégé ou privé et en contrôler l’accès par deux méthodes de type public : un accesseur (getter) pour récupérer
+l’attribut ou un mutateur (setter) pour en fixer la valeur.</p>
+<p>En Python la visibilité des attributs et méthodes est de type public. Toutefois, il est recommandé de prendre l’habitude
+d’utiliser des accesseurs et mutateurs. L’exemple suivant illustre ce principe sur une classe <strong>Counter</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">class</span> <span class="nc">Counter</span><span class="p">:</span>
+    <span class="sd">"""</span>
+<span class="sd">    Classe gérant un comtpeur</span>
+<span class="sd">    """</span>      
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Constructeur de la classe</span>
+
+<span class="sd">        """</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span> 
+
+    <span class="k">def</span> <span class="nf">increase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Méthode qui incrémente le compteur</span>
+<span class="sd">        """</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+        
+    <span class="k">def</span> <span class="nf">decrease</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Méthode qui décrémente le compteur</span>
+<span class="sd">        """</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">-</span> <span class="mi">1</span>   
+        
+    <span class="k">def</span> <span class="nf">getCount</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Getter pour l'attribut count</span>
+<span class="sd">        </span>
+<span class="sd">        :return: int</span>
+<span class="sd">        """</span>   
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span>
+    
+    <span class="k">def</span> <span class="nf">setCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Setter pour l'attribut count</span>
+<span class="sd">        """</span>   
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="n">count</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>        
+    <span class="n">x</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">getCount</span><span class="p">())</span>
+    <span class="n">x</span><span class="o">.</span><span class="n">increase</span><span class="p">()</span>
+    <span class="n">x</span><span class="o">.</span><span class="n">increase</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">getCount</span><span class="p">())</span>
+    <span class="n">x</span><span class="o">.</span><span class="n">setCount</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">x</span><span class="o">.</span><span class="n">decrease</span><span class="p">()</span>   
+    <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">getCount</span><span class="p">())</span>    
+
+
+</pre></div>
+</div>
+</div>
+<div class="section" id="chainage-de-methodes-method-chaining">
+<h2>Chaînage de méthodes (Method Chaining)<a class="headerlink" href="#chainage-de-methodes-method-chaining" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Le chaînage de méthodes permet d’appliquer successivement des méthodes dans une même instruction, sans avoir besoin de
+séparer les appels ou de passer par une étape intermédiaire.</p>
+<p>Dans l’exemple précédent, l’affichage de la valeur du compteur après avoir défini sa valeur par le mutateur et l’avoir
+décrémenté nécessite trois instructions.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="n">x</span><span class="o">.</span><span class="n">setCount</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">x</span><span class="o">.</span><span class="n">decrease</span><span class="p">()</span>   
+    <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">getCount</span><span class="p">())</span>    
+</pre></div>
+</div>
+<p>A la place on aimerait pouvoir écrire :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">setCount</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">decrease</span><span class="p">()</span><span class="o">.</span><span class="n">getCount</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Analysons le chaînage en le décomposant. Le début <em>x.setCount(10)</em> ne pose pas
+de difficulté, il s’agit, comme précédemment, de l’appel de la méthode <em>setCount()</em>
+de l’objet <em>x</em> mais cette méthode ne retourne aucune valeur car il n’y
+a pas d’instruction <strong>return</strong>. On ne peut donc pas enchaîner avec la méthode
+<em>decrease()</em>. Pour que cela devienne possible, il suffit que la méthode <em>setCount()</em>
+retourne un objet pour lequel la méthode <em>decrease()</em> est valide.
+Dans notre cas, il suffit que la méthode <em>setCount()</em> retourne l’objet considéré,
+c’est-à-dire <em>self</em>. Il en va de même pour la méthode <em>decrease()</em> afin que l’on
+puisse enchaîner avec la méthode <em>getCount()</em>. Ainsi la transformation du code est
+assez simple pour permettre le chaînage de méthodes.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="k">class</span> <span class="nc">Counter</span><span class="p">:</span>
+    <span class="sd">"""</span>
+<span class="sd">    Classe gérant un comtpeur</span>
+<span class="sd">    """</span>      
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Constructeur de la classe</span>
+
+<span class="sd">        """</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span> 
+
+    <span class="k">def</span> <span class="nf">increase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Méthode qui incrémente le compteur</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Counter</span>
+<span class="sd">        """</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">self</span>
+        
+    <span class="k">def</span> <span class="nf">decrease</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Méthode qui décrémente le compteur</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Counter        </span>
+<span class="sd">        """</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">-</span> <span class="mi">1</span>  
+        <span class="k">return</span> <span class="bp">self</span>
+        
+    <span class="k">def</span> <span class="nf">getCount</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Getter pour l'attribut count</span>
+<span class="sd">        </span>
+<span class="sd">        :return: int</span>
+<span class="sd">        """</span>   
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span>
+    
+    <span class="k">def</span> <span class="nf">setCount</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Setter pour l'attribut count</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Counter        </span>
+<span class="sd">        """</span>   
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="n">count</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>        
+    <span class="n">x</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">increase</span><span class="p">()</span><span class="o">.</span><span class="n">increase</span><span class="p">()</span><span class="o">.</span><span class="n">getCount</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">setCount</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">decrease</span><span class="p">()</span><span class="o">.</span><span class="n">getCount</span><span class="p">())</span>  
+
+
+
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Les deux premiers chaînages sont appliqués sur l’instance
+<em>x</em> mais on peut directement opérer sur l’instance de la classe
+engendrée par <em>Counter()</em>. Dans ce cas, il s’agit évidemment
+d’un nouvel objet différent de <em>x</em>.</p>
+</div>
+</div>
+<div class="section" id="injection-de-dependances-dependency-injection">
+<h2>Injection de dépendances (Dependency injection)<a class="headerlink" href="#injection-de-dependances-dependency-injection" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Un objet de type <em>A</em> peut dépendre d’un objet de type <em>B</em> de plusieurs façons (voir <a class="reference external" href="https://fr.wikipedia.org/wiki/Injection_de_d%C3%A9pendances">injection de dépendances</a>).
+Par exemple, un objet <em>a</em> de type <em>A</em> peut avoir besoin d’un compteur, i.e. un objet de type <em>Counter</em>,
+éventuellement initialisé à une certaine valeur qui dépendra du contexte.
+Plutôt que de laisser à l’objet <em>a</em> le soin de créer l’instance de la classe <em>Counter</em>, on peut préférer créer un objet
+<em>x</em> de type <em>Counter</em> en dehors de cette classe et <em>injecter</em> l’objet <em>x</em> dans l’objet <em>a</em>.</p>
+<p>Pour ce faire on pourra utiliser une injection par constructeur, l’objet <em>x</em> est passé alors en paramètre
+lors de la création de l’objet <em>a</em>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">ClasseChainedCounter</span> <span class="kn">import</span> <span class="n">Counter</span>
+
+<span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
+    <span class="sd">"""</span>
+<span class="sd">    Classe permettant l'injection d'un compteur par le constructeur</span>
+<span class="sd">    """</span>      
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compteur</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Constructeur de la classe</span>
+
+<span class="sd">        :param: Counter</span>
+<span class="sd">        """</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">compteur</span> <span class="o">=</span> <span class="n">compteur</span>   
+
+    <span class="k">def</span> <span class="nf">traitement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Méthode qui décrémente deux fois le compteur et retourne sa valeur</span>
+<span class="sd">        </span>
+<span class="sd">        :return: int</span>
+<span class="sd">        """</span>      
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compteur</span><span class="o">.</span><span class="n">decrease</span><span class="p">()</span><span class="o">.</span><span class="n">decrease</span><span class="p">()</span><span class="o">.</span><span class="n">getCount</span><span class="p">()</span>
+        
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span><span class="o">.</span><span class="n">setCount</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>     
+    <span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">traitement</span><span class="p">())</span>  
+ 
+</pre></div>
+</div>
+<p>On peut bien sûr remplacer les trois dernières lignes par le code suivant.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="n">Counter</span><span class="p">()</span><span class="o">.</span><span class="n">setCount</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span><span class="o">.</span><span class="n">traitement</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>On peut aussi réaliser l’injection par un mutateur (setter) spécifique.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">ClasseChainedCounter</span> <span class="kn">import</span> <span class="n">Counter</span>
+
+<span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
+    <span class="sd">"""</span>
+<span class="sd">    Classe permettant l'injection d'un compteur par un setter</span>
+<span class="sd">    """</span>      
+    <span class="k">def</span> <span class="nf">setCompteur</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compteur</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Injecteur pour le compteur</span>
+
+<span class="sd">        :param: Counter</span>
+<span class="sd">        """</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">compteur</span> <span class="o">=</span> <span class="n">compteur</span>   
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">traitement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Méthode qui décrémente deux fois le compteur et retourne sa valeur</span>
+<span class="sd">        </span>
+<span class="sd">        :return: int</span>
+<span class="sd">        """</span>      
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compteur</span><span class="o">.</span><span class="n">decrease</span><span class="p">()</span><span class="o">.</span><span class="n">decrease</span><span class="p">()</span><span class="o">.</span><span class="n">getCount</span><span class="p">()</span>
+        
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span><span class="o">.</span><span class="n">setCount</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>     
+    <span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">()</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">setCompteur</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">traitement</span><span class="p">())</span>  
+
+ 
+</pre></div>
+</div>
+<p>Comme le mutateur renvoie <em>self</em>, on peut remplacer les quatre dernières lignes par
+le code suivant.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">A</span><span class="p">()</span><span class="o">.</span><span class="n">setCompteur</span><span class="p">(</span><span class="n">Counter</span><span class="p">()</span><span class="o">.</span><span class="n">setCount</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span><span class="o">.</span><span class="n">traitement</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="ExemplesObjet.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Exemples de classe</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="NotionObjet.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Notion d’objet</div>
+                
+              </div>
+            </a>
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2020, Laurent Foulloy
+            |
+            <a class="muted-link" href="_sources/DefinirClasses.rst.txt"
+               rel="nofollow">
+              Montrer le code source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contenu
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Définir des classes</a><ul>
+<li><a class="reference internal" href="#constructeur">Constructeur</a></li>
+<li><a class="reference internal" href="#ajout-de-methodes">Ajout de méthodes</a></li>
+<li><a class="reference internal" href="#surcharge-d-operateurs">Surcharge d’opérateurs</a></li>
+<li><a class="reference internal" href="#accesseurs-getters-et-mutateurs-setters">Accesseurs (getters) et mutateurs (setters)</a></li>
+<li><a class="reference internal" href="#chainage-de-methodes-method-chaining">Chaînage de méthodes (Method Chaining)</a></li>
+<li><a class="reference internal" href="#injection-de-dependances-dependency-injection">Injection de dépendances (Dependency injection)</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </main>
+</div>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/translations.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+</html>

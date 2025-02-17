@@ -1,0 +1,380 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Programmer en Python</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="css/theme/metropolis.css" id="theme">
+		<link rel="stylesheet" href="plugin/title-footer/title-footer.css">
+		<link rel="stylesheet" href="plugin/chalkboard/style.css">
+		<link rel="stylesheet" href="css/flexbox/flexboxgrid.css" type="text/css">
+		<link rel="stylesheet" href="plugin/presentable/presentable.min.css">
+		<link rel="stylesheet" href="css/custom.css" type="text/css">
+
+		<style>
+			.container{
+					display: flex;
+			}
+			.col{
+					flex: 1;
+					margin: auto;
+			}
+		</style>
+
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+		<link rel="stylesheet" href="plugin/verticator/verticator.css">
+
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+
+					<h1 class="talk-title" style="font-weight: bolder;">Introduction à la programmation</h1>
+					<h2>Répétitions et Exercices</h2>
+					<p style="margin-bottom: 10%;">Cours Magistral 4/8</p>
+
+					<img class="plain" height="75px" src="./assets/logos/USMB.svg" style="margin-right: 3%;">
+					<img class="plain" height="75px" src="./assets/logos/Polytech.svg" style="margin-right: 3%;">
+					<img class="plain" height="75px" src="./assets/logos/IAE.png">
+				</section>
+
+				<section>
+					<h1>Table of Contents</h1>
+					<nav id="presentable-toc" class="revealjs" style="font-size:large;"></nav>
+				</section>
+
+				<section>
+					<section data-background-color="rgba(185, 171, 230, 1)">
+						<h1>Les répétitions</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="400" 
+							src="./assets/realpython_range.png">
+						</div>
+					</section>
+
+					<section>
+						<h2>Jeu de Nim</h2>
+						<blockquote>
+							<b>Problème :</b></br>
+							Il faut pouvoir faire un tour de jeu jusqu'à ce que le nombre de bâtonnets total arrive à $0$. Il faut donc <b>répéter</b> des tours de jeu jusqu'à victoire d'un des joueurs.
+						</blockquote>
+					</section>
+
+					<section>
+						<h2>Une définition générale</h2>
+
+							<blockquote class="fragment">
+								En programmation informatique, une répétition ou boucle est une séquence d'instructions qui se répète jusqu'à ce qu'une certaine condition soit atteinte
+							</blockquote>	
+							<span class="fragment">
+								<ul>
+									<li>Une suite d'opérations est effectuée : i.e. création de variable ou modification de valeur.. </li>
+									<li>Une condition est vérifiée à la fin de la suite d'opérations : i.e. un compteur a atteint un nombre prescrit</li>
+									<li>Si la condition est vérifiée, on refait la suite d'opérations, sinon on passe à la suite</li>
+								</ul>
+							</span>
+						</ul>
+					</section>
+
+					<section>
+						<h2>Un exemple : répéter la même tâche encore et encore</h2>
+						<p class="fragment">Imprimer les chiffres de 1 à 5</p>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+print(1)
+print(2)
+print(3)
+print(4)
+print(5)
+						</code></pre>
+						<p class="fragment" style="color: red;">Pourquoi écrire la même fonction 5 fois ??</p>
+					</section>
+
+					<section>
+						<h2>Ça a l'air mieux</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+for i in range(1, 6):
+    print(i)
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>Il y a deux grandes classes de répétitions</h2>
+						<ul>
+							<li class="fragment">
+								Les répétitions où le nombre de fois est connu en avance ➡️ for
+							</li>
+							<li class="fragment">
+								Les répétitions dont le nombre n’est pas connu a priori ➡️ while
+							</li>
+						</ul>
+					</section>
+				</section>
+
+				<section>
+
+					<section data-background-color="rgba(219, 187, 162, 1)">
+						<h1>L'instruction <b>For</b></h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Python-for-Loops-Definite-Iteration_Watermarked.b38126d495e1.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>Pour un nombre connu d'itérations :</h2>
+						<blockquote>
+							On sait à l'avance combien de fois il faut répéter une séquence d'opérations.
+						</blockquote>
+						Par exemple :<br>
+						<ul>
+							<li>Calcul des $n$ premiers termes d'une suite</li>
+							<li>Jeux avec un nombre de tours définis</li>
+						</ul>
+
+						<p class="fragment">D'autres exemples ?</p>
+					</section>
+
+					<section>
+						<h2>Instruction <b>for</b></h2>
+						<p class="fragment">Dans la plupart des langages, une boucle for définit la variable sur laquelle boucler et sa valeur initiale, jusqu'à ce que la condition soit remplie, et comment changer la condition à chaque itération</p>
+						<pre class="fragment"><code class="language-c" style="font-size:20px;"">
+for int i = 1; i <= 5; i++ {
+	...
+}
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>Python est différent</h2>
+						<p class="fragment">Le for est défini sur une liste d'éléments itérables. A chaque étape, la variable prend la valeur de l'itération en cours</p>
+
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+for var in iterable:
+	statement(s)
+						</code></pre>
+						<p class="fragment">Remarquer l'indentation...</p>
+						<p class="fragment">Un itérable, c'est un <b>objet</b> qui permet de produire une séquence..</p>
+						<ul>
+							<li class="fragment">listes, tupes, dictionnaires (cf CM5)</li>
+							<li class="fragment">iterable range, enumerate, etc</li>
+						</ul>
+					</section>
+					
+
+					<section>					
+						<h2>Un exemple en pratique</h2>
+						
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+for i in range(1, 6):
+    # A chaque étape i a une valeur comprise entre 1 et 5
+    ...
+						</code></pre>
+						<p class="fragment">Fonction range: Return an object that produces a sequence of integers from start (inclusive) to stop (exclusive) by step. range(i, j) produces i, i+1, i+2, ..., j-1.</p>
+					</section>
+
+					<section>
+						<h2>Un exemple sur une liste</h2>
+						<pre class="fragment"><code class="language-python" style="font-size:20px;"">
+>>> a = ['foo', 'bar', 'baz']
+>>> for i in a:
+...     print(i)
+</code></pre>
+					</section>
+
+					<section>
+						<h2>Un exemple plus intéressant</h2>
+						<pre class="fragment"><code class="language-c" style="font-size:20px;"">
+def moyenne(liste):
+	resultat = 0
+	for x in liste:
+		resultat = resultat + x
+	resultat = resultat / len(liste)
+
+	return resultat
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>La fonction enumerate</h2>
+						<p class="fragment">Permet de récupérer à la fois l’indice et le contenu des éléments d’un objet itérable</p>
+						<pre class="fragment"><code class="language-c" style="font-size:20px;"">
+def moyennePonderee(liste, poids):
+	numerateur = 0
+	denominateur = 0
+
+	for i,x in enumerate(liste):
+		numerateur = numerateur + x * poids[i]
+		denominateur = denominateur + poids[i]
+	return numerateur / denominateur
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>La fonction zip</h2>
+						<p class="fragment">Permet d’agréger plusiers éléments itérables</p>
+						<pre class="fragment"><code class="language-c" style="font-size:20px;"">
+def moyennePonderee(liste, poids):
+	numerateur = 0
+	denominateur = 0
+
+	for x, p in zip(liste, poids):
+		numerateur = numerateur + x * p
+		denominateur = denominateur + p
+	return numerateur / denominateur
+						</code></pre>
+					</section>
+
+					<section>
+						<h2>Exercice</h2>
+						<blockquote>
+							Calculer le produit des $n$ premiers entiers..
+						</blockquote>
+					</section>
+
+				</section>
+
+				<section>
+					<section data-background-color="rgba(153, 206, 212, 1)">
+						<h1>L'instruction <b>While</b></h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Python-while-Loops-Indefinite-Iteration_Watermarked.ef0b89ed9dae.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>Pour une nombre <b>Indéfini</b> de répétitions</h2>
+						<blockquote>
+							Quand on ne sait pas à l'avence combien de fois il faudra répéter une séquence d'instructions.
+						</blockquote>
+						<p>Exemples</p>
+						<ul>
+							<li>Demander à l'utilisateur un nombre respectant une condition..</li>
+							<li>Déplacer un personnage à l'écran jusqu'à ce qu'il arrive à une destination donnéee</li>
+						</ul>
+						<p class="="fragment">
+							D'autres exemples ?
+						</p>
+					</section>
+
+					<section>
+						<h2>Instruction while</h2>
+						<p class="fragment">Permet de répéter une séquence d’instructions tant qu’une condition est vraie</p>
+						<pre class="fragment"><code class="language-c" style="font-size:20px;"">
+i = 1
+while i <= 5:
+	print(i)
+	i += 1
+						</code></pre>
+						<p class="fragment">C'est fondamentalement comme un if mais répète le code interne jusqu'à ce que la condition soit fausse</p>
+					</section>
+
+					<section>
+						<h2>Il convient de toujours vérifier que la séquence d’instructions fait évoluer la condition de sorte à ce qu’elle devienne fausse à un moment !</h2>
+						<p class="fragment">Essayez plutôt ceci</p>
+						<pre class="fragment"><code class="language-c" style="font-size:20px;"">
+i = 1
+while i <= 5:
+	print(i)
+						</code></pre>
+						<p class="fragment" style="color: red;">Vous pouvez arrêter Python en utilisant ctrl+c</p>
+					</section>
+
+					<section>
+						<h2>Exercice</h2>
+						<blockquote>
+							Fonction qui demande un nom à l'utilisateur son nom tant qu'il n'a pas écrit "END". Une fois fini, écrire "On a fini.".
+						</blockquote>
+					</section>
+
+				</section>
+
+				<section>
+					<section>
+						<h1>Revenons au jeu de Nim...</h1>
+					</section>
+
+					<section>
+						<h2>Répétition du tour de jeu ?</h2>
+						<blockquote>
+							For ou while ?
+						</blockquote>
+						&rarr; Implémenter le jeu de Nim en entier
+					</section>
+				</section>
+
+
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script src="plugin/math/math.js"></script>
+		<script src="plugin/menu/menu.js"></script>
+		<script src="plugin/chalkboard/plugin.js"></script>
+		<script src="plugin/verticator/verticator.js"></script>
+		<script src="plugin/presentable/presentable.min.js"></script>
+		
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+				controls: true,
+				transition: 'slide',
+				dependencies: [
+					{ src: 'plugin/reveald3js/reveald3.js' },
+					// { src: 'plugin/title-footer/title-footer.js', async: true, callback: function() { title_footer.initialize(); } },
+					// { src: 'plugin/typed/typed.js', async: false , callback: function() { callTypedJs(); }}
+				],
+				math: {
+					mathjax: 'https://cdn.jsdelivr.net/gh/mathjax/mathjax@2.7.8/MathJax.js',
+					config: 'TeX-AMS_HTML-full',
+					},
+				menu: {
+					numbers: true,
+					width: 'wide',
+					themes: false,
+					transitions: false,
+					openSlideNumber: true,
+				},
+				chalkboard: {
+					toggleChalkboardButton: { left: "80px" },
+					toggleNotesButton: { left: "130px" },
+					colorButtons: true,
+					boardHandle: true,
+					storage: "Notes",
+					eraser: { src: path + 'img/sponge.png', radius: 40}
+				},
+				verticator: {
+					darktheme: false,
+					skipuncounted: false,
+					clickable: true
+				},
+				slideNumber: "c/t",
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMath, RevealMarkdown, RevealHighlight, RevealNotes, RevealMenu, RevealChalkboard, Verticator ]
+			});
+
+			presentable.toc({
+				framework: "revealjs",
+				hideNoTitle: true,
+				titles: "h1,.presentable-title"
+			});
+		</script>
+	</body>
+</html>

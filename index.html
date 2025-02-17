@@ -1,20 +1,805 @@
-<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="generator" content="Astro v5.2.5"><title>Ammar Mian</title><link rel="stylesheet" href="/_astro/index.C8UlJc-M.css"></head> <script>
-        const getThemePreference = () => {
-            if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-                return localStorage.getItem('theme');
-            }
-            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        };
-        const isDark = getThemePreference() === 'dark';
-        document.documentElement.classList[isDark ? 'add' : 'remove']('dark');
-     
-        if (typeof localStorage !== 'undefined') {
-            const observer = new MutationObserver(() => {
-                const isDark = document.documentElement.classList.contains('dark');
-                localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            });
-            observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-        }
-    </script> <body> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).load=e;window.dispatchEvent(new Event("astro:load"));})();;(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="2bOvRK" prefix="r1" component-url="/_astro/Navigation.CKanfqid.js" component-export="default" renderer-url="/_astro/client.DP-nP0Gs.js" props="{}" ssr client="load" opts="{&quot;name&quot;:&quot;NavigationMain&quot;,&quot;value&quot;:true}" await-children><link rel="preload" as="image" href="/images/logo.png"/><div class="fixed top-0 left-0 sm:bg-white dark:sm:bg-black  lg:bg-transparent lg:backdrop-blur-sm md:bg-transparent md:backdrop-blur-sm w-full z-50 h-16 flex items-center px-4 sm:px-6 lg:px-8 flex-col sm:flex-row"><div class="text"><a href="/"><img src="/images/logo.png" class="hover:filter hover:hue-rotate-[-80deg] hover:brightness-150" width="70px" height="15px" alt="Logo"/></a></div><div class="flex-1"></div><div class="flex"><nav aria-label="Main" data-orientation="horizontal" dir="ltr" class="relative z-10 flex max-w-max flex-1 items-center justify-center"><div style="position:relative"><ul data-orientation="horizontal" class="group flex flex-1 list-none items-center justify-center space-x-1" dir="ltr"><li><a href="/" class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 lg:bg-transparent lg:backdrop-blur-sm md:bg-transparent md:backdrop-blur-sm" data-radix-collection-item="">Home</a></li><li><button id="radix-:r1R3:-trigger-radix-:r1R4r:" data-state="closed" aria-expanded="false" aria-controls="radix-:r1R3:-content-radix-:r1R4r:" class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 group md:bg-transparent md:backdrop-blur-sm lg:bg-transparent lg:backdrop-blur-sm" data-radix-collection-item="">Research<!-- --> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down relative top-[1px] ml-1 h-3 w-3 transition duration-300 group-data-[state=open]:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button></li><li><button id="radix-:r1R3:-trigger-radix-:r1R6r:" data-state="closed" aria-expanded="false" aria-controls="radix-:r1R3:-content-radix-:r1R6r:" class="group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50 group md:bg-transparent md:backdrop-blur-sm lg:bg-transparent lg:backdrop-blur-sm" data-radix-collection-item="">Teaching<!-- --> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down relative top-[1px] ml-1 h-3 w-3 transition duration-300 group-data-[state=open]:rotate-180" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button></li></ul></div><div class="absolute left-0 top-full flex justify-center"></div></nav></div><div class="flex ml-4"><div class="flex items-center space-x-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun h-5 w-5 text-yellow-500"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg><button type="button" role="switch" aria-checked="false" data-state="unchecked" value="on" class="peer inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input relative"><span data-state="unchecked" class="pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0"></span></button><input type="checkbox" aria-hidden="true" style="transform:translateX(-100%);position:absolute;pointer-events:none;opacity:0;margin:0" tabindex="-1" value="on"/><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon h-5 w-5 text-gray-500 dark:text-white"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg></div></div></div><!--astro:end--></astro-island> <div class="  mt-16">  <astro-island uid="1YBA6F" prefix="r0" component-url="/_astro/homepage.DhGjklds.js" component-export="default" renderer-url="/_astro/client.DP-nP0Gs.js" props="{}" ssr client="load" opts="{&quot;name&quot;:&quot;HomePage&quot;,&quot;value&quot;:true}" await-children><link rel="preload" as="image" href="/images/profile.jpg"/><main class="flex items-center justify-center mt-30"><div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:grid-cols-3 p-4 md:max-w-[800px] lg:max-w-[900px]"><div class="md:col-span-2 lg:col-span-2" style="opacity:0;transform:translateY(40px)"><div class="rounded-xl border bg-card text-card-foreground shadow p-6 flex items-center hover:drop-shadow-xl hover:dark:drop-shadow-[0_5px_10px_rgba(255,255,255,0.1)]"><div class="p-6 pt-0 flex items-center gap-4 place-content-center"><img src="/images/profile.jpg" alt="Profile" class="w-40 h-40 rounded-full"/><div><h1 class="text-2xl font-bold">Ammar Mian</h1><p class="text-gray-500">Associate Professor at Université Savoie Mont Blanc</p><div class="flex mt-2 gap-4"><a href="https://github.com/ammarmian/" class="flex items-center gap-2 hover:text-gray-500"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg> Github</a><a href="https://scholar.google.com/citations?user=XDirnBMAAAAJ&amp;hl=en" class="flex items-center gap-2 hover:text-gray-500"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-school"><path d="M14 22v-4a2 2 0 1 0-4 0v4"></path><path d="m18 10 3.447 1.724a1 1 0 0 1 .553.894V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-7.382a1 1 0 0 1 .553-.894L6 10"></path><path d="M18 5v17"></path><path d="m4 6 7.106-3.553a2 2 0 0 1 1.788 0L20 6"></path><path d="M6 5v17"></path><circle cx="12" cy="9" r="2"></circle></svg> Scholar</a></div><p class="mt-1"><b>Contact:</b> ammar.mian at univ-smb.fr</p></div></div></div></div><div class="md:col-span-1 md:row-span-2 lg:col-span-1 lg:row-span-2 hover:drop-shadow-xl hover:dark:drop-shadow-[0_5px_10px_rgba(255,255,255,0.1)]" style="opacity:0;transform:translateY(40px)"><div class="rounded-xl border bg-card text-card-foreground shadow p-6"><h1 class="text-xl font-bold mb-3">Research interests:</h1><ul class="list-none pl-0 space-y-2"><li class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-waves text-blue-500"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path></svg><span>Statistical Signal Processing</span></li><li class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-server text-green-500"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"></rect><rect width="20" height="8" x="2" y="14" rx="2" ry="2"></rect><line x1="6" x2="6.01" y1="6" y2="6"></line><line x1="6" x2="6.01" y1="18" y2="18"></line></svg><span>Machine Learning</span></li><li class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler text-purple-500"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"></path><path d="m14.5 12.5 2-2"></path><path d="m11.5 9.5 2-2"></path><path d="m8.5 6.5 2-2"></path><path d="m17.5 15.5 2-2"></path></svg><span>Riemannian Geometry</span></li><li class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-satellite text-indigo-500"><path d="M13 7 9 3 5 7l4 4"></path><path d="m17 11 4 4-4 4-4-4"></path><path d="m8 12 4 4 6-6-4-4Z"></path><path d="m16 8 3-3"></path><path d="M9 21a6 6 0 0 0-6-6"></path></svg><span>Remote Sensing</span></li><li class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bolt text-yellow-500"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><circle cx="12" cy="12" r="4"></circle></svg><span>Frugal Computations</span></li></ul></div></div><div class="md:col-span-2 lg:col-span-2 hover:drop-shadow-xl hover:dark:drop-shadow-[0_5px_10px_rgba(255,255,255,0.1)]" style="opacity:0;transform:translateY(40px)"><div class="rounded-xl border bg-card text-card-foreground shadow p-6"><div class="p-6 pt-0"><h1 class="text-xl font-bold mb-3">News</h1><ul class="list-none pl-0 space-y-2"><li class="flex items-center gap-3"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-newspaper"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path><path d="M18 14h-8"></path><path d="M15 18h-5"></path><path d="M10 6h8v4h-8V6Z"></path></svg> <span>Looking for an Internship (M2) in Measuring Energy costs of Federated Machine Learning models. See <a class="text-gray-500" href="https://www.univ-smb.fr/listic/wp-content/uploads/sites/66/2024/12/sujet_stage_mesure_machine_learning.pdf">here</a>.</span></li></ul></div></div></div><div class="md:col-span-2 lg:col-span-2 row-span-1" style="opacity:0;transform:translateY(40px)"><div class="rounded-xl border bg-card text-card-foreground shadow p-6 hover:drop-shadow-xl hover:dark:drop-shadow-[0_5px_10px_rgba(255,255,255,0.1)]"><div class="p-6 pt-0"><h1 class="text-xl font-bold">Positions</h1><div class="mt-4"><div class="relative pl-6"><div class="relative flex items-start mb-6"><div class="absolute left-3.5 top-6 h-full w-1 bg-gray-300" style="height:calc(110% + 6px)"></div><div class="relative z-10 w-9 h-9 flex items-center justify-center bg-white border border-gray-300 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-school text-blue-500"><path d="M14 22v-4a2 2 0 1 0-4 0v4"></path><path d="m18 10 3.447 1.724a1 1 0 0 1 .553.894V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-7.382a1 1 0 0 1 .553-.894L6 10"></path><path d="M18 5v17"></path><path d="m4 6 7.106-3.553a2 2 0 0 1 1.788 0L20 6"></path><path d="M6 5v17"></path><circle cx="12" cy="9" r="2"></circle></svg></div><div class="ml-6"><h3 class="font-bold text-lg">Associate professor</h3><span class="text-gray-500 text-sm">Sept 2020 - Current</span><p class="text-gray-600 text-sm">LISTIC lab, Université Savoie Mont-Blanc</p></div></div><div class="relative flex items-start mb-6"><div class="absolute left-3.5 top-6 h-full w-1 bg-gray-300" style="height:calc(110% + 6px)"></div><div class="relative z-10 w-9 h-9 flex items-center justify-center bg-white border border-gray-300 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-computer text-green-500"><rect width="14" height="8" x="5" y="2" rx="2"></rect><rect width="20" height="8" x="2" y="14" rx="2"></rect><path d="M6 18h2"></path><path d="M12 18h6"></path></svg></div><div class="ml-6"><h3 class="font-bold text-lg">Post-doc</h3><span class="text-gray-500 text-sm">Oct 2019 - Aug 2020</span><p class="text-gray-600 text-sm">Aalto University, under Esa Ollila&#x27;s supervision</p></div></div><div class="relative flex items-start mb-6"><div class="relative z-10 w-9 h-9 flex items-center justify-center bg-white border border-gray-300 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-microscope text-red-500"><path d="M6 18h8"></path><path d="M3 22h18"></path><path d="M14 22a7 7 0 1 0 0-14h-1"></path><path d="M9 14h2"></path><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"></path><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"></path></svg></div><div class="ml-6"><h3 class="font-bold text-lg">Ph.D candidate</h3><span class="text-gray-500 text-sm">Oct 2016 - Sept 2019</span><p class="text-gray-600 text-sm">SONDRA lab, CentraleSupélec</p></div></div></div></div></div></div></div><div class="md:col-start-3 lg:col-start-3 md:-mt-40 lg:-mt-40" style="opacity:0;transform:translateY(40px)"><a href="/cv.pdf"><div class="rounded-xl border bg-card text-card-foreground shadow p-6 min-h-[100px] w-full bg-linear-to-r from-cyan-500 to-blue-500 flex place-content-center items-center transition-transform duration-300 transform hover:scale-105 peer"><h2 class="text-xl font-bold text-white justify-center">Curriculum Vitae</h2></div></a></div><div class="md:col-start-3 lg:col-start-3 md:-mt-115 lg:-mt-115" style="opacity:0;transform:translateY(40px)"><a href="https://github.com/ammarmian/qanat"><div class="rounded-xl border bg-card text-card-foreground shadow p-6 min-h-[250px] w-full bg-[url(/images/qanat.png)] bg-cover transition-transform duration-300 transform hover:scale-105 peer"></div></a></div><div class="md:col-start-3 lg:col-start-3 md:-mt-52 lg:-mt-52" style="opacity:0;transform:translateY(40px)"><a href="https://github.com/ammarmian/anotherspdnet"><div class="rounded-xl border bg-card text-card-foreground shadow p-6 min-h-[100px] w-full bg-linear-to-r from-cyan-500 to-blue-500 flex place-content-center items-center transition-transform duration-300 transform hover:scale-105 peer"><h2 class="text-xl font-bold text-white justify-center">AnotherSPDNet</h2></div></a></div></div></main><!--astro:end--></astro-island> </div> <div class="flex justify-center text-sm mb-5">
-Copyright @Ammar Mian, 2025
-</div> </body></html>
+
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="scroll-smooth" data-default-appearance="dark"
+  data-auto-appearance="false"><head>
+	<meta name="generator" content="Hugo 0.90.1" />
+  <meta charset="utf-8" />
+  
+  <meta http-equiv="content-language" content="en" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  
+  <title>Ammar Mian</title>
+  <meta name="title" content="Ammar Mian" />
+  
+  <meta name="description" content="Academic website of Ammar Mian" />
+  
+  
+  
+  <link rel="canonical" href="https://ammarmian.github.io/" />
+  
+  <link rel="alternate" type="application/rss+xml" href="/index.xml" title="Ammar Mian" />
+  
+  <link rel="alternate" type="application/json" href="/index.json" title="Ammar Mian" />
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <link type="text/css" rel="stylesheet" href="/css/main.bundle.min.66ed92a6ac185c999e78834768db9b344571f58877aeb59b0baddc260eb5755b391edcfe01213a7b7293fb80f1a60ffcfedfb5e2abe2adc388cadd33f9f34315.css"
+    integrity="sha512-Zu2SpqwYXJmeeINHaNubNEVx9Yh3rrWbC63cJg61dVs5Htz&#43;ASE6e3KT&#43;4Dxpg/8/t&#43;14qvircOIyt0z&#43;fNDFQ==" />
+  
+  
+  <script type="text/javascript" src="/js/main.min.cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e.js" integrity="sha512-z4PhNX7vuL3xVChQ1m2AB9Yg5AULVxXcg/SpIdNs6c5H0NE8XYXysP&#43;DGNKHfuwvY7kxvUdBeoGlODJ6&#43;SfaPg=="></script>
+  
+  
+  <script type="text/javascript" src="/js/appearance.min.49025a779c36ad37a5bf9f1cc6bffd35ccb69ce15560ef1b10057ddf31576265b19f8bcc1733207336c9144926f7b18aea2e5895f29e858b24271332a2fa5cd5.js"
+    integrity="sha512-SQJad5w2rTelv58cxr/9Ncy2nOFVYO8bEAV93zFXYmWxn4vMFzMgczbJFEkm97GK6i5YlfKehYskJxMyovpc1Q=="></script>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <script defer type="text/javascript" id="script-bundle" src="/js/main.bundle.min.34ee8372ff77835535e486c6ed01ff6993374a1cec8108898cad793fc6ae7520778e24db68e085c762d25af6fa7d00b57d7a791438dc68b676581f8c8344f6e0.js"
+    integrity="sha512-NO6Dcv93g1U15IbG7QH/aZM3ShzsgQiJjK15P8audSB3jiTbaOCFx2LSWvb6fQC1fXp5FDjcaLZ2WB&#43;Mg0T24A==" data-copy="" data-copied=""></script>
+  
+  <script src="/js/zoom.min.js"></script>
+  
+  
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="" />
+<meta property="og:description" content="Academic website of Ammar Mian" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://ammarmian.github.io/" /><meta property="og:site_name" content="Ammar Mian" />
+
+
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="Academic website of Ammar Mian"/>
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "https:\/\/ammarmian.github.io\/",
+    "name": "Ammar Mian",
+    "description": "Academic website of Ammar Mian",
+    "inLanguage": "en",
+    "url": "https:\/\/ammarmian.github.io\/",
+    
+    "publisher" : {
+      "@type": "Person",
+      "name": "Ammar Mian"
+    }
+  }
+  </script>
+
+
+  
+  
+  <meta name="author" content="Ammar Mian" />
+  
+  
+  
+  <link href="mailto:ammar.mian@univ-smb.fr" rel="me" />
+  
+  
+  <link href="https://ammarmian.github.io/" rel="me" />
+  
+  
+  <link href="https://github.com/ammarmian" rel="me" />
+  
+  
+  <link href="https://orcid.org/0000-0003-1796-8707" rel="me" />
+  
+  
+  <link href="https://www.researchgate.net/profile/Ammar-Mian" rel="me" />
+  
+  
+  
+  
+
+
+
+
+
+
+  
+  
+  
+  
+
+
+  
+  
+  
+  
+  
+</head><body
+  class="flex flex-col h-screen px-6 m-auto text-lg leading-7 max-w-7xl bg-neutral text-neutral-900 dark:bg-neutral-800 dark:text-neutral sm:px-14 md:px-24 lg:px-32">
+  <div id="the-top" class="absolute flex self-center">
+    <a class="px-3 py-1 text-sm -translate-y-8 rounded-b-lg bg-primary-200 focus:translate-y-0 dark:bg-neutral-600"
+      href="#main-content"><span
+        class="font-bold text-primary-600 ltr:pr-2 rtl:pl-2 dark:text-primary-400">&darr;</span>Skip to main content</a>
+  </div>
+  
+  
+  <div style="padding-left:0;padding-right:0"
+    class="flex items-center justify-between px-4 py-6 sm:px-6 md:justify-start space-x-3">
+    
+    
+    <div>
+        <a href="/" class="flex">
+            <span class="sr-only">Ammar Mian</span>
+
+            <img src="/img/logo.png" width="191" height="101"
+                class="max-h-[5rem] max-w-[5rem] object-scale-down object-left nozoom" alt="Ammar Mian" />
+
+        </a>
+    </div>
+    
+    <div class="flex flex-1 items-center justify-between">
+        <nav class="flex space-x-3">
+
+            <a href="/" class="text-base font-medium text-gray-500 hover:text-gray-900">Ammar Mian</a>
+            
+            
+        </nav>
+        <div class="hidden md:flex items-center space-x-5 md:ml-12">
+
+            
+            
+            <a href="/publications/"  class="text-base font-medium text-gray-500 hover:text-gray-900" title="List of publications">
+                
+
+
+                
+                Publications
+            </a>
+            
+            <a href="/activities/"  class="text-base font-medium text-gray-500 hover:text-gray-900" title="Scientific Activities">
+                
+
+
+                
+                Scientific Activities
+            </a>
+            
+            <a href="/teaching/"  class="text-base font-medium text-gray-500 hover:text-gray-900" title="Teaching">
+                
+
+
+                
+                Teaching
+            </a>
+            
+            <a href="/projects/"  class="text-base font-medium text-gray-500 hover:text-gray-900" title="Projects">
+                
+
+
+                
+                Projects
+            </a>
+            
+            <a href="/contact/"  class="text-base font-medium text-gray-500 hover:text-gray-900" title="Contact">
+                
+
+
+                
+                Contact
+            </a>
+            
+            <a href="/photography/"  class="text-base font-medium text-gray-500 hover:text-gray-900" title="Photography">
+                
+
+
+                
+                Photography
+            </a>
+            
+            
+
+            
+
+
+            
+            <button id="search-button" class="text-base hover:text-primary-600 dark:hover:text-primary-400"
+                title="">
+                
+
+  <span class="relative block icon">
+    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="search" class="svg-inline--fa fa-search fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/></svg>
+
+  </span>
+
+
+            </button>
+            
+
+            
+            
+            
+
+        </div>
+        <div class="flex md:hidden items-center space-x-5 md:ml-12">
+
+            <span></span>
+
+            
+
+
+            
+            <button id="search-button-mobile" class="text-base hover:text-primary-600 dark:hover:text-primary-400"
+                title="">
+                
+
+  <span class="relative block icon">
+    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="search" class="svg-inline--fa fa-search fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/></svg>
+
+  </span>
+
+
+            </button>
+            
+
+            
+            
+
+        </div>
+    </div>
+    <div class="-my-2 -mr-2 md:hidden">
+
+        <label id="menu-button" for="menu-controller" class="block">
+            <input type="checkbox" id="menu-controller" class="hidden" />
+            <div class="cursor-pointer hover:text-primary-600 dark:hover:text-primary-400">
+                
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M0 96C0 78.33 14.33 64 32 64H416C433.7 64 448 78.33 448 96C448 113.7 433.7 128 416 128H32C14.33 128 0 113.7 0 96zM0 256C0 238.3 14.33 224 32 224H416C433.7 224 448 238.3 448 256C448 273.7 433.7 288 416 288H32C14.33 288 0 273.7 0 256zM416 448H32C14.33 448 0 433.7 0 416C0 398.3 14.33 384 32 384H416C433.7 384 448 398.3 448 416C448 433.7 433.7 448 416 448z"/></svg>
+
+  </span>
+
+
+            </div>
+            <div id="menu-wrapper" style="padding-top:25px;"
+                class="fixed inset-0 z-30 invisible w-screen h-screen m-auto overflow-auto transition-opacity opacity-0 cursor-default bg-neutral-100/50 backdrop-blur-sm dark:bg-neutral-900/50">
+                <ul
+                    class="flex movedown flex-col w-full px-6 py-6 mx-auto overflow-visible list-none ltr:text-right rtl:text-left max-w-7xl sm:px-14 md:px-24 lg:px-32 sm:py-10 sm:pt-10">
+                    <li class="mb-1">
+                        <span class="cursor-pointer hover:text-primary-600 dark:hover:text-primary-400">
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"/></svg>
+
+  </span>
+
+</span>
+                    </li>
+
+                    
+                    
+                    <li class="mb-1">
+                        <a  class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2"
+                            href="/publications/" title="List of publications">
+                            <span class="inline-block align-text-bottom">
+
+</span>
+                            
+                            Publications
+                        </a>
+                    </li>
+                    
+                    <li class="mb-1">
+                        <a  class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2"
+                            href="/activities/" title="Scientific Activities">
+                            <span class="inline-block align-text-bottom">
+
+</span>
+                            
+                            Scientific Activities
+                        </a>
+                    </li>
+                    
+                    <li class="mb-1">
+                        <a  class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2"
+                            href="/teaching/" title="Teaching">
+                            <span class="inline-block align-text-bottom">
+
+</span>
+                            
+                            Teaching
+                        </a>
+                    </li>
+                    
+                    <li class="mb-1">
+                        <a  class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2"
+                            href="/projects/" title="Projects">
+                            <span class="inline-block align-text-bottom">
+
+</span>
+                            
+                            Projects
+                        </a>
+                    </li>
+                    
+                    <li class="mb-1">
+                        <a  class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2"
+                            href="/contact/" title="Contact">
+                            <span class="inline-block align-text-bottom">
+
+</span>
+                            
+                            Contact
+                        </a>
+                    </li>
+                    
+                    <li class="mb-1">
+                        <a  class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2"
+                            href="/photography/" title="Photography">
+                            <span class="inline-block align-text-bottom">
+
+</span>
+                            
+                            Photography
+                        </a>
+                    </li>
+                    
+                    
+
+                </ul>
+            </div>
+        </label>
+    </div>
+</div>
+  
+  <div class="relative flex flex-col grow">
+    <main id="main-content" class="grow">
+      
+  
+  
+    <article class="max-w-full prose dark:prose-invert">
+    <div class="relative">
+        <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gray-100"></div>
+        <div class="mx-auto max-w-7xl p-0">
+            <div class="relative sm:overflow-hidden">
+                <div class="fixed inset-x-0 top-0" style="z-index:-10">
+                    
+                    
+                    
+                    
+                    <img class="w-full h-[1000px] object-cover m-0 nozoom" src="/img/backgrounds/Dasht-e_Kavir.jpg">
+                    <div
+                        class="absolute inset-0 h-[1000px] bg-gradient-to-t from-neutral dark:from-neutral-800 to-transparent mix-blend-normal">
+                    </div>
+                    <div
+                        class="opacity-70 absolute inset-0 h-[1000px] bg-gradient-to-t from-neutral dark:from-neutral-800 to-neutral dark:to-neutral-800 mix-blend-normal">
+                    </div>
+                    
+                </div>
+                <div class="relative px-4 py-16 sm:px-6 sm:py-16 lg:py-24 lg:px-8 flex flex-col items-center justify-center text-center">
+                    
+                    
+                    
+                    
+                    <img class="mb-2 rounded-full h-38 w-38" width="250" height="250"
+                        alt="Ammar Mian" src="/img/profile_hu2ba03ca2ad58d40ae4ad4ed471dc2bdd_5879627_700x700_fill_q75_box_smart1.jpg" />
+                    
+                    
+                    <h1 class="mb-2 text-4xl font-extrabold text-neutral-800 dark:text-neutral-200">
+                        Ammar Mian
+                    </h1>
+                    
+                    <h2 class="mt-0 mb-0 text-xl text-neutral-800 dark:text-neutral-300">
+                        Human being, I guess
+                    </h2>
+                    
+                    <div class="mt-1 mb-10 text-2xl">
+                        
+                        <div class="flex flex-wrap">
+                            
+                            
+                            <a class="px-1 hover:text-primary-400 text-primary-800 dark:text-primary-200" href="mailto:ammar.mian@univ-smb.fr" target="_blank"
+                                aria-label="Email" rel="me noopener noreferrer">
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M207.8 20.73c-93.45 18.32-168.7 93.66-187 187.1c-27.64 140.9 68.65 266.2 199.1 285.1c19.01 2.888 36.17-12.26 36.17-31.49l.0001-.6631c0-15.74-11.44-28.88-26.84-31.24c-84.35-12.98-149.2-86.13-149.2-174.2c0-102.9 88.61-185.5 193.4-175.4c91.54 8.869 158.6 91.25 158.6 183.2l0 16.16c0 22.09-17.94 40.05-40 40.05s-40.01-17.96-40.01-40.05v-120.1c0-8.847-7.161-16.02-16.01-16.02l-31.98 .0036c-7.299 0-13.2 4.992-15.12 11.68c-24.85-12.15-54.24-16.38-86.06-5.106c-38.75 13.73-68.12 48.91-73.72 89.64c-9.483 69.01 43.81 128 110.9 128c26.44 0 50.43-9.544 69.59-24.88c24 31.3 65.23 48.69 109.4 37.49C465.2 369.3 496 324.1 495.1 277.2V256.3C495.1 107.1 361.2-9.332 207.8 20.73zM239.1 304.3c-26.47 0-48-21.56-48-48.05s21.53-48.05 48-48.05s48 21.56 48 48.05S266.5 304.3 239.1 304.3z"/></svg>
+
+  </span>
+
+</a>
+                            
+                            
+                            
+                            <a class="px-1 hover:text-primary-400 text-primary-800 dark:text-primary-200" href="https://ammarmian.github.io/" target="_blank"
+                                aria-label="Link" rel="me noopener noreferrer">
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path fill="currentColor" d="M172.5 131.1C228.1 75.51 320.5 75.51 376.1 131.1C426.1 181.1 433.5 260.8 392.4 318.3L391.3 319.9C381 334.2 361 337.6 346.7 327.3C332.3 317 328.9 297 339.2 282.7L340.3 281.1C363.2 249 359.6 205.1 331.7 177.2C300.3 145.8 249.2 145.8 217.7 177.2L105.5 289.5C73.99 320.1 73.99 372 105.5 403.5C133.3 431.4 177.3 435 209.3 412.1L210.9 410.1C225.3 400.7 245.3 404 255.5 418.4C265.8 432.8 262.5 452.8 248.1 463.1L246.5 464.2C188.1 505.3 110.2 498.7 60.21 448.8C3.741 392.3 3.741 300.7 60.21 244.3L172.5 131.1zM467.5 380C411 436.5 319.5 436.5 263 380C213 330 206.5 251.2 247.6 193.7L248.7 192.1C258.1 177.8 278.1 174.4 293.3 184.7C307.7 194.1 311.1 214.1 300.8 229.3L299.7 230.9C276.8 262.1 280.4 306.9 308.3 334.8C339.7 366.2 390.8 366.2 422.3 334.8L534.5 222.5C566 191 566 139.1 534.5 108.5C506.7 80.63 462.7 76.99 430.7 99.9L429.1 101C414.7 111.3 394.7 107.1 384.5 93.58C374.2 79.2 377.5 59.21 391.9 48.94L393.5 47.82C451 6.731 529.8 13.25 579.8 63.24C636.3 119.7 636.3 211.3 579.8 267.7L467.5 380z"/></svg>
+
+  </span>
+
+</a>
+                            
+                            
+                            
+                            <a class="px-1 hover:text-primary-400 text-primary-800 dark:text-primary-200" href="https://github.com/ammarmian" target="_blank"
+                                aria-label="Github" rel="me noopener noreferrer">
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+
+  </span>
+
+</a>
+                            
+                            
+                            
+                            <a class="px-1 hover:text-primary-400 text-primary-800 dark:text-primary-200" href="https://orcid.org/0000-0003-1796-8707" target="_blank"
+                                aria-label="Orcid" rel="me noopener noreferrer">
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M294.75 188.19h-45.92V342h47.47c67.62 0 83.12-51.34 83.12-76.91 0-41.64-26.54-76.9-84.67-76.9zM256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm-80.79 360.76h-29.84v-207.5h29.84zm-14.92-231.14a19.57 19.57 0 1 1 19.57-19.57 19.64 19.64 0 0 1-19.57 19.57zM300 369h-81V161.26h80.6c76.73 0 110.44 54.83 110.44 103.85C410 318.39 368.38 369 300 369z"/></svg>
+
+  </span>
+
+</a>
+                            
+                            
+                            
+                            <a class="px-1 hover:text-primary-400 text-primary-800 dark:text-primary-200" href="https://www.researchgate.net/profile/Ammar-Mian" target="_blank"
+                                aria-label="Researchgate" rel="me noopener noreferrer">
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M0 32v448h448V32H0zm262.2 334.4c-6.6 3-33.2 6-50-14.2-9.2-10.6-25.3-33.3-42.2-63.6-8.9 0-14.7 0-21.4-.6v46.4c0 23.5 6 21.2 25.8 23.9v8.1c-6.9-.3-23.1-.8-35.6-.8-13.1 0-26.1.6-33.6.8v-8.1c15.5-2.9 22-1.3 22-23.9V225c0-22.6-6.4-21-22-23.9V193c25.8 1 53.1-.6 70.9-.6 31.7 0 55.9 14.4 55.9 45.6 0 21.1-16.7 42.2-39.2 47.5 13.6 24.2 30 45.6 42.2 58.9 7.2 7.8 17.2 14.7 27.2 14.7v7.3zm22.9-135c-23.3 0-32.2-15.7-32.2-32.2V167c0-12.2 8.8-30.4 34-30.4s30.4 17.9 30.4 17.9l-10.7 7.2s-5.5-12.5-19.7-12.5c-7.9 0-19.7 7.3-19.7 19.7v26.8c0 13.4 6.6 23.3 17.9 23.3 14.1 0 21.5-10.9 21.5-26.8h-17.9v-10.7h30.4c0 20.5 4.7 49.9-34 49.9zm-116.5 44.7c-9.4 0-13.6-.3-20-.8v-69.7c6.4-.6 15-.6 22.5-.6 23.3 0 37.2 12.2 37.2 34.5 0 21.9-15 36.6-39.7 36.6z"/></svg>
+
+  </span>
+
+</a>
+                            
+                            
+                        </div>
+                        
+                    </div>
+                    <section class="prose dark:prose-invert" style="text-align: left;"><p>I am an associate professor at <a href="https://www.univ-smb.fr/"   target="_blank">
+    Université Savoie Mont Blanc</a> where I do my research in the <a href="https://www.listic.univ-smb.fr/en/home/"   target="_blank">
+    LISTIC</a> lab. I teach in <a href="https://www.polytech.univ-smb.fr"   target="_blank">
+    Polytech Annecy-Chambéry</a>.</p>
+<div id="recent-news" class="anchor">Recent news></div>
+<h3 class="relative group">Recent news 
+    <span
+        class="absolute top-0 w-6 transition-opacity opacity-0 ltr:-left-6 rtl:-right-6 not-prose group-hover:opacity-100">
+        <a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700"
+            style="text-decoration-line: none !important;" href="#recent-news" aria-label="Anchor">#</a></span>        
+    
+</h3>
+<section class="w-full mt-10 mb-10">
+    
+    
+        
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <a class="flex flex-wrap article border border-neutral-200 dark:border-neutral-700 border-2 rounded-md backdrop-blur" href="/news/internship_transfer_learning_2022/">
+    <div class=" p-4">
+      <div class="items-center text-xl font-semibold">
+        
+        <div class="font-bold text-xl text-neutral-800 decoration-primary-500 hover:underline hover:underline-offset-2 dark:text-neutral"
+          href="/news/internship_transfer_learning_2022/">Internship proposal on Riemannian domain adaptation for remote sensing application</div>
+        
+        
+        
+      </div>
+      <div class="text-sm text-neutral-500 dark:text-neutral-400">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  <time datetime="2021-10-31 00:00:00 &#43;0000 UTC">31 October 2021</time><span class="px-2 text-primary-500">&middot;</span><span>750 words</span><span class="px-2 text-primary-500">&middot;</span><span title="Reading time">4 mins</span>
+  
+
+  
+  
+</div>
+
+
+
+
+
+<div class="flex flex-row flex-wrap items-center">
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/internship/&#34;);">
+    <span class="flex">
+  <span
+    class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400"
+  >
+    Internship
+  </span>
+</span>
+
+  </span>
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/machine-learning/&#34;);">
+    <span class="flex">
+  <span
+    class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400"
+  >
+    Machine learning
+  </span>
+</span>
+
+  </span>
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/riemannian-geometry/&#34;);">
+    <span class="flex">
+  <span
+    class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400"
+  >
+    Riemannian geometry
+  </span>
+</span>
+
+  </span>
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/domain-adaptation/&#34;);">
+    <span class="flex">
+  <span
+    class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400"
+  >
+    Domain adaptation
+  </span>
+</span>
+
+  </span>
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/transfer-learning/&#34;);">
+    <span class="flex">
+  <span
+    class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400"
+  >
+    Transfer Learning
+  </span>
+</span>
+
+  </span>
+  
+  <span style="margin-top:0.5rem" class="mr-2" onclick="window.open(&#34;/tags/remote-sensing/&#34;);">
+    <span class="flex">
+  <span
+    class="rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400"
+  >
+    Remote Sensing
+  </span>
+</span>
+
+  </span>
+  
+  
+  
+  
+</div>
+
+
+
+      </div>
+      
+    </div>
+  </a>
+        
+    
+</section>
+<div style="padding-left:45%"><a  href="news/"><span class="rounded-md border border-primary-400 px-2 py-[1px] font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400">More</span></a></div>
+<!-- <img style="position:relative; margin-left:auto; margin-right:auto" src="img/logo.png" width=200> --></section>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+<section>
+    
+
+
+</section>
+
+<div id="background-blur" class="fixed opacity-0 inset-x-0 top-0 h-full single_hero_background nozoom backdrop-blur-2xl"></div>
+<script>
+    window.addEventListener('scroll', function (e) {
+        var scroll = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+        var background_blur = document.getElementById('background-blur');
+        background_blur.style.opacity = (scroll / 300)
+    });
+</script>
+
+
+  
+
+      
+    </main><footer class="py-10 print:hidden">
+  
+  
+    
+    <nav class="flex flex-row pb-4 text-base font-medium text-neutral-500 dark:text-neutral-400">
+      <ul class="flex flex-col list-none sm:flex-row">
+        
+        <li class="flex mb-1 ltr:text-right rtl:text-left sm:mb-0 ltr:sm:mr-7 ltr:sm:last:mr-0 rtl:sm:ml-7 rtl:sm:last:ml-0">
+          <a class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2" href="/tags/"
+            title="Tags">Tags</a>
+        </li>
+        
+      </ul>
+    </nav>
+    
+  
+  <div class="flex items-center justify-between">
+
+    
+    
+    <p class="text-sm text-neutral-500 dark:text-neutral-400">
+      @2022, Ammar Mian. Background Images: <a href="https://www.esa.int/ESA_Multimedia/Sets/Earth_observation_image_of_the_week/(result_type)/images">ESA</a>
+    </p>
+    
+
+    
+    
+    <p class="text-xs text-neutral-500 dark:text-neutral-400">
+      
+      
+      Powered by <a class="hover:underline hover:decoration-primary-400 hover:text-primary-500"
+        href="https://gohugo.io/" target="_blank" rel="noopener noreferrer">Hugo</a> &amp; <a class="hover:underline hover:decoration-primary-400 hover:text-primary-500"
+        href="https://nunocoracao.github.io/blowfish/" target="_blank" rel="noopener noreferrer">Blowfish</a>
+    </p>
+    
+
+  </div>
+  <script>
+    
+    mediumZoom(document.querySelectorAll("img:not(.nozoom)"), {
+      margin: 24,
+      background: 'rgba(0,0,0,0.5)',
+      scrollOffset: 0,
+    })
+    
+  </script>
+  
+  
+  <script type="text/javascript" src="/js/process.min.e7c3599dbb1cedb20b622602837cde52ffd76433ccf3544defb2f071860d81580f68eb150111f9b7fabdeda3aacb803d34d2d8a0a0a9f10410e9d20b98b1f4a1.js" integrity="sha512-58NZnbsc7bILYiYCg3zeUv/XZDPM81RN77LwcYYNgVgPaOsVARH5t/q97aOqy4A9NNLYoKCp8QQQ6dILmLH0oQ=="></script>
+  
+  
+</footer><div
+  id="search-wrapper"
+  class="invisible fixed inset-0 flex h-screen w-screen cursor-default flex-col bg-neutral-500/50 p-4 backdrop-blur-sm dark:bg-neutral-900/50 sm:p-6 md:p-[10vh] lg:p-[12vh]"
+  data-url="https://ammarmian.github.io/"
+  style="z-index:500"
+>
+  <div
+    id="search-modal"
+    class="flex flex-col w-full max-w-3xl min-h-0 mx-auto border rounded-md shadow-lg top-20 border-neutral-200 bg-neutral dark:border-neutral-700 dark:bg-neutral-800"
+  >
+    <header class="relative z-10 flex items-center justify-between flex-none px-2">
+      <form class="flex items-center flex-auto min-w-0">
+        <div class="flex items-center justify-center w-8 h-8 text-neutral-400">
+          
+
+  <span class="relative block icon">
+    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="search" class="svg-inline--fa fa-search fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"/></svg>
+
+  </span>
+
+
+        </div>
+        <input
+          type="search"
+          id="search-query"
+          class="flex flex-auto h-12 mx-1 bg-transparent appearance-none focus:outline-dotted focus:outline-2 focus:outline-transparent"
+          placeholder="Search"
+          tabindex="0"
+        />
+      </form>
+      <button
+        id="close-search-button"
+        class="flex items-center justify-center w-8 h-8 text-neutral-700 hover:text-primary-600 dark:text-neutral dark:hover:text-primary-400"
+        title="Close (Esc)"
+      >
+        
+
+  <span class="relative block icon">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"/></svg>
+
+  </span>
+
+
+      </button>
+    </header>
+    <section class="flex-auto px-2 overflow-auto">
+      <ul id="search-results">
+        
+      </ul>
+    </section>
+  </div>
+</div>
+
+  </div>
+</body>
+
+</html>

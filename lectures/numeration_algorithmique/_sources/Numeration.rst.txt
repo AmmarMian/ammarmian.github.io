@@ -1,0 +1,551 @@
+.. -*- coding: utf-8 -*-
+
+************************************
+Notion de représentation des données
+************************************
+
+Ce chapitre aborde de manière rapide quelques notions importantes
+pour la représentation des données. Un travail personnel est nécessaire 
+pour approfondir les différentes notions traitées.
+
+Notion de codage
+================
+    
+En informatique, toute information est représentée par une suite de 0 ou 1.
+Un élément :math:`x \in \{0,1\}` est appelé un "bit" (contraction de binary digit).
+Un bit prend donc deux valeurs différentes.
+
+Un codage est un processus qui permet de passer d'une représentation d'informations à une autre, de manière 
+bijective pour ce cours (il existe des codage non bijectifs comme ceux qui servent à crypter les mots de passe).
+
+Avec un code sur un bit on peut représenter deux informations différentes.
+A titre d'exemple la :numref:`Codage1bit` représente deux informations que nous allons appeler "On" et "Off".
+
+.. _Codage1bit:
+
+.. figure:: Images/Codage1bit.png
+  :scale: 40%
+  :align: center
+  
+  Deux voyants lumineux - source : https://pixabay.com
+  
+On peut définir une fonction de codage :math:`f: \{On, Off\} \rightarrow \{0, 1\}` telle que
+:math:`f(Off) = 0` et :math:`f(On) = 1`. 
+La fonction de décodage est :math:`f^{-1}: \{0, 1\} \rightarrow \{Off, On\}` telle que 
+:math:`f^{-1}(0) = Off` et :math:`f^{-1}(1) = On`.
+
+Avec 2 bits, on peut représenter 2x2 informations. 
+
+Avec trois 3 bits, on peut représenter 2x2x2 informations.
+
+D'une manière générale, un code sur :math:`n` bits permet de représenter :math:`2^n` informations.         
+
+De manière réciproque, pour représenter :math:`m` informations il faut au moins :math:`\lceil log_2(m) \rceil` bits où la notation :math:`\lceil x \rceil` représente l'entier 
+immédiatement supérieur à :math:`x` et :math:`log_2(m)` est le logarithme en base 2 de :math:`m` soit :math:`log_2(m) = log(m) / log(2)`.
+ 
+.. admonition:: Exemple
+
+    Soit :math:`m = 223` informations différentes à représenter.
+    
+    :math:`log_2(223) = 7.8008 …`
+    
+    :math:`\lceil log_2(223) \rceil = 8`.
+    
+    Il faut donc au minimum 8 bits.
+     
+.. admonition:: Exercice
+
+    Depuis 2009, la France utilise un nouveau système de numérotation des véhicules. 
+
+    .. figure:: Images/CodagePlaqueImmatriculation.png  
+        :scale: 40%
+        :align: center 
+          
+        Spécimen de plaque - source Wikipédia
+
+    Actuellement, les lettres I, O, U ne sont pas utilisées pour éviter les confusions avec, 
+    respectivement, 1, 0 et V. Le couple de lettres SS n’est ni utilisé à gauche, 
+    ni à droite. Le couple de lettres WW n’est pas utilisé à droite.
+
+    - Avec ce système, combien de véhicules peut-on immatriculer ?
+    - Si l’on affectait un code binaire à chaque véhicule pouvant être représenté selon ce code, 
+      combien de bits seraient nécessaires ?
+    - En choisissant un code binaire pour chaque lettre et un code binaire pour le nombre, 
+      combien de bits seraient nécessaires ?
+    - Sachant qu’il y avait environ 37 millions de véhicules immatriculés en 2009 et 
+      qu’il y a environ 3 millions de nouvelles immatriculations chaque année, 
+      quelle est la durée approximative de ce codage ?
+
+.. admonition:: Exercice 
+
+    Soit :math:`A` une partie (sous-ensemble) d'un ensemble fini :math:`E`. 
+    Proposer une représentation simple de :math:`A` qui permette, de vérifier si :math:`B`, 
+    une autre partie de :math:`E`, est incluse dans :math:`A`. 
+
+    **Conseil** :  faire une analogie entre le nombre de parties possibles d’un ensemble :math:`E` à :math:`n` éléments et 
+    le nombre d’informations représentables sur :math:`n` bits. En déduire un codage pour représenter un sous-ensemble de :math:`E`. 
+    
+    L’intersection des deux ensembles permet de savoir si une partie est incluse dans une autre. 
+    Avec le codage précédent, déterminer l’opération logique entre les codes des deux sous-ensembles 
+    qui permette de répondre au problème.
+    
+
+Représentation des nombres entiers non signés
+=============================================
+
+Un nombre est représenté par une suite de chiffres lus de gauche à droite. Pour un
+nombre exprimé en base :math:`B`, chaque chiffre appartient à un ensemble de :math:`B` symboles distincts.
+
+- En base 2 (système binaire) : :math:`x \in \{0,1\}`
+- En base 8 (système octal) : :math:`x \in \{0,1,2,3,4,5,6,7\}`
+- En base 10 (système décimal) : :math:`x \in \{0,1,2,3,4,5,6,7,8,9\}`
+- En base 16 (système hexadécimal) : :math:`x \in \{0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F\}`
+
+On notera :math:`N_B` un nombre exprimé en base :math:`B`. Lorsqu'il n'y a pas d'ambiguïté, on 
+écrira :math:`N` lorsque :math:`N` est exprimé en base 10. Ainsi, :math:`11_{10} = 11`.
+
+On écrira :math:`(N_A)_B` la conversion du nombre :math:`N` exprimé en base :math:`A` vers la base :math:`B`.
+
+.. admonition:: Exemples
+
+    - :math:`(9_{10})_2 = 1001_2`
+    - :math:`(11_2)_{10} = 3`   
+    - :math:`(11101_2)_{16} = 1D_{16}`
+    
+Soit :math:`N_B` un nombre en base :math:`B` sur :math:`n` chiffres notés :math:`x_i, i\in\{0, n-1\}`. 
+
+:math:`N_B = x_{n-1}...x_2x_1x_0\ _B`.
+
+La conversion de ce nombre en base 10 s'effectue en affectant à chaque :math:`x_i` son poids :math:`p_i` en base 10 multiplié par :math:`B^i`. Ainsi :
+
+:math:`(N_B)_{10} = p_{n-1}.B^{n-1} +...+ p_2.B^2+p_1.B^1+p_0.B^0`.
+
+En suppposant que les chiffres de la base soient placés dans une liste ordonnée, le poids du chiffre est la position du chiffre dans cette liste.
+Ainsi, en base 2, en base 8 et de façon plus générale dans les bases inférieures ou égale à 10, le poids d'un chiffre en base 10 est le chiffre lui-même.
+
+En base 16, les poids des chiffres de 0 à 9 sont les mêmes qu'en base 10. Les chiffres :math:`A, B, C, D, E, F` ont respectivement les poids
+10, 11, 12, 13, 14 et 15.
+
+.. admonition:: Exercice 
+
+    - Soient :math:`T = 323_8, U = 323_{16}, V = 1AF_{16}, W = 323_3`, 
+      comment s’écrivent respectivement ces nombres en base 10 ?
+    
+    - Soit :math:`X = 111011_2` , comment s’écrit ce nombre en base 10 et en base 16 ?
+    
+.. admonition:: Exercice
+
+    On a vu que si :math:`N_B = x_{n-1}...x_2x_1x_0\ _B` sa conversion en base 10 est :math:`(N_B)_{10} = p_{n-1}.B^{n-1} +...+ p_2.B^2+p_1.B^1+p_0.B^0`.
+    
+    - Quelle information fournit la division euclidienne de :math:`(N_B)_{10}` par :math:`B`?
+    - En déduire un principe général de conversion d'un nombre en base 10 vers une base quelconque.
+    - Convertir le nombre 125 en base 2, en base 8 et en base 16 selon ce principe.
+    - Retrouver les conversions en base 8 et en base 16 précédentes directement à partir de la conversion en base 2. 
+
+On écrira :math:`^P(N_A)_B` la conversion du nombre :math:`N` exprimé en base :math:`A` vers la base :math:`B` sur :math:`P` chiffres. 
+
+.. admonition:: Exemples
+
+    - :math:`^8(9_{10})_2 = 00001001_2`
+    - :math:`^4(11_2)_{10} = 0003`
+
+Dans de nombreux langages de programmation, la représentation d'un nombre entier repose 
+sur un codage exprimé sur un nombre de bits donné.
+
+- Entier sur 8 bits : le codage est :math:`^8(N_{10})_2` 
+- Entier sur 16 bits : le codage est :math:`^{16}(N_{10})_2`
+- Entier sur 32 bits : le codage est :math:`^{32}(N_{10})_2` 
+
+Addition de nombres non signés
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+D'une manière générale, dans une base quelconque, l'addition s'effectue 
+dans la base, chiffres par chiffres, en commençant par le chiffre de plus faible poids et en propageant la retenue.
+On notera :math:`+_B` l'addition dans la base :math:`B`.
+
+.. admonition:: Exemples
+
+    - :math:`81_{10} +_{10} 89_{10} = 170_{10}` ;
+    - :math:`81_{16} +_{16} 89_{16} = 10A_{16}`;
+    - :math:`00101_{2} +_{2} 01110_{2} = 10011_{2}`.
+
+Lorsque la représentation s'effectue sur un nombre de chiffres donné, l'existence d'une retenue finale indique un débordement, c'est-à-dire l'impossibilité
+de représenter correctement le résultat dans le format donné. 
+
+.. note::
+
+    Les unités arithmétiques et logiques des microprocesseurs intègrent ce processus de détection en positionnant un indicateur, souvent noté C, lorsque ce cas arrive.
+    Il revient au programmeur, selon les langages de programmation qu'il utilise de veiller à ces problèmes de débordement.
+    
+.. admonition:: Exemples
+
+    - Soient :math:`U = 28` et :math:`V = 5` deux nombres dont on calcule la somme sur une machine informatique sur 8 bits. 
+      L'opération est représentée :numref:`AdditionNonSigneSansDebordement`. Le calcul conduit à une retenue finale non positionnée. Il n'y a donc pas de débordement.
+      Effectivement, le décodage du résultat donne :math:`00100001_2 = 33_{10}` qui est bien la somme de 28 et 5.
+    
+      .. _AdditionNonSigneSansDebordement:
+       
+      .. figure:: Images/AdditionNonSigneSansDebordement.png  
+            :scale: 40%
+            :align: center 
+      
+            Addition de deux nombres non signés sans débordement   
+
+    - On effectue maintenant la même opération avec les nombres :math:`U = 128` et :math:`V = 129`. 
+      Le calcul, illustré :numref:`AdditionNonSigneAvecDebordement`, conduit à une retenue finale positionnée. Il y a donc débordement et le résultat sera incorrect.
+      En effet, le résultat s'exprime dans le format donné, c'est-à-dire sur 8 bits. 
+      Ainsi, son décodage donne :math:`00000001_2 = 1_{10}` qui n'est pas la somme de 128 et 129.
+      
+      On rappelle qu'avec 8 bits, le nombre de codes possibles est :math:`2^8 = 256`. La fonction de codage choisie permet de représenter les entiers positifs entre
+      0 et 255. La somme de 128 et 129 vaut 257 qui n'est pas représentable dans ce format.
+    
+      .. _AdditionNonSigneAvecDebordement:
+      
+      .. figure:: Images/AdditionNonSigneAvecDebordement.png  
+            :scale: 40%
+            :align: center  
+            
+            Addition de deux nombres non signés avec débordement                      
+    
+Nombres entiers signés
+======================
+
+Introduction
+^^^^^^^^^^^^
+
+Si aujourd'hui les notions de nombres positifs et nombres négatifs sont familières, il n'en a pas toujours été de même 
+(voir `histoire des nombres négatifs`_).
+
+Usuellement on distingue un nombre positif d'un nombre négatif par l'utilisation de deux symboles supplémentaires, respectivement + et -. 
+En cas d'omission du signe + le nombre est considéré comme positif.
+
+Une idée simple consiste à considérer ces deux symboles supplémentaires comme deux informations à coder.  On peut donc penser à ajouter un bit
+à la valeur absolue pour coder le signe. Supposons une représentation de la valeur absolue des nombres sur 3 bits. On peut donc représenter 
+:math:`2^3` nombres soit les entiers de 0 à 7. L'ajout d'un bit pour le signe conduit à un codage sur 4 bits. On dispose de 16 codes pour représenter les
+nombres de -7 à +7 avec deux représentations possibles du 0, c'est-à-dire -0 et +0.
+
+Choisissons pour ce bit, par exemple, la valeur 0 pour coder un nombre positif et la valeur 1 pour un nombre négatif. 
+Le nombre +3 et -3 s'écriraient respectivement :math:`{\color{red}0}011_2` et :math:`{\color{red}1}011_2`.
+
+Cette représentation présente deux inconvénients :
+
+- le nombre 0 a deux codes différents (+0 et 0). En reprenant le codage précédent, les deux codes seraient :math:`{\color{red}0}000_2` et :math:`{\color{red}1}000_2`.
+- l'utilisation de nombres négatifs dans une opération d'addition donne des résultats incorrects. Ainsi l'addition du nombre +3 (code :math:`{\color{red}0}011_2`) et
+  du nombre -2 (code :math:`{\color{red}1}010_2`) donne le code :math:`{\color{red}1}101_2` dont le décodage serait -5. 
+
+Utilisation du code complément
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+L'idée du code complément repose sur un autre principe. Considérons que nous disposons toujours de 4 bits, soit 16 codes possibles. On réserve la moitié des codes
+pour les nombres positifs en utilisant la fonction de codage des nombres entiers non signés soit :math:`^4(N_{10})_2`. Les nombres positifs vont donc de 0 à 7. 
+Ainsi le nombre +3 est codé 0011\ :sub:`2`.
+
+Les 8 codes restants sont utilisés pour représenter les nombres strictement négatifs. On ira donc de -8 à -1. L'avantage de cette représentation est d'éviter 
+d'avoir deux codes pour 0, l'inconvénient est de désymétriser les échelles (-8 pour le plus petit nombre négatif et +7 pour le plus grand nombre positif).
+
+Les huit codes restants sont tels que l'opération d'addition donne un décodage correct. 
+On peut formaliser ce principe dans une base paire :math:`B` sur :math:`P` chiffres en posant :
+
+:math:`^P(N)_B +_B {^P(-N)_B} = {^P(0)_B}` où :math:`+_B` représente l'addition dans la base :math:`B`.
+
+.. admonition:: Exemple
+
+    Illustrons ce principe en base 10 sur 4 chiffres. Sur les :math:`10^4` codes disponibles, la moitié servent à coder les nombres positifs ou nul en utilisant 
+    la fonction de codage :math:`^4(N)` : le nombre 0 s'écrit 0000, le nombre 3 s'écrit 0003 et le plus grand nombre positif représentable est 4999 qui s'écrit 4999.
+    
+    Le codage des nombres négatifs s'effectue en résolvant l'équation précédente. Ainsi le code du nombre -3 est tel que :
+    
+    :math:`^4(3) + {^4(-3)} = {^4(0)}` soit :math:`0003 + {^4(-3)} = 0000`. 
+    
+    Le code de -3 est donc la valeur qu'il faut ajouter à 3 pour que les quatre derniers chiffres de l'opération d'addition valent 0000. 
+    Ainsi, :math:`^4(-3) = 9997`. En effet dans l'opération d'addition 3 + 9997 donne 10000 dont les quatre derniers chiffres sont bien 0000.
+    
+.. important::
+    
+    Il est impératif de respecter l'écriture sur :math:`P` chiffres. On rappelle que l'on peut omettre la base 10 dans l'écriture lorsqu'il n'y a pas d'ambiguïté.
+             
+L'exemple intuitif précédent permet de formuler la propriété suivante :
+
+Pour une base :math:`B` paire et :math:`P` chiffres, :math:`^P(-N)_B = {^P(B^P - N)_B}`. 
+
+.. note::
+    
+    Dans le codage des nombres négatifs :
+    
+    - Le résultat du calcul :math:`B^P - N` est toujours supérieur ou égal à :math:`B^P / 2` et s'écrit, par conséquent, sur :math:`P` chiffres. 
+    
+    - La valeur du chiffre de plus fort poids est toujours supérieure ou égale à :math:`B/2`. Cette propriété permet de distinguer facilement 
+      le codage d'un nombre positif de celui d'un nombre négatif.
+      Ceci est particulièrement simple en base 2 où le bit de poids fort du code vaudra 0 pour les nombres positifs et 1 pour les nombres négatifs.
+      On appelle ce bit, le bit de signe. Il est important de bien comprendre la différence entre ce codage et la représentation signe + valeur absolue vue au
+      paragraphe précédent.
+      
+.. admonition:: Exercice
+
+    - Dans une représentation en base 2 sur 8 bits, donner le code de 3 puis le code de -3.
+    - Dans une représentation en base 4 sur 3 chiffres, donner le code de 3 puis de -3.
+          
+Revenons à notre formulation précédente qui présente l'inconvénient de nécessiter une opération de soustraction alors que nous avions souhaité n'utiliser 
+que des additions. Afin d'aboutir à un résultat facilement réalisable sur une machine informatique, il nous faut introduire la notion de complément.
+
+Soit :math:`x_B` un chiffre exprimé d'une base :math:`B`. On appelle complément en base :math:`B` de  :math:`x_B`, que l'on notera :math:`x^*_B`, le chiffre tel que :
+
+:math:`x_B +_B x^*_B = (B - 1)_B`.
+
+.. admonition:: Exemples
+
+    - en base 2, :math:`1^*_2 = 0_2` car :math:`1_2 +_2 0_2 = 1_2 = 1`;
+    - en base 8, :math:`1^*_8 = 6_8` car :math:`1_8 +_8 6_8 = 7_8 = 7` ;
+    - en base 16, :math:`1^*_{16} = E_{16}` car :math:`1_{16} +_{16} E_{16} = F_{16} = 15`.
+     
+.. note::
+
+    Le complément est involutif, c'est-à-dire :math:`x_B^{**} = x_B`.    
+        
+Soit :math:`^P(N)_B` un nombre en base :math:`B` sur :math:`P` chiffres, le complément de :math:`^P(N)_B`, noté :math:`^P(N)_B^*`, 
+est obtenu en calculant le complément en base :math:`B` de chaque chiffre de :math:`^P(N)_B`. 
+
+.. admonition:: Exemples
+
+    - en base 2 sur 8 bits, :math:`01011000_2^* = 10100111_2`
+    - en base 10 sur 3 chiffres, :math:`108^* = 891`
+
+Soit :math:`N_B` un nombre en base :math:`B` et :math:`P` un nombre de chiffres alors :math:`^P(N)_B +_B {^P(N)_B^*} = {^P(B^P - 1)_B}`.
+
+.. admonition:: Exemples
+
+    - en base 2 sur 8 bits, :math:`01011000_2 +_2 01011000_2^* = 01011000_2 +_2 10100111_2 = 11111111_2 = 255 = 2^8 - 1`
+    - en base 10 sur 3 chiffres, :math:`108 + 108^* = 108 + 891 = 999 = 10^3 - 1`
+
+De la propriété précédente on déduit :math:`B^P = (^P(N)_B +_B {^P(N)_B^*)_{10}} + 1`.
+Nous pouvons maintenant utiliser :math:`B^P` dans l'expression du calcul de :math:`^P(-N)_B = {^P((^P(N)_B} +_B {^P(N)_B^*)_{10}} + 1 - N)_B`. 
+L'expression :math:`(^P(N)_B +_B {^P(N)_B^*)_{10}}` peut s'écrire :math:`(^P(N)_B)_{10} +_{10} (^P(N)_B^*)_{10} = N + (^P(N)_B^*)_{10}`.
+On obtient donc :math:`^P(-N)_B = {^P((^P(N)_B^*)_{10} + 1)_B}`. 
+
+Notons que :math:`(^P(N)_B^*)_{10} + 1 < B^P` et s'écrit donc sur :math:`P` chiffres, ce qui permet de simplifier l'écriture.
+En repassant en base :math:`B` on obtient :
+
+:math:`^P(-N)_B = {^P(N)_B^*} +_B 1`. 
+
+Ce code est appelé code complément à :math:`B`.
+
+.. admonition:: Exemple
+
+    - Retrouvons, par ce nouveau calcul, le code de -3 en base 10 sur 4 chiffres que nous avions trouvé de manière
+      plus intuitive. On a donc :
+      
+      :math:`^4(-3) = {^4(3)^*} + 1` 
+      
+      :math:`^4(3)^* = 0003^* = 9996` donc
+      
+      :math:`^4(-3) = 9996 + 1 = 9997`.
+      
+    - Effectuons le même calcul en base 2 sur 8 bits, soit :
+    
+      :math:`^8(-3)_2 = {^8(3)_2^*} +_2 1`. 
+      
+      :math:`^8(3)_2^* = 00000011_2^* = 11111100_2` donc
+      
+      :math:`^8(-3)_2 = 11111100_2 +_2 1 = 11111101_2`.
+
+.. note::
+    
+    La complémentation d'un bit est une opération qui ne nécessite qu'un seul transistor. Le code complément à deux est donc 
+    un moyen peu coûteux pour représenter les nombres négatifs sur une machine informatique.
+    
+.. important::
+    
+    Avec nos notations, la fonction de codage d'un nombre entier signé :math:`N` dans une base :math:`B` paire sur :math:`P` chiffres
+    est la suivante :    
+    
+    - si :math:`0 \leq N < B^N/2` alors :math:`f(N) = {^P(N)_B}` ;
+    - si :math:`-B^N/2 \leq N <0` alors :math:`f(N) = {^P(-N)_B^*} +_B 1`.
+    
+.. admonition:: Exercice
+
+    - Calculer le code de -128 en base 2 sur 8 bits.
+    - Calculer le code de -3 en base 16 sur 4 chiffres.
+    - Si :math:`X` est la conversion d'un nombre négatif, c'est-à-dire :math:`X = {^P(-N)_B} = {^P(N)_B^*} +_B 1`,
+      que vaut :math:`X^* +_B\ 1` ? Vérifier le résultat sur la question précédente.
+    
+Addition de nombres signés
+^^^^^^^^^^^^^^^^^^^^^^^^^^    
+              
+L'addition de deux nombres signés s'effectuent en additionnant ces nombres dans la base dans laquelle ils sont représentés. 
+Nous utiliserons la base 2 sur 8 bits dans la suite de cette partie.
+
+Comme pour l'addition entre nombres non signés, l'addition de deux nombres signés peut donner un résultat incorrect dans
+la représentation choisie, c'est-à-dire sur le nombre de bits donné. On parle alors de débordement (overflow).
+
+La règle de détection de ces débordements est simple et repose sur l'observation du signe des opérandes et du résultat.
+Ainsi, si l'on effectue la somme deux nombres positifs et que le résultat est négatif ou si l'on effectue la somme deux nombres négatifs
+et que le résultat est positif, il y débordement. 
+
+.. admonition:: Exemple
+    
+    soient :math:`U = 7` et :math:`V = 123` deux nombres. Leur représentation respective en base 2 sur 8 bits est 
+    :math:`^8(U)_2 = {\color{red}0} 0000111_2` et :math:`^8(V)_2 = {\color{red}0} 1111011_2`. Les bits de signe de ces deux nombres, représentés
+    en rouge, valent 0 indiquant que les nombres sont positifs, comme nous l'avons vu précédemment.
+    
+    La somme de ces deux nombres est :math:`^8(U)_2 +_2 {^8(V)_2} = {\color{red}1}0000010_2= -126_{10}`. Le bit de signe du résultat est négatif, il y a
+    donc débordement car la somme de deux nombres positifs devrait être un nombre positif. Si l'on fait le calcul en base 10 la somme est 
+    :math:`U + V = 130` qui n'est pas représentable dans le format choisi. En effet, la plus grande valeur positive représentable en base 2 sur 8 bits est :math:`2^8 -1 = 127`. 
+    
+.. note::
+
+    Les unités arithmétiques et logiques des microprocesseurs intègrent ce processus de détection en positionnant un indicateur, souvent noté V ou OV, lorsque ce cas arrive.
+    Il revient au programmeur, selon les langages de programmation qu'il utilise de veiller à ces problèmes de débordement.
+
+.. admonition:: Exercice
+
+    - En base 2 sur 8 bits, on souhaite calculer les sommes :math:`S_1 = -2 + 5, S_2 = 4 + 7, S_3 = - 4 - 3,  S_4 = -125 - 9`. Pour chaque somme :
+    
+        - effectuer le calcul en base 2 ;
+        - donner la valeur de l'indicateur de débordement (on utilisera la valeur 1 s'il y a débordement, 0 dans le cas contraire) ;
+        - décoder le résultat en base 10 et comparer au résultat attendu.
+        
+    - Soient deux nombres signés :math:`U` et :math:`V`. Soit :math:`W =  U + V`. En notant :math:`S_U` et :math:`S_V` les signes respectifs des deux opérandes et :math:`S_W`
+      le signe du résultat, donner l'équation logique de l'indicateur de débordement.  
+      
+Nombres en virgule fixe
+=======================
+
+Ce paragraphe a pour vocation d'effectuer une transition vers la représentation des nombres flottants dans le format IEEE 754. L'idée de la représentation en virgule fixe consiste
+à considérer un code de :math:`n` chiffres composé de deux parties : une partie de :math:`p` chiffres pour coder la partie entière et une partie de :math:`q` chiffres pour coder 
+la partie fractionnaire avec :math:`n = p + q`.
+
+.. admonition:: Exemples
+
+    - En base 10, avec :math:`p = 5` et :math:`q = 3`, le nombre N = 123,45 a pour code :math:`{\color{blue}{00123}}{\color{red}{450}}`. La partie en couleur 
+      bleue représente la partie entière, celle en couleur rouge la partie fractionnaire.
+    - En base 2, avec les mêmes valeurs de :math:`p` et :math:`q`, le code :math:`{\color{blue}{01110}}{\color{red}{010}}` représente le nombre :math:`1110,01_2`.
+    
+Supposons que le code en virgule fixe, d'un nombre :math:`N_B` en base :math:`B`, avec :math:`p` chiffres pour la partie entière et :math:`q` chiffres pour 
+la partie fractionnaire s'écrive :
+
+:math:`N^{p,q}_B = {{\color{blue}{x_{p-1}...x_1x_0}}{\color{red}{x_{-1}x_{-2}...x_{-q}}}}_B`
+
+La conversion en base 10 du code d'un nombre en base :math:`B` en virgule fixe s'effectue de la manière suivante : 
+
+    - la décodage de la partie entière :math:`{\color{blue}{x_{p-1}...x_1x_0}}` s'effectue selon le même principe que pour un nombre entier non signé ;
+    - le décodage de la partie fractionnaire :math:`{\color{red}{x_{-1}x_{-2}...x_{-q}}}` s'effectue en affectant à chaque :math:`x_{-j}, j \in \{1, q\}` 
+      son poids :math:`p_{-j}` en base 10  multiplié par :math:`B^{-j}`. 
+      
+Les deux principes étant similaires, la fonction de décodage est :
+
+:math:`N = p_{p-1}.B^{p-1} +...+ p_2.B^2+p_1.B^1+p_0.B^0+p_{-1}.B^{-1}+p_{-2}.B^{-2}+...p_{-q}.B^{-q}`.
+    
+.. admonition:: Exemple
+
+    - Soit le code en base 2 :math:`N^{5,3}_2 = {\color{blue}{01110}}{\color{red}{010}}` d'un nombre en virgule fixe, son décodage en base 10 est :
+      
+      :math:`N = 0.2^4 + 1.2^3 + 1.2^2 + 1.2^1 + 0.2^0 + 0.2^{-1} + 1.2^{-2} + 0.2^{-3} = 14,25.`    
+
+.. admonition:: Exercice
+
+    La valeur en base 10 d'un nombre fractionnaire écrit en base :math:`B` sur :math:`q` chiffres est :math:`F = p_{-1}.B^{-1}+p_{-2}.B^{-2}+...p_{-q}.B^{-q}`.
+    
+    - Quelle information apporte la multiplication de :math:`F` par :math:`B` ?
+    - En déduire un principe général pour convertir un nombre fractionnaire de la base 10 vers une base quelconque.
+    - En utilisant ce principe, convertir le nombre 17,625 en virgule fixe en base 2 avec :math:`p = 5` et :math:`q = 3`.
+    
+Nombres en virgule flottante
+============================
+
+Ce paragraphe ne présente qu'une approche réduite de la représentation des `nombres en virgule flottante`_. Le format le plus souvent
+utilisé dans les machines informatiques est la norme IEEE 754. Ce format et les opérations arithmétiques associées sont aujourd'hui 
+implémentés dans la majorité des processeurs des ordinateurs afin de grantir leur exécution rapide.
+
+La représentation flottante repose sur la décomposition d'un mot de 32 bits (« simple précision ») ou de 64 bits (« double précision ») 
+en trois champs repectivement appelés Signe, Exposant et Mantisse.
+
+Les deux formats fixés par la norme IEEE 754 sont résumés à la :numref:`NormeIEEE754`. 
+
+      .. _NormeIEEE754:
+       
+      .. figure:: Images/NormeIEEE754.png  
+            :scale: 70%
+            :align: center 
+
+            Formats de la norme IEEE 754 - source Wikipedia
+
+La :numref:`NormeIEEE754SimplePrecision` représente la répartition des champs pour le format simple précision.
+
+      .. _NormeIEEE754SimplePrecision:
+       
+      .. figure:: Images/NormeIEEE754SimplePrecision.png  
+            :scale: 50%
+            :align: center 
+
+            Format de la norme IEEE 754 en simple précision
+            
+Décodage d'un nombre en virgule flottante sur 32 bits
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^            
+
+Avec nos notations, pour un code normalisé sur 32 bits, le décodage est :
+
+:math:`N_{10} = -1^S . (1,M_2 . 2^{(E_2)_{10} - 127})_{10}`.
+
+
+.. admonition:: Exemple
+
+    Soit :math:`N_{IEEE754} = \color{green}{1}\color{orange}{10001001}\color{red}{00000000001100000000000}` le code d'un nombre en virgule flottante au format IEEE 754 sur 32 bits. On a :
+
+    - :math:`S = \color{green}{1}` ;
+    - :math:`E = \color{orange}{10001001}_2 = 137_{10}` ;
+    - :math:`M = \color{red}{00000000001100000000000}_2` 
+
+    En appliquant la fonction de décodage on obtient :
+
+
+    :math:`N = -1^1 . ({1, 00000000001100000000000}_2 . 2^{137 - 127} )_{10}`
+    
+    :math:`N = -({1, 00000000001100000000000}_2 . 2^{10})_{10}`
+    
+    :math:`N = -({10000000000,1100000000000}_2)_{10}`
+    
+    :math:`N = -1024,75`.
+
+Codage d'un nombre en format flottant sur 32 bits
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Le principe est assez simple :
+
+- on détermine le signe S ;
+- on convertit le nombre en binaire (partie entière et partie décimale) ;
+- on détermine la mantisse en décalant à droite ou à gauche pour faire apparaitre 1,... ;
+- on termine en calculant l'exposant.
+
+.. admonition:: Exemple 
+
+    On cherche la représentation au format IEEE 754 sur 32 bits du nombre :math:`N = 12,625`.
+
+    - Le nombre est positif donc :math:`S = \color{green}{0}`
+
+    - La conversion en binaire du nombre est :math:`N = 12,625_{10} = 1100,101_2`
+
+    - Le décalage de la virgule s'effectue à gauche dans ce cas.
+      :math:`N = 1100,101_2 = 1,100101_2.2^3`. On exprime ensuite le résultat sur 23 bits :math:`M = {^{23}(100101_2)} =  \color{red}{10010100000000000000000}_2`.
+
+    - L'exposant :math:`E` est obtenu en résolvant :math:`2^{E-127} = 2^3` et en convertissant sur 8 bits, soit :math:`E = {^8(130)_2} =  \color{orange}{10000010}_2`.
+
+    N = 12,625 est représenté par  :math:`\color{green}{0}\color{orange}{10000010}\color{red}{10010100000000000000000}_{IEEE754}`
+
+Caractères
+==========
+
+Cette partie du cours repose sur un travail personnel. Comme point de départ, on pourra lire l'article sur le
+`codage des caractères`_ de Wikipedia. On pourra aussi approfondir en lisant les articles sur l'ASCII, l'ASCII étendu, l'Unicode, le Art ASCII.
+
+.. admonition:: Exercice
+
+    Si un caractère est codé en ASCII :
+    
+    - comment passer du caractère '3' au chiffre 3 ?
+    - comment récupérer la position d'une lettre dans l'alphabet ?
+    - comment convertir une majuscule en minuscule ?
+    
+    Si l'on saisit la suite de caractères 123 au clavier, quelle est la représentation de cette saisie dans la mémoire de l'ordinateur ? 
+    
+
+.. include:: References.rst

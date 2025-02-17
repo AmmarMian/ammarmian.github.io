@@ -1,0 +1,508 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Introduction à la numération et l'algorithmique</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="css/theme/metropolis.css" id="theme">
+		<link rel="stylesheet" href="plugin/title-footer/title-footer.css">
+		<link rel="stylesheet" href="plugin/chalkboard/style.css">
+		<link rel="stylesheet" href="css/flexbox/flexboxgrid.css" type="text/css">
+		<link rel="stylesheet" href="plugin/presentable/presentable.min.css">
+		<link rel="stylesheet" href="css/custom.css" type="text/css">
+
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+		<link rel="stylesheet" href="plugin/verticator/verticator.css">
+	</head>
+	<body>
+
+		<div class="reveal">
+			<div class="slides">
+
+<!-- --------------------------------------------------------------------------------------------- -->
+<!-- -------------------------- THE PRESENTATION ELEMENTS GO UNDER HERE -------------------------- -->
+<!-- --------------------------------------------------------------------------------------------- -->
+				
+				<!-- First horizontal slide -->
+				<section>
+
+					<h1 class="talk-title" style="font-weight: bolder;">Numération et algorithmique</h1>
+					<h2>Introduction et notions de représentation de nombres</h2>
+					<p style="margin-bottom: 10%;">Cours Magistral 1/7</p>
+
+					<img class="plain" height="75px" src="assets/logos/USMB.svg" style="margin-right: 3%;">
+					<img class="plain" height="75px" src="assets/logos/Polytech.svg" style="margin-right: 3%;">
+					<img class="plain" height="75px" src="assets/logos/IAE.png">
+				</section>
+				<!-- End of first horizontal slide -->
+
+				<section>
+					<h1>Table of Contents</h1>
+					<nav id="presentable-toc" class="revealjs"></nav>
+				</section>
+
+				<!-- Second horizontal slide -->
+				<section>
+
+					<!-- First vertical slide on second horizontal slide-->
+					<section><h1>Informations sur module INFO501</h1></section>
+
+					<section>
+						<h2>Organisation</h2>
+
+							<div class="fragment">
+								<b>Responsable :</b>
+								<blockquote style="margin-bottom: 7%;"> Ammar Mian</br>
+									Mail : <a href="mailto:ammar.mian@univ-smb.fr">ammar.mian@univ-smb.fr</a></br>
+									Bureau : A131, site d'Annecy
+								</blockquote>
+						
+							</div>
+
+							<div class="fragment">
+								<b>Modalités :</br></b>
+								<blockquote style="margin-bottom: 7%;">
+									<ul class="fa-ul" style="padding-left: 5%; list-style: none;">
+										<li><span class="fa-li"><i class="fas fa-graduation-cap fa-xs"></i></span>Cours magistraux : 7 séances</li>
+										<li><span class="fa-li"><i class="fas fa-pen fa-xs"></i></span>Tavaux dirigés : 6 séances</li>
+										<li><span class="fa-li"><i class="fas fa-terminal fa-xs"></i></span>Tavaux pratique : 4 séances</li>
+									</ul>
+								</blockquote>					
+							</div>
+					</section>
+
+					<section>
+						<iframe width="100%", height="900" src="assets/listeCM/liste.html"></iframe>
+					</section>
+
+					<section>
+						<h2>Évaluation</h2>
+						<figure>
+							<img src="./assets/evaluations.png">
+						</figure>
+
+						&rarr; Tous les détails sur le <a href="https://flying-chard-818.notion.site/Syllabus-INFO501-2021-2022-95322d77419442b5bd7aa274981ecc06">syllabus</a> du cours disponible dans le moodle du cours !
+					</section>
+
+					<section>
+						<h2>Carte du cours</h2>
+						<iframe style="border:none" width="100%" height="600" data-src="./assets/course_map.html" data-preload></iframe>
+					</section>
+	
+					<section>
+						<h2>État du niveau en programmation de la promo</h2>
+						<style>ol.question {
+							columns: 2;
+							-webkit-columns: 2;
+							-moz-columns: 2;
+							column-gap: 50px;
+							list-style: upper-latin;
+							font-size: 30px;
+						  }</style>
+						<ol class=question>
+							<li>Peu ou pas d'expérience de programmation</li>
+							<li>Besoin de rappel</li>
+							<li>Bonne expérience</li>
+							<li>Programmateur expérimenté</li>
+						</ol>
+						<iframe width="1000" height="350" data-src="https://toreply.univ-lille.fr/"></iframe>
+						
+					</section>
+
+					<section>
+						<h2>Pre-requis</h2>
+
+						<h3>Connaissances :</h3>
+						<div class="fragment"><blockquote style="margin-bottom: 7%;">
+						<ul>
+							<li>Cours de programmation : on reprend tout à plat </li>
+							<li>On insiste dans ce cours plus sur l'algorithmique et on donne des éléments sur la représentation des données</li>
+						</ul></blockquote>
+						</div>
+					
+						</br> 
+						<div class="fragment">
+						<h3>Matériel</h3>
+						<blockquote style="margin-bottom: 7%;">
+						<ul>
+							<li>Machine personelle avec Anaconda (voir syllabus)</li>
+							<li>Compte Github pour les TPs : s'inscrire dés maintenant !</li>
+						</ul></blockquote>
+						</div>
+					</section>
+
+
+				</section>
+				<!-- End of second horizontal slide-->
+
+				<section>
+
+					<section data-background-color="rgba(182,226,180, 161)">
+						<h1>Pourquoi la programmation informatique ?</h1>
+						<div style=" bottom: 5%; right: 5%;">
+							<img width="700" 
+							src="https://files.realpython.com/media/Newbie_Watermarked.a9319218252a.jpg">
+						</div>
+					</section>
+
+					<section>
+						<h2>Programmer un ordinateur ?</h2>
+						
+						<blockquote>
+							Programmer c'est de fournir à un ordinateur des <b>instructions</b> afin d'accomplir une tâche spécifique. Cela se fait en amont de l'exécution de la dite tâche qui se fait lors de l'<b>éxécution du programme</b>.
+						</blockquote>
+						<div class="fragment">Comment indiquer à l'ordinateur de faire une tâche ?</div>
+						<div class="fragment">&rarr; On utilise un <b>langage de programmation</b> !</br>
+						</div>
+						<div class="fragment row">
+							<div class="col-xs-3">
+								<img height="200" src="./assets/python-3d-pixel.svg">
+							</div>
+							<div class="col-xs-7">
+							</br></br>
+								Dans ce module on utilise le langage de progammation <b>Python</b>.
+							</div>
+						</div>
+						
+					</section>
+
+					<section>
+						<h2>Une analogie avec la musique</h2>
+						<img src="./assets/music.svg">
+					</section>
+
+					<section>
+						<h2>En pratique</h2>
+						<div class="row">
+							<div class="col-xs-4">
+								<iframe scrolling="no" style="width: 400px; height: 400px;" src="./content/animation_desk.html"></iframe>
+							</div>
+							<div class="col-xs-8">
+								<ul>
+									<li>Le programmeur écrit un programme</li>
+									<li>Le programme donne une liste d'instructions à la machine</li>
+								</ul>
+								<p class="fragment">Sauf que... l'ordinateur n'est pas très intelligent...</p>
+								<p class="fragment">On passe par un <b>interpréteur</b> qui traduit un langage plus haut niveau en instructions simples</p>
+								<pre class="fragment"><code class="python" data-line-numbers="">65+i</code></pre>
+								<pre class="fragment"><code class="assembly" data-line-numbers="">movq    8(%rbp), %rdx
+movq    $65, %rax
+addq    %rdx, %rax</code></pre>
+							</div>
+						</div>
+					</section>
+
+				<section>
+					<h2>Qu'est-ce qu'on peux faire avec ça ?</h2>
+					<blockquote>
+						Réalisation de jeux vidéos..
+					</blockquote>
+					<div class="row">
+						<div class="fragment col-xs">
+							<img src="https://cdn.vox-cdn.com/thumbor/yXkYtLLwk1joaBMa6UCzaFBm2fo=/0x0:3306x2244/1720x0/filters:focal(0x0:3306x2244):format(webp):no_upscale()/cdn.vox-cdn.com/uploads/chorus_asset/file/20012300/90774293.jpg.jpg">
+						</div>
+						<div class="fragment col-xs">
+							<img src="https://i0.wp.com/i.imgur.com/UflJPUC.png?w=500">
+						</div>
+					</div>
+						
+				</section>
+
+				<section>
+					<h2>Qu'est-ce qu'on peux faire avec ça ?</h2>
+					<blockquote>
+						Digital art..
+					</blockquote>
+					<div class="row">
+						<div class="fragment col-xs">
+							<img src="https://4.bp.blogspot.com/-S59ICCfR_OY/Xe7a3TOzFCI/AAAAAAAAIb8/bBAimp-o754BYRndkgUEM8uuqBKg_Ch1QCLcBGAsYHQ/s1600/Screen%2BShot%2B2019-12-09%2Bat%2B3.37.50%2BPM.png">
+							@ Robert Felker
+						</div>
+						<div class="fragment col-xs">
+							<img src="https://upload.wikimedia.org/wikipedia/commons/2/21/Mandel_zoom_00_mandelbrot_set.jpg">
+						</div>
+					</div>
+					
+					&rarr; https://www.youtube.com/watch?v=6avJHaC3C2U
+				</section>
+
+				<section>
+					<h2>Qu'est-ce qu'on peux faire avec ça ?</h2>
+					<blockquote>
+						<p><b>Boids:</b> Simulation de comportement d'oiseaux/poissons</p>
+					</blockquote>
+					<figure>
+						<iframe width="100%" height="500" src="https://jumpoffboids.netlify.app"></iframe>
+						<figcaption style="font-size: small;">Simulation de boids: <a href="https://jumpoff.io/portfolio/boids">Jumpoff</a></figcaption>
+					</figure>
+				</section>
+
+				<section>
+					<h2>Qu'est-ce qu'on peux faire avec ça ?</h2>
+					<blockquote>
+						<p>Mais aussi des choses plus pratiques..</p>
+					</blockquote>
+					<ul>
+						<li class="fragment">Organiser automatiquement une bibliothèque musicale avec règles</li>
+						<li class="fragment">Faire des sites webs</li>
+						<li class="fragment">Rapports financiers automatique d'une entreprise</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2 style="margin-bottom: 8cm;">Vos exemples d'applications</h2>
+					
+				</section>
+            </section>
+
+			<section>
+				<section data-background-color="rgba(182, 173, 225, 1)">
+				<h1>Représentation d'informations en informatique</h1>
+				<div style=" bottom: 5%; right: 5%;">
+					<img width="700" 
+					src="https://files.realpython.com/media/Reading-and-Writing-Files-in-Python_Watermarked.0d394921fd90.jpg">
+				</div>
+				</section>
+
+					
+				<section  data-background-image="./assets/photos/motherboard.jpg" data-background-opacity=0.1 >
+					<h2>Comment représenter de l'information dans un ordinateur ?</h2>
+					<ul>
+						<li class="fragment">Un circuit électrique peut laisser passer ou non le courant électrique à l'aide de <b>transistors</b>.</br>
+							<img height="75" src="./assets/photos/transistor.png">
+						</li>
+						<li class="fragment">L'état du transistor (laisser passer ou non) donne une information sur <b>1 bit</b>.</li>
+						<li class="fragment">Fonction de codage : $ f:\{On, Off\} \rightarrow \{0, 1\}.$
+						</li>
+					</ul>
+					<p class="fragment">&rarr; Il est nécéssaire de considérer un espace de représentation binaire et y associer un codage pour les éléments que l'on veut utiliser.</p>
+				</section>
+
+				<section>
+					<h2>Exercice: plaque d'immatriculation</h2>
+					<blockquote>
+						<p style="font-size: small;">Depuis 2009, la France utilise un nouveau système de numérotation des véhicules.</p>
+						<figure>
+							<img width=200 src="https://upload.wikimedia.org/wikipedia/commons/0/08/AA-229-AA_ref_License_plate_of_France.png">
+						</figure>
+						<p style="font-size: small;">
+							Actuellement, les lettres I, O, U ne sont pas utilisées pour éviter les confusions avec, respectivement, 1, 0 et V. Le couple de lettres SS n’est ni utilisé à gauche, ni à droite. Le couple de lettres WW n’est pas utilisé à droite.
+						</p>
+						<ol>
+							<li class="fragment highlight-current-blue" style="font-size: small;" data-fragment-index="1">Avec ce système, combien de véhicules peut-on immatriculer ?</li>
+							<li class="fragment highlight-current-blue" style="font-size: small;" data-fragment-index="3">Si l’on affectait un code binaire à chaque véhicule pouvant être représenté selon ce code, combien de bits seraient nécessaires ?</li>
+							<li class="fragment highlight-current-blue" style="font-size: small;" data-fragment-index="4">En choisissant un code binaire pour chaque lettre et un code binaire pour le nombre, combien de bits seraient nécessaires ?</li>
+							<li class="fragment highlight-current-blue" style="font-size: small;" data-fragment-index="5">Sachant qu’il y avait environ 37 millions de véhicules immatriculés en 2009 et qu’il y a environ 3 millions de nouvelles immatriculations chaque année, quelle est la durée approximative de ce codage ?</li>
+						</ol>
+					</blockquote>
+					<div class="row fragment fade-up" data-fragment-index="2">
+						<div class="col-xs-4">
+							<iframe src="https://www.desmos.com/testing/virginia/scientific" width="100%" height="300"></iframe>
+						</div>
+						<div class="cols-md">
+						</div>
+					</div>
+				</section>
+
+				<section>
+					<h2>Exercice à la maison</h2>
+					<div style="font-size: smaller;">
+						<p>Soit <span class="math notranslate nohighlight">\(A\)</span> une partie (sous-ensemble) d’un ensemble fini <span class="math notranslate nohighlight">\(E\)</span>.
+							Proposer une représentation simple de <span class="math notranslate nohighlight">\(A\)</span> qui permette, de vérifier si <span class="math notranslate nohighlight">\(B\)</span>,
+							une autre partie de <span class="math notranslate nohighlight">\(E\)</span>, est incluse dans <span class="math notranslate nohighlight">\(A\)</span>.</p>
+							<blockquote>
+							<p><strong>Conseil</strong> :  faire une analogie entre le nombre de parties possibles d’un ensemble <span class="math notranslate nohighlight">\(E\)</span> à <span class="math notranslate nohighlight">\(n\)</span> éléments et
+							le nombre d’informations représentables sur <span class="math notranslate nohighlight">\(n\)</span> bits. En déduire un codage pour représenter un sous-ensemble de <span class="math notranslate nohighlight">\(E\)</span>.</p></blockquote>
+							<p>L’intersection des deux ensembles permet de savoir si une partie est incluse dans une autre.
+							Avec le codage précédent, déterminer l’opération logique entre les codes des deux sous-ensembles
+							qui permette de répondre au problème.</p>
+					</div>
+				</section>
+
+				<section>
+					<h2>Quoi représenter pour faire de la programmation ?</h2>
+					
+					<ul>
+						<li class="fragment">Nombres : indispensables pour gérer tout problème de programmation...
+							<ul>
+								<li class="fragment highlight-red">Nombre entiers</li>
+								<li class="fragment highlight-red">Nombre entiers signés</li>
+								<li>Nombres à virgules</li>
+							</ul>
+						</li>
+						<li class="fragment">Chaîne de caractères : pouvoir afficher, gérer du texte, c'est utile...</li>
+						<li class="fragment">Booléens : pour des valeurs de Vrai/Faux</li>
+					</ul>
+
+					</br> </br>
+					<p class="fragment"> &rarr; Il faut trouver une représentation de ces éléments en codage binaire ! </p>
+
+				</section>
+			</section>
+
+			<section>
+				<section data-background-color="rgba(248,202,124, 1)">
+					<h1>Notions de codage de nombre</h1>
+					<div style=" bottom: 5%; right: 5%;">
+						<img width="700" 
+						src="https://files.realpython.com/media/Encodings--Number-Systems_Watermarked.906d62e907dc.jpg">
+					</div>
+
+				</section>
+
+				<section>
+					<h2>Un peu de théorie sur la représentation de nombres i</h2>
+					<p>Un nombre est représenté par une suite de chiffres lus de gauche à droite. Pour un nombre exprimé en base $B$, chaque chiffre appartient à un ensemble de $B$ symboles distincts.</p>
+					<div class="fragment">Exemples :
+						<blockquote class="blockquote">
+							<ul style="font-size: smaller;">
+								<li>En base 2 : $x \in \{0,1\}$</li>
+								<li>En base 10 : $x \in \{0, 1, 2, 3, 4, 5, 6, 7, 8, 9 \}$</li>
+								<li>En base 8 : $x\in\{0,1,2,3,4,5,6,7\}$</li>
+								<li>En base 16 : $x \in \{0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F\}$</li>
+							</ul>
+						</blockquote>
+					</div>
+				
+				</section>
+
+				<section>
+					<h2>Un peu de théorie sur la représentation de nombres ii</h2>
+					<p>Soit $N_{10}=9_{10}$, en base $10$ (dénoté par l'indice), on peut avoir le même nombre dans les autres représentations:</p>
+					<div class="fragment">
+						<blockquote class="blockquote">
+							<ul style="font-size: smaller;">
+								<li>En base 2 : $N_2 = 1001_2$</li>
+								<li>En base 8 : $N_8 = 11_2$</li>
+								<li>En hexadécimal : $N_{16} = 9_{16}$</li>
+							</ul>
+						</blockquote>
+
+						<p class="fragment">&rarr; Comment à partir d'une représentation dans une base $B$ quelconque, on revient à une base 10 ?</p>
+						<p class="fragment"><b>Hint : </b>Comment est construit le code d'un nombre en base 10 ?</p>
+					</div>
+				
+				</section>
+
+				<section>
+					<h2>Conversion de base $B$ à la base 10</h2>
+					<blockquote style="font-size: smaller;">Soit $N_B = x_{n-1}...x_2x_1x_0\ _B$ un nombre en base $B$ donné sur $n$ chiffres. On obtient le codage de ce nombre en base $10$ par la formule :
+						\[
+							(N_B)_{10} = p_{n-1}.B^{n-1} +...+ p_2.B^2+p_1.B^1+p_0.B^0
+						\]
+					</blockquote>
+
+					<div class="fragment" style="font-size: smaller;">
+						<b>Exercice :</b></br>
+						Soient $T=323_8$, $U=323_{16}$, $V = 1AF_{16}$ et $W=323_3$. Comment s’écrivent respectivement ces nombres en base $10$ ?
+					</div>
+				</section>
+
+				<section>
+					<h2>Conversion de la base 10 à une base $B$</h2>
+					<blockquote style="font-size: smaller;">Soit $N_{10} = x_{n-1}...x_2x_1x_0\ _B$ un nombre en base $10$ donné sur $n$ chiffres. Comment obtenir le codage de ce nombre dans une base quelconque $B$ ?
+					</blockquote>
+
+					<p style="font-size: smaller;">On a vu que si $N_B = x_{n-1}...x_2x_1x_0\ _B$ sa conversion en base 10 est $(N_B)_{10} = p_{n-1}.B^{n-1} +...+ p_2.B^2+p_1.B^1+p_0.B^0$.</p>
+					<ul style="font-size: smaller;">
+						<li class="fragment">Quelle information fournit la division euclidienne de $(N_B)_{10}$ par $B$ ?</li>
+						<li class="fragment">En déduire un principe général de conversion d'un nombre en base 10 vers une base quelconque.</li>
+					</ul>
+
+					<p class="fragment" style="font-size: smaller;">On écrira $^P(N_A)_B$ la conversion du nombre $N$ exprimé en base $A$ vers la base $B$ sur $P$ chiffres.</p>
+
+				</section>
+
+
+
+			</section>
+
+				<!-- <section>
+					<section><h1>Bibliographie</h1></section>
+
+					<section id="references">
+						<div id="refs" class="references">
+							<div id="ref-behbahani2014aircraft">
+							<p>Behbahani, Alireza R, Alexander Von Moll, Robert Zeller, and James Ordo. 2014. “Aircraft Integration Challenges and Opportunities for Distributed     Intelligent Control, Power, Thermal Management, Diagnostic and Prognostic Systems.” <em>SAE Tech. Pap. 2014-01</em> 2161.</p>
+							</div>
+						</div>
+
+					</section>
+				</section> -->
+
+
+
+<!-- --------------------------------------------------------------------------------------------- -->
+<!-- -------------------------- IT ENDS HERE -------------------------- -->
+<!-- --------------------------------------------------------------------------------------------- -->
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script src="plugin/math/math.js"></script>
+		<script src="plugin/menu/menu.js"></script>
+		<script src="plugin/chalkboard/plugin.js"></script>
+		<script src="plugin/verticator/verticator.js"></script>
+		<script src="plugin/presentable/presentable.min.js"></script>
+		
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				backgroundTransition: 'slide',
+				hash: true,
+				touch: true,
+				controls: true,
+				transition: 'slide',
+				dependencies: [
+					{ src: 'plugin/reveald3js/reveald3.js' },
+					// { src: 'plugin/title-footer/title-footer.js', async: true, callback: function() { title_footer.initialize(); } },
+					// { src: 'plugin/typed/typed.js', async: false , callback: function() { callTypedJs(); }}
+				],
+				math: {
+					mathjax: 'https://cdn.jsdelivr.net/gh/mathjax/mathjax@2.7.8/MathJax.js',
+					config: 'TeX-AMS_HTML-full',
+					},
+				menu: {
+					numbers: true,
+					width: 'wide',
+					themes: false,
+					transitions: false,
+					openSlideNumber: true,
+				},
+				chalkboard: {
+					toggleChalkboardButton: { left: "80px" },
+					toggleNotesButton: { left: "130px" },
+					colorButtons: true,
+					boardHandle: true,
+					eraser: { src: path + 'img/sponge.png', radius: 40},
+					storage: './notes'
+				},
+				verticator: {
+					darktheme: false,
+					skipuncounted: false,
+					clickable: true
+				},
+				slideNumber: "c/t",
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMath, RevealMarkdown, RevealHighlight, RevealNotes, RevealMenu, RevealChalkboard, Verticator ]
+			});
+
+			presentable.toc({
+				framework: "revealjs",
+				hideNoTitle: true,
+				titles: "h1,.presentable-title"
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,173 @@
+.. -*- coding: utf-8 -*-
+
+******************
+Exemples de classe
+******************
+
+.. note::
+
+   Cette partie contient des exemples qui illustrent les concepts relatifs
+   aux objets.
+   Ils permettent de progresser en les analysant et en les testant sur machine.
+
+.. important::
+  
+   On rappelle que le livre de Gérard Swinnen `Apprendre à programmer avec Python 3`_ est en diffusion libre. 
+   Il contient de nombreux exercices dont les corrigés sont téléchargeables sur la
+   `page de Gérard Swinnen`_.
+
+Algèbre des intervalles d'Allen
+===============================
+
+Pour faire des raisonnements sur des intervalles de temps, Allen a défini des relations possibles
+entre ces intervalles (Voir `Algèbre des intervalles d'Allen`_).
+
+.. note::
+   
+   L'article de J.F. Allen, "Maintaining knowledge about temporal intervals", Communications of the ACM, No 11,
+   Vol. 26, pp. 832-843, 1983, n'est pas en accès libre. Par contre le rapport dont il est issu est disponible sur 
+   le site de la bibliothèque de l'université de Rochester (`Rapport Allen 1983`_).
+
+On va construire une classe *Intervalle* comprenant plusieurs méthodes :
+
+   - une méthode *__init__()*, constructeur de la classe. L'intervalle sera représenté 
+     par une liste à deux éléments ;   
+   - une méthode *during()* qui retourne True si l'intervalle considéré se déroule pendant 
+     l'intervalle passé en paramètre ;   
+   - une méthode *__lt__()* qui permet de surcharger l'opérateur < (relation *before* d'Allen) ;   
+   - une méthode *__gt__()* qui permet de surcharger l'opérateur > (inverse de la relation précédente) ;   
+   - une méthode *__eq__()* qui permet de surcharger l'opérateur == (relation *equal* d'Allen) ;
+
+On ajoute à cette classe plusieurs méthodes qui ne font pas partie des relations d'Allen :
+
+- deux méthodes qui permettent de surcharger les opérateurs `+` et `-` avec les méthodes *__add__* et *__sub__*
+  pour faire respectivement l'addition et la soustraction des intervalles ; 
+
+- la méthode *disjoint()* qui retourne True si l'intervalle considéré est disjoint de l'intervalle passé en paramètre.
+  On notera que cette méthode est traitée en utilisant les opérateurs `>`et `<` qui ont été surchargés à la place
+  de conditions sur les bornes des intervalles ;  
+  
+- la méthode *longueur()* qui fournit la longueur de l'intervalle calculée comme la valeur absolue de la 
+  différence entre les deux bornes ;
+  
+- la méthode *__str__()* pour l'affichage.
+
+.. literalinclude:: Python/INFO501/ClasseIntervalle.py
+    :language: python
+    :lines: 1,7-99 
+
+.. note::
+ 
+   Attention à la soustraction des intervalles où les bornes du résultat ne sont pas la différence des
+   bornes des opérandes.
+   
+On peut maintenant utiliser notre classe pour faire des calculs.
+
+.. code-block:: python
+
+    In [1]: A = Intervalle([3, 8])
+    
+    In [2]: B = Intervalle([5, 7])
+    
+    In [31]: C = Intervalle([1, 4])
+    
+    In [4]: print(A < C)
+    False
+    
+    In [5]: print(A > C)
+    False
+    
+    In [6]: print(C < B)
+    True
+    
+    In [7]: print(B > C)
+    True
+    
+    In [8]: print(B.during(A))
+    True
+    
+    In [9]: print(B + C)
+    [6, 11]
+    
+    In [10]: print(A.during(B + C))
+    False
+    
+    In [11]: print(B - C)
+    [1, 6]
+    
+    In [12]: print((B - C) < B)
+    False
+    
+    In [13]: print((B+C).disjoint(C))
+    True
+    
+    In [13]: print(A.longueur())
+    5    
+ 
+.. admonition:: Exercice
+
+   Compléter la classe *Intervalle* pour représenter toutes les relations 
+   de l'algèbre des intervalles d'Allen.
+   
+Rectangle coloré défini par deux intervalles
+============================================
+
+On souhaite afficher un rectangle coloré défini par un intervalle qui représente sa position 
+sur l’axe des abscisses, un intervalle qui représente sa position sur l’axe des ordonnées et une 
+couleur. La couleur est représentée par une liste de 3 entiers entre 0 et 255 correspondant respectivement 
+à l'intensité de rouge, de vert et de bleu (codage RVB). La figure suivante illustre ce principe.
+
+.. figure:: Images/RectangleBleu.png
+    :align: center
+  
+    Définition d'un rectangle bleu par deux intervalles
+
+Il existe plusieurs modules pour effectuer des dessins et gérer des interfaces avec l'utilisateur comme, par exemple, `tkinter`_.
+Dans cet exemple, on a choisi d'utiliser `pygame`_ pour sa simplicité et pour la préparation des TP. 
+
+.. important::
+
+    le module pygame n'est pas encore disponible sur le canal par défaut d'Anaconda. On peut l'importer via la commande suivante dans
+    une fenêtre de commande du système d'exploitation. 
+    
+    .. code-block:: text
+    
+        conda install -c cogsci pygame
+
+On définit la classe *Rectangle* comme suit. Le constructeur de cette classe utilise deux intervalles, instances de la classe *Intervalle* ci-dessus.
+
+.. literalinclude:: Python/INFO501/ClasseRectangle.py
+    :language: python
+    :lines: 1,7- 
+    
+.. admonition:: Exercice
+
+   Analyser cette classe en utilisant la documentation de `pygame`_.    
+   
+Rectangles colorés
+==================
+
+On souhaite effectuer maintenant des traitements sur des rectangles colorés définis comme précédemment. Pour cela on crée une classe
+*Rectangles* qui contient une méthode *ajoute()* pour ajouter un rectangle coloré.
+
+La classe contient également une méthode permettant d'encadrer le rectangle de plus grande surface en blanc par défaut avec une bordure d'un pixel par défaut.
+
+.. literalinclude:: Python/INFO501/ClasseRectangles.py
+    :language: python
+    :lines: 1,7-
+    
+.. figure:: Images/Rectangles.png
+    :align: center  
+    :scale: 50%  
+    
+    Résultat après l'exécution du programme (deux *clicks* dans la fenêtre)
+
+.. admonition:: Exercice
+
+   Ecrire la méthode *fusion(i, j)* qui retourne le plus petit rectangle contenant à la fois le rectangle dont l'indice est i et celui dont l'indice est j 
+   dans la liste *self.rectangles*. Pour cela on modifera la classe *Rectangle* pour lui ajouter la méthode *coinBasDroite()*.
+   Donner la séquence d'instructions qui affiche le rectangle fusionné. 
+  
+    
+.. include:: References.rst
+
