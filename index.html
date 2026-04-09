@@ -55,13 +55,21 @@
       object-fit: cover;
       filter: saturate(0.80) brightness(0.95) contrast(1.05);
       pointer-events: none;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
     }
 
+    /* Hide all webkit video controls */
     #bg-video::-webkit-media-controls,
     #bg-video::-webkit-media-controls-panel,
     #bg-video::-webkit-media-controls-play-button,
-    #bg-video::-webkit-media-controls-start-playback-button {
+    #bg-video::-webkit-media-controls-start-playback-button,
+    #bg-video::-webkit-media-controls-current-time-display,
+    #bg-video::-webkit-media-controls-time-remaining-display,
+    #bg-video::-webkit-media-controls-timeline {
       display: none !important;
+      visibility: hidden !important;
       appearance: none;
     }
 
@@ -685,10 +693,21 @@
     /* ── Video scrubbing ────────────────────────────────────── */
     const bgVideo = document.getElementById('bg-video');
     let vidDur = 0;
+
+    // Disable all controls on mobile and desktop
+    bgVideo.removeAttribute('controls');
+    bgVideo.style.pointerEvents = 'none';
+
     bgVideo.addEventListener('loadedmetadata', () => {
       vidDur = bgVideo.duration;
       bgVideo.pause();
     });
+
+    // Prevent native UI and touch interactions
+    bgVideo.addEventListener('contextmenu', (e) => e.preventDefault());
+    document.addEventListener('touchstart', (e) => {
+      if (e.target === bgVideo) e.preventDefault();
+    }, { passive: false });
 
     /* ── Brush strokes setup ────────────────────────────────── */
     const linesLayer    = document.getElementById('lines-layer');
