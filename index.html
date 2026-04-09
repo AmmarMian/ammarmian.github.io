@@ -54,6 +54,15 @@
       height: 100%;
       object-fit: cover;
       filter: saturate(0.80) brightness(0.95) contrast(1.05);
+      pointer-events: none;
+    }
+
+    #bg-video::-webkit-media-controls,
+    #bg-video::-webkit-media-controls-panel,
+    #bg-video::-webkit-media-controls-play-button,
+    #bg-video::-webkit-media-controls-start-playback-button {
+      display: none !important;
+      appearance: none;
     }
 
     /* Dark vignette overlay */
@@ -420,7 +429,6 @@
 
     #poem-col-1, #poem-col-2 {
       position: absolute;
-      top: 38vh;
       writing-mode: vertical-rl;
       font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: clamp(1rem, 1.6vw, 1.4rem);
@@ -429,13 +437,14 @@
       letter-spacing: 0.25em;
       line-height: 1;
       opacity: 0;
+      vertical-align: top;
     }
 
-    /* まっすぐな道で — left of waves */
-    #poem-col-1 { right: calc(50% + clamp(5rem, 8vw, 9rem)); }
+    /* まっすぐな道で — right of waves (first column, Japanese order) */
+    #poem-col-1 { left: calc(50% + clamp(5rem, 8vw, 9rem)); top: 38vh; }
 
-    /* さみしい — right of waves */
-    #poem-col-2 { left: calc(50% + clamp(5rem, 8vw, 9rem)); }
+    /* さみしい — left of waves (second column, Japanese order) */
+    #poem-col-2 { right: calc(50% + clamp(5rem, 8vw, 9rem)); top: 38vh; }
 
     #poem-attr {
       position: absolute;
@@ -513,6 +522,7 @@
   <!-- Video background -->
   <div id="video-wrap">
     <video id="bg-video" autoplay muted loop playsinline preload="metadata"
+           disablepictureinpicture x-webkit-airplay="deny"
            poster="assets/charvin_poster.jpg">
       <source src="assets/charvin_loop_web.mp4" type="video/mp4">
     </video>
