@@ -28,7 +28,6 @@
       font-family: 'Cormorant Garamond', 'Palatino Linotype', Georgia, serif;
       color: var(--cream);
       overflow-x: hidden;
-      cursor: none;
       overscroll-behavior: none;
     }
 
@@ -54,7 +53,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: saturate(0.55) brightness(0.75) contrast(1.05);
+      filter: saturate(0.80) brightness(0.95) contrast(1.05);
     }
 
     /* Dark vignette overlay */
@@ -64,10 +63,10 @@
       inset: 0;
       background:
         linear-gradient(180deg,
-          rgba(10,8,6,0.62) 0%,
-          rgba(10,8,6,0.18) 38%,
-          rgba(10,8,6,0.12) 55%,
-          rgba(10,8,6,0.70) 100%
+          rgba(10,8,6,0.40) 0%,
+          rgba(10,8,6,0.08) 38%,
+          rgba(10,8,6,0.06) 55%,
+          rgba(10,8,6,0.45) 100%
         );
       z-index: 1;
     }
@@ -78,8 +77,8 @@
       position: absolute;
       inset: 0;
       background: radial-gradient(ellipse 90% 80% at 50% 50%,
-        transparent 35%,
-        rgba(10,8,6,0.55) 100%
+        transparent 40%,
+        rgba(10,8,6,0.30) 100%
       );
       z-index: 1;
     }
@@ -336,7 +335,7 @@
       font-size: 0.48rem;
       letter-spacing: 0.45em;
       text-transform: uppercase;
-      color: var(--cream-25);
+      color: rgba(237, 231, 221, 0.65);
       writing-mode: vertical-rl;
       font-weight: 300;
     }
@@ -344,7 +343,7 @@
     #scroll-track {
       width: 1px;
       height: 56px;
-      background: rgba(237, 231, 221, 0.12);
+      background: rgba(237, 231, 221, 0.35);
       position: relative;
       overflow: visible;
     }
@@ -356,7 +355,7 @@
       width: 3px;
       height: 3px;
       border-radius: 50%;
-      background: var(--gold);
+      background: var(--cream);
       margin-left: -1px;
       transition: top 0.1s linear;
     }
@@ -407,24 +406,69 @@
       100% { transform: scale(1.28); opacity: 0; }
     }
 
+    /* ── Poem block ──────────────────────────────────────────── */
+    #poem-block {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 6;
+      pointer-events: none;
+      will-change: opacity;
+    }
+
+    #poem-col-1, #poem-col-2 {
+      position: absolute;
+      top: 38vh;
+      writing-mode: vertical-rl;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1rem, 1.6vw, 1.4rem);
+      font-weight: 300;
+      color: var(--cream);
+      letter-spacing: 0.25em;
+      line-height: 1;
+      opacity: 0;
+    }
+
+    /* まっすぐな道で — left of waves */
+    #poem-col-1 { right: calc(50% + clamp(5rem, 8vw, 9rem)); }
+
+    /* さみしい — right of waves */
+    #poem-col-2 { left: calc(50% + clamp(5rem, 8vw, 9rem)); }
+
+    #poem-attr {
+      position: absolute;
+      bottom: 12vh;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(0.52rem, 0.65vw, 0.6rem);
+      font-weight: 300;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: var(--cream-25);
+      white-space: nowrap;
+      opacity: 0;
+    }
+
     /* ── Contact block ───────────────────────────────────────── */
     #contact-block {
       position: fixed;
-      top: 88vh;
-      left: 50%;
-      transform: translateX(-50%);
+      top: 6vh;
+      right: clamp(1.8rem, 5vw, 4rem);
       z-index: 5;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: flex-end;
       gap: 1.1em;
       opacity: 0;
       pointer-events: none;
-      transition: pointer-events 0s;
+      transition: opacity 1.1s ease 2s, pointer-events 0s 2s;
       white-space: nowrap;
     }
 
-    #contact-block.active { pointer-events: all; }
+    #contact-block.active { pointer-events: all; opacity: 1; }
 
     .c-link {
       font-family: 'Cormorant Garamond', Georgia, serif;
@@ -432,7 +476,7 @@
       font-weight: 300;
       letter-spacing: 0.36em;
       text-transform: uppercase;
-      color: var(--cream-50);
+      color: rgba(237, 231, 221, 0.85);
       text-decoration: none;
       transition: color 0.3s ease;
     }
@@ -443,6 +487,7 @@
       display: flex;
       align-items: center;
       gap: 1.2em;
+      flex-direction: row-reverse;
     }
 
     .c-icon-link {
@@ -451,11 +496,11 @@
       gap: 0.55em;
     }
 
-    .c-icon-link svg { opacity: 0.6; flex-shrink: 0; }
+    .c-icon-link svg { opacity: 0.9; flex-shrink: 0; }
     .c-icon-link:hover svg { opacity: 1; }
 
     .c-sep {
-      color: var(--gold-dim);
+      color: rgba(196, 164, 106, 0.85);
       font-size: 0.5rem;
     }
   </style>
@@ -496,6 +541,33 @@
     <div id="location">
       <span>Université Savoie Mont Blanc</span>
     </div>
+  </div>
+
+  <!-- Contact block — appears before waves -->
+  <div id="contact-block">
+    <a href="mailto:ammar.mian@univ-smb.fr" class="c-link">ammar.mian@univ-smb.fr</a>
+    <div class="c-row">
+      <a href="https://github.com/ammarmian" target="_blank" rel="noopener" class="c-link c-icon-link">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        ammarmian
+      </a>
+      <span class="c-sep">·</span>
+      <a href="https://scholar.google.com/citations?user=XDirnBMAAAAJ&hl=fr" target="_blank" rel="noopener" class="c-link c-icon-link">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 24a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm0-24L0 9.5l4.838 3.94A8 8 0 0 1 12 10a8 8 0 0 1 7.162 3.44L24 9.5z"/>
+        </svg>
+        Scholar
+      </a>
+    </div>
+  </div>
+
+  <!-- Poem block — appears after waves -->
+  <div id="poem-block">
+    <span id="poem-col-1">まっすぐな道で</span>
+    <span id="poem-col-2">さみしい</span>
+    <span id="poem-attr">Santōka · 山頭火</span>
   </div>
 
   <!-- Brush strokes (late-scroll) -->
@@ -559,26 +631,6 @@
     </div>
   </div>
 
-  <!-- Contact block — appears after waves -->
-  <div id="contact-block">
-    <a href="mailto:ammar.mian@univ-smb.fr" class="c-link">ammar.mian@univ-smb.fr</a>
-    <div class="c-row">
-      <a href="https://github.com/ammarmian" target="_blank" rel="noopener" class="c-link c-icon-link">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-        </svg>
-        ammarmian
-      </a>
-      <span class="c-sep">·</span>
-      <a href="https://scholar.google.com/citations?user=XDirnBMAAAAJ&hl=fr" target="_blank" rel="noopener" class="c-link c-icon-link">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12 24a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm0-24L0 9.5l4.838 3.94A8 8 0 0 1 12 10a8 8 0 0 1 7.162 3.44L24 9.5z"/>
-        </svg>
-        Scholar
-      </a>
-    </div>
-  </div>
-
   <script>
     /* ── Grain ──────────────────────────────────────────────── */
     const grainCanvas = document.getElementById('grain-canvas');
@@ -604,36 +656,7 @@
     resizeGrain();
     drawGrain();
     let grainInterval = setInterval(drawGrain, 85);
-    window.addEventListener('resize', () => { resizeGrain(); drawGrain(); resizeCursor(); });
-
-    /* ── Cursor canvas ──────────────────────────────────────── */
-    const cursorEl = document.createElement('canvas');
-    Object.assign(cursorEl.style, {
-      position: 'fixed', top: '0', left: '0',
-      width: '100%', height: '100%',
-      zIndex: '20', pointerEvents: 'none'
-    });
-    document.body.appendChild(cursorEl);
-    const cursorCtx = cursorEl.getContext('2d');
-
-    function resizeCursor() {
-      cursorEl.width  = window.innerWidth;
-      cursorEl.height = window.innerHeight;
-    }
-    resizeCursor();
-
-    let rawCX = -300, rawCY = -300;
-    const trail = []; // { x, y }
-    const TRAIL_LEN = 22;
-
-    window.addEventListener('mousemove', e => {
-      rawCX = e.clientX; rawCY = e.clientY;
-      trail.push({ x: e.clientX, y: e.clientY });
-      if (trail.length > TRAIL_LEN) trail.shift();
-    });
-    document.addEventListener('mouseleave', () => {
-      rawCX = -300; rawCY = -300; trail.length = 0;
-    });
+    window.addEventListener('resize', () => { resizeGrain(); drawGrain(); });
 
     /* ── Mouse parallax state ───────────────────────────────── */
     let tMX = 0, tMY = 0, mX = 0, mY = 0;
@@ -652,6 +675,10 @@
 
     /* ── Brush strokes setup ────────────────────────────────── */
     const linesLayer    = document.getElementById('lines-layer');
+    const poemBlock     = document.getElementById('poem-block');
+    const poemCol1      = document.getElementById('poem-col-1');
+    const poemCol2      = document.getElementById('poem-col-2');
+    const poemAttr      = document.getElementById('poem-attr');
     const contactBlock  = document.getElementById('contact-block');
     const brushStrokes = [
       { rect: document.getElementById('cr-1'), start: 0.67, end: 0.85 },
@@ -685,6 +712,10 @@
         showEl('location');
         scrollUi.classList.add('show');
       }, 200);
+      // Socials fade in after name appears
+      setTimeout(() => {
+        contactBlock.classList.add('active');
+      }, 1200);
     });
 
     /* ── Parallax ───────────────────────────────────────────── */
@@ -745,44 +776,17 @@
         bs.rect.setAttribute('height', t * 900);
       });
 
-      // Contact block fades in after waves are drawn
-      const contactOp = smoothstep(0.88, 0.97, progress);
-      contactBlock.style.opacity = contactOp;
-      if (contactOp > 0.05) contactBlock.classList.add('active');
-      else contactBlock.classList.remove('active');
+
+      // Poem: columns appear one after the other after waves complete
+      const col1Op = smoothstep(0.88, 0.94, progress);
+      const col2Op = smoothstep(0.94, 1.00, progress);
+      poemBlock.style.opacity = 1;
+      poemCol1.style.opacity = col1Op;
+      poemCol2.style.opacity = col2Op;
+      poemAttr.style.opacity = col2Op;
 
       // Scroll thumb
       scrollThumb.style.top = `${progress * (scrollTrack.offsetHeight - 3)}px`;
-
-      // ── Cursor render ──────────────────────────────────────
-      cursorCtx.clearRect(0, 0, cursorEl.width, cursorEl.height);
-
-      // Ink trail
-      if (trail.length > 1) {
-        for (let i = 1; i < trail.length; i++) {
-          const t = i / trail.length;
-          cursorCtx.beginPath();
-          cursorCtx.moveTo(trail[i-1].x, trail[i-1].y);
-          cursorCtx.lineTo(trail[i].x, trail[i].y);
-          cursorCtx.strokeStyle = `rgba(237,231,221,${t * 0.20})`;
-          cursorCtx.lineWidth = t * 2.2;
-          cursorCtx.lineCap = 'round';
-          cursorCtx.stroke();
-        }
-      }
-
-      // Crosshair dot
-      if (rawCX > -100) {
-        const arm = 6;
-        cursorCtx.strokeStyle = 'rgba(237,231,221,0.70)';
-        cursorCtx.lineWidth = 0.75;
-        cursorCtx.beginPath();
-        cursorCtx.moveTo(rawCX - arm, rawCY);
-        cursorCtx.lineTo(rawCX + arm, rawCY);
-        cursorCtx.moveTo(rawCX, rawCY - arm);
-        cursorCtx.lineTo(rawCX, rawCY + arm);
-        cursorCtx.stroke();
-      }
 
       requestAnimationFrame(raf);
     }
