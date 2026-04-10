@@ -920,6 +920,16 @@
       poemCol2.style.opacity = col2Op;
       poemAttr.style.opacity = col2Op;
 
+      // Auto-reset translation state when scrolling away from waves
+      if (col1Op < 0.05 && translationVisible) {
+        translationVisible = false;
+        poemCol1.classList.remove('hide');
+        poemCol2.classList.remove('hide');
+        translationCol1.classList.remove('reveal');
+        translationCol2.classList.remove('reveal');
+        linesLayer.classList.remove('dimmed');
+      }
+
       // Scroll thumb
       scrollThumb.style.top = `${progress * (scrollTrack.offsetHeight - 3)}px`;
 
