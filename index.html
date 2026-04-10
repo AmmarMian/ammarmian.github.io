@@ -522,10 +522,10 @@
       }
     }
 
-    /* Mobile: stack vertically with background */
+    /* Mobile: stack vertically with shared background */
     @media (max-width: 768px) {
       #translation-col-1, #translation-col-2 {
-        backdrop-filter: blur(24px);
+        background: none;
       }
 
       #translation-col-1 {
@@ -547,6 +547,10 @@
 
       #translation-col-1.reveal, #translation-col-2.reveal {
         transform: translate(-50%, 0);
+      }
+
+      #lines-layer.dimmed {
+        opacity: 0.15 !important;
       }
     }
 
@@ -688,7 +692,7 @@
   </div>
 
 
-  <!-- Brush strokes (late-scroll) -->
+<!-- Brush strokes (late-scroll) -->
   <div id="lines-layer">
     <svg id="flow-lines" viewBox="0 0 1440 900"
          preserveAspectRatio="xMidYMid slice"
@@ -938,11 +942,13 @@
         poemCol2.classList.add('hide');
         translationCol1.classList.add('reveal');
         translationCol2.classList.add('reveal');
+        linesLayer.classList.add('dimmed');
       } else {
         poemCol1.classList.remove('hide');
         poemCol2.classList.remove('hide');
         translationCol1.classList.remove('reveal');
         translationCol2.classList.remove('reveal');
+        linesLayer.classList.remove('dimmed');
       }
     }
 
