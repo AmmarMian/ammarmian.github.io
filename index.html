@@ -367,13 +367,13 @@
 
     #scroll-thumb {
       position: absolute;
-      top: 0; left: 50%;
-      transform: translateX(-50%);
+      top: 0;
+      left: 50%;
+      transform: translate(-50%, 0);
       width: 3px;
       height: 3px;
       border-radius: 50%;
       background: var(--cream);
-      margin-left: -1px;
       transition: top 0.1s linear;
     }
 
@@ -410,6 +410,12 @@
     #flow-lines {
       width: 100%;
       height: 100%;
+      pointer-events: none;
+    }
+
+    #flow-lines use {
+      pointer-events: auto;
+      cursor: pointer;
     }
 
     #flow-lines path {
@@ -468,6 +474,89 @@
       color: var(--cream-25);
       white-space: nowrap;
       opacity: 0;
+    }
+
+
+    /* ── Translation overlays ────────────────────────────────── */
+    #translation-col-1, #translation-col-2 {
+      position: absolute;
+      writing-mode: horizontal-tb;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+      font-weight: 300;
+      letter-spacing: 0.08em;
+      color: var(--cream);
+      text-align: center;
+      line-height: 1.8;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      padding: 1.5rem;
+      background: rgba(10, 8, 6, 0.6);
+      border-radius: 2px;
+    }
+
+    #translation-col-1.reveal, #translation-col-2.reveal {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #translation-col-1 {
+      left: calc(50% + clamp(12rem, 18.5vw, 19.5rem) - 120px);
+      top: 38vh;
+      width: 240px;
+    }
+
+    #translation-col-2 {
+      right: calc(50% + clamp(12rem, 18.5vw, 19.5rem) - 120px);
+      top: 38vh;
+      width: 240px;
+    }
+
+    /* Desktop: no background */
+    @media (min-width: 769px) {
+      #translation-col-1, #translation-col-2 {
+        background: none;
+        backdrop-filter: none;
+      }
+    }
+
+    /* Mobile: stack vertically with background */
+    @media (max-width: 768px) {
+      #translation-col-1, #translation-col-2 {
+        backdrop-filter: blur(24px);
+      }
+
+      #translation-col-1 {
+        left: 50%;
+        top: 28vh;
+        transform: translate(-50%, 8px);
+        width: 90%;
+        max-width: 300px;
+      }
+
+      #translation-col-2 {
+        right: auto;
+        left: 50%;
+        top: 48vh;
+        transform: translate(-50%, 8px);
+        width: 90%;
+        max-width: 300px;
+      }
+
+      #translation-col-1.reveal, #translation-col-2.reveal {
+        transform: translate(-50%, 0);
+      }
+    }
+
+    /* Hide kanji when translations are shown */
+    #poem-col-1, #poem-col-2 {
+      transition: opacity 0.4s ease;
+    }
+
+    #poem-col-1.hide, #poem-col-2.hide {
+      opacity: 0 !important;
     }
 
     /* ── Contact block ───────────────────────────────────────── */
@@ -594,7 +683,10 @@
     <span id="poem-col-1">山あれば山を観る<br>雨の日は雨を聴く</span>
     <span id="poem-col-2">春夏秋冬<br>あしたもよろし<br>ゆふべもよろし</span>
     <span id="poem-attr">Santōka Taneda · 種田山頭火</span>
+    <div id="translation-col-1">If there are mountains,<br>I look at the mountains;<br><br>On rainy days<br>I listen to the rain.</div>
+    <div id="translation-col-2">Spring, summer,<br>autumn, winter.<br>Tomorrow too will be good.<br>Tonight too is good.</div>
   </div>
+
 
   <!-- Brush strokes (late-scroll) -->
   <div id="lines-layer">
@@ -716,6 +808,8 @@
     const poemCol1      = document.getElementById('poem-col-1');
     const poemCol2      = document.getElementById('poem-col-2');
     const poemAttr      = document.getElementById('poem-attr');
+    const translationCol1 = document.getElementById('translation-col-1');
+    const translationCol2 = document.getElementById('translation-col-2');
     const contactBlock  = document.getElementById('contact-block');
     const brushStrokes = [
       { rect: document.getElementById('cr-1'), start: 0.67, end: 0.85 },
@@ -829,6 +923,53 @@
     }
 
     requestAnimationFrame(raf);
+
+    /* ── Translation reveal on waves ────────────────────────── */
+    const waveElements = document.querySelectorAll('#flow-lines use');
+    let translationVisible = false;
+
+    // Detect if device supports hover
+    const supportsHover = window.matchMedia('(hover: hover)').matches;
+
+    function toggleTranslation() {
+      translationVisible = !translationVisible;
+      if (translationVisible) {
+        poemCol1.classList.add('hide');
+        poemCol2.classList.add('hide');
+        translationCol1.classList.add('reveal');
+        translationCol2.classList.add('reveal');
+      } else {
+        poemCol1.classList.remove('hide');
+        poemCol2.classList.remove('hide');
+        translationCol1.classList.remove('reveal');
+        translationCol2.classList.remove('reveal');
+      }
+    }
+
+    waveElements.forEach(wave => {
+      // Desktop hover behavior (only if device supports hover)
+      if (supportsHover) {
+        wave.addEventListener('mouseenter', () => {
+          poemCol1.classList.add('hide');
+          poemCol2.classList.add('hide');
+          translationCol1.classList.add('reveal');
+          translationCol2.classList.add('reveal');
+        });
+
+        wave.addEventListener('mouseleave', () => {
+          poemCol1.classList.remove('hide');
+          poemCol2.classList.remove('hide');
+          translationCol1.classList.remove('reveal');
+          translationCol2.classList.remove('reveal');
+        });
+      } else {
+        // Mobile tap behavior (only if device doesn't support hover)
+        wave.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          toggleTranslation();
+        });
+      }
+    });
   </script>
 </body>
 </html>
