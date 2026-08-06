@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Students — Ammar Mian</title>
+<meta name="description" content="PhD and Master's students supervised by Ammar Mian at LISTIC, Polytech Annecy-Chambéry.">
+<link rel="preload" href="assets/fonts/cormorant-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<canvas id="field" class="flow-canvas" aria-hidden="true"></canvas>
+<div class="vignette vignette--page" aria-hidden="true"></div>
+
+<div class="stack">
+  <header class="hdr">
+    <div class="hdr-brand">
+      <div id="fox" class="fox-slot" data-fox-dash role="button" aria-label="Fox mascot"></div>
+      <a href="index.html" class="brand-name">Ammar Mian</a>
+    </div>
+    <button type="button" id="navToggle" class="nav-toggle">Menu</button>
+    <nav class="nav-links">
+      <a href="Publications.html">Publications</a>
+      <a href="Students.html" class="current">Students</a>
+      <a href="CV.html">CV</a>
+      <a href="Contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <section class="page-section">
+    <div class="page-title-wrap">
+      <h1 class="page-title">Students</h1>
+      <div class="page-kicker">LISTIC · Polytech Annecy-Chambéry</div>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-rail"><svg id="spine"></svg></div>
+
+      <div id="rows" class="timeline-rows">
+
+        <div class="timeline-group-label">Current</div>
+
+        <div class="tl-row tl-row--wide" data-node>
+          <div class="tl-main">
+            <div class="tl-role">Matthieu Verlynde</div>
+            <div class="tl-org">Apprentissage frugal pour la télédétection</div>
+            <div class="tl-note">Co-supervised with Y. Yan</div>
+          </div>
+          <div class="tl-side">
+            <div class="tl-kind">PhD</div>
+            <div class="tl-year">2024—</div>
+          </div>
+        </div>
+
+        <div class="tl-row tl-row--wide" data-node>
+          <div class="tl-main">
+            <div class="tl-role">Wenli Shi</div>
+            <div class="tl-org">Réseau de diffusions sparses sur des données non textuelles</div>
+            <div class="tl-note">Co-directors F. Pascal (L2S) &amp; M. Jonckheere (LAAS)</div>
+          </div>
+          <div class="tl-side">
+            <div class="tl-kind">PhD</div>
+            <div class="tl-year">2025—</div>
+          </div>
+        </div>
+
+        <div class="timeline-group-label">Past</div>
+
+        <div class="tl-row tl-row--wide" data-node>
+          <div class="tl-main">
+            <div class="tl-role">Douba Jafuno</div>
+            <div class="tl-org">Classification de signaux GPR — soutenue le 4 novembre 2025</div>
+            <div class="tl-note">Co-encadrants G. Ginolhac, N. Stelzenmuller</div>
+          </div>
+          <div class="tl-side">
+            <div class="tl-kind">PhD</div>
+            <div class="tl-year">2022—2025</div>
+          </div>
+        </div>
+
+        <div class="tl-row tl-row--wide" data-node>
+          <div class="tl-main">
+            <div class="tl-role">Olivier Lerda</div>
+            <div class="tl-org">Détection robuste pour un sonar à croix de Mills — soutenue le 17 décembre 2024</div>
+            <div class="tl-note">Co-encadrants G. Ginolhac, J-P. Ovarlez</div>
+          </div>
+          <div class="tl-side">
+            <div class="tl-kind">PhD</div>
+            <div class="tl-year">2023—2024</div>
+          </div>
+        </div>
+
+        <div class="timeline-group-label">Master's</div>
+
+        <div class="tl-row tl-row--wide" data-node>
+          <div class="tl-main">
+            <div class="tl-role">Thibault Pautrel</div>
+            <div class="tl-org">SPDnet federated learning</div>
+            <div class="tl-note">Co-supervised with F. Bouchard and G. Ginolhac</div>
+          </div>
+          <div class="tl-side">
+            <div class="tl-kind">M2</div>
+            <div class="tl-year">2025</div>
+          </div>
+        </div>
+
+        <div class="tl-row tl-row--wide" data-node>
+          <div class="tl-main">
+            <div class="tl-role">Thomas Petellat</div>
+            <div class="tl-org">Détection de fissures volcaniques par apprentissage automatique</div>
+            <div class="tl-note">Co-supervised with C. Lin-Kwong-Chon and Y. Yan</div>
+          </div>
+          <div class="tl-side">
+            <div class="tl-kind">M2</div>
+            <div class="tl-year">2025</div>
+          </div>
+        </div>
+
+        <div class="tl-row tl-row--wide" data-node>
+          <div class="tl-main">
+            <div class="tl-role">Mamour Ndiaye</div>
+            <div class="tl-org">Pansharpening avec la variation totale</div>
+            <div class="tl-note">Co-supervised with Y. Mhiri</div>
+          </div>
+          <div class="tl-side">
+            <div class="tl-kind">M2</div>
+            <div class="tl-year">2025</div>
+          </div>
+        </div>
+
+        <div class="tl-row tl-row--wide" data-node>
+          <div class="tl-main">
+            <div class="tl-role">Emma Molière</div>
+            <div class="tl-org">Pansharpening and unrolling</div>
+            <div class="tl-note">Co-supervised with A. Bhanot</div>
+          </div>
+          <div class="tl-side">
+            <div class="tl-kind">M2</div>
+            <div class="tl-year">2024</div>
+          </div>
+        </div>
+
+        <div class="tl-row tl-row--wide" data-node>
+          <div class="tl-main">
+            <div class="tl-role">Matthieu Verlynde</div>
+            <div class="tl-org">Efficient algorithms for remote sensing</div>
+          </div>
+          <div class="tl-side">
+            <div class="tl-kind">M2</div>
+            <div class="tl-year">2024</div>
+          </div>
+        </div>
+
+        <div class="tl-row tl-row--wide" data-node>
+          <div class="tl-main">
+            <div class="tl-role">Matthieu Gallet</div>
+            <div class="tl-org">Inversion robuste de signaux GPR</div>
+            <div class="tl-note">Co-supervised with G. Ginolhac</div>
+          </div>
+          <div class="tl-side">
+            <div class="tl-kind">M2</div>
+            <div class="tl-year">2020</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="assets/flow.js"></script>
+<script>
+  Flow.initChrome({
+    canvas: document.getElementById("field"),
+    foxEl: document.getElementById("fox"),
+    navToggle: document.getElementById("navToggle"),
+    spineSvg: document.getElementById("spine"),
+    spineRows: document.getElementById("rows"),
+    cfg: {
+      bg: "#0a0d13", count: 2600, trail: 260, prewarm: 60,
+      ink: "#c9d6e6", bright: 0.7, mode: "rewind", auto: 0,
+      scale: 0.0065, pattern: "random", fox: "none",
+      turb: 0.3, width: 2.0, opacity: 0.08,
+      drift: 0, scrollPower: 1.0, step: 1.7
+    }
+  });
+</script>
+</body>
+</html>

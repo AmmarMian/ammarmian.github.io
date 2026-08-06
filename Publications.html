@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Publications — Ammar Mian</title>
+<meta name="description" content="Publications by Ammar Mian, fetched live from the HAL open archive.">
+<link rel="preload" href="assets/fonts/cormorant-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<canvas id="field" class="flow-canvas" aria-hidden="true"></canvas>
+<div class="vignette vignette--page" aria-hidden="true"></div>
+
+<div class="stack">
+  <header class="hdr">
+    <div class="hdr-brand">
+      <div id="fox" class="fox-slot" data-fox-dash role="button" aria-label="Fox mascot"></div>
+      <a href="index.html" class="brand-name">Ammar Mian</a>
+    </div>
+    <button type="button" id="navToggle" class="nav-toggle">Menu</button>
+    <nav class="nav-links">
+      <a href="Publications.html" class="current">Publications</a>
+      <a href="Students.html">Students</a>
+      <a href="CV.html">CV</a>
+      <a href="Contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <section class="page-section" style="max-width:1080px; padding:clamp(28px,6vw,60px) clamp(18px,5vw,56px) clamp(80px,14vw,160px)">
+    <div class="page-title-wrap">
+      <h1 class="page-title">Publications</h1>
+      <div id="statusLine" class="page-kicker">Querying HAL…</div>
+    </div>
+
+    <div class="pub-search">
+      <span class="pub-search-label">Search</span>
+      <input id="query" type="search" placeholder="title, author, venue, year">
+      <button type="button" id="clearBtn" class="pub-clear" style="display:none">Clear</button>
+    </div>
+
+    <div id="filters" class="pub-filters"></div>
+
+    <div id="errorState" class="pub-state" style="display:none">
+      <div class="pub-state-title">HAL did not answer</div>
+      <div class="pub-state-text">The publication list is fetched live from the HAL open archive. The request failed or timed out.</div>
+      <button type="button" id="retryBtn" class="pub-retry">Try again</button>
+    </div>
+
+    <div id="emptyState" class="pub-empty" style="display:none">No records matched this filter.</div>
+
+    <div style="margin-top:56px; display:grid; grid-template-columns:1fr; align-items:start">
+      <div id="rows" class="timeline-rows"></div>
+    </div>
+  </section>
+</div>
+
+<script src="assets/flow.js"></script>
+<script>
+(function () {
+  var KINDS = {
+    ART: "Journal", COMM: "Conference", UNDEFINED: "Preprint", OTHER: "Other",
+    COUV: "Chapter", THESE: "Thesis", HDR: "HDR", POSTER: "Poster", REPORT: "Report", OUV: "Book"
+  };
+
+  var canvas = document.getElementById("field");
+  var rowsEl = document.getElementById("rows");
+  var statusLine = document.getElementById("statusLine");
+  var filtersEl = document.getElementById("filters");
+  var errorState = document.getElementById("errorState");
+  var emptyState = document.getElementById("emptyState");
+  var queryInput = document.getElementById("query");
+  var clearBtn = document.getElementById("clearBtn");
+  var retryBtn = document.getElementById("retryBtn");
+
+  var state = { status: "loading", docs: [], filter: "All", shown: 0, query: "" };
+  var revealTimer = null;
+
+  var cfg = {
+    bg: "#0a0d13", count: 2600, trail: 260, prewarm: 60,
+    ink: "#c9d6e6", bright: 0.7, mode: "rewind", auto: 0,
+    scale: 0.0065, pattern: "random", fox: "none",
+    turb: 0.3, width: 2.0, opacity: 0.08,
+    drift: 0, scrollPower: 1.0, step: 1.7
+  };
+
+  var chrome = Flow.initChrome({
+    canvas: canvas,
+    foxEl: document.getElementById("fox"),
+    navToggle: document.getElementById("navToggle"),
+    cfg: cfg
+  });
+
+  function visible() {
+    var out = state.filter === "All" ? state.docs : state.docs.filter(function (d) { return d.kind === state.filter; });
+    var q = (state.query || "").trim().toLowerCase();
+    if (q) {
+      var terms = q.split(/\s+/);
+      out = out.filter(function (d) {
+        var hay = (d.title + " " + d.authors + " " + d.venue + " " + d.kind + " " + d.year).toLowerCase();
+        return terms.every(function (t) { return hay.indexOf(t) >= 0; });
+      });
+    }
+    return out;
+  }
+
+  function reveal() {
+    clearInterval(revealTimer);
+    var n = visible().length;
+    revealTimer = setInterval(function () {
+      state.shown = Math.min(state.shown + 3, n);
+      applyReveal();
+      if (state.shown >= n) clearInterval(revealTimer);
+    }, 55);
+  }
+
+  function applyReveal() {
+    var els = rowsEl.querySelectorAll(".pub-row");
+    els.forEach(function (el, i) {
+      el.classList.toggle("shown", i < state.shown);
+    });
+  }
+
+  function render() {
+    var vis = visible();
+
+    // filters
+    var seen = [];
+    state.docs.forEach(function (d) { if (seen.indexOf(d.kind) < 0) seen.push(d.kind); });
+    filtersEl.innerHTML = "";
+    if (state.status === "ok") {
+      var all = ["All"].concat(seen);
+      all.forEach(function (k) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "pub-filter" + (state.filter === k ? " active" : "");
+        btn.textContent = k === "All" ? "All (" + state.docs.length + ")" : k;
+        btn.addEventListener("click", function () {
+          state.filter = k; state.shown = 0;
+          render(); reveal();
+        });
+        filtersEl.appendChild(btn);
+      });
+    }
+
+    errorState.style.display = state.status === "error" ? "flex" : "none";
+    emptyState.style.display = state.status === "ok" && vis.length === 0 ? "block" : "none";
+    statusLine.textContent = state.status === "loading" ? "Querying HAL…"
+      : state.status === "error" ? "Connection failed"
+      : vis.length + " records · idHAL ammar-mian";
+
+    clearBtn.style.display = state.query.length > 0 ? "inline-block" : "none";
+
+    // grouped rows
+    var byYear = new Map();
+    vis.forEach(function (d) {
+      var y = d.year || "n.d.";
+      if (!byYear.has(y)) byYear.set(y, []);
+      byYear.get(y).push(d);
+    });
+    var years = Array.from(byYear.keys()).sort(function (a, b) {
+      return b === "n.d." ? -1 : a === "n.d." ? 1 : b - a;
+    });
+
+    rowsEl.innerHTML = "";
+    years.forEach(function (year) {
+      var yearEl = document.createElement("div");
+      yearEl.className = "pub-year";
+      yearEl.setAttribute("data-node", "");
+      yearEl.textContent = String(year);
+      rowsEl.appendChild(yearEl);
+
+      byYear.get(year).forEach(function (d) {
+        var a = document.createElement("a");
+        a.className = "pub-row";
+        a.setAttribute("data-node", "");
+        a.href = d.uri;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.innerHTML =
+          '<div class="pub-main">' +
+            '<div class="pub-title"></div>' +
+            '<div class="pub-authors"></div>' +
+            '<div class="pub-venue"></div>' +
+          '</div>' +
+          '<div class="pub-kind"></div>';
+        a.querySelector(".pub-title").textContent = d.title;
+        a.querySelector(".pub-authors").textContent = d.authors;
+        a.querySelector(".pub-venue").textContent = d.venue;
+        a.querySelector(".pub-kind").textContent = d.kind;
+        rowsEl.appendChild(a);
+      });
+    });
+
+    applyReveal();
+  }
+
+  function fetchHal() {
+    state.status = "loading"; state.shown = 0;
+    render();
+    var fl = "title_s,authFullName_s,producedDateY_i,journalTitle_s,conferenceTitle_s,bookTitle_s,docType_s,uri_s,doiId_s";
+    var url = "https://api.archives-ouvertes.fr/search/?q=authIdHal_s:ammar-mian&fl=" +
+      fl + "&rows=500&sort=producedDateY_i%20desc&wt=json";
+    var ctrl = new AbortController();
+    var to = setTimeout(function () { ctrl.abort(); }, 12000);
+    fetch(url, { signal: ctrl.signal })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (j) {
+        clearTimeout(to);
+        var docs = ((j.response && j.response.docs) || []).map(function (d) {
+          return {
+            title: Array.isArray(d.title_s) ? d.title_s[0] : (d.title_s || "Untitled"),
+            authors: (d.authFullName_s || []).join(", "),
+            year: d.producedDateY_i || 0,
+            venue: d.journalTitle_s || d.conferenceTitle_s || d.bookTitle_s || (d.doiId_s ? "doi:" + d.doiId_s : "HAL"),
+            kind: KINDS[d.docType_s] || d.docType_s || "Other",
+            uri: d.uri_s || "#"
+          };
+        });
+        state.status = "ok"; state.docs = docs;
+        render();
+        reveal();
+      })
+      .catch(function () {
+        clearTimeout(to);
+        state.status = "error";
+        render();
+      });
+  }
+
+  queryInput.addEventListener("input", function (e) {
+    state.query = e.target.value; state.shown = 0;
+    render(); reveal();
+  });
+  clearBtn.addEventListener("click", function () {
+    queryInput.value = "";
+    state.query = ""; state.shown = 0;
+    render(); reveal();
+  });
+  retryBtn.addEventListener("click", fetchHal);
+
+  fetchHal();
+})();
+</script>
+</body>
+</html>

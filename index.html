@@ -1,991 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>A. Mian</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --ink:      #0a0806;
-      --cream:    #ede7dd;
-      --cream-50: rgba(237, 231, 221, 0.50);
-      --cream-25: rgba(237, 231, 221, 0.25);
-      --gold:     #c4a46a;
-      --gold-dim: rgba(196, 164, 106, 0.55);
-    }
-
-    html {
-      background: var(--ink);
-      overscroll-behavior: none;
-    }
-
-    body {
-      font-family: 'Cormorant Garamond', 'Palatino Linotype', Georgia, serif;
-      color: var(--cream);
-      overflow-x: hidden;
-      overscroll-behavior: none;
-    }
-
-    /* ── Scroll space ────────────────────────────────────────── */
-    #spacer { height: 320vh; }
-
-    /* ── Video ───────────────────────────────────────────────── */
-    #video-wrap {
-      position: fixed;
-      top: -18%;
-      left: 0;
-      width: 100%;
-      height: 136%;
-      z-index: 0;
-      will-change: transform;
-      opacity: 0;
-      transition: opacity 1.4s ease;
-    }
-
-    #video-wrap.visible { opacity: 1; }
-
-    #bg-video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: saturate(0.80) brightness(0.95) contrast(1.05);
-      pointer-events: none;
-      -webkit-user-select: none;
-      user-select: none;
-      -webkit-touch-callout: none;
-    }
-
-    /* Hide all webkit video controls */
-    #bg-video::-webkit-media-controls,
-    #bg-video::-webkit-media-controls-panel,
-    #bg-video::-webkit-media-controls-play-button,
-    #bg-video::-webkit-media-controls-start-playback-button,
-    #bg-video::-webkit-media-controls-current-time-display,
-    #bg-video::-webkit-media-controls-time-remaining-display,
-    #bg-video::-webkit-media-controls-timeline {
-      display: none !important;
-      visibility: hidden !important;
-      appearance: none;
-    }
-
-    /* Dark vignette overlay */
-    #video-wrap::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        linear-gradient(180deg,
-          rgba(10,8,6,0.40) 0%,
-          rgba(10,8,6,0.08) 38%,
-          rgba(10,8,6,0.06) 55%,
-          rgba(10,8,6,0.45) 100%
-        );
-      z-index: 1;
-    }
-
-    /* Radial vignette */
-    #video-wrap::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 90% 80% at 50% 50%,
-        transparent 40%,
-        rgba(10,8,6,0.30) 100%
-      );
-      z-index: 1;
-    }
-
-    /* ── Grain ────────────────────────────────────────────────── */
-    #grain {
-      position: fixed;
-      inset: 0;
-      z-index: 4;
-      pointer-events: none;
-      overflow: hidden;
-    }
-
-    #grain-canvas {
-      position: absolute;
-      top: -3%;
-      left: -3%;
-      width: 106%;
-      height: 106%;
-    }
-
-    /* ── Shared layer base ────────────────────────────────────── */
-    .layer {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100vh;
-      z-index: 2;
-      pointer-events: none;
-      will-change: transform;
-    }
-
-    /* ── Coordinates — top left ───────────────────────────────── */
-    #coords {
-      position: absolute;
-      top: clamp(2.2rem, 5vh, 4rem);
-      left: clamp(1.8rem, 5vw, 4rem);
-      display: flex;
-      flex-direction: column;
-      gap: 0.2em;
-      opacity: 0;
-      transform: translateY(8px);
-      transition: opacity 1s ease 1.8s, transform 1s ease 1.8s;
-    }
-
-    #coords.show { opacity: 1; transform: translateY(0); }
-
-    #coords span {
-      display: block;
-      font-size: clamp(0.58rem, 0.8vw, 0.72rem);
-      font-weight: 300;
-      letter-spacing: 0.42em;
-      text-transform: uppercase;
-      color: var(--cream-50);
-      line-height: 1.7;
-    }
-
-    #coords .dot {
-      display: inline-block;
-      width: 3px;
-      height: 3px;
-      background: var(--gold-dim);
-      border-radius: 50%;
-      vertical-align: middle;
-      margin-right: 0.7em;
-      margin-bottom: 1px;
-    }
-
-    /* ── Elevation — top right ────────────────────────────────── */
-    #elevation {
-      position: absolute;
-      top: clamp(1.8rem, 4.5vh, 3.5rem);
-      right: clamp(1.8rem, 5vw, 4rem);
-      text-align: right;
-      opacity: 0;
-      transform: translateY(8px);
-      transition: opacity 1s ease 1.2s, transform 1s ease 1.2s;
-    }
-
-    #elevation.show { opacity: 1; transform: translateY(0); }
-
-    #elevation .num {
-      display: block;
-      font-size: clamp(2.8rem, 6vw, 5.5rem);
-      font-weight: 300;
-      letter-spacing: 0.1em;
-      line-height: 0.92;
-      color: var(--cream);
-    }
-
-    #elevation .unit {
-      display: block;
-      font-size: clamp(0.55rem, 0.72vw, 0.68rem);
-      font-weight: 300;
-      letter-spacing: 0.55em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-top: 0.5em;
-    }
-
-    /* ── Title — bottom left ──────────────────────────────────── */
-    #title-wrap {
-      position: absolute;
-      bottom: clamp(6rem, 18vh, 13rem);
-      left: clamp(1.8rem, 5vw, 4rem);
-    }
-
-    #pre-title {
-      display: block;
-      font-size: clamp(0.58rem, 0.78vw, 0.7rem);
-      font-weight: 300;
-      letter-spacing: 0.55em;
-      text-transform: uppercase;
-      color: var(--cream-50);
-      margin-bottom: 0.6em;
-      opacity: 0;
-      transform: translateY(10px);
-      transition: opacity 0.9s ease 0.6s, transform 0.9s ease 0.6s;
-    }
-
-    #pre-title.show { opacity: 1; transform: translateY(0); }
-
-    #title-mont {
-      display: block;
-      font-size: clamp(4rem, 10.5vw, 9.5rem);
-      font-weight: 300;
-      letter-spacing: 0.22em;
-      line-height: 0.85;
-      color: var(--cream);
-      opacity: 0;
-      transform: translateY(14px);
-      transition: opacity 1.1s ease 0.9s, transform 1.1s ease 0.9s;
-    }
-
-    #title-mont.show { opacity: 1; transform: translateY(0); }
-
-    #title-charvin {
-      display: block;
-      font-size: clamp(4rem, 10.5vw, 9.5rem);
-      font-weight: 300;
-      font-style: italic;
-      letter-spacing: 0.08em;
-      line-height: 0.92;
-      color: var(--cream);
-      opacity: 0;
-      transform: translateY(14px);
-      transition: opacity 1.1s ease 1.1s, transform 1.1s ease 1.1s;
-    }
-
-    #title-charvin.show { opacity: 1; transform: translateY(0); }
-
-    /* ── Hairline rule ────────────────────────────────────────── */
-    #rule {
-      position: absolute;
-      bottom: clamp(4.5rem, 13vh, 9rem);
-      left: clamp(1.8rem, 5vw, 4rem);
-      width: 0;
-      height: 1px;
-      background: linear-gradient(90deg, var(--gold-dim), transparent 80%);
-      transition: width 1.2s ease 2s;
-    }
-
-    #rule.show { width: min(38vw, 280px); }
-
-    /* ── Location — bottom right ──────────────────────────────── */
-    #location {
-      position: absolute;
-      bottom: clamp(4.5rem, 13vh, 9rem);
-      right: clamp(1.8rem, 5vw, 4rem);
-      text-align: right;
-      opacity: 0;
-      transform: translateY(8px);
-      transition: opacity 0.9s ease 2.2s, transform 0.9s ease 2.2s;
-    }
-
-    #location.show { opacity: 1; transform: translateY(0); }
-
-    #location span {
-      display: block;
-      font-size: clamp(0.58rem, 0.75vw, 0.7rem);
-      font-weight: 300;
-      letter-spacing: 0.42em;
-      text-transform: uppercase;
-      color: var(--cream-50);
-      line-height: 1.9;
-    }
-
-    /* ── Poem — mid-scroll reveal ─────────────────────────────── */
-    #poem-layer {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100vh;
-      z-index: 3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-      opacity: 0;
-      will-change: transform, opacity;
-    }
-
-    #poem {
-      text-align: center;
-      padding: 0 2rem;
-      transform: translateY(20px);
-      transition: transform 0s; /* controlled by JS */
-    }
-
-    #poem p {
-      font-size: clamp(1.6rem, 3.8vw, 3.4rem);
-      font-weight: 300;
-      font-style: italic;
-      line-height: 1.55;
-      color: var(--cream);
-      letter-spacing: 0.01em;
-    }
-
-    #poem-rule {
-      display: block;
-      width: 40px;
-      height: 1px;
-      background: var(--gold-dim);
-      margin: 2.2em auto 1.6em;
-    }
-
-    #poem .attr {
-      display: block;
-      font-size: clamp(0.55rem, 0.72vw, 0.65rem);
-      font-weight: 300;
-      letter-spacing: 0.55em;
-      text-transform: uppercase;
-      color: var(--gold);
-    }
-
-    /* ── Scroll indicator — right edge ───────────────────────── */
-    #scroll-ui {
-      position: fixed;
-      right: clamp(1rem, 2.5vw, 2rem);
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.8em;
-      opacity: 0;
-      transition: opacity 0.8s ease 2.8s;
-    }
-
-    #scroll-ui.show { opacity: 1; }
-
-    #scroll-ui .scroll-label {
-      font-size: 0.48rem;
-      letter-spacing: 0.45em;
-      text-transform: uppercase;
-      color: rgba(237, 231, 221, 0.65);
-      writing-mode: vertical-rl;
-      font-weight: 300;
-    }
-
-    #scroll-track {
-      width: 1px;
-      height: 56px;
-      background: rgba(237, 231, 221, 0.35);
-      position: relative;
-      overflow: visible;
-    }
-
-    #scroll-thumb {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translate(-50%, 0);
-      width: 3px;
-      height: 3px;
-      border-radius: 50%;
-      background: var(--cream);
-      transition: top 0.1s linear;
-    }
-
-    /* ── Year mark — subtle bottom center ────────────────────── */
-    #year-mark {
-      position: fixed;
-      bottom: clamp(1.2rem, 3vh, 2.5rem);
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 2;
-      font-size: 0.5rem;
-      letter-spacing: 0.6em;
-      text-transform: uppercase;
-      color: var(--cream-25);
-      font-weight: 300;
-      pointer-events: none;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.8s ease 3s;
-    }
-
-    #year-mark.show { opacity: 1; }
-
-    /* ── Flow lines ──────────────────────────────────────────── */
-    #lines-layer {
-      position: fixed;
-      inset: 0;
-      z-index: 2;
-      pointer-events: none;
-      opacity: 0;
-      will-change: opacity;
-    }
-
-    #flow-lines {
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-
-    #flow-lines use {
-      pointer-events: auto;
-      cursor: pointer;
-    }
-
-    #flow-lines path {
-      fill: none;
-      stroke-linecap: round;
-    }
-
-    @keyframes pulse-ring {
-      0%   { transform: scale(1); opacity: 0.4; }
-      60%  { transform: scale(1.28); opacity: 0; }
-      100% { transform: scale(1.28); opacity: 0; }
-    }
-
-    /* ── Poem block ──────────────────────────────────────────── */
-    #poem-block {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 6;
-      pointer-events: none;
-      will-change: opacity;
-    }
-
-    #poem-col-1, #poem-col-2 {
-      position: absolute;
-      writing-mode: vertical-rl;
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(1rem, 1.6vw, 1.4rem);
-      font-weight: 300;
-      color: var(--cream);
-      letter-spacing: 0.25em;
-      line-height: 1.8;
-      opacity: 0;
-      vertical-align: top;
-      white-space: normal;
-    }
-
-    /* まっすぐな道で — right of waves (first column, Japanese order) */
-    #poem-col-1 { left: calc(50% + clamp(5rem, 8vw, 9rem)); top: 38vh; }
-
-    /* さみしい — left of waves (second column, Japanese order) */
-    #poem-col-2 { right: calc(50% + clamp(5rem, 8vw, 9rem)); top: 38vh; }
-
-    #poem-attr {
-      position: absolute;
-      bottom: 12vh;
-      left: 50%;
-      transform: translateX(-50%);
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(0.52rem, 0.65vw, 0.6rem);
-      font-weight: 300;
-      letter-spacing: 0.45em;
-      text-transform: uppercase;
-      color: var(--cream-25);
-      white-space: nowrap;
-      opacity: 0;
-    }
-
-
-    /* ── Translation overlays ────────────────────────────────── */
-    #translation-col-1, #translation-col-2 {
-      position: absolute;
-      writing-mode: horizontal-tb;
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(1.1rem, 1.8vw, 1.5rem);
-      font-weight: 300;
-      letter-spacing: 0.08em;
-      color: var(--cream);
-      text-align: center;
-      line-height: 1.8;
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(8px);
-      transition: opacity 0.4s ease, transform 0.4s ease;
-      padding: 1.5rem;
-      background: rgba(10, 8, 6, 0.6);
-      border-radius: 2px;
-    }
-
-    #translation-col-1.reveal, #translation-col-2.reveal {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    #translation-col-1 {
-      left: calc(50% + clamp(12rem, 18.5vw, 19.5rem) - 120px);
-      top: 38vh;
-      width: 240px;
-    }
-
-    #translation-col-2 {
-      right: calc(50% + clamp(12rem, 18.5vw, 19.5rem) - 120px);
-      top: 38vh;
-      width: 240px;
-    }
-
-    /* Desktop: no background */
-    @media (min-width: 769px) {
-      #translation-col-1, #translation-col-2 {
-        background: none;
-        backdrop-filter: none;
-      }
-    }
-
-    /* Mobile: stack vertically with shared background */
-    @media (max-width: 768px) {
-      #translation-col-1, #translation-col-2 {
-        background: none;
-      }
-
-      #translation-col-1 {
-        left: 50%;
-        top: 28vh;
-        transform: translate(-50%, 8px);
-        width: 90%;
-        max-width: 300px;
-      }
-
-      #translation-col-2 {
-        right: auto;
-        left: 50%;
-        top: 48vh;
-        transform: translate(-50%, 8px);
-        width: 90%;
-        max-width: 300px;
-      }
-
-      #translation-col-1.reveal, #translation-col-2.reveal {
-        transform: translate(-50%, 0);
-      }
-
-      #lines-layer.dimmed {
-        opacity: 0.15 !important;
-      }
-    }
-
-    /* Hide kanji when translations are shown */
-    #poem-col-1, #poem-col-2 {
-      transition: opacity 0.4s ease;
-    }
-
-    #poem-col-1.hide, #poem-col-2.hide {
-      opacity: 0 !important;
-    }
-
-    /* ── Contact block ───────────────────────────────────────── */
-    #contact-block {
-      position: fixed;
-      top: 6vh;
-      right: clamp(1.8rem, 5vw, 4rem);
-      z-index: 5;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 1.1em;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 1.1s ease 2s, pointer-events 0s 2s;
-      white-space: nowrap;
-    }
-
-    #contact-block.active { pointer-events: all; opacity: 1; }
-
-    .c-link {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(0.6rem, 0.85vw, 0.76rem);
-      font-weight: 300;
-      letter-spacing: 0.36em;
-      text-transform: uppercase;
-      color: rgba(237, 231, 221, 0.85);
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    .c-link:hover { color: var(--cream); }
-
-    .c-row {
-      display: flex;
-      align-items: center;
-      gap: 1.2em;
-      flex-direction: row-reverse;
-    }
-
-    .c-icon-link {
-      display: flex;
-      align-items: center;
-      gap: 0.55em;
-    }
-
-    .c-icon-link svg { opacity: 0.9; flex-shrink: 0; }
-    .c-icon-link:hover svg { opacity: 1; }
-
-    .c-sep {
-      color: rgba(196, 164, 106, 0.85);
-      font-size: 0.5rem;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ammar Mian</title>
+<meta name="description" content="Ammar Mian — Associate professor at LISTIC, Université Savoie Mont-Blanc.">
+<link rel="preload" href="assets/fonts/cormorant-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
 
-  <!-- Scroll space -->
-  <div id="spacer"></div>
+<div class="hero-shell">
+  <canvas id="field" class="flow-canvas" aria-hidden="true"></canvas>
+  <div class="vignette vignette--hero" aria-hidden="true"></div>
 
-  <!-- Video background -->
-  <div id="video-wrap">
-    <video id="bg-video" muted loop playsinline preload="metadata"
-           disablepictureinpicture x-webkit-airplay="deny"
-           poster="assets/charvin_poster.jpg">
-      <source src="assets/charvin_loop_web.mp4" type="video/mp4">
-    </video>
-  </div>
+  <div class="hero-grid">
 
-  <!-- Grain overlay -->
-  <div id="grain">
-    <canvas id="grain-canvas"></canvas>
-  </div>
+    <header class="hdr" style="padding:0; min-height:48px">
+      <div class="hdr-brand">
+        <div id="fox" class="fox-slot" data-fox-dash role="button" aria-label="Fox mascot"></div>
+        <div class="brand-name">Ammar Mian</div>
+      </div>
+      <button type="button" id="navToggle" class="nav-toggle">Menu</button>
+      <nav class="nav-links">
+        <a href="Publications.html">Publications</a>
+        <a href="Students.html">Students</a>
+        <a href="CV.html">CV</a>
+        <a href="Contact.html">Contact</a>
+      </nav>
+    </header>
 
-  <!-- Layer A · empty parallax depth layer -->
-  <div class="layer" id="layer-a"></div>
-
-  <!-- Layer B · Name (medium parallax) -->
-  <div class="layer" id="layer-b">
-    <div id="title-wrap">
-      <span id="pre-title">Associate Professor</span>
-      <span id="title-mont">Ammar</span>
-      <span id="title-charvin">Mian</span>
+    <div class="hero-main">
+      <div class="hero-titles">
+        <h1 class="hero-h1">Ammar</h1>
+        <h1 class="hero-h1 hero-h1--ital">Mian</h1>
+        <div class="hero-role">Associate professor</div>
+        <div class="hero-rule"></div>
+      </div>
     </div>
-  </div>
 
-  <!-- Layer C · Rule + University (fast parallax) -->
-  <div class="layer" id="layer-c">
-    <div id="rule"></div>
-    <div id="location">
-      <span>Université Savoie Mont Blanc</span>
+    <div class="hero-foot">
+      <div class="field-menu-btn">
+        <button type="button" id="patternToggle" class="field-menu-toggle">
+          <span id="patternLabel">field</span>
+          <span id="patternCaret" style="font-size:8px; opacity:0.7">▴</span>
+        </button>
+        <div id="patternMenu" class="field-menu">
+          <div class="field-menu-label">Vector field</div>
+          <!-- items injected by script -->
+        </div>
+      </div>
+      <div class="hero-univ">Université Savoie Mont-Blanc</div>
     </div>
-  </div>
 
-  <!-- Contact block — appears before waves -->
-  <div id="contact-block">
-    <a href="mailto:ammar.mian@univ-smb.fr" class="c-link">ammar.mian@univ-smb.fr</a>
-    <div class="c-row">
-      <a href="https://github.com/ammarmian" target="_blank" rel="noopener" class="c-link c-icon-link">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-        </svg>
-        ammarmian
-      </a>
-      <span class="c-sep">·</span>
-      <a href="https://scholar.google.com/citations?user=XDirnBMAAAAJ&hl=fr" target="_blank" rel="noopener" class="c-link c-icon-link">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12 24a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm0-24L0 9.5l4.838 3.94A8 8 0 0 1 12 10a8 8 0 0 1 7.162 3.44L24 9.5z"/>
-        </svg>
-        Scholar
-      </a>
-      <span class="c-sep">·</span>
-      <a href="https://hal.science/search/index/?q=*&authIdPerson_i=1402765" target="_blank" rel="noopener" class="c-link c-icon-link">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M4 3h16a1 1 0 0 1 1 1v2H3V4a1 1 0 0 1 1-1zm-1 5h18v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8zm4 3v2h10v-2H7zm0 4v2h7v-2H7z"/>
-        </svg>
-        HAL
-      </a>
+    <button type="button" id="sparkBtn" class="spark-btn" aria-label="Open field lab">
+      <span class="spark-dot"></span>
+    </button>
+
+    <div id="labPanel" class="lab-panel">
+      <div class="lab-head">
+        <div class="lab-head-label">Den · field lab</div>
+        <button type="button" id="labClose" class="lab-close">×</button>
+      </div>
+      <div class="lab-body">
+        <div id="labControls"></div>
+        <div class="lab-inks">
+          <span class="lab-ink-label">Ink</span>
+          <div id="inkSwatches" class="lab-ink-swatches"></div>
+        </div>
+        <button type="button" id="labReset" class="lab-reset">Reset</button>
+      </div>
     </div>
+
   </div>
+</div>
 
-  <!-- Poem block — appears after waves -->
-  <div id="poem-block">
-    <span id="poem-col-1">山あれば山を観る<br>雨の日は雨を聴く</span>
-    <span id="poem-col-2">春夏秋冬<br>あしたもよろし<br>ゆふべもよろし</span>
-    <span id="poem-attr">Santōka Taneda · 種田山頭火</span>
-    <div id="translation-col-1">If there are mountains,<br>I look at the mountains;<br><br>On rainy days<br>I listen to the rain.</div>
-    <div id="translation-col-2">Spring, summer,<br>autumn, winter.<br>Tomorrow too will be good.<br>Tonight too is good.</div>
-  </div>
+<script src="assets/flow.js"></script>
+<script>
+(function () {
+  var DEFAULTS = {
+    particleCount: 2350, trailLength: 470, turbulence: 3, fieldScale: 65, stepSize: 13,
+    autoSpeed: 8, lineWidth: 20, lineOpacity: 15, brightness: 150, inkColor: "#c9d6e6"
+  };
+  var INKS = ["#c9d6e6", "#9fb3c8", "#d8c9a8", "#a8c0b8"];
+  var t = {}; // tweak overrides, same shape as DEFAULTS keys
+  var pick = null; // pinned pattern, null = random-per-load
 
+  function v(key) { return (key in t) ? t[key] : DEFAULTS[key]; }
 
-<!-- Brush strokes (late-scroll) -->
-  <div id="lines-layer">
-    <svg id="flow-lines" viewBox="0 0 1440 900"
-         preserveAspectRatio="xMidYMid slice"
-         xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <!-- Wavy paths reused at multiple stroke widths for brush quality -->
-        <path id="wave-1"
-          d="M 720,290
-             C 808,338 632,386 720,434
-             C 808,482 632,530 720,578
-             C 808,610 720,622 720,622"/>
-        <path id="wave-2"
-          d="M 748,318
-             C 828,364 668,410 748,456
-             C 828,502 748,542 748,564"/>
-        <path id="wave-3"
-          d="M 692,336
-             C 766,380 618,424 692,468
-             C 766,512 692,548 692,568"/>
+  function cfg() {
+    return {
+      bg: "#0a0d13",
+      count: v("particleCount"), trail: v("trailLength"), prewarm: 10,
+      ink: v("inkColor"), bright: v("brightness") / 100,
+      mode: "one-way", auto: v("autoSpeed") / 10,
+      scale: v("fieldScale") / 10000, pattern: pick || "random", fox: "none",
+      turb: v("turbulence") / 10, width: v("lineWidth") / 10, opacity: v("lineOpacity") / 100,
+      drift: 0, scrollPower: 0, step: v("stepSize") / 10
+    };
+  }
 
-        <!-- Clip rects — grow top→bottom on scroll -->
-        <clipPath id="clip-bs-1"><rect id="cr-1" x="0" y="0" width="1440" height="0"/></clipPath>
-        <clipPath id="clip-bs-2"><rect id="cr-2" x="0" y="0" width="1440" height="0"/></clipPath>
-        <clipPath id="clip-bs-3"><rect id="cr-3" x="0" y="0" width="1440" height="0"/></clipPath>
-      </defs>
+  var canvas = document.getElementById("field");
+  var chrome = Flow.initChrome({
+    canvas: canvas,
+    foxEl: document.getElementById("fox"),
+    navToggle: document.getElementById("navToggle"),
+    cfg: cfg
+  });
+  var field = chrome.field;
 
-      <!-- Stroke 1: center, first, tallest -->
-      <g clip-path="url(#clip-bs-1)" fill="none">
-        <use href="#wave-1" stroke="rgba(237,231,221,0.07)" stroke-width="42"/>
-        <use href="#wave-1" stroke="rgba(237,231,221,0.19)" stroke-width="16"/>
-        <use href="#wave-1" stroke="rgba(237,231,221,0.65)" stroke-width="3.2"/>
-      </g>
+  var patternLabel = document.getElementById("patternLabel");
+  var patternCaret = document.getElementById("patternCaret");
+  var patternToggle = document.getElementById("patternToggle");
+  var patternMenu = document.getElementById("patternMenu");
 
-      <!-- Stroke 2: slightly right, second -->
-      <g clip-path="url(#clip-bs-2)" fill="none">
-        <use href="#wave-2" stroke="rgba(237,231,221,0.06)" stroke-width="34"/>
-        <use href="#wave-2" stroke="rgba(237,231,221,0.16)" stroke-width="13"/>
-        <use href="#wave-2" stroke="rgba(237,231,221,0.52)" stroke-width="2.6"/>
-      </g>
+  function updatePatternLabel() {
+    var name = field.pattern;
+    patternLabel.textContent = name ? name + " field" : "field";
+  }
+  updatePatternLabel();
 
-      <!-- Stroke 3: slightly left, third -->
-      <g clip-path="url(#clip-bs-3)" fill="none">
-        <use href="#wave-3" stroke="rgba(237,231,221,0.05)" stroke-width="26"/>
-        <use href="#wave-3" stroke="rgba(237,231,221,0.13)" stroke-width="10"/>
-        <use href="#wave-3" stroke="rgba(237,231,221,0.44)" stroke-width="2.0"/>
-      </g>
-
-
-    </svg>
-  </div>
-
-
-  <!-- Scroll UI -->
-  <div id="scroll-ui">
-    <span class="scroll-label">scroll</span>
-    <div id="scroll-track">
-      <div id="scroll-thumb"></div>
-    </div>
-  </div>
-
-  <script>
-    /* ── Grain ──────────────────────────────────────────────── */
-    const grainCanvas = document.getElementById('grain-canvas');
-    const gCtx = grainCanvas.getContext('2d');
-    let grainW, grainH;
-
-    function resizeGrain() {
-      grainW = grainCanvas.width  = Math.ceil(window.innerWidth  * 1.06);
-      grainH = grainCanvas.height = Math.ceil(window.innerHeight * 1.06);
-    }
-
-    function drawGrain() {
-      const img = gCtx.createImageData(grainW, grainH);
-      const d = img.data;
-      for (let i = 0; i < d.length; i += 4) {
-        const v = (Math.random() * 255) | 0;
-        d[i] = d[i + 1] = d[i + 2] = v;
-        d[i + 3] = 14;
-      }
-      gCtx.putImageData(img, 0, 0);
-    }
-
-    resizeGrain();
-    drawGrain();
-    let grainInterval = setInterval(drawGrain, 85);
-    window.addEventListener('resize', () => { resizeGrain(); drawGrain(); });
-
-    /* ── Mouse parallax state ───────────────────────────────── */
-    let tMX = 0, tMY = 0, mX = 0, mY = 0;
-    window.addEventListener('mousemove', e => {
-      tMX = (e.clientX / window.innerWidth  - 0.5) * 2;
-      tMY = (e.clientY / window.innerHeight - 0.5) * 2;
-    });
-
-    /* ── Video scrubbing ────────────────────────────────────── */
-    const bgVideo = document.getElementById('bg-video');
-    let vidDur = 0;
-
-    // Disable all controls on mobile and desktop
-    bgVideo.removeAttribute('controls');
-    bgVideo.style.pointerEvents = 'none';
-
-    bgVideo.addEventListener('loadedmetadata', () => {
-      vidDur = bgVideo.duration;
-      bgVideo.pause();
-    });
-
-    // Prevent native UI and touch interactions
-    bgVideo.addEventListener('contextmenu', (e) => e.preventDefault());
-    document.addEventListener('touchstart', (e) => {
-      if (e.target === bgVideo) e.preventDefault();
-    }, { passive: false });
-
-    /* ── Brush strokes setup ────────────────────────────────── */
-    const linesLayer    = document.getElementById('lines-layer');
-    const poemBlock     = document.getElementById('poem-block');
-    const poemCol1      = document.getElementById('poem-col-1');
-    const poemCol2      = document.getElementById('poem-col-2');
-    const poemAttr      = document.getElementById('poem-attr');
-    const translationCol1 = document.getElementById('translation-col-1');
-    const translationCol2 = document.getElementById('translation-col-2');
-    const contactBlock  = document.getElementById('contact-block');
-    const brushStrokes = [
-      { rect: document.getElementById('cr-1'), start: 0.67, end: 0.85 },
-      { rect: document.getElementById('cr-2'), start: 0.77, end: 0.94 },
-      { rect: document.getElementById('cr-3'), start: 0.82, end: 0.98 },
-    ];
-
-    /* ── Element references ─────────────────────────────────── */
-    const videoWrap  = document.getElementById('video-wrap');
-    const layerA     = document.getElementById('layer-a');
-    const layerB     = document.getElementById('layer-b');
-    const layerC     = document.getElementById('layer-c');
-    const scrollThumb = document.getElementById('scroll-thumb');
-    const scrollTrack = document.getElementById('scroll-track');
-    const scrollUi   = document.getElementById('scroll-ui');
-
-    /* ── Entrance sequence ──────────────────────────────────── */
-    function showEl(id, cls = 'show') {
-      const el = document.getElementById(id);
-      if (el) el.classList.add(cls);
-    }
-
-    // Video reveal first
-    requestAnimationFrame(() => {
-      videoWrap.classList.add('visible');
-      setTimeout(() => {
-        showEl('pre-title');
-        showEl('title-mont');
-        showEl('title-charvin');
-        showEl('rule');
-        showEl('location');
-        scrollUi.classList.add('show');
-      }, 200);
-      // Socials fade in after name appears
-      setTimeout(() => {
-        contactBlock.classList.add('active');
-      }, 1200);
-    });
-
-    /* ── Parallax ───────────────────────────────────────────── */
-    let targetY  = 0;
-    let currentY = 0;
-
-    function lerp(a, b, t) { return a + (b - a) * t; }
-
-    function smoothstep(e0, e1, x) {
-      const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0)));
-      return t * t * (3 - 2 * t);
-    }
-
-    function onScroll() {
-      targetY = Math.max(0, Math.min(window.scrollY, TOTAL_H()));
-    }
-    window.addEventListener('scroll', onScroll, { passive: true });
-
-    const TOTAL_H = () => document.documentElement.scrollHeight - window.innerHeight;
-
-    function raf() {
-      currentY = lerp(currentY, targetY, 0.085);
-      mX = lerp(mX, tMX, 0.055);
-      mY = lerp(mY, tMY, 0.055);
-
-      const s        = currentY;
-      const total    = TOTAL_H();
-      const progress = total > 0 ? s / total : 0;
-
-      // Video: scroll parallax + subtle mouse tilt
-      videoWrap.style.transform =
-        `translateY(${-s * 0.07 + mY * 4}px) translateX(${mX * 3}px)`;
-
-      // Layer A: slow scroll + gentle mouse offset
-      layerA.style.transform =
-        `translateY(${-s * 0.20 + mY * 7}px) translateX(${mX * 5}px)`;
-
-      // Layer B: medium scroll + more mouse depth
-      layerB.style.transform =
-        `translateY(${-s * 0.38 + mY * 12}px) translateX(${mX * 9}px)`;
-
-      // Layer C: fast scroll + strongest mouse response
-      layerC.style.transform =
-        `translateY(${-s * 0.60 + mY * 18}px) translateX(${mX * 14}px)`;
-
-      // Video scrubbing
-      if (vidDur > 0) {
-        const seek = progress * vidDur;
-        if (Math.abs(bgVideo.currentTime - seek) > 0.08) bgVideo.currentTime = seek;
-      }
-
-      // Brush strokes: reveal top-to-bottom via clipRect
-      const linesOpacity = smoothstep(0.44, 0.60, progress);
-      linesLayer.style.opacity = linesOpacity;
-
-      brushStrokes.forEach(bs => {
-        const t = smoothstep(bs.start, bs.end, progress);
-        bs.rect.setAttribute('height', t * 900);
+  function renderPatternMenu() {
+    var items = patternMenu.querySelectorAll(".field-menu-item");
+    items.forEach(function (el) { el.remove(); });
+    ["random", "curl", "ridges", "swirl", "bands", "cells"].forEach(function (k) {
+      var active = k === "random" ? !pick : pick === k;
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "field-menu-item" + (active ? " active" : "");
+      btn.innerHTML = "<span>" + k + "</span><span>" + (active ? "·" : "") + "</span>";
+      btn.addEventListener("click", function () {
+        pick = k === "random" ? null : k;
+        field.setPattern(k);
+        updatePatternLabel();
+        renderPatternMenu();
+        patternMenu.classList.remove("open");
       });
-
-
-      // Poem: columns appear one after the other after waves complete
-      const col1Op = smoothstep(0.88, 0.94, progress);
-      const col2Op = smoothstep(0.94, 1.00, progress);
-      poemBlock.style.opacity = 1;
-      poemCol1.style.opacity = col1Op;
-      poemCol2.style.opacity = col2Op;
-      poemAttr.style.opacity = col2Op;
-
-      // Auto-reset translation state when scrolling away from waves
-      if (col1Op < 0.05 && translationVisible) {
-        translationVisible = false;
-        poemCol1.classList.remove('hide');
-        poemCol2.classList.remove('hide');
-        translationCol1.classList.remove('reveal');
-        translationCol2.classList.remove('reveal');
-        linesLayer.classList.remove('dimmed');
-      }
-
-      // Scroll thumb
-      scrollThumb.style.top = `${progress * (scrollTrack.offsetHeight - 3)}px`;
-
-      requestAnimationFrame(raf);
-    }
-
-    requestAnimationFrame(raf);
-
-    /* ── Translation reveal on waves ────────────────────────── */
-    const waveElements = document.querySelectorAll('#flow-lines use');
-    let translationVisible = false;
-
-    // Detect if device supports hover
-    const supportsHover = window.matchMedia('(hover: hover)').matches;
-
-    function toggleTranslation() {
-      translationVisible = !translationVisible;
-      if (translationVisible) {
-        poemCol1.classList.add('hide');
-        poemCol2.classList.add('hide');
-        translationCol1.classList.add('reveal');
-        translationCol2.classList.add('reveal');
-        linesLayer.classList.add('dimmed');
-      } else {
-        poemCol1.classList.remove('hide');
-        poemCol2.classList.remove('hide');
-        translationCol1.classList.remove('reveal');
-        translationCol2.classList.remove('reveal');
-        linesLayer.classList.remove('dimmed');
-      }
-    }
-
-    waveElements.forEach(wave => {
-      // Desktop hover behavior (only if device supports hover)
-      if (supportsHover) {
-        wave.addEventListener('mouseenter', () => {
-          poemCol1.classList.add('hide');
-          poemCol2.classList.add('hide');
-          translationCol1.classList.add('reveal');
-          translationCol2.classList.add('reveal');
-        });
-
-        wave.addEventListener('mouseleave', () => {
-          poemCol1.classList.remove('hide');
-          poemCol2.classList.remove('hide');
-          translationCol1.classList.remove('reveal');
-          translationCol2.classList.remove('reveal');
-        });
-      } else {
-        // Mobile tap behavior (only if device doesn't support hover)
-        wave.addEventListener('touchstart', (e) => {
-          e.preventDefault();
-          toggleTranslation();
-        });
-      }
+      patternMenu.appendChild(btn);
     });
-  </script>
+  }
+  renderPatternMenu();
+
+  patternToggle.addEventListener("click", function () {
+    var open = patternMenu.classList.toggle("open");
+    patternCaret.textContent = open ? "▾" : "▴";
+  });
+  document.addEventListener("click", function (e) {
+    if (!patternMenu.classList.contains("open")) return;
+    if (!patternMenu.contains(e.target) && e.target !== patternToggle && !patternToggle.contains(e.target)) {
+      patternMenu.classList.remove("open");
+      patternCaret.textContent = "▴";
+    }
+  });
+
+  // field lab drawer
+  var sparkBtn = document.getElementById("sparkBtn");
+  var labPanel = document.getElementById("labPanel");
+  var labClose = document.getElementById("labClose");
+  var labControls = document.getElementById("labControls");
+  var inkSwatches = document.getElementById("inkSwatches");
+  var labReset = document.getElementById("labReset");
+
+  var STRUCTURAL = ["particleCount", "trailLength", "fieldScale", "turbulence", "stepSize"];
+
+  var CONTROLS = [
+    { key: "particleCount", label: "Particles", min: 100, max: 8000, step: 50, fmt: function (x) { return String(x); } },
+    { key: "trailLength", label: "Trail", min: 10, max: 900, step: 10, fmt: function (x) { return String(x); } },
+    { key: "turbulence", label: "Turbulence", min: 2, max: 90, step: 1, fmt: function (x) { return (x / 10).toFixed(1); } },
+    { key: "fieldScale", label: "Field scale", min: 2, max: 120, step: 1, fmt: function (x) { return (x / 10000).toFixed(4); } },
+    { key: "stepSize", label: "Step", min: 5, max: 60, step: 1, fmt: function (x) { return (x / 10).toFixed(1); } },
+    { key: "autoSpeed", label: "Speed", min: 1, max: 50, step: 1, fmt: function (x) { return (x / 10).toFixed(1); } },
+    { key: "lineWidth", label: "Line width", min: 1, max: 60, step: 1, fmt: function (x) { return (x / 10).toFixed(1); } },
+    { key: "lineOpacity", label: "Opacity", min: 1, max: 100, step: 1, fmt: function (x) { return x + "%"; } },
+    { key: "brightness", label: "Brightness", min: 10, max: 400, step: 5, fmt: function (x) { return x + "%"; } }
+  ];
+
+  function renderControls() {
+    labControls.innerHTML = "";
+    CONTROLS.forEach(function (c) {
+      var val = v(c.key);
+      var wrap = document.createElement("div");
+      wrap.className = "lab-control";
+      wrap.innerHTML =
+        '<div class="lab-control-head"><span class="lab-control-name">' + c.label +
+        '</span><span class="lab-control-val">' + c.fmt(val) + '</span></div>';
+      var input = document.createElement("input");
+      input.type = "range"; input.min = c.min; input.max = c.max; input.step = c.step; input.value = val;
+      input.addEventListener("input", function (e) {
+        t[c.key] = Number(e.target.value);
+        wrap.querySelector(".lab-control-val").textContent = c.fmt(t[c.key]);
+        if (STRUCTURAL.indexOf(c.key) >= 0) field.reseed();
+      });
+      wrap.appendChild(input);
+      labControls.appendChild(wrap);
+    });
+  }
+  renderControls();
+
+  function renderInks() {
+    inkSwatches.innerHTML = "";
+    INKS.forEach(function (hex) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "lab-ink-swatch" + (v("inkColor") === hex ? " active" : "");
+      btn.style.background = hex;
+      btn.addEventListener("click", function () {
+        t.inkColor = hex;
+        renderInks();
+      });
+      inkSwatches.appendChild(btn);
+    });
+  }
+  renderInks();
+
+  labReset.addEventListener("click", function () {
+    t = {};
+    renderControls();
+    renderInks();
+    field.reseed();
+  });
+
+  sparkBtn.addEventListener("click", function () { labPanel.classList.toggle("open"); });
+  labClose.addEventListener("click", function () { labPanel.classList.remove("open"); });
+})();
+</script>
 </body>
 </html>
