@@ -93,6 +93,15 @@
     cfg: cfg
   });
 
+  function safeUrl(u) {
+    try {
+      var parsed = new URL(u, window.location.href);
+      return (parsed.protocol === "http:" || parsed.protocol === "https:") ? parsed.href : "#";
+    } catch (e) {
+      return "#";
+    }
+  }
+
   function visible() {
     var out = state.filter === "All" ? state.docs : state.docs.filter(function (d) { return d.kind === state.filter; });
     var q = (state.query || "").trim().toLowerCase();
@@ -176,7 +185,7 @@
         var a = document.createElement("a");
         a.className = "pub-row";
         a.setAttribute("data-node", "");
-        a.href = d.uri;
+        a.href = safeUrl(d.uri);
         a.target = "_blank";
         a.rel = "noopener";
         a.innerHTML =
