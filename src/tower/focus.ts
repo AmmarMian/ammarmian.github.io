@@ -56,7 +56,12 @@ export function createFocusController(opts: {
     });
   }
 
+  // Remembered so the framing can be re-derived when something other than
+  // navigation changes it — the console opening, for one.
+  let framedFloor: number | null = null;
+
   function focusFloor(k: number | null): Promise<void> {
+    framedFloor = k;
     floors.forEach((f, i) => {
       const on = k === null || i <= k;
       f.g.visible = on; f.fg.visible = on;
@@ -99,9 +104,34 @@ export function createFocusController(opts: {
     panelSide = open ? side : null;
   }
 
+  /** Re-run the current framing without changing which floor is in view —
+   *  for when the space available to the tower changes rather than the
+   *  subject, as when the console opens beside it. */
+  function reframe(dur = 900): Promise<void> {
+    const k = framedFloor;
+    const box = new THREE.Box3();
+    if (k === null) box.setFromObject(model); else box.setFromObject(floors[k].g);
+    if (k !== null) box.max.y = Math.min(box.max.y, k * FH + WH + 0.5);
+    const sph = box.getBoundingSphere(new THREE.Sphere());
+    const target = sph.center.clone();
+    // Keep the visitor's own azimuth — they may have turned the tower since
+    // it was framed, and yanking it back would feel like a reset.
+    const dir = camera.position.clone().sub(controls.target).normalize();
+    if (panelSide && !isNarrowViewport()) {
+      const forward = dir.clone().multiplyScalar(-1);
+      const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
+      target.addScaledVector(right, sph.radius * 0.85 * (panelSide === 'right' ? 1 : -1));
+    }
+    const dist = camera.position.distanceTo(controls.target);
+    const wasRotating = controls.autoRotate;
+    return flyTo(target.clone().addScaledVector(dir, dist), target, dur).then(() => {
+      controls.autoRotate = wasRotating;
+    });
+  }
+
   // Any deliberate interaction is the visitor taking the wheel — stop the
   // idle rotation so free navigation never feels like it's fighting back.
   controls.addEventListener('start', () => { controls.autoRotate = false; });
 
-  return { flyTo, focusFloor, setPanelOpen };
+  return { flyTo, focusFloor, setPanelOpen, reframe };
 }

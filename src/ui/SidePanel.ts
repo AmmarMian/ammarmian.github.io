@@ -1,6 +1,13 @@
 import type { TowerScene } from '../tower/scene';
 import { createSearchInput } from './SearchBox';
-import { fetchHalPublications, filterHalDocs, shelfFor, docSlugFor, type HalDoc } from '../data/hal';
+import {
+  fetchHalPublications, filterHalDocs, shelfFor, docSlugFor,
+  toBibTeX, toBibTeXAll, toCSV, toPlainCitation, type HalDoc,
+} from '../data/hal';
+import { copyText, downloadText, flashLabel, announce } from './io';
+import { setRecordMeta, setRouteMeta } from './meta';
+import { routeForSlug } from '../router';
+import { WORLD_LABELS, WORLD_BLURBS } from '../data/worlds';
 import { createYearRangeSlider } from './YearRange';
 import type { FloorRoute } from '../router';
 import { PROFILE, CONTACT } from '../data/profile';
@@ -128,7 +135,11 @@ export class SidePanel {
     const list = document.createElement('ul');
     list.className = 'pub-list';
 
+    // What the filters currently show — the set the export buttons act on.
+    let shown: HalDoc[] = docs;
+
     const render = (results: HalDoc[]) => {
+      shown = results;
       list.innerHTML = '';
       status.textContent = `${results.length} record${results.length === 1 ? '' : 's'} · idHAL ammar-mian`;
       for (const doc of results) {
@@ -178,6 +189,36 @@ export class SidePanel {
       this.bodyEl.appendChild(slider);
     }
 
+    // Export acts on whatever the filters currently show, not the whole
+    // record — "the twelve SAR papers since 2020" is the set people
+    // actually want, and they've just built it with the controls above.
+    const actions = document.createElement('div');
+    actions.className = 'pub-actions';
+    const exportBtn = (label: string, run: () => void) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip-btn';
+      b.textContent = label;
+      b.addEventListener('click', run);
+      actions.appendChild(b);
+      return b;
+    };
+    const stamp = () => new Date().toISOString().slice(0, 10);
+    exportBtn('.bib', () => {
+      downloadText(`ammar-mian-${stamp()}.bib`, toBibTeXAll(shown), 'application/x-bibtex');
+      announce(`Exported ${shown.length} records as BibTeX`);
+    });
+    exportBtn('.csv', () => {
+      downloadText(`ammar-mian-${stamp()}.csv`, toCSV(shown), 'text/csv');
+      announce(`Exported ${shown.length} records as CSV`);
+    });
+    const copyAll = exportBtn('copy BibTeX', async () => {
+      const ok = await copyText(toBibTeXAll(shown));
+      flashLabel(copyAll, ok ? 'copied ✓' : 'copy failed');
+      announce(ok ? `${shown.length} BibTeX entries copied` : 'Copy failed');
+    });
+
+    this.bodyEl.appendChild(actions);
     this.bodyEl.appendChild(status);
     this.bodyEl.appendChild(list);
     render(docs);
@@ -203,17 +244,51 @@ export class SidePanel {
     void this.tower.pluckBook(shelf);
     void this.tower.focusShelf(shelf);
 
+    const slug = docSlugFor(doc.id);
+    const permalink = `${window.location.origin}/publications#doc-${encodeURIComponent(slug)}`;
+
     this.bodyEl.innerHTML = `
       <button class="back-link" type="button">&larr; back to the shelves</button>
       <h2>${escapeHtml(doc.title)}</h2>
       <p class="pub-meta">${escapeHtml(doc.authors)}</p>
       <p class="pub-meta">${escapeHtml(doc.venue)} &middot; ${doc.year || 'n.d.'} &middot; ${escapeHtml(doc.kind)}</p>
-      <a class="read-link" href="${escapeAttr(doc.uri)}" target="_blank" rel="noopener">Read on HAL &rarr;</a>
+      ${doc.doi ? `<p class="pub-meta">doi: <a href="https://doi.org/${escapeAttr(doc.doi)}" target="_blank" rel="noopener">${escapeHtml(doc.doi)}</a></p>` : ''}
+      <p class="pub-links">
+        <a class="read-link" href="${escapeAttr(doc.uri)}" target="_blank" rel="noopener">Read on HAL &rarr;</a>
+        ${doc.pdf ? `<a class="read-link" href="${escapeAttr(doc.pdf)}" target="_blank" rel="noopener">PDF &rarr;</a>` : ''}
+      </p>
+      <div class="pub-actions pub-actions-detail"></div>
     `;
     this.bodyEl.querySelector('.back-link')!.addEventListener('click', () => this.closeDetail());
 
+    // The things a reader of an academic page actually reaches for.
+    const acts = this.bodyEl.querySelector('.pub-actions-detail') as HTMLElement;
+    const act = (label: string, get: () => string, said: string) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip-btn';
+      b.textContent = label;
+      b.addEventListener('click', async () => {
+        const ok = await copyText(get());
+        flashLabel(b, ok ? 'copied ✓' : 'copy failed');
+        announce(ok ? `${said} copied` : 'Copy failed');
+      });
+      acts.appendChild(b);
+    };
+    act('copy BibTeX', () => toBibTeX(doc), 'BibTeX');
+    act('copy citation', () => toPlainCitation(doc), 'Citation');
+    act('copy link', () => permalink, 'Link');
+    const dl = document.createElement('button');
+    dl.type = 'button';
+    dl.className = 'chip-btn';
+    dl.textContent = '.bib';
+    dl.addEventListener('click', () => downloadText(`${slug}.bib`, toBibTeX(doc) + '\n', 'application/x-bibtex'));
+    acts.appendChild(dl);
+
+    setRecordMeta(doc.title, doc.authors, doc.year, slug);
+
     this.clearDetailHandler();
-    const hash = '#doc-' + encodeURIComponent(docSlugFor(doc.id));
+    const hash = '#doc-' + encodeURIComponent(slug);
     if (pushHistory && window.location.hash !== hash) window.history.pushState({}, '', window.location.pathname + hash);
     this.detailPopHandler = () => { if (window.location.hash !== hash) this.closeDetail(false); };
     window.addEventListener('popstate', this.detailPopHandler);
@@ -221,6 +296,9 @@ export class SidePanel {
 
   private closeDetail(popHash = true) {
     this.clearDetailHandler();
+    // The record replaced the page title and canonical URL; the list is the
+    // publications floor again.
+    setRouteMeta(routeForSlug('publications'), 'publications');
     if (popHash && /^#doc-/.test(window.location.hash)) window.history.back();
     this.bodyEl.innerHTML = '';
     // Pull the camera back out from the shelf close-up to the general
@@ -255,10 +333,52 @@ export class SidePanel {
     this.bodyEl.appendChild(ul);
   }
 
+  /** The sanctum is the gate room, so its panel is the gate: the same
+   *  destinations the dial offers, reachable from here. It used to be a
+   *  single paragraph promising content that didn't exist. */
   private renderElsewhere() {
+    const worlds = this.tower.worlds;
     const p = document.createElement('p');
-    p.textContent = 'The portal genuinely shows other worlds. Turn the dial in the sanctum to step the gate to the next one — a few more of them will open up here later.';
+    p.textContent = 'The portal here genuinely opens. Step the tower through it and the world outside the windows changes — the light, the fog and the glass all follow.';
     this.bodyEl.appendChild(p);
+
+    const list = document.createElement('ul');
+    list.className = 'pub-list';
+    const rows: { kind: string | null; label: string; blurb: string }[] = [
+      { kind: null, label: 'Back to the tower', blurb: 'No world — the ordinary sky' },
+      ...worlds.kinds.map((k: string) => ({
+        kind: k,
+        label: WORLD_LABELS[k] ?? k,
+        blurb: WORLD_BLURBS[k] ?? '',
+      })),
+    ];
+    for (const r of rows) {
+      const li = document.createElement('li');
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pub-item';
+      btn.innerHTML = `<strong>${escapeHtml(r.label)}</strong><span>${escapeHtml(r.blurb)}</span>`;
+      if (worlds.current() === r.kind) btn.setAttribute('aria-current', 'true');
+      btn.addEventListener('click', () => {
+        worlds.teleport(r.kind);
+        // The gate takes about two seconds; re-mark the active row once the
+        // tower has come back down rather than guessing at it now.
+        window.addEventListener('lair-teleport', function done(e: any) {
+          if (e.detail?.phase !== 'done') return;
+          window.removeEventListener('lair-teleport', done);
+          for (const b of list.querySelectorAll('.pub-item')) b.removeAttribute('aria-current');
+          if (worlds.current() === r.kind) btn.setAttribute('aria-current', 'true');
+        });
+      });
+      li.appendChild(btn);
+      list.appendChild(li);
+    }
+    this.bodyEl.appendChild(list);
+
+    const note = document.createElement('p');
+    note.className = 'pub-meta';
+    note.textContent = 'The dial in this room and the telescope in the observatory reach the same places.';
+    this.bodyEl.appendChild(note);
   }
 
   private renderNow() {

@@ -9,6 +9,7 @@
  *   worlds.shell('ghost');             // 'off' | 'ghost' | 'solid'
  *   worlds.teleport('forest');         // rise into light, swap world, descend
  *   worlds.tick(tSeconds, dtSeconds);  // once per frame
+ *   worlds.rebase();                   // re-snapshot the lights as the no-world baseline
  *
  * dims: { R, FH, NF, WH, TOP? }
  */
@@ -218,6 +219,18 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims }) {
     hemi: rig.hemi && { i: rig.hemi.intensity, sky: rig.hemi.color.clone(), gnd: rig.hemi.groundColor.clone() },
     keys: rig.keys.map((l) => ({ i: l.intensity, c: l.color.clone(), p: l.position.clone() })),
   };
+  /* Re-snapshot the rig as the new "no world" baseline. The host page owns
+     the ordinary tower's lighting — it runs a day/night wash on these same
+     three lights — so the defaults captured at install time go stale within
+     minutes. The host calls this whenever it has just written the baseline
+     itself, and only while no world is active. */
+  function rebase() {
+    if (rig.hemi) {
+      rigDefaults.hemi = { i: rig.hemi.intensity, sky: rig.hemi.color.clone(), gnd: rig.hemi.groundColor.clone() };
+    }
+    rigDefaults.keys = rig.keys.map((l) => ({ i: l.intensity, c: l.color.clone(), p: l.position.clone() }));
+  }
+
   function applyLight(cfg) {
     if (rig.hemi) {
       const d = rigDefaults.hemi;
@@ -1926,6 +1939,9 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims }) {
     tpFx.visible = true;
     if (fx) fx.visible = false;
     window.dispatchEvent(new CustomEvent('lair-teleport', { detail: { kind, phase: 'out' } }));
+    // One frame later, so the flash is already on screen before the build
+    // blocks the main thread — the rise then covers the whole cost.
+    if (!tp.swap) requestAnimationFrame(() => { if (tp.active) ensureBuilt(kind); });
     return true;
   }
 
@@ -2236,6 +2252,44 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims }) {
   const savedFog = scene.fog;
   let current = null;
 
+  /* Worlds are expensive to build and expensive to keep: a couple of
+     hundred thousand vertices, a dozen shader programs and a fistful of
+     instanced meshes each. Visiting all six and holding every one resident
+     is a lot of idle VRAM for scenery nobody is looking at, so only the
+     most recently used few survive. Textures are deliberately left alone —
+     the soft sprite map and friends are shared across every builder. */
+  const KEEP = 3;
+  const recent = [];
+
+  function touch(kind) {
+    const i = recent.indexOf(kind);
+    if (i >= 0) recent.splice(i, 1);
+    recent.unshift(kind);
+    for (const stale of recent.splice(KEEP)) release(stale);
+  }
+
+  function release(kind) {
+    const w = built[kind];
+    if (!w || kind === current) return;
+    scene.remove(w.group);
+    w.group.traverse((o) => {
+      if (o.geometry) o.geometry.dispose();
+      const mats = Array.isArray(o.material) ? o.material : o.material ? [o.material] : [];
+      for (const m of mats) m.dispose();
+    });
+    delete built[kind];
+  }
+
+  /* Building during the teleport's rise is the whole point: a fresh world
+     costs tens of milliseconds, and the rise is ~950ms of white flash that
+     hides the hitch completely. Called ahead of the swap, never on it. */
+  function ensureBuilt(kind) {
+    if (!kind || built[kind] || !BUILDERS[kind]) return;
+    built[kind] = BUILDERS[kind]();
+    built[kind].group.visible = false;
+    scene.add(built[kind].group);
+  }
+
   function set(kind, quiet) {
     if (kind === current && !quiet) return current;
     if (current && built[current]) built[current].group.visible = false;
@@ -2248,10 +2302,8 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims }) {
       refreshFog();
       return current;
     }
-    if (!built[kind]) {
-      built[kind] = BUILDERS[kind]();
-      scene.add(built[kind].group);
-    }
+    ensureBuilt(kind);
+    touch(kind);
     const w = built[kind];
     w.group.visible = true;
     scene.fog = w.fog;
@@ -2280,6 +2332,9 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims }) {
     kinds: ['seafloor', 'moon', 'forest', 'beach', 'city', 'space'],
     set,
     tick,
+    /* the host owns the tower's own light rig (it runs a day/night wash on
+       it); this tells the world system what "no world" now looks like */
+    rebase,
     teleport,
     teleporting: () => tp.active,
     shell: setShell,

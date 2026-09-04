@@ -138,9 +138,41 @@ body[data-backdrop="meadow"] { background: linear-gradient(#8fc4e8 0%, #bcd9ea 4
   appearance: none; background: none; border: none; cursor: pointer;
   font-size: 10px; letter-spacing: 0.1em; text-decoration: none;
 }
-.nav-util-first { margin-left: 6px; padding-left: 20px; border-left: 1px solid var(--rule); }
 .nav-util-on { color: var(--accent-bright); }
 .nav-util-on::before { content: '●'; font-size: 6px; vertical-align: middle; margin-right: 5px; color: var(--accent); }
+
+/* The utility group — how you look at the tower, kept clearly apart from
+   the floors, which are where you go. */
+.nav-utils {
+  display: flex; align-items: center; gap: 18px;
+  margin-left: 4px; padding-left: 22px; border-left: 1px solid var(--rule);
+}
+.nav-views-wrap { position: relative; }
+.nav-views { display: flex; align-items: center; gap: 5px; }
+.nav-caret { font-size: 8px; opacity: 0.7; transition: transform 160ms ease; }
+.nav-views-open .nav-caret { transform: rotate(180deg); }
+.nav-views-open .nav-views { color: var(--accent-bright); }
+
+.nav-menu {
+  position: absolute; top: calc(100% + 10px); right: 0; z-index: 8;
+  min-width: 240px; display: flex; flex-direction: column;
+  background: var(--bg); border: 1px solid var(--rule); border-radius: 4px;
+  padding: 6px; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+.nav-menu[hidden] { display: none; }
+.nav-menu-item {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 9px 10px; border-radius: 3px;
+  text-decoration: none; color: var(--ink);
+  transition: background 140ms ease, color 140ms ease;
+}
+.nav-menu-item strong { font-weight: 500; font-size: 12px; letter-spacing: 0.02em; }
+.nav-menu-item span { font-size: 10.5px; color: var(--ink-dim); line-height: 1.45; }
+.nav-menu-item:hover { background: rgba(111, 214, 255, 0.08); color: var(--accent-bright); }
+.nav-menu-item[aria-current="true"] { color: var(--accent-bright); }
+.nav-menu-item[aria-current="true"] strong::before {
+  content: '● '; font-size: 8px; color: var(--accent); vertical-align: middle;
+}
 
 /* ---------- dot nav: mobile-only, tap a dot or slide the row ---------- */
 .dot-nav {
@@ -361,50 +393,205 @@ body[data-backdrop="meadow"] { background: linear-gradient(#8fc4e8 0%, #bcd9ea 4
 .dest-item[aria-current="true"] { color: var(--accent-bright); }
 .dest-item[aria-current="true"] strong::before { content: '● '; color: var(--accent); font-size: 9px; }
 
-/* ---------- terminal overlay ---------- */
-.term-overlay {
-  position: fixed; inset: 0; z-index: 30;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(4, 5, 12, 0.68);
-  opacity: 0; transition: opacity 200ms ease;
+/* ---------- publication export chips ---------- */
+.pub-actions { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 12px; }
+.callout-left .pub-actions { justify-content: flex-end; }
+.pub-actions-detail { margin-top: 14px; }
+.chip-btn {
+  appearance: none; cursor: pointer;
+  font: inherit; font-size: 10.5px; letter-spacing: 0.08em;
+  color: var(--ink-dim); background: none;
+  border: 1px solid var(--rule); border-radius: 3px;
+  padding: 4px 9px;
+  transition: color 140ms ease, border-color 140ms ease;
 }
-.term-overlay[hidden] { display: none; }
-.term-overlay.term-overlay-visible { opacity: 1; }
-.term-card {
-  width: min(560px, 92vw); height: min(420px, 70vh);
+.chip-btn:hover { color: var(--accent-bright); border-color: var(--accent); }
+.chip-btn.is-flashing { color: var(--accent-bright); border-color: var(--accent); }
+.pub-links { display: flex; gap: 16px; margin: 0; }
+.callout-left .pub-links { justify-content: flex-end; }
+
+/* ---------- console: a column of text standing in the scene ----------
+   Deliberately chromeless. It's built from the same parts as a floor
+   callout — kicker, body, back-link — so it reads as another panel of this
+   site rather than a terminal emulator dropped on top of it. The only
+   background is a soft scrim, enough to keep text legible over the tower. */
+.console {
+  position: fixed; right: 5vw; top: 15%; bottom: 11%; z-index: 25;
+  /* Grows with the viewport rather than sitting at a fixed narrow column —
+     on a wide screen there is a lot of empty scenery to the right of the
+     tower, and a cramped console just wraps its own help table. Capped so
+     the lines stay a readable measure. */
+  width: clamp(400px, 46vw, 820px);
   display: flex; flex-direction: column;
-  background: #05060d; border: 1px solid var(--rule); border-radius: 6px;
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
-  transform: translateY(6px); transition: transform 200ms ease;
-  overflow: hidden;
+  font-family: var(--font-mono);
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 300ms ease, transform 300ms ease;
+  pointer-events: none;
 }
-.term-overlay-visible .term-card { transform: translateY(0); }
-.term-titlebar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 12px; border-bottom: 1px solid var(--rule);
-  font-family: var(--font-display); font-size: 11px; letter-spacing: 0.08em;
-  color: var(--ink-dim); text-transform: lowercase;
+.console > * { pointer-events: auto; }
+.console[hidden] { display: none; }
+.console.console-visible { opacity: 1; transform: translateY(0); }
+
+.console-log {
+  flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: thin; padding-bottom: 10px;
+  font-size: 12.5px; line-height: 1.65; color: var(--ink);
 }
-.term-close {
-  appearance: none; background: none; border: none; color: var(--ink-dim);
-  font-size: 16px; line-height: 1; cursor: pointer; padding: 0 4px;
+.console-line { white-space: pre-wrap; word-break: break-word; min-height: 0.65em; }
+/* Two-column rows (the help table, publication listings) keep their second
+   column aligned when a line wraps, instead of the overflow starting back
+   at column 0 and reading as a new entry. */
+.console-cmd, .ascii-cmd { padding-left: 26ch; text-indent: -26ch; }
+.console-hit, .ascii-hit { padding-left: 14ch; text-indent: -14ch; }
+.console-echo { color: var(--accent); }
+.console-dim { color: var(--ink-dim); }
+.console-err { color: #ff9d84; }
+.console-ok { color: #93e6a8; }
+.console-head { color: var(--accent-bright); }
+.console-pre { color: var(--accent-warm); font-size: 11.5px; }
+
+/* The prompt is a line of type, not a form control: no box, no fill, just
+   a caret that blinks where you're typing. */
+.console-inputline {
+  flex: 0 0 auto; display: flex; align-items: baseline; gap: 9px;
+  border-top: 1px solid var(--rule); padding: 12px 0 4px;
 }
-.term-close:hover { color: var(--accent-bright); }
-.term-log {
-  flex: 1 1 auto; overflow-y: auto; padding: 10px 12px;
-  font-family: var(--font-mono); font-size: 12.5px; line-height: 1.6; color: var(--accent-bright);
+.console-prompt { color: var(--accent); font-size: 14px; line-height: 1; }
+.console-input {
+  flex: 1 1 auto; min-width: 0;
+  background: none; border: none; outline: none; padding: 0;
+  font: inherit; font-size: 13.5px; color: var(--accent-bright);
+  caret-color: var(--accent);
 }
-.term-line { white-space: pre-wrap; word-break: break-word; }
-.term-inputline {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 12px; border-top: 1px solid var(--rule);
+.console-input::placeholder { color: var(--ink-dim); opacity: 0.7; }
+.console-close { margin: 12px 0 0; }
+
+/* The tower keeps the whole frame — the console floats over it. A callout
+   on the same side would collide, so it moves aside while the console is up. */
+body[data-console="on"] .callout-right { right: auto; left: 5vw; }
+body[data-console="on"] .callout-right .callout-inner { text-align: right; }
+body[data-console="on"] .callout-right .leader-wrap { left: auto; right: -220px; }
+body[data-console="on"] .callout-right .leader { transform: scaleX(-1); }
+body[data-console="on"] .help-btn,
+body[data-console="on"] .dest-btn { opacity: 0.25; }
+
+/* ---------- ASCII console: the same site, drawn in type ----------
+   Same palette, same display face for headings, same hairline rules and
+   kickers as every other page here. The tower is text; the design isn't. */
+.ascii-view {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  width: 100%; max-width: 780px; margin: 0 auto;
+  padding: 40px 24px max(16px, env(safe-area-inset-bottom));
+  font-family: var(--font-mono); color: var(--ink);
 }
-.term-prompt { color: var(--accent); font-family: var(--font-mono); font-size: 13px; }
-.term-input {
-  flex: 1 1 auto; background: none; border: none; outline: none;
-  font: inherit; font-family: var(--font-mono); font-size: 13px; color: var(--ink);
+.ascii-masthead { flex: 0 0 auto; }
+.ascii-name {
+  font-family: var(--font-display); font-weight: 500; font-size: 30px;
+  letter-spacing: 0.01em; color: var(--accent-bright); margin-bottom: 4px;
 }
-.term-input::placeholder { color: var(--ink-dim); }
+.ascii-role { font-size: 12px; color: var(--accent); letter-spacing: 0.02em; }
+.ascii-modes {
+  margin-top: 10px; display: flex; gap: 10px; align-items: baseline;
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-dim);
+}
+.ascii-modes a { color: var(--ink-dim); text-decoration: none; transition: color 140ms ease; }
+.ascii-modes a:hover { color: var(--accent-bright); }
+
+/* The tower diagram sits beside the log on a wide screen, above it on a
+   phone — the same "drawing plus callout" relationship the 3D view has. */
+.ascii-body {
+  flex: 1 1 auto; display: flex; gap: 28px; min-height: 0;
+  margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--rule);
+}
+.ascii-tower {
+  flex: 0 0 auto; margin: 0; padding: 0;
+  font-family: var(--font-mono); font-size: 11.5px; line-height: 1.3;
+  color: var(--ink-dim); white-space: pre;
+}
+.ascii-row { display: block; }
+button.ascii-row {
+  appearance: none; background: none; border: none; padding: 0;
+  font: inherit; color: inherit; text-align: left; width: 100%; cursor: pointer;
+  transition: color 140ms ease;
+}
+button.ascii-row:hover { color: var(--accent); }
+.ascii-row-active { color: var(--accent-bright); }
+
+.ascii-log {
+  flex: 1 1 auto; min-width: 0; overflow-y: auto; overscroll-behavior: contain;
+  font-size: 12.5px; line-height: 1.65; scrollbar-width: thin; padding-bottom: 8px;
+}
+.ascii-line { white-space: pre-wrap; word-break: break-word; min-height: 0.65em; }
+.ascii-echo { color: var(--accent); }
+.ascii-dim { color: var(--ink-dim); }
+.ascii-err { color: #ff9d84; }
+.ascii-ok { color: #93e6a8; }
+.ascii-line.ascii-head { color: var(--accent-bright); }
+.ascii-pre { color: var(--accent-warm); font-size: 11.5px; }
+
+.ascii-inputline {
+  flex: 0 0 auto; display: flex; align-items: baseline; gap: 10px;
+  border-top: 1px solid var(--rule); padding-top: 14px; margin-top: 4px;
+}
+.ascii-prompt { color: var(--accent); font-size: 15px; line-height: 1; }
+.ascii-input {
+  flex: 1 1 auto; min-width: 0;
+  background: none; border: none; outline: none; padding: 0;
+  font: inherit; font-size: 16px;   /* 16px keeps iOS from zooming the page */
+  color: var(--accent-bright); caret-color: var(--accent);
+}
+.ascii-input::placeholder { color: var(--ink-dim); font-size: 13px; }
+.ascii-keys {
+  flex: 0 0 auto; display: flex; flex-wrap: wrap; gap: 8px; padding-top: 14px;
+}
+.ascii-key {
+  appearance: none; cursor: pointer; font: inherit;
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-dim); background: none;
+  border: 1px solid var(--rule); border-radius: 3px; padding: 7px 11px;
+  transition: color 140ms ease, border-color 140ms ease;
+}
+.ascii-key:hover { color: var(--accent-bright); border-color: var(--accent); }
+
+/* ---------- keyboard focus ---------- */
+/* Every interactive thing here had its outline removed and nothing put
+   back, which made the whole site unnavigable by keyboard. :focus-visible
+   keeps the ring off mouse clicks. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.search-box input:focus-visible,
+.pub-filter-select:focus-visible { outline-offset: 4px; }
+/* The two prompts are the one place a focus ring is pure noise: the caret
+   sits on a lit prompt glyph, which says where you're typing far better
+   than a box drawn around an invisible field would. */
+.console-input:focus,
+.console-input:focus-visible,
+.ascii-input:focus,
+.ascii-input:focus-visible { outline: none; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.welcome-keys { margin-top: 8px !important; font-size: 11px !important; color: var(--ink-dim) !important; }
+.welcome-keys kbd {
+  font-family: var(--font-mono); font-size: 10px;
+  border: 1px solid var(--rule); border-radius: 3px; padding: 1px 4px; color: var(--accent);
+}
+.kicker-sub { margin-top: 4px; }
+
+/* A lost WebGL context leaves a black canvas; say so rather than looking
+   like a crash. */
+body[data-gl-lost="1"] #tower-host::after {
+  content: 'The graphics context was lost — it should recover in a moment.';
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  font-family: var(--font-mono); font-size: 12px; color: var(--ink-dim); text-align: center;
+}
 
 @media (max-width: 900px) {
   .nav-rail { display: none; }
@@ -427,6 +614,24 @@ body[data-backdrop="meadow"] { background: linear-gradient(#8fc4e8 0%, #bcd9ea 4
   #hint, .welcome-note {
     bottom: auto; top: max(78px, calc(14px + env(safe-area-inset-top) + 64px));
   }
+
+  /* No room to stand beside the tower — the console takes the lower half
+     of the screen, still chromeless, over a scrim that keeps it readable. */
+  .console {
+    right: 0; left: 0; top: auto; bottom: 0; width: 100%;
+    padding: 20px 20px max(16px, env(safe-area-inset-bottom));
+    max-height: 70vh;
+    background: linear-gradient(to top, var(--bg) 62%, transparent);
+  }
+  body[data-console="on"] .callout { display: none; }
+  body[data-console="on"] .help-btn,
+  body[data-console="on"] .dest-btn { display: none; }
+
+  /* The diagram stacks above the log rather than sitting beside it. */
+  .ascii-view { padding-top: 28px; }
+  .ascii-name { font-size: 24px; }
+  .ascii-body { flex-direction: column; gap: 16px; margin-top: 18px; padding-top: 16px; }
+  .ascii-tower { font-size: 11px; align-self: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {

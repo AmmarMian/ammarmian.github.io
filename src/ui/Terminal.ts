@@ -1,142 +1,39 @@
-import { PROFILE, CONTACT } from '../data/profile';
-import { fetchHalPublications } from '../data/hal';
-import students from '../data/students.json';
-import projects from '../data/projects.json';
-import { FLOORS, navigate } from '../router';
+import { PROFILE } from '../data/profile';
+import { runCommand, type Ctx, type ConsoleHost } from './commands';
+import { attachLineEditor } from './lineEditor';
 
-interface WorldsApi {
-  kinds: string[];
-  current: () => string | null;
-  teleport: (kind: string | null, onSwap?: () => void) => boolean;
-}
-
-interface Host {
-  worlds: WorldsApi;
-  setShellOverride: (mode: 'off' | 'ghost' | 'solid' | null) => void;
-}
-
-interface Ctx extends Host {
-  print: (line: string) => void;
-  clear: () => void;
-  close: () => void;
-}
-
-const GOTO_TARGETS: Record<string, string | null> = { home: null, tower: null };
-for (const f of FLOORS) GOTO_TARGETS[f.slug] = f.slug;
-
-const JUMP_TARGETS = ['none', 'seafloor', 'moon', 'forest', 'beach', 'city', 'space'];
-const SHELL_TARGETS = ['off', 'ghost', 'solid', 'auto'];
-
-const COMMANDS: Record<string, (args: string[], ctx: Ctx) => void | Promise<void>> = {
-  help(_args, { print }) {
-    print('Commands:');
-    print('  help                 this list');
-    print('  whoami               who lives here');
-    print('  cat cv.txt           bio, positions, education');
-    print('  cat contact.txt      how to reach me');
-    print('  ls                   tools and projects');
-    print('  ls publications      recent HAL records');
-    print(`  goto <floor>         ${Object.keys(GOTO_TARGETS).join(', ')}`);
-    print(`  jump <world>         ${JUMP_TARGETS.join(', ')} — teleport the backdrop`);
-    print(`  shell <mode>         ${SHELL_TARGETS.join(', ')} — force the outer shell, or hand control back`);
-    print('  clear                clear the screen');
-    print('  exit                 close this terminal');
-  },
-  whoami(_args, { print }) {
-    print(`${PROFILE.name} — ${PROFILE.role}`);
-    print(PROFILE.affiliation);
-  },
-  async cat(args, { print }) {
-    const file = args[0];
-    if (file === 'cv.txt') {
-      print(`${PROFILE.role} — ${PROFILE.affiliation}`);
-      print(PROFILE.bio);
-      print('');
-      print('positions:');
-      for (const p of PROFILE.positions) print(`  ${p.year.padEnd(11)} ${p.role} — ${p.org}`);
-      print('education:');
-      for (const e of PROFILE.education) print(`  ${e.year.padEnd(11)} ${e.role} — ${e.org}`);
-    } else if (file === 'contact.txt') {
-      print(`email    ${CONTACT.email}`);
-      print(`office   ${CONTACT.office}`);
-      print(`github   ${CONTACT.github}`);
-      print(`hal      ${CONTACT.hal}`);
-    } else {
-      print(`cat: ${file || 'missing operand'}: no such file — try cv.txt or contact.txt`);
-    }
-  },
-  async ls(args, { print }) {
-    if (args[0] === 'publications') {
-      print('querying HAL…');
-      try {
-        const docs = await fetchHalPublications();
-        docs.slice(0, 14).forEach((d) => print(`  ${String(d.year || 'n.d.').padEnd(6)} ${d.title}`));
-        print(`… ${docs.length} records total — see /publications`);
-      } catch {
-        print('HAL did not answer.');
-      }
-      return;
-    }
-    for (const p of projects as any[]) print(`  ${p.name.padEnd(10)} ${p.description}`);
-    const current = (students as any[]).filter((s) => s.status === 'current');
-    if (current.length) {
-      print('');
-      print('currently supervising:');
-      for (const s of current) print(`  ${s.name.padEnd(20)} ${s.topic}`);
-    }
-  },
-  goto(args, { print, close }) {
-    const target = args[0];
-    if (target && target in GOTO_TARGETS) { navigate(GOTO_TARGETS[target]); close(); }
-    else print(`goto: unknown floor '${target || ''}' — try: ${Object.keys(GOTO_TARGETS).join(', ')}`);
-  },
-  jump(args, { print, worlds }) {
-    const target = args[0];
-    if (!target || !JUMP_TARGETS.includes(target)) {
-      print(`jump: unknown world '${target || ''}' — try: ${JUMP_TARGETS.join(', ')}`);
-      return;
-    }
-    const kind = target === 'none' ? null : target;
-    if (kind === worlds.current()) { print(`already there.`); return; }
-    worlds.teleport(kind);
-    print(`stepping through the gate to ${target}…`);
-  },
-  shell(args, { print, setShellOverride }) {
-    const mode = args[0];
-    if (!mode || !SHELL_TARGETS.includes(mode)) {
-      print(`shell: unknown mode '${mode || ''}' — try: ${SHELL_TARGETS.join(', ')}`);
-      return;
-    }
-    setShellOverride(mode === 'auto' ? null : (mode as 'off' | 'ghost' | 'solid'));
-    print(mode === 'auto' ? 'shell: back to automatic.' : `shell: forced ${mode}, even up close.`);
-  },
-  clear(_args, { clear }) { clear(); },
-  exit(_args, { close }) { close(); },
-};
-
-export function createTerminal(root: HTMLElement, host: Host) {
-  const overlay = document.createElement('div');
-  overlay.className = 'term-overlay';
-  overlay.hidden = true;
-  overlay.innerHTML = `
-    <div class="term-card" role="dialog" aria-modal="true" aria-label="Terminal">
-      <div class="term-titlebar">
-        <span>tower &mdash; zsh</span>
-        <button type="button" class="term-close" aria-label="Close terminal">&times;</button>
-      </div>
-      <div class="term-log"></div>
-      <div class="term-inputline">
-        <span class="term-prompt">&gt;</span>
-        <input class="term-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Terminal command">
-      </div>
-    </div>
+/** The console docks beside the tower rather than covering it: the two are
+ *  meant to be used together — `jump forest` is far better watched than
+ *  described — and a modal that hides the thing it drives was the wrong
+ *  shape for that. Below 900px it takes the whole screen instead, where
+ *  there isn't room to share. */
+export function createTerminal(root: HTMLElement, host: ConsoleHost) {
+  const panel = document.createElement('aside');
+  panel.className = 'console';
+  panel.hidden = true;
+  // No window chrome: the console is a column of text standing in the
+  // scene, built from the same parts as the floor callouts — a kicker, a
+  // body, and a quiet way out. A titlebar and a boxed input made it read
+  // as a separate application pasted on top of the tower.
+  panel.innerHTML = `
+    <div class="kicker">console</div>
+    <div class="console-log" role="log" aria-label="Console output"></div>
+    <form class="console-inputline" autocomplete="off">
+      <label class="console-prompt" for="console-input" aria-label="Command">&gt;</label>
+      <input class="console-input" id="console-input" type="text" autocomplete="off"
+             autocapitalize="off" autocorrect="off" spellcheck="false"
+             placeholder="help" aria-label="Console command">
+    </form>
+    <button type="button" class="back-link console-close">&larr; close the console</button>
   `;
-  const log = overlay.querySelector('.term-log') as HTMLElement;
-  const input = overlay.querySelector('.term-input') as HTMLInputElement;
 
-  function print(line: string) {
+  const log = panel.querySelector('.console-log') as HTMLElement;
+  const input = panel.querySelector('.console-input') as HTMLInputElement;
+  const form = panel.querySelector('.console-inputline') as HTMLFormElement;
+
+  function print(line: string, cls = '') {
     const row = document.createElement('div');
-    row.className = 'term-line';
+    row.className = 'console-line' + (cls ? ' console-' + cls : '');
     row.textContent = line;
     log.appendChild(row);
     log.scrollTop = log.scrollHeight;
@@ -144,40 +41,61 @@ export function createTerminal(root: HTMLElement, host: Host) {
   function clear() { log.innerHTML = ''; }
 
   let open = false;
+  const ctx: Ctx = { print, clear, close: () => setOpen(false), mode: 'tower', ...host };
+
   function setOpen(v: boolean) {
+    if (v === open) return;
     open = v;
-    overlay.hidden = !v;
+    panel.hidden = !v;
+    // Drives the layout: the tower host, nav rail and callout all give way
+    // to the console's column while it's open (see style.css).
+    document.body.dataset.console = v ? 'on' : 'off';
     if (v) {
-      requestAnimationFrame(() => overlay.classList.add('term-overlay-visible'));
+      requestAnimationFrame(() => panel.classList.add('console-visible'));
       if (!log.children.length) {
-        print(`${PROFILE.name}'s tower — type "help" to get started.`);
+        print(`${PROFILE.name}'s tower — a console for the scene beside it.`, 'head');
+        print('Type "help" for commands, or "hello" to meet the keeper.', 'dim');
+        print('Tab completes, ↑/↓ walks history, any command takes --help.', 'dim');
+        print('');
       }
-      input.value = '';
       requestAnimationFrame(() => input.focus());
     } else {
-      overlay.classList.remove('term-overlay-visible');
+      panel.classList.remove('console-visible');
     }
+    host.onToggle?.();
   }
 
-  const ctx: Ctx = { print, clear, close: () => setOpen(false), ...host };
-
-  async function run(raw: string) {
-    const line = raw.trim();
-    if (!line) return;
-    print('> ' + line);
-    const [cmd, ...args] = line.split(/\s+/);
-    const fn = COMMANDS[cmd.toLowerCase()];
-    if (!fn) { print(`command not found: ${cmd} — type "help"`); return; }
-    await fn(args, ctx);
+  async function run(line: string) {
+    print('> ' + line, 'echo');
+    try {
+      await runCommand(line, ctx);
+    } catch (err) {
+      print(`error: ${err instanceof Error ? err.message : String(err)}`, 'err');
+    }
+    print('');
   }
 
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { const v = input.value; input.value = ''; void run(v); }
+  attachLineEditor({
+    input, form, ctx, print,
+    storageKey: 'lair-console-history',
+    onSubmit: run,
+    onClear: clear,
+    onClose: () => setOpen(false),
   });
-  overlay.querySelector('.term-close')!.addEventListener('click', () => setOpen(false));
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) setOpen(false); });
-  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && open) setOpen(false); });
 
-  root.appendChild(overlay);
-  return { toggle: () => setOpen(!open), open: () => setOpen(true), close: () => setOpen(false) };
+  // Clicking anywhere in the panel that isn't a text selection puts the
+  // caret back in the input, the way a real terminal window behaves.
+  panel.addEventListener('mouseup', () => {
+    if (!window.getSelection()?.toString()) input.focus();
+  });
+  panel.querySelector('.console-close')!.addEventListener('click', () => setOpen(false));
+
+  root.appendChild(panel);
+  return {
+    toggle: () => setOpen(!open),
+    open: () => setOpen(true),
+    close: () => setOpen(false),
+    isOpen: () => open,
+    print,
+  };
 }

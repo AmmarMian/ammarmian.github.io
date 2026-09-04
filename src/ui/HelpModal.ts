@@ -1,9 +1,21 @@
+import { createFocusTrap } from './dialog';
+
 const ROWS: [string, string][] = [
   ['Look around', 'Drag — one finger on touch'],
   ['Zoom', 'Scroll — pinch on touch'],
   ['Pan', 'Right-click drag — two fingers on touch'],
   ['Visit a floor', 'Click it, or use the floors above / the dots below'],
   ['Whole tower', 'Turns slowly on its own until you take the wheel'],
+];
+
+const KEYS: [string, string][] = [
+  ['↑ / ↓', 'Previous / next floor'],
+  ['1 – 6', 'Jump straight to a floor'],
+  ['H', 'Back to the whole tower'],
+  ['G', 'Open the destination gate'],
+  ['/', 'Open the console'],
+  ['?', 'This panel'],
+  ['Esc', 'Close whatever is open'],
 ];
 
 export function createHelpButton(root: HTMLElement) {
@@ -22,22 +34,36 @@ export function createHelpButton(root: HTMLElement) {
       <div class="kicker">Camera</div>
       <h2>Finding your way around</h2>
       <dl class="help-rows"></dl>
+      <div class="kicker kicker-sub">Keyboard</div>
+      <dl class="help-rows help-keys"></dl>
       <button type="button" class="back-link help-close">&larr; close</button>
     </div>
   `;
-  const rows = overlay.querySelector('.help-rows')!;
-  for (const [term, desc] of ROWS) {
-    const dt = document.createElement('dt'); dt.textContent = term;
-    const dd = document.createElement('dd'); dd.textContent = desc;
-    rows.appendChild(dt); rows.appendChild(dd);
-  }
+  const fill = (sel: string, pairs: [string, string][]) => {
+    const rows = overlay.querySelector(sel)!;
+    for (const [term, desc] of pairs) {
+      const dt = document.createElement('dt'); dt.textContent = term;
+      const dd = document.createElement('dd'); dd.textContent = desc;
+      rows.appendChild(dt); rows.appendChild(dd);
+    }
+  };
+  fill('.help-rows', ROWS);
+  fill('.help-keys', KEYS);
+
+  const trap = createFocusTrap(overlay);
 
   let open = false;
   function setOpen(v: boolean) {
+    if (v === open) return;
     open = v;
     overlay.hidden = !v;
-    if (v) requestAnimationFrame(() => overlay.classList.add('help-overlay-visible'));
-    else overlay.classList.remove('help-overlay-visible');
+    if (v) {
+      requestAnimationFrame(() => overlay.classList.add('help-overlay-visible'));
+      trap.activate();
+    } else {
+      overlay.classList.remove('help-overlay-visible');
+      trap.release();
+    }
     btn.setAttribute('aria-expanded', String(v));
   }
   btn.addEventListener('click', () => setOpen(!open));
@@ -47,4 +73,5 @@ export function createHelpButton(root: HTMLElement) {
 
   root.appendChild(btn);
   root.appendChild(overlay);
+  return { open: () => setOpen(true), close: () => setOpen(false), toggle: () => setOpen(!open), isOpen: () => open };
 }

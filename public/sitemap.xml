@@ -7,6 +7,46 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://ammarmian.fr/text</loc>
+    <lastmod>2026-09-04T00:00:00+00:00</lastmod>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://ammarmian.fr/about</loc>
+    <lastmod>2026-09-04T00:00:00+00:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ammarmian.fr/publications</loc>
+    <lastmod>2026-09-04T00:00:00+00:00</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ammarmian.fr/projects</loc>
+    <lastmod>2026-09-04T00:00:00+00:00</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ammarmian.fr/contact</loc>
+    <lastmod>2026-09-04T00:00:00+00:00</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ammarmian.fr/now</loc>
+    <lastmod>2026-09-04T00:00:00+00:00</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://ammarmian.fr/elsewhere</loc>
+    <lastmod>2026-09-04T00:00:00+00:00</lastmod>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://ammarmian.fr/console</loc>
+    <lastmod>2026-09-04T00:00:00+00:00</lastmod>
+    <priority>0.4</priority>
+  </url>
+  <url>
     <loc>https://ammarmian.fr/legacy/CV.html</loc>
     <lastmod>2026-08-06T00:00:00+00:00</lastmod>
     <priority>0.5</priority>

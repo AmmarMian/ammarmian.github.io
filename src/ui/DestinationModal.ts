@@ -1,26 +1,12 @@
+import { createFocusTrap } from './dialog';
+import { WORLD_LABELS as LABELS, WORLD_BLURBS as BLURBS } from '../data/worlds';
+
 interface WorldsApi {
   kinds: string[];
   current: () => string | null;
   teleport: (kind: string | null, onSwap?: () => void) => boolean;
 }
 
-const LABELS: Record<string, string> = {
-  seafloor: 'Sea floor',
-  moon: 'The moon',
-  forest: 'Deep forest',
-  beach: 'Beach',
-  city: 'Abandoned city',
-  space: 'Deep space',
-};
-
-const BLURBS: Record<string, string> = {
-  seafloor: 'Caustics, whales, fish schools, kelp',
-  moon: 'A ringed gas giant low over the horizon',
-  forest: 'Instanced trunks, ferns, light shafts',
-  beach: 'Shoaling waves, sun glitter, a surf line',
-  city: 'Lit windows, stopped cars, a patrolling eye',
-  space: 'Starfield, nebulae, a ringed giant adrift',
-};
 
 export function createDestinationModal(root: HTMLElement, worlds: WorldsApi) {
   const overlay = document.createElement('div');
@@ -63,13 +49,23 @@ export function createDestinationModal(root: HTMLElement, worlds: WorldsApi) {
     }
   }
 
+  const trap = createFocusTrap(overlay, {
+    initial: () => overlay.querySelector('[aria-current="true"]') ?? overlay.querySelector('.dest-item'),
+  });
+
   let open = false;
   function setOpen(v: boolean) {
+    if (v === open) return;
     open = v;
     if (v) render();
     overlay.hidden = !v;
-    if (v) requestAnimationFrame(() => overlay.classList.add('help-overlay-visible'));
-    else overlay.classList.remove('help-overlay-visible');
+    if (v) {
+      requestAnimationFrame(() => overlay.classList.add('help-overlay-visible'));
+      trap.activate();
+    } else {
+      overlay.classList.remove('help-overlay-visible');
+      trap.release();
+    }
   }
   overlay.querySelector('.dest-close')!.addEventListener('click', () => setOpen(false));
   overlay.addEventListener('click', (e) => { if (e.target === overlay) setOpen(false); });

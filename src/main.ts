@@ -5,15 +5,26 @@ import { createHelpButton } from './ui/HelpModal';
 import { createTerminal } from './ui/Terminal';
 import { createDestinationModal } from './ui/DestinationModal';
 import { renderTextPage } from './ui/TextPage';
-import { FLOORS, routeForSlug, routeForIndex, currentSlug, navigate, onRouteChange, BASE } from './router';
+import { renderAsciiConsole } from './ui/AsciiConsole';
+import { createViewMenu } from './ui/ViewMenu';
+import { setRouteMeta } from './ui/meta';
+import { announce } from './ui/io';
+import {
+  FLOORS, routeForSlug, routeForIndex, currentSlug, navigate, onRouteChange, BASE,
+  worldFromUrl, setWorldInUrl,
+} from './router';
 
 const app = document.getElementById('app')!;
 
-// The plain-text route skips the 3D scene entirely — a full CV's worth of
-// content for anyone who can't or doesn't want to drive a spatial camera
-// (screen readers, low-power devices, search crawlers, a quick skim).
-if (currentSlug() === 'text') {
+// Three ways in, all showing the same content:
+//   /text     — plain semantic HTML, for screen readers, crawlers and skimming
+//   /console  — an ASCII tower driven by typing or tapping, good on a phone
+//   /         — the 3D tower
+const entry = currentSlug();
+if (entry === 'text') {
   renderTextPage(app);
+} else if (entry === 'console') {
+  renderAsciiConsole(app);
 } else if (isMobileDevice()) {
   promptForMode();
 } else {
@@ -30,20 +41,21 @@ function isMobileDevice(): boolean {
   return uaMobile || (coarse && narrow);
 }
 
-/** A five-second choice: ride the 3D tower, or jump to the text version.
- *  No answer in time defaults to text — the safer, lighter option. */
+/** A five-second choice between the three views. No answer in time still
+ *  defaults to text — the safest, lightest option on a phone. */
 function promptForMode() {
   const overlay = document.createElement('div');
   overlay.className = 'mode-prompt';
   overlay.innerHTML = `
     <div class="mode-prompt-card">
       <div class="kicker">choose a view</div>
-      <p>This site is an interactive 3D tower. On a phone it can be slow to load and awkward to navigate — you can view a plain text version instead.</p>
+      <p>This site is an interactive 3D tower. On a phone it can be slow to load and awkward to navigate — there's a text console that walks the same tower, or a plain text page.</p>
       <div class="mode-prompt-actions">
         <button type="button" class="mode-btn mode-btn-primary" data-choice="3d">Load 3D scene</button>
-        <button type="button" class="mode-btn" data-choice="text">Text version</button>
+        <button type="button" class="mode-btn" data-choice="console">Text console</button>
+        <button type="button" class="mode-btn" data-choice="text">Plain text</button>
       </div>
-      <div class="mode-prompt-timer">Text version in <span class="mode-prompt-count">5</span>s&hellip;</div>
+      <div class="mode-prompt-timer">Plain text in <span class="mode-prompt-count">5</span>s&hellip;</div>
     </div>
   `;
   document.body.appendChild(overlay);
@@ -57,7 +69,7 @@ function promptForMode() {
   }, 1000);
 
   let settled = false;
-  function settle(choice: '3d' | 'text') {
+  function settle(choice: '3d' | 'text' | 'console') {
     if (settled) return;
     settled = true;
     window.clearInterval(tick);
@@ -65,13 +77,16 @@ function promptForMode() {
     if (choice === 'text') {
       navigate('text', { replace: true });
       renderTextPage(app);
+    } else if (choice === 'console') {
+      navigate('console', { replace: true });
+      renderAsciiConsole(app);
     } else {
       bootTower();
     }
   }
 
   overlay.querySelectorAll<HTMLButtonElement>('.mode-btn').forEach((btn) => {
-    btn.addEventListener('click', () => settle(btn.dataset.choice as '3d' | 'text'));
+    btn.addEventListener('click', () => settle(btn.dataset.choice as '3d' | 'text' | 'console'));
   });
 }
 
@@ -124,7 +139,24 @@ function setShellOverride(mode: 'off' | 'ghost' | 'solid' | null) {
 }
 window.addEventListener('lair-teleport', (e: any) => { if (e.detail?.phase === 'done') syncShell(); });
 
-createHelpButton(app);
+/* ---------- the active world lives in the URL ----------
+   ?world=space makes a view shareable, and makes the telescope shortcut
+   something you can link to. Written with replaceState — arriving at a
+   world is not a navigation, so Back shouldn't have to undo it. */
+window.addEventListener('lair-teleport', (e: any) => {
+  if (e.detail?.phase === 'done') setWorldInUrl(tower.worlds.current());
+});
+const initialWorld = worldFromUrl();
+if (initialWorld && tower.worlds.kinds.includes(initialWorld)) {
+  // Set directly rather than teleported: the visitor asked to arrive there,
+  // not to watch the transition into it.
+  tower.worlds.set(initialWorld);
+  syncShell();
+} else if (initialWorld) {
+  setWorldInUrl(null);   // an unknown world in the URL is just noise
+}
+
+const help = createHelpButton(app);
 const destBtn = document.createElement('button');
 destBtn.type = 'button';
 destBtn.className = 'dest-btn';
@@ -134,7 +166,33 @@ destBtn.setAttribute('aria-haspopup', 'dialog');
 destBtn.addEventListener('click', () => destModal.open());
 app.appendChild(destBtn);
 
-const terminal = createTerminal(app, { worlds: tower.worlds, setShellOverride });
+// The console takes the right-hand column, so the tower steps aside for it
+// exactly as it does for a floor callout — otherwise the two overlap and
+// the text sits on the busiest part of the scene.
+function syncConsoleFraming() {
+  const open = terminal.isOpen();
+  const route = routeForSlug(currentSlug());
+  if (open) tower.setPanelOpen(true, 'right');
+  else if (route) tower.setPanelOpen(true, route.side);
+  else tower.setPanelOpen(false);
+  void tower.reframe();
+}
+
+const terminal = createTerminal(app, {
+  worlds: tower.worlds,
+  setShellOverride,
+  onToggle: () => {
+    syncConsoleFraming();
+    termBtn.setAttribute('aria-pressed', String(terminal.isOpen()));
+    termBtn.classList.toggle('nav-util-on', terminal.isOpen());
+  },
+  scene: {
+    setPixelMode: tower.setPixelMode,
+    setLightMode: tower.setLightMode,
+    setAutoRotate: tower.setAutoRotate,
+    autoRotate: tower.autoRotate,
+  },
+});
 
 /* ---------- nav rail: a horizontal spine across the top, out of the callout's way ---------- */
 const navRail = document.createElement('nav');
@@ -161,18 +219,25 @@ for (const f of FLOORS_BY_LEVEL) {
   navRail.appendChild(a);
   links.push(a);
 }
-const textLink = document.createElement('a');
-textLink.className = 'nav-item nav-util nav-util-first';
-textLink.href = BASE + '/text';
-textLink.innerHTML = `<span class="nav-label">Text version</span>`;
-navRail.appendChild(textLink);
+// Utilities live in their own group after a rule: the floors are where you
+// go, these are how you look at them. Three separate presentation links
+// used to sit inline with the floors, which made a nine-item row of things
+// that aren't remotely the same kind of thing.
+const navUtils = document.createElement('div');
+navUtils.className = 'nav-utils';
 
 const termBtn = document.createElement('button');
 termBtn.type = 'button';
-termBtn.className = 'nav-item nav-term';
-termBtn.innerHTML = `<span class="nav-label">&gt;_ Terminal</span>`;
+termBtn.className = 'nav-item nav-util nav-term';
+termBtn.setAttribute('aria-pressed', 'false');
+termBtn.innerHTML = `<span class="nav-label">&gt;_ Console</span>`;
 termBtn.addEventListener('click', () => terminal.toggle());
-navRail.appendChild(termBtn);
+navUtils.appendChild(termBtn);
+
+const viewMenu = createViewMenu('3d');
+navUtils.appendChild(viewMenu.el);
+
+navRail.appendChild(navUtils);
 document.body.appendChild(navRail);
 
 /* ---------- mobile nav: a row of dots, tap for a name, slide to move ---------- */
@@ -273,6 +338,54 @@ window.addEventListener('lair-act', (e: any) => {
   hint.textContent = e.detail;
   hint.dataset.on = '1';
   actUntil = Date.now() + 1200;
+  // The props are the most rewarding part of the scene and were previously
+  // pointer-and-eyesight only; at least say what just happened.
+  announce(e.detail);
+});
+
+/* ---------- keyboard navigation ----------
+   The tower was mouse-only: nothing in the canvas takes focus, so without
+   this there is no way to reach a floor from the keyboard at all. Arrow
+   keys walk the storeys in physical order, digits jump, and the single
+   letters mirror the three buttons. Anything typed into a field is left
+   well alone. */
+const FLOOR_ORDER = FLOORS_BY_LEVEL.map((f) => f.slug);
+
+function isTyping(target: EventTarget | null) {
+  const el = target as HTMLElement | null;
+  if (!el) return false;
+  return el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName);
+}
+
+function stepFloor(delta: number) {
+  const slug = currentSlug();
+  const at = FLOOR_ORDER.indexOf(slug ?? '');
+  // From the whole-tower view, down enters at the bottom and up at the top.
+  const next = at === -1
+    ? (delta > 0 ? 0 : FLOOR_ORDER.length - 1)
+    : at + delta;
+  if (next < 0) { navigate(null); return; }
+  if (next >= FLOOR_ORDER.length) return;
+  navigate(FLOOR_ORDER[next]);
+}
+
+window.addEventListener('keydown', (e) => {
+  if (isTyping(e.target) || e.metaKey || e.ctrlKey || e.altKey) return;
+  switch (e.key) {
+    case 'ArrowUp': e.preventDefault(); stepFloor(1); break;
+    case 'ArrowDown': e.preventDefault(); stepFloor(-1); break;
+    case 'Home': case 'h': case 'H': e.preventDefault(); navigate(null); break;
+    case 'g': case 'G': e.preventDefault(); destModal.open(); break;
+    // '/' — the search-and-command key everything else uses. preventDefault
+    // matters here: Firefox's quick-find would otherwise steal it.
+    case '/': e.preventDefault(); terminal.toggle(); break;
+    case '?': e.preventDefault(); help.toggle(); break;
+    default:
+      if (/^[1-6]$/.test(e.key)) {
+        e.preventDefault();
+        navigate(FLOOR_ORDER[Number(e.key) - 1]);
+      }
+  }
 });
 
 /* ---------- panel + router ---------- */
@@ -295,6 +408,8 @@ async function applyRoute(slug: string | null) {
   // destination modal and the terminal's `jump` command do that.
   floorFocused = !!route;
   syncShell();
+  setRouteMeta(route, slug);
+  announce(route ? `${route.label} — ${route.title}` : 'The whole tower');
   links.forEach((a) => {
     const isCurrent = route && a.getAttribute('href') === BASE + '/' + route.slug;
     if (isCurrent) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
@@ -306,13 +421,15 @@ async function applyRoute(slug: string | null) {
   // the record only appears once the tower has settled on the floor.
   panel.close();
 
+  // An open console always owns the right-hand column, so it decides which
+  // way the tower leans regardless of which side this floor's callout uses.
   if (route) {
-    tower.setPanelOpen(true, route.side);
+    tower.setPanelOpen(true, terminal.isOpen() ? 'right' : route.side);
     await tower.focusFloor(route.index);
     if (gen !== navGen) return;
     panel.open(route);
   } else {
-    tower.setPanelOpen(false);
+    tower.setPanelOpen(terminal.isOpen(), 'right');
     await tower.focusFloor(null);
   }
 }
@@ -330,13 +447,25 @@ tower.start();
   setTimeout(() => loading.remove(), 700);
 
   await tower.playIntro();
-  await applyRoute(currentSlug());
 
+  // Shown the moment the tower finishes rising, not after the camera has
+  // also flown to a floor — it used to appear some eight seconds in, and on
+  // a deep link it arrived over an already-focused storey telling the
+  // visitor to click a floor. A deep link means they know where they're
+  // going, so it stays away entirely.
+  const deepLink = currentSlug() !== null;
+  if (!deepLink) showWelcome();
+
+  await applyRoute(currentSlug());
+})();
+
+function showWelcome() {
   const welcome = document.createElement('div');
   welcome.className = 'welcome-note';
   welcome.innerHTML = `
     <div class="kicker">welcome</div>
     <p>A tower, spiralling upward. Drag to look around, click a floor — or the door itself — to visit.</p>
+    <p class="welcome-keys">Arrow keys walk the storeys &middot; <kbd>G</kbd> the gate &middot; <kbd>/</kbd> the console &middot; <kbd>?</kbd> help</p>
   `;
   document.body.appendChild(welcome);
   requestAnimationFrame(() => welcome.classList.add('welcome-in'));
@@ -344,7 +473,9 @@ tower.start();
     welcome.classList.remove('welcome-in');
     setTimeout(() => welcome.remove(), 500);
   };
-  setTimeout(dismiss, 6000);
+  setTimeout(dismiss, 7000);
   welcome.addEventListener('click', dismiss);
-})();
+  // Any real interaction means they've started exploring — get out of the way.
+  window.addEventListener('pointerdown', dismiss, { once: true });
+}
 }

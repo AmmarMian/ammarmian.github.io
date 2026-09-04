@@ -39,10 +39,32 @@ export function currentSlug(): string | null {
 export function navigate(slug: string | null, opts: { replace?: boolean } = {}) {
   const path = slug ? `${BASE}/${slug}` : `${BASE}/`;
   if (window.location.pathname !== path) {
-    if (opts.replace) window.history.replaceState({}, '', path);
-    else window.history.pushState({}, '', path);
+    // The query string carries the active backdrop world (?world=space), so
+    // it has to survive floor navigation — the two are independent axes.
+    const url = path + window.location.search;
+    if (opts.replace) window.history.replaceState({}, '', url);
+    else window.history.pushState({}, '', url);
   }
   window.dispatchEvent(new CustomEvent('lair-route'));
+}
+
+/** The active backdrop world lives in the query string so a view is
+ *  shareable — "look at the tower on the seafloor" is a link, not a
+ *  sequence of instructions. Written with replaceState: teleporting is not
+ *  a navigation, and shouldn't need a Back press to undo. */
+export function worldFromUrl(): string | null {
+  const w = new URLSearchParams(window.location.search).get('world');
+  return w && w !== 'none' ? w : null;
+}
+
+export function setWorldInUrl(kind: string | null) {
+  const params = new URLSearchParams(window.location.search);
+  if (kind) params.set('world', kind); else params.delete('world');
+  const qs = params.toString();
+  const url = window.location.pathname + (qs ? '?' + qs : '') + window.location.hash;
+  if (url !== window.location.pathname + window.location.search + window.location.hash) {
+    window.history.replaceState({}, '', url);
+  }
 }
 
 export function onRouteChange(cb: (slug: string | null) => void) {

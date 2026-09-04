@@ -1,5 +1,10 @@
 import * as THREE from 'three';
 import anime from 'animejs';
+// Kept a static import on purpose. Loading the worlds lazily splits out a
+// 22KB (gzipped) chunk but costs ~150KB in the entry chunk: installWorlds
+// takes the whole THREE namespace as an argument, and once that namespace
+// escapes across a lazy-chunk boundary Rollup can no longer prove which of
+// three.js is unused, so it retains all of it. Measured, not assumed.
 import { installWorlds } from '../worlds.js';
 import { createStage } from './stage';
 import { M } from './materials';
@@ -20,6 +25,8 @@ import { createInteractionSystem } from './interactions';
 
 export type TowerScene = ReturnType<typeof createTowerScene>;
 
+const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 // Which floor the wizard is keeping himself busy on, by hour of day.
 function stationForHour(hour: number): number {
   if (hour < 6) return F.quarters;      // deep night — asleep
@@ -31,7 +38,7 @@ function stationForHour(hour: number): number {
 }
 
 export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor: (i: number) => void; onOpenDestinations: () => void }) {
-  const { renderer, scene, camera, controls, setPixel, hemi, key, fill } = createStage(container);
+  const { renderer, scene, camera, controls, setPixel, applyPixel, hemi, key, fill } = createStage(container);
 
   const model = new THREE.Group();
   const fx = new THREE.Group();
@@ -434,39 +441,149 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   // right at the boundary. minDistance/maxDistance are 5.5/48, and a
   // single-floor view sits around 15-18, so the band straddles that gap.
   let pixelNear = true;
+  // Pinned by the console's `pixel` command; null hands the choice back to
+  // the distance rule below.
+  let pixelOverride: number | null = null;
   function autoPixel() {
+    if (pixelOverride !== null) return;
     const dist = camera.position.distanceTo(controls.target);
     const wantNear = pixelNear ? dist < 27 : dist < 23;
     if (wantNear !== pixelNear) { pixelNear = wantNear; setPixel(pixelNear ? 4 : 2); }
   }
+  function setPixelMode(scale: number | null) {
+    pixelOverride = scale;
+    if (scale === null) {
+      const dist = camera.position.distanceTo(controls.target);
+      pixelNear = dist < 25;
+      setPixel(pixelNear ? 4 : 2);
+    } else setPixel(scale);
+    return pixelOverride;
+  }
 
-  let raf = 0, t0 = performance.now();
+  /* The idle turntable only ever swung the camera around the tower's waist.
+     A very slow rise and fall on top of it makes the whole silhouette read
+     — you see the roof, then the base — without ever feeling like motion
+     you have to wait out. Roughly a minute per cycle, and it yields the
+     instant the visitor takes the wheel (OrbitControls' own 'start' event
+     clears autoRotate). */
+  const _drift = new THREE.Spherical(), _driftV = new THREE.Vector3();
+  let driftPhase = 0, driftBasePhi = 0, drifting = false;
+  function idleDrift(dt: number) {
+    if (!controls.autoRotate || reducedMotion()) { drifting = false; return; }
+    _driftV.copy(camera.position).sub(controls.target);
+    _drift.setFromVector3(_driftV);
+    if (!drifting) { driftBasePhi = _drift.phi; driftPhase = 0; drifting = true; }
+    driftPhase += dt;
+    _drift.phi = THREE.MathUtils.clamp(
+      driftBasePhi + Math.sin(driftPhase * 0.105) * 0.17,
+      controls.minPolarAngle + 0.03,
+      controls.maxPolarAngle - 0.03,
+    );
+    camera.position.copy(controls.target).add(_driftV.setFromSpherical(_drift));
+    camera.lookAt(controls.target);
+  }
+
+  let raf = 0, t0 = performance.now(), running = false, contextLost = false;
   function loop(now: number) {
     const dt = Math.min((now - t0) / 1000, 0.05); t0 = now;
     tick(now / 1000, dt);
     worlds.tick(now / 1000, dt);
     autoPixel();
     controls.update();
-    renderer.render(scene, camera);
+    idleDrift(dt);
+    if (!contextLost) renderer.render(scene, camera);
     raf = requestAnimationFrame(loop);
   }
 
+  function resume() {
+    if (running) return;
+    running = true;
+    // Without this the first frame back sees the whole hidden interval as
+    // one dt and every animation lurches forward.
+    t0 = performance.now();
+    raf = requestAnimationFrame(loop);
+  }
+  function pause() {
+    if (!running) return;
+    running = false;
+    cancelAnimationFrame(raf);
+  }
+
+  // A backgrounded tab has nothing to show and no reason to keep a GPU busy;
+  // browsers throttle rAF but don't stop it, and this scene is not cheap.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') pause(); else resume();
+  });
+
+  // A GPU reset — waking a laptop from sleep is the usual cause — otherwise
+  // leaves a permanently black canvas with no hint that anything is wrong.
+  renderer.domElement.addEventListener('webglcontextlost', (e) => {
+    e.preventDefault();
+    contextLost = true;
+    document.body.dataset.glLost = '1';
+  });
+  renderer.domElement.addEventListener('webglcontextrestored', () => {
+    contextLost = false;
+    delete document.body.dataset.glLost;
+    // Every compiled program and uploaded buffer went with the context;
+    // three.js re-uploads lazily, but materials need to be told to recompile.
+    scene.traverse((o: any) => {
+      const mats = Array.isArray(o.material) ? o.material : o.material ? [o.material] : [];
+      for (const m of mats) m.needsUpdate = true;
+    });
+    applyPixel();
+  });
+
   // A soft day/night wash on the stage lighting, driven by the visitor's
-  // own clock — brightest at 13:00, dimmest and bluest at 01:00. Doesn't
-  // touch the backdrop, so it never fights an active world.
+  // own clock — brightest at 13:00, dimmest and bluest at 01:00.
+  //
+  // Those three lights are also what a backdrop world takes over when one
+  // is active, so this must not write to them while a world holds them —
+  // it used to, on a five-minute timer, which silently reverted every
+  // world's carefully-set rig a few minutes after arriving. Instead the
+  // wash owns the no-world case only, and hands its result to the world
+  // system as the baseline to restore when the visitor comes home.
   const HEMI_SKY_DAY = new THREE.Color(0x9fb0ff), HEMI_SKY_NIGHT = new THREE.Color(0x1a2040);
   const HEMI_GROUND_DAY = new THREE.Color(0x2a2038), HEMI_GROUND_NIGHT = new THREE.Color(0x0c0d1a);
   const KEY_DAY = new THREE.Color(0xffffff), KEY_NIGHT = new THREE.Color(0x8fa8ff);
+  // 'auto' follows the clock; the console can pin it either way.
+  let lightMode: 'auto' | 'day' | 'night' = 'auto';
+
+  function nightAmount() {
+    if (lightMode === 'day') return 0;
+    if (lightMode === 'night') return 1;
+    const now = new Date();
+    const hour = now.getHours() + now.getMinutes() / 60;
+    return 0.5 - 0.5 * Math.cos(((hour - 13 + 24) % 24) / 24 * Math.PI * 2);
+  }
+
   function applyDayNight() {
-    const hour = new Date().getHours() + new Date().getMinutes() / 60;
-    const night = 0.5 - 0.5 * Math.cos(((hour - 13 + 24) % 24) / 24 * Math.PI * 2);
+    if (worlds.current()) return;   // a world owns the rig — leave it alone
+    const night = nightAmount();
     hemi.color.copy(HEMI_SKY_DAY).lerp(HEMI_SKY_NIGHT, night);
     hemi.groundColor.copy(HEMI_GROUND_DAY).lerp(HEMI_GROUND_NIGHT, night);
     hemi.intensity = THREE.MathUtils.lerp(0.34, 0.13, night);
     key.color.copy(KEY_DAY).lerp(KEY_NIGHT, night);
     key.intensity = THREE.MathUtils.lerp(1.15, 0.32, night);
     fill.intensity = THREE.MathUtils.lerp(0.5, 0.2, night);
+    // What the lights read now *is* the no-world baseline. Without this the
+    // world system would keep restoring whatever the rig happened to hold
+    // when it was installed, before the clock had ever been consulted.
+    worlds.rebase();
   }
+
+  function setLightMode(mode: 'auto' | 'day' | 'night') {
+    lightMode = mode;
+    applyDayNight();
+    return lightMode;
+  }
+
+  // Coming home from a world: the world system has just restored the
+  // baseline, and the clock may have moved on considerably since it was
+  // taken. Re-derive it from the current hour.
+  window.addEventListener('lair-teleport', (e: any) => {
+    if (e.detail?.phase === 'done' && !worlds.current()) applyDayNight();
+  });
 
   function start() {
     try {
@@ -476,10 +593,9 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     setPixel(4);
     applyDayNight();
     window.setInterval(applyDayNight, 5 * 60 * 1000);
-    t0 = performance.now();
-    raf = requestAnimationFrame(loop);
+    resume();
   }
-  function stop() { cancelAnimationFrame(raf); }
+  function stop() { pause(); }
 
   /** The tower rises out of the ground one floor at a time — each group's
    *  local origin sits at its own floor's base, so scaling it up from the
@@ -576,10 +692,16 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     worlds,
     focusFloor: focus.focusFloor,
     setPanelOpen: focus.setPanelOpen,
+    reframe: focus.reframe,
     sendWizard: wiz.sendWizard,
     stepWizard: wiz.stepWizard,
     setBackdrop: (kind: any) => setBackdropFx(scene, kind),
     setPixel,
+    setPixelMode,
+    setLightMode,
+    lightMode: () => lightMode,
+    setAutoRotate: (on: boolean) => { controls.autoRotate = on; return on; },
+    autoRotate: () => controls.autoRotate as boolean,
     pluckBook,
     focusShelf,
     playIntro,
