@@ -497,6 +497,7 @@ body[data-console="on"] .dest-btn { opacity: 0.25; }
 }
 .ascii-modes a { color: var(--ink-dim); text-decoration: none; transition: color 140ms ease; }
 .ascii-modes a:hover { color: var(--accent-bright); }
+.ascii-tower-toggle { display: none; }
 
 /* The tower diagram sits beside the log on a wide screen, above it on a
    phone — the same "drawing plus callout" relationship the 3D view has. */
@@ -627,13 +628,29 @@ body[data-gl-lost="1"] #tower-host::after {
   body[data-console="on"] .help-btn,
   body[data-console="on"] .dest-btn { display: none; }
 
-  /* The diagram stacks above the log rather than sitting beside it. */
+  /* On phones the terminal gets the available height. The complete tower
+     opens only on demand, as a short-lived overlay. */
   .ascii-view { padding-top: 28px; }
   .ascii-name { font-size: 24px; }
-  .ascii-body { flex-direction: column; gap: 16px; margin-top: 18px; padding-top: 16px; }
+  .ascii-masthead { position: relative; }
+  .ascii-tower-toggle {
+    display: inline-flex; align-items: center; gap: 5px;
+    position: absolute; right: 0; bottom: 0;
+    appearance: none; cursor: pointer; padding: 5px 7px;
+    background: var(--bg); border: 1px solid var(--rule); border-radius: 3px;
+    color: var(--ink-dim); font: inherit; font-size: 10px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .ascii-tower-toggle:hover { color: var(--accent-bright); border-color: var(--accent); }
+  .ascii-body { margin-top: 18px; padding-top: 16px; }
   .ascii-tower {
-    align-self: center; min-height: 0; max-height: 22vh; overflow-y: auto;
-    font-size: 11px; scrollbar-width: thin;
+    display: none;
+  }
+  .ascii-tower.ascii-tower-open {
+    display: block; position: absolute; z-index: 1;
+    top: 112px; right: 16px; left: 16px; margin: 0; padding: 16px;
+    overflow: hidden; border: 1px solid var(--rule); border-radius: 4px;
+    background: var(--bg); color: var(--ink-dim); font-size: 11px;
   }
 }
 

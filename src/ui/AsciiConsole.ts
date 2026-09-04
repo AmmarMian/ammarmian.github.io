@@ -23,9 +23,12 @@ export function renderAsciiConsole(root: HTMLElement) {
       <nav class="ascii-modes" aria-label="Other views">
         <a href="/">3D tower</a><span aria-hidden="true">·</span><a href="/text">Text version</a>
       </nav>
+      <button class="ascii-tower-toggle" type="button" aria-controls="ascii-tower" aria-expanded="false">
+        <span aria-hidden="true">⌂</span> Tower
+      </button>
     </header>
     <div class="ascii-body">
-      <pre class="ascii-tower" aria-label="The tower, in text. Each storey is a link."></pre>
+      <pre class="ascii-tower" id="ascii-tower" aria-label="The tower, in text. Each storey is a link."></pre>
       <div class="ascii-log" role="log" aria-label="Console output"></div>
     </div>
     <form class="ascii-inputline" autocomplete="off">
@@ -43,6 +46,20 @@ export function renderAsciiConsole(root: HTMLElement) {
   const input = view.querySelector('.ascii-input') as HTMLInputElement;
   const form = view.querySelector('.ascii-inputline') as HTMLFormElement;
   const keys = view.querySelector('.ascii-keys') as HTMLElement;
+  const towerToggle = view.querySelector('.ascii-tower-toggle') as HTMLButtonElement;
+
+  function setTowerOpen(open: boolean) {
+    towerEl.classList.toggle('ascii-tower-open', open);
+    towerToggle.setAttribute('aria-expanded', String(open));
+    towerToggle.innerHTML = open
+      ? '<span aria-hidden="true">×</span> Close tower'
+      : '<span aria-hidden="true">⌂</span> Tower';
+    if (!open) input.focus();
+  }
+
+  towerToggle.addEventListener('click', () => {
+    setTowerOpen(!towerEl.classList.contains('ascii-tower-open'));
+  });
 
   function print(line: string, cls = '') {
     const row = document.createElement('div');
@@ -76,7 +93,12 @@ export function renderAsciiConsole(root: HTMLElement) {
       const route = FLOORS.find((f) => f.index === floor);
       btn.setAttribute('aria-label', `${FLOOR_NAMES[floor]}${route ? ` — ${route.label}` : ''}`);
       if (floor === active) btn.setAttribute('aria-current', 'true');
-      btn.addEventListener('click', () => { if (route) void submit(`goto ${route.slug}`); });
+      btn.addEventListener('click', () => {
+        if (route) {
+          setTowerOpen(false);
+          void submit(`goto ${route.slug}`);
+        }
+      });
       towerEl.appendChild(btn);
     });
   }
@@ -86,6 +108,7 @@ export function renderAsciiConsole(root: HTMLElement) {
   const ctx: Ctx = {
     print, clear, draw,
     close: () => { window.location.href = '/'; },
+    isCompact: () => window.matchMedia('(max-width: 900px)').matches,
     mode: 'ascii',
     scene: null,
     // No 3D scene here, so nothing can hold a world; `jump` says so plainly

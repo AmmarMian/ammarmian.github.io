@@ -39,6 +39,8 @@ export interface Ctx extends ConsoleHost {
   print: (line: string, cls?: string) => void;
   clear: () => void;
   close: () => void;
+  /** Whether the current console viewport needs compact text art. */
+  isCompact?: () => boolean;
   /** 'tower' drives the 3D scene; 'ascii' is the text-only console. */
   mode: 'tower' | 'ascii';
   /** ASCII console only — re-draw the tower diagram. */
@@ -192,6 +194,24 @@ function speechBubble(lines: string[], indent = 8): string[] {
   ];
 }
 
+function wrapBubbleLines(lines: string[], width: number): string[] {
+  return lines.flatMap((line) => {
+    if (!line) return [''];
+    const wrapped: string[] = [];
+    let current = '';
+    for (const word of line.split(' ')) {
+      if (!current || current.length + word.length + 1 > width) {
+        if (current) wrapped.push(current);
+        current = word;
+      } else {
+        current += ' ' + word;
+      }
+    }
+    if (current) wrapped.push(current);
+    return wrapped;
+  });
+}
+
 function greeting(): string[] {
   const h = new Date().getHours();
   const when = h < 6 ? 'You keep late hours. So do I.'
@@ -270,7 +290,9 @@ export const COMMANDS: Record<string, Command> = {
     detail: 'The tower\'s wizard greets you, and points at where to start. He says something different depending on the hour, as he does in the tower itself.',
     examples: ['hello'],
     run(_args, ctx) {
-      for (const line of speechBubble(greeting())) ctx.print(line, 'head');
+      const compact = ctx.isCompact?.() ?? false;
+      const lines = compact ? wrapBubbleLines(greeting(), 28) : greeting();
+      for (const line of speechBubble(lines, compact ? 0 : 8)) ctx.print(line, 'head');
       for (const line of WIZARD) ctx.print(line, 'pre');
     },
   },
