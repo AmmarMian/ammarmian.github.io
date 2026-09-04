@@ -14,8 +14,65 @@ const app = document.getElementById('app')!;
 // (screen readers, low-power devices, search crawlers, a quick skim).
 if (currentSlug() === 'text') {
   renderTextPage(app);
+} else if (isMobileDevice()) {
+  promptForMode();
 } else {
   bootTower();
+}
+
+/** Coarse pointer + narrow viewport reads as "phone-shaped" — the 3D tower
+ *  is heavy on mobile GPUs/CPUs and often unwelcome on metered data, so
+ *  those visitors get asked instead of dropped straight into it. */
+function isMobileDevice(): boolean {
+  const coarse = window.matchMedia('(pointer: coarse)').matches;
+  const narrow = window.innerWidth <= 820;
+  const uaMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  return uaMobile || (coarse && narrow);
+}
+
+/** A five-second choice: ride the 3D tower, or jump to the text version.
+ *  No answer in time defaults to text — the safer, lighter option. */
+function promptForMode() {
+  const overlay = document.createElement('div');
+  overlay.className = 'mode-prompt';
+  overlay.innerHTML = `
+    <div class="mode-prompt-card">
+      <div class="kicker">choose a view</div>
+      <p>This site is an interactive 3D tower. On a phone it can be slow to load and awkward to navigate — you can view a plain text version instead.</p>
+      <div class="mode-prompt-actions">
+        <button type="button" class="mode-btn mode-btn-primary" data-choice="3d">Load 3D scene</button>
+        <button type="button" class="mode-btn" data-choice="text">Text version</button>
+      </div>
+      <div class="mode-prompt-timer">Text version in <span class="mode-prompt-count">5</span>s&hellip;</div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const countEl = overlay.querySelector('.mode-prompt-count')!;
+  let remaining = 5;
+  const tick = window.setInterval(() => {
+    remaining -= 1;
+    countEl.textContent = String(Math.max(remaining, 0));
+    if (remaining <= 0) settle('text');
+  }, 1000);
+
+  let settled = false;
+  function settle(choice: '3d' | 'text') {
+    if (settled) return;
+    settled = true;
+    window.clearInterval(tick);
+    overlay.remove();
+    if (choice === 'text') {
+      navigate('text', { replace: true });
+      renderTextPage(app);
+    } else {
+      bootTower();
+    }
+  }
+
+  overlay.querySelectorAll<HTMLButtonElement>('.mode-btn').forEach((btn) => {
+    btn.addEventListener('click', () => settle(btn.dataset.choice as '3d' | 'text'));
+  });
 }
 
 function bootTower() {
