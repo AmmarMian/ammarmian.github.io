@@ -14,7 +14,7 @@ import { buildSanctum } from './floors/sanctum';
 import { buildKitchen } from './floors/kitchen';
 import { buildWizardMesh, createWizardController } from './wizard';
 import { buildFoxMesh, createFoxState, foxDecide } from './fox';
-import { buildStarfield, buildNebula, makePoints, setBackdrop as setBackdropFx } from './fx';
+import { makePoints, setBackdrop as setBackdropFx } from './fx';
 import { createFocusController } from './focus';
 import { createInteractionSystem } from './interactions';
 
@@ -107,9 +107,6 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   // so meshes added afterward wouldn't get patched.
   const worlds = installWorlds({ THREE, scene, camera, model, fx, dims: { R, FH, NF, WH, ROT } });
 
-  const starfield = buildStarfield(scene);
-  buildNebula(scene);
-
   const TOP = FH * (NF - 1) + 2.5;
   const dust = makePoints(fx, 260, 0xffd9a8, 0.05, () => {
     const a = Math.random() * Math.PI * 2, r = Math.random() * (R - 0.6);
@@ -127,15 +124,6 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   }));
 
   const interactions = createInteractionSystem(model, floors);
-  // Shared between the observatory telescope and the nav's starfield
-  // toggle — either can flip it, and a 'lair-space-view' event keeps any
-  // UI reflecting it (like the toggle's on/off state) in sync.
-  let spaceView = false;
-  function setSpaceView(on: boolean) {
-    spaceView = on;
-    setBackdropFx(scene, on ? 'space' : 'blueprint', false);
-    window.dispatchEvent(new CustomEvent('lair-space-view', { detail: on }));
-  }
   wireInteractables();
 
   const focus = createFocusController({
@@ -239,7 +227,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     const scope = obs.getObjectByName('telescope_tube_assembly');
     if (scope) interactions.interact(scope, 'Look through the telescope', (e) => {
       e.t = 2.2;
-      setSpaceView(!spaceView);
+      worlds.teleport(worlds.current() === 'space' ? null : 'space');
     }, (e, t) => {
       scope.rotation.x = -0.62 + (e.t > 0 ? Math.sin(t * 2.2) * 0.35 : 0);
     });
@@ -437,8 +425,6 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
       mat.opacity += ((f.ring.userData as any).target - mat.opacity) * Math.min(dt * 8, 1);
     }
 
-    (starfield.material as THREE.ShaderMaterial).uniforms.uTime.value = t;
-
     interactions.tick(t, dt);
   }
 
@@ -467,7 +453,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
 
   // A soft day/night wash on the stage lighting, driven by the visitor's
   // own clock — brightest at 13:00, dimmest and bluest at 01:00. Doesn't
-  // touch the backdrop, so it never fights the telescope's space toggle.
+  // touch the backdrop, so it never fights an active world.
   const HEMI_SKY_DAY = new THREE.Color(0x9fb0ff), HEMI_SKY_NIGHT = new THREE.Color(0x1a2040);
   const HEMI_GROUND_DAY = new THREE.Color(0x2a2038), HEMI_GROUND_NIGHT = new THREE.Color(0x0c0d1a);
   const KEY_DAY = new THREE.Color(0xffffff), KEY_NIGHT = new THREE.Color(0x8fa8ff);
@@ -593,7 +579,6 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     sendWizard: wiz.sendWizard,
     stepWizard: wiz.stepWizard,
     setBackdrop: (kind: any) => setBackdropFx(scene, kind),
-    setSpaceView,
     setPixel,
     pluckBook,
     focusShelf,

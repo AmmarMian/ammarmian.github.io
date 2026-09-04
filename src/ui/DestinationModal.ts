@@ -10,6 +10,7 @@ const LABELS: Record<string, string> = {
   forest: 'Deep forest',
   beach: 'Beach',
   city: 'Abandoned city',
+  space: 'Deep space',
 };
 
 const BLURBS: Record<string, string> = {
@@ -18,6 +19,7 @@ const BLURBS: Record<string, string> = {
   forest: 'Instanced trunks, ferns, light shafts',
   beach: 'Shoaling waves, sun glitter, a surf line',
   city: 'Lit windows, stopped cars, a patrolling eye',
+  space: 'Starfield, nebulae, a ringed giant adrift',
 };
 
 export function createDestinationModal(root: HTMLElement, worlds: WorldsApi) {

@@ -24,7 +24,7 @@ interface Ctx extends Host {
 const GOTO_TARGETS: Record<string, string | null> = { home: null, tower: null };
 for (const f of FLOORS) GOTO_TARGETS[f.slug] = f.slug;
 
-const JUMP_TARGETS = ['none', 'seafloor', 'moon', 'forest', 'beach', 'city'];
+const JUMP_TARGETS = ['none', 'seafloor', 'moon', 'forest', 'beach', 'city', 'space'];
 const SHELL_TARGETS = ['off', 'ghost', 'solid', 'auto'];
 
 const COMMANDS: Record<string, (args: string[], ctx: Ctx) => void | Promise<void>> = {

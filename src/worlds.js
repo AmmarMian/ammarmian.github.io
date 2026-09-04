@@ -5,7 +5,7 @@
  *
  *   import { installWorlds } from './worlds.js';
  *   const worlds = installWorlds({ THREE, scene, camera, model, fx, dims });
- *   worlds.set('seafloor');            // 'seafloor' | 'moon' | 'forest' | null
+ *   worlds.set('seafloor');            // 'seafloor' | 'moon' | 'forest' | 'beach' | 'city' | 'space' | null
  *   worlds.shell('ghost');             // 'off' | 'ghost' | 'solid'
  *   worlds.teleport('forest');         // rise into light, swap world, descend
  *   worlds.tick(tSeconds, dtSeconds);  // once per frame
@@ -1641,6 +1641,194 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims }) {
     };
   }
 
+  /* ============================ 6 · deep space ============================ */
+
+  function buildSpace() {
+    const g = new THREE.Group();
+    g.name = 'world_space';
+    g.add(skyDome(0x11132c, 0x05060f, 0x000000));
+
+    /* stars: two overlapping shells (near/bright, far/dim) so parallax reads
+       even though nothing here actually moves relative to the camera. each
+       point twinkles on its own phase, in a round glyph rather than a square
+       dot — the same trick as the nav's own starfield, just self-contained. */
+    const stars = (() => {
+      const N = 3200;
+      const pos = new Float32Array(N * 3), seed = new Float32Array(N),
+        size = new Float32Array(N), col = new Float32Array(N * 3);
+      for (let i = 0; i < N; i++) {
+        const far = Math.random() < 0.6;
+        const v = new THREE.Vector3().randomDirection().multiplyScalar(far ? rnd(400, 260) : rnd(220, 90));
+        pos.set([v.x, v.y, v.z], i * 3);
+        seed[i] = rnd(6.28);
+        size[i] = far ? rnd(1.6, 0.6) : rnd(3.2, 1.4);
+        _c.setHSL(rnd(0.62, 0.5) + (Math.random() < 0.12 ? rnd(0.12, 0.02) : 0), rnd(0.4, 0.05), rnd(0.95, 0.55));
+        col.set([_c.r, _c.g, _c.b], i * 3);
+      }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      geo.setAttribute('aSeed', new THREE.BufferAttribute(seed, 1));
+      geo.setAttribute('aSize', new THREE.BufferAttribute(size, 1));
+      geo.setAttribute('aColor', new THREE.BufferAttribute(col, 3));
+      const mat = new THREE.ShaderMaterial({
+        fog: false, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+        uniforms: { uT },
+        vertexShader: `attribute float aSeed; attribute float aSize; attribute vec3 aColor;
+          uniform float uT; varying vec3 vColor; varying float vTwinkle;
+          void main() {
+            vColor = aColor;
+            vTwinkle = 0.5 + 0.5 * sin(uT * (0.4 + fract(aSeed) * 1.1) + aSeed * 6.2831853);
+            vec4 mv = modelViewMatrix * vec4(position, 1.0);
+            gl_PointSize = aSize * (300.0 / -mv.z) * (0.6 + 0.4 * vTwinkle);
+            gl_Position = projectionMatrix * mv;
+          }`,
+        fragmentShader: `varying vec3 vColor; varying float vTwinkle;
+          void main() {
+            vec2 uv = gl_PointCoord - 0.5;
+            float core = smoothstep(0.5, 0.0, length(uv) * 2.0);
+            gl_FragColor = vec4(vColor, core * (0.4 + 0.6 * vTwinkle));
+          }`,
+      });
+      const m = new THREE.Points(geo, mat);
+      m.frustumCulled = false;
+      g.add(m);
+      return m;
+    })();
+
+    /* nebulae: soft colour washes far out, each its own slow-turning group so
+       the parallax between them reads even though the camera barely moves */
+    const nebGroup = new THREE.Group();
+    g.add(nebGroup);
+    const NEB = [
+      [0x9a6cff, new THREE.Vector3(-135, 60, -160), 85, 0.16],
+      [0x3fa0e0, new THREE.Vector3(160, -40, -125), 95, 0.15],
+      [0xe0508c, new THREE.Vector3(40, 100, 170), 78, 0.14],
+      [0x4fe8d0, new THREE.Vector3(-110, -90, 135), 72, 0.13],
+    ];
+    for (const [color, center, radius, opacity] of NEB) {
+      pointCloud(nebGroup, 1300, () => {
+        const d = new THREE.Vector3().randomDirection();
+        const r = radius * Math.pow(Math.random(), 0.5);
+        return { x: center.x + d.x * r, y: center.y + d.y * r * 0.55, z: center.z + d.z * r };
+      }, { color, size: 22, opacity, additive: true });
+    }
+
+    /* the sun: a small, hot red dwarf. Its direction also lights the ocean
+       world below, so the two agree on where "up" is. */
+    const SUN_DIR = new THREE.Vector3(0.5, 0.32, 0.8).normalize();
+    const SUN_COLOR = new THREE.Vector3(1.6, 0.6, 0.34);
+    const sun = new THREE.Group();
+    sun.position.copy(SUN_DIR.clone().multiplyScalar(360));
+    sun.add(new THREE.Mesh(new THREE.SphereGeometry(13, 20, 14),
+      new THREE.MeshBasicMaterial({ color: 0xff6a35, fog: false })));
+    const sunHalo = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: softTex, color: 0xff8747, transparent: true, opacity: 0.95, depthWrite: false,
+      blending: THREE.AdditiveBlending, fog: false,
+    }));
+    sunHalo.scale.setScalar(130);
+    sun.add(sunHalo);
+    const sunHalo2 = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: softTex, color: 0xffcf9a, transparent: true, opacity: 0.7, depthWrite: false,
+      blending: THREE.AdditiveBlending, fog: false,
+    }));
+    sunHalo2.scale.setScalar(46);
+    sun.add(sunHalo2);
+    g.add(sun);
+
+    /* a lone ocean world: seamless object-space noise (no UV, so no seam)
+       carves continents and swirling cloud bands, lit by the red dwarf above
+       with a lambert term, a sun glint off open water, and a blue limb haze */
+    const planet = new THREE.Group();
+    planet.position.set(150, 45, -225);
+    planet.rotation.z = 0.2;
+    const body = new THREE.Mesh(new THREE.SphereGeometry(48, 48, 34), new THREE.ShaderMaterial({
+      fog: false,
+      uniforms: { uT, uSunDir: { value: SUN_DIR }, uSunColor: { value: SUN_COLOR } },
+      vertexShader: `varying vec3 vN; varying vec3 vP; varying vec3 vWPos;
+        void main(){ vN = normalize(mat3(modelMatrix) * normal); vP = position;
+          vec4 wp = modelMatrix * vec4(position,1.0); vWPos = wp.xyz;
+          gl_Position = projectionMatrix * viewMatrix * wp; }`,
+      fragmentShader: `${NOISE}
+        varying vec3 vN; varying vec3 vP; varying vec3 vWPos;
+        uniform float uT; uniform vec3 uSunDir; uniform vec3 uSunColor;
+        void main(){
+          vec3 n = normalize(vN);
+          float land = fbm(vP.xy * 0.028 + vP.yz * 0.011) * 0.6 + fbm(vP.yz * 0.06) * 0.4;
+          float continent = smoothstep(0.52, 0.64, land);
+          vec3 ocean = mix(vec3(0.03,0.16,0.40), vec3(0.08,0.34,0.52), smoothstep(-0.2, 0.6, land));
+          vec3 shore = mix(vec3(0.30,0.38,0.20), vec3(0.58,0.50,0.32), smoothstep(0.62, 0.92, land));
+          vec3 surf = mix(ocean, shore, continent);
+          vec2 cp = vP.xy * 0.09 + vec2(uT * 0.02, uT * 0.01);
+          float clouds = fbm(cp) * 0.6 + fbm(vP.yz * 0.15 - vec2(uT * 0.014, 0.0)) * 0.4;
+          float cloudMask = smoothstep(0.56, 0.8, clouds);
+          surf = mix(surf, vec3(0.94,0.96,0.98), cloudMask * 0.85);
+          float lam = clamp(dot(n, uSunDir) * 0.55 + 0.48, 0.0, 1.0);
+          vec3 lit = surf * (0.22 + 0.95 * lam) * uSunColor;
+          vec3 viewDir = normalize(cameraPosition - vWPos);
+          vec3 h = normalize(uSunDir + viewDir);
+          float spec = pow(max(dot(n, h), 0.0), 70.0) * (1.0 - continent) * (1.0 - cloudMask) * lam;
+          lit += vec3(1.0,0.82,0.62) * spec * 1.8;
+          float fres = pow(1.0 - clamp(dot(n, viewDir), 0.0, 1.0), 2.4);
+          lit += mix(vec3(0.25,0.5,0.85), uSunColor, 0.4) * fres * 0.55;
+          gl_FragColor = vec4(lit, 1.0);
+        }`,
+    }));
+    planet.add(body);
+    g.add(planet);
+
+    const moon2 = new THREE.Mesh(new THREE.SphereGeometry(9, 16, 12),
+      new THREE.MeshBasicMaterial({ color: 0xc9c2d8, fog: false }));
+    moon2.position.set(-125, 85, 170);
+    g.add(moon2);
+
+    /* a belt of tumbled rock, held in one static InstancedMesh and orbited by
+       rotating the whole group each frame — far cheaper than per-instance
+       matrix updates for something this far from the camera */
+    const belt = new THREE.Group();
+    const rockGeo = new THREE.DodecahedronGeometry(1, 0);
+    const rockMat = patchStd(new THREE.MeshStandardMaterial({
+      color: 0x6a6482, roughness: 1, flatShading: true, emissive: 0x1c1830, emissiveIntensity: 0.7,
+    }), {
+      frag: `diffuseColor.rgb *= 0.7 + 0.55 * fbm(vWP.xz * 0.4 + vWP.y * 0.3);`,
+    });
+    const rocks = new THREE.InstancedMesh(rockGeo, rockMat, 46);
+    for (let i = 0; i < 46; i++) {
+      const a = rnd(6.28), d = rnd(200, 130), y = rnd(40, -30), sz = rnd(4.5, 1);
+      _e.set(rnd(3), rnd(3), rnd(3));
+      rocks.setMatrixAt(i, _m4.compose(
+        _v.set(Math.cos(a) * d, y, Math.sin(a) * d), _q.setFromEuler(_e), _s.set(sz, sz * rnd(1, 0.5), sz)));
+    }
+    belt.add(rocks);
+    g.add(belt);
+
+    const motes = pointCloud(g, 420, () => ({
+      x: rnd(180, -180), y: rnd(130, -130), z: rnd(180, -180), v: rnd(0.15, 0.02),
+    }), { color: 0xbfd0ff, size: 0.4, opacity: 0.4 });
+
+    return {
+      group: g,
+      fog: new THREE.FogExp2(0x05060d, 0.0011),
+      css: '#03040a',
+      glass: { color: 0xcfe4ff, emissive: 0x8fb0ff, intensity: 1.3 },
+      light: {
+        hemi: { i: 0.95, sky: 0x5a70c8, gnd: 0x14162c },
+        key: { mul: 0.9, c: 0xffab7a, p: [22, 14, 35] },
+        fill: { mul: 0.55, c: 0x7a8ad0 },
+      },
+      tick(t, dt) {
+        nebGroup.rotation.y = t * 0.004;
+        planet.rotation.y = 0.2 + t * 0.02;
+        belt.rotation.y = t * 0.015;
+        const mp = motes.pos;
+        for (let i = 0; i < mp.length; i += 3) {
+          mp[i + 1] += motes.vel[i / 3] * dt;
+          if (mp[i + 1] > 130) mp[i + 1] = -130;
+        }
+        motes.m.geometry.attributes.position.needsUpdate = true;
+      },
+    };
+  }
+
   /* ============================== teleport =============================== */
 
   const tp = {
@@ -2044,7 +2232,7 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims }) {
   /* ============================== switching ============================== */
 
   const built = {};
-  const BUILDERS = { seafloor: buildSeafloor, moon: buildMoon, forest: buildForest, beach: buildBeach, city: buildCity };
+  const BUILDERS = { seafloor: buildSeafloor, moon: buildMoon, forest: buildForest, beach: buildBeach, city: buildCity, space: buildSpace };
   const savedFog = scene.fog;
   let current = null;
 
@@ -2089,7 +2277,7 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims }) {
   }
 
   return {
-    kinds: ['seafloor', 'moon', 'forest', 'beach', 'city'],
+    kinds: ['seafloor', 'moon', 'forest', 'beach', 'city', 'space'],
     set,
     tick,
     teleport,
