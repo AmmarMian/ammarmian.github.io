@@ -631,7 +631,10 @@ body[data-gl-lost="1"] #tower-host::after {
   .ascii-view { padding-top: 28px; }
   .ascii-name { font-size: 24px; }
   .ascii-body { flex-direction: column; gap: 16px; margin-top: 18px; padding-top: 16px; }
-  .ascii-tower { font-size: 11px; align-self: center; }
+  .ascii-tower {
+    align-self: center; min-height: 0; max-height: 22vh; overflow-y: auto;
+    font-size: 11px; scrollbar-width: thin;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
