@@ -1,8 +1,7 @@
 import { F } from './tower/scene-constants';
 
-// Served at ammarmian.fr/tower/ (see vite.config.ts), not the domain root —
-// every path built or parsed here needs that prefix.
-export const BASE = '/tower';
+// Served at the domain root (see vite.config.ts).
+export const BASE = '';
 
 export interface FloorRoute {
   index: number;
