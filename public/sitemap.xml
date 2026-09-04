@@ -2,28 +2,28 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://ammarmian.github.io/</loc>
-    <lastmod>2026-08-06T00:00:00+00:00</lastmod>
+    <loc>https://ammarmian.fr/</loc>
+    <lastmod>2026-09-04T00:00:00+00:00</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://ammarmian.github.io/CV.html</loc>
+    <loc>https://ammarmian.fr/legacy/CV.html</loc>
     <lastmod>2026-08-06T00:00:00+00:00</lastmod>
-    <priority>0.8</priority>
+    <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://ammarmian.github.io/Publications.html</loc>
+    <loc>https://ammarmian.fr/legacy/Publications.html</loc>
     <lastmod>2026-08-06T00:00:00+00:00</lastmod>
-    <priority>0.8</priority>
+    <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://ammarmian.github.io/Students.html</loc>
+    <loc>https://ammarmian.fr/legacy/Students.html</loc>
     <lastmod>2026-08-06T00:00:00+00:00</lastmod>
-    <priority>0.6</priority>
+    <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://ammarmian.github.io/Contact.html</loc>
+    <loc>https://ammarmian.fr/legacy/Contact.html</loc>
     <lastmod>2026-08-06T00:00:00+00:00</lastmod>
-    <priority>0.6</priority>
+    <priority>0.3</priority>
   </url>
 </urlset>

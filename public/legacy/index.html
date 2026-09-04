@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ammar Mian</title>
+<meta name="description" content="Ammar Mian — Associate professor at LISTIC, Université Savoie Mont-Blanc.">
+<link rel="preload" href="assets/fonts/cormorant-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<div class="hero-shell">
+  <canvas id="field" class="flow-canvas" aria-hidden="true"></canvas>
+  <div class="vignette vignette--hero" aria-hidden="true"></div>
+
+  <div class="hero-grid">
+
+    <header class="hdr" style="padding:0; min-height:48px">
+      <div class="hdr-brand">
+        <div id="fox" class="fox-slot" data-fox-dash role="button" aria-label="Fox mascot"></div>
+        <div class="brand-name">Ammar Mian</div>
+      </div>
+      <button type="button" id="navToggle" class="nav-toggle">Menu</button>
+      <nav class="nav-links">
+        <a href="Publications.html">Publications</a>
+        <a href="Students.html">Students</a>
+        <a href="CV.html">CV</a>
+        <a href="Contact.html">Contact</a>
+      </nav>
+    </header>
+
+    <div class="hero-main">
+      <div class="hero-titles">
+        <h1 class="hero-h1">Ammar</h1>
+        <h1 class="hero-h1 hero-h1--ital">Mian</h1>
+        <div class="hero-role">Associate professor</div>
+        <div class="hero-rule"></div>
+      </div>
+    </div>
+
+    <div class="hero-foot">
+      <div class="field-menu-btn">
+        <button type="button" id="patternToggle" class="field-menu-toggle">
+          <span id="patternLabel">field</span>
+          <span id="patternCaret" style="font-size:8px; opacity:0.7">▴</span>
+        </button>
+        <div id="patternMenu" class="field-menu">
+          <div class="field-menu-label">Vector field</div>
+          <!-- items injected by script -->
+        </div>
+      </div>
+      <div class="hero-univ">Université Savoie Mont-Blanc</div>
+    </div>
+
+    <button type="button" id="sparkBtn" class="spark-btn" aria-label="Open field lab">
+      <span class="spark-dot"></span>
+    </button>
+
+    <div id="labPanel" class="lab-panel">
+      <div class="lab-head">
+        <div class="lab-head-label">Den · field lab</div>
+        <button type="button" id="labClose" class="lab-close">×</button>
+      </div>
+      <div class="lab-body">
+        <div id="labControls"></div>
+        <div class="lab-inks">
+          <span class="lab-ink-label">Ink</span>
+          <div id="inkSwatches" class="lab-ink-swatches"></div>
+        </div>
+        <button type="button" id="labReset" class="lab-reset">Reset</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="assets/flow.js"></script>
+<script>
+(function () {
+  var DEFAULTS = {
+    particleCount: 2350, trailLength: 470, turbulence: 3, fieldScale: 65, stepSize: 13,
+    autoSpeed: 8, lineWidth: 20, lineOpacity: 15, brightness: 150, inkColor: "#c9d6e6"
+  };
+  var INKS = ["#c9d6e6", "#9fb3c8", "#d8c9a8", "#a8c0b8"];
+  var t = {}; // tweak overrides, same shape as DEFAULTS keys
+  var pick = null; // pinned pattern, null = random-per-load
+
+  function v(key) { return (key in t) ? t[key] : DEFAULTS[key]; }
+
+  function cfg() {
+    return {
+      bg: "#0a0d13",
+      count: v("particleCount"), trail: v("trailLength"), prewarm: 10,
+      ink: v("inkColor"), bright: v("brightness") / 100,
+      mode: "one-way", auto: v("autoSpeed") / 10,
+      scale: v("fieldScale") / 10000, pattern: pick || "random", fox: "none",
+      turb: v("turbulence") / 10, width: v("lineWidth") / 10, opacity: v("lineOpacity") / 100,
+      drift: 0, scrollPower: 0, step: v("stepSize") / 10
+    };
+  }
+
+  var canvas = document.getElementById("field");
+  var chrome = Flow.initChrome({
+    canvas: canvas,
+    foxEl: document.getElementById("fox"),
+    navToggle: document.getElementById("navToggle"),
+    cfg: cfg
+  });
+  var field = chrome.field;
+
+  var patternLabel = document.getElementById("patternLabel");
+  var patternCaret = document.getElementById("patternCaret");
+  var patternToggle = document.getElementById("patternToggle");
+  var patternMenu = document.getElementById("patternMenu");
+
+  function updatePatternLabel() {
+    var name = field.pattern;
+    patternLabel.textContent = name ? name + " field" : "field";
+  }
+  updatePatternLabel();
+
+  function renderPatternMenu() {
+    var items = patternMenu.querySelectorAll(".field-menu-item");
+    items.forEach(function (el) { el.remove(); });
+    ["random", "curl", "ridges", "swirl", "bands", "cells"].forEach(function (k) {
+      var active = k === "random" ? !pick : pick === k;
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "field-menu-item" + (active ? " active" : "");
+      btn.innerHTML = "<span>" + k + "</span><span>" + (active ? "·" : "") + "</span>";
+      btn.addEventListener("click", function () {
+        pick = k === "random" ? null : k;
+        field.setPattern(k);
+        updatePatternLabel();
+        renderPatternMenu();
+        patternMenu.classList.remove("open");
+      });
+      patternMenu.appendChild(btn);
+    });
+  }
+  renderPatternMenu();
+
+  patternToggle.addEventListener("click", function () {
+    var open = patternMenu.classList.toggle("open");
+    patternCaret.textContent = open ? "▾" : "▴";
+  });
+  document.addEventListener("click", function (e) {
+    if (!patternMenu.classList.contains("open")) return;
+    if (!patternMenu.contains(e.target) && e.target !== patternToggle && !patternToggle.contains(e.target)) {
+      patternMenu.classList.remove("open");
+      patternCaret.textContent = "▴";
+    }
+  });
+
+  // field lab drawer
+  var sparkBtn = document.getElementById("sparkBtn");
+  var labPanel = document.getElementById("labPanel");
+  var labClose = document.getElementById("labClose");
+  var labControls = document.getElementById("labControls");
+  var inkSwatches = document.getElementById("inkSwatches");
+  var labReset = document.getElementById("labReset");
+
+  var STRUCTURAL = ["particleCount", "trailLength", "fieldScale", "turbulence", "stepSize"];
+
+  var CONTROLS = [
+    { key: "particleCount", label: "Particles", min: 100, max: 8000, step: 50, fmt: function (x) { return String(x); } },
+    { key: "trailLength", label: "Trail", min: 10, max: 900, step: 10, fmt: function (x) { return String(x); } },
+    { key: "turbulence", label: "Turbulence", min: 2, max: 90, step: 1, fmt: function (x) { return (x / 10).toFixed(1); } },
+    { key: "fieldScale", label: "Field scale", min: 2, max: 120, step: 1, fmt: function (x) { return (x / 10000).toFixed(4); } },
+    { key: "stepSize", label: "Step", min: 5, max: 60, step: 1, fmt: function (x) { return (x / 10).toFixed(1); } },
+    { key: "autoSpeed", label: "Speed", min: 1, max: 50, step: 1, fmt: function (x) { return (x / 10).toFixed(1); } },
+    { key: "lineWidth", label: "Line width", min: 1, max: 60, step: 1, fmt: function (x) { return (x / 10).toFixed(1); } },
+    { key: "lineOpacity", label: "Opacity", min: 1, max: 100, step: 1, fmt: function (x) { return x + "%"; } },
+    { key: "brightness", label: "Brightness", min: 10, max: 400, step: 5, fmt: function (x) { return x + "%"; } }
+  ];
+
+  function renderControls() {
+    labControls.innerHTML = "";
+    CONTROLS.forEach(function (c) {
+      var val = v(c.key);
+      var wrap = document.createElement("div");
+      wrap.className = "lab-control";
+      wrap.innerHTML =
+        '<div class="lab-control-head"><span class="lab-control-name">' + c.label +
+        '</span><span class="lab-control-val">' + c.fmt(val) + '</span></div>';
+      var input = document.createElement("input");
+      input.type = "range"; input.min = c.min; input.max = c.max; input.step = c.step; input.value = val;
+      input.addEventListener("input", function (e) {
+        t[c.key] = Number(e.target.value);
+        wrap.querySelector(".lab-control-val").textContent = c.fmt(t[c.key]);
+        if (STRUCTURAL.indexOf(c.key) >= 0) field.reseed();
+      });
+      wrap.appendChild(input);
+      labControls.appendChild(wrap);
+    });
+  }
+  renderControls();
+
+  function renderInks() {
+    inkSwatches.innerHTML = "";
+    INKS.forEach(function (hex) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "lab-ink-swatch" + (v("inkColor") === hex ? " active" : "");
+      btn.style.background = hex;
+      btn.addEventListener("click", function () {
+        t.inkColor = hex;
+        renderInks();
+      });
+      inkSwatches.appendChild(btn);
+    });
+  }
+  renderInks();
+
+  labReset.addEventListener("click", function () {
+    t = {};
+    renderControls();
+    renderInks();
+    field.reseed();
+  });
+
+  sparkBtn.addEventListener("click", function () { labPanel.classList.toggle("open"); });
+  labClose.addEventListener("click", function () { labPanel.classList.remove("open"); });
+})();
+</script>
+</body>
+</html>

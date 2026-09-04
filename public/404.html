@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sorcerer's Tower</title>
+<script>
+  /* GitHub Pages has no server-side router — a direct load of, say,
+     /contact lands here. Stash the real URL and bounce to the app
+     shell; index.html restores it via history.replaceState. */
+  sessionStorage.redirect = location.href;
+</script>
+<meta http-equiv="refresh" content="0;URL='/'">
+</head>
+<body></body>
+</html>

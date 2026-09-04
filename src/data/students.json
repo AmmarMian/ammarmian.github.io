@@ -1,0 +1,12 @@
+[
+  { "name": "Matthieu Verlynde", "topic": "Apprentissage frugal pour la télédétection", "note": "Co-supervised with Y. Yan", "kind": "PhD", "period": "2024—", "status": "current" },
+  { "name": "Wenli Shi", "topic": "Réseau de diffusions sparses sur des données non textuelles", "note": "Co-directors F. Pascal (L2S) & M. Jonckheere (LAAS)", "kind": "PhD", "period": "2025—", "status": "current" },
+  { "name": "Douba Jafuno", "topic": "Classification de signaux GPR — defended 4 Nov 2025", "note": "Co-supervisors G. Ginolhac, N. Stelzenmuller", "kind": "PhD", "period": "2022—2025", "status": "done" },
+  { "name": "Olivier Lerda", "topic": "Détection robuste pour un sonar à croix de Mills — defended 17 Dec 2024", "note": "Co-supervisors G. Ginolhac, J-P. Ovarlez", "kind": "PhD", "period": "2023—2024", "status": "done" },
+  { "name": "Thibault Pautrel", "topic": "SPDnet federated learning", "note": "Co-supervised with F. Bouchard and G. Ginolhac", "kind": "M2", "period": "2025", "status": "done" },
+  { "name": "Thomas Petellat", "topic": "Détection de fissures volcaniques par apprentissage automatique", "note": "Co-supervised with C. Lin-Kwong-Chon and Y. Yan", "kind": "M2", "period": "2025", "status": "done" },
+  { "name": "Mamour Ndiaye", "topic": "Pansharpening avec la variation totale", "note": "Co-supervised with Y. Mhiri", "kind": "M2", "period": "2025", "status": "done" },
+  { "name": "Emma Molière", "topic": "Pansharpening and unrolling", "note": "Co-supervised with A. Bhanot", "kind": "M2", "period": "2024", "status": "done" },
+  { "name": "Matthieu Verlynde", "topic": "Efficient algorithms for remote sensing", "kind": "M2", "period": "2024", "status": "done" },
+  { "name": "Matthieu Gallet", "topic": "Inversion robuste de signaux GPR", "note": "Co-supervised with G. Ginolhac", "kind": "M2", "period": "2020", "status": "done" }
+]
