@@ -53,12 +53,19 @@ export function createStage(container: HTMLElement) {
   ro.observe(container);
 
   let pixelOn = true, pixelScale = 4;
+  let flatApplied: boolean | null = null;
   function applyPixel() {
     const ratio = pixelOn ? 1 / pixelScale : Math.min(window.devicePixelRatio || 1, 2);
     renderer.setPixelRatio(ratio);
     fit();
     renderer.domElement.style.imageRendering = pixelOn ? 'pixelated' : 'auto';
-    for (const k in M) { (M[k] as any).flatShading = pixelOn; M[k].needsUpdate = true; }
+    /* Only when it actually changed. flatShading is a shader define, so
+       needsUpdate recompiles every material in the tower — and applyPixel runs
+       on every window resize, where the pixel mode has not moved at all. */
+    if (flatApplied !== pixelOn) {
+      flatApplied = pixelOn;
+      for (const k in M) { (M[k] as any).flatShading = pixelOn; M[k].needsUpdate = true; }
+    }
   }
   function setPixel(scale: number) {
     if (scale === 0) pixelOn = false; else { pixelOn = true; pixelScale = scale; }

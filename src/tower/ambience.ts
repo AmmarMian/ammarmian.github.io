@@ -211,12 +211,21 @@ export function applyAmbience(world: string | null, night: number) {
   shaftMat.color.copy(sky);
   shaftMat.opacity = 0.035 + a.through * 0.14;
 
+  /* Lights that contribute nothing are switched off rather than left at a
+     token intensity: three only uploads and loops over *visible* lights, and
+     with six storeys of candles, four window rigs and a fill per floor this
+     scene carries enough of them for that to matter in every lit fragment.
+     The count only changes when the sky crosses a threshold — once at dusk,
+     once at dawn, on a teleport — so the recompile it costs is rare. */
+  const skyLit = a.through > 0.06;
   for (const w of windows) {
     w.halo.color.copy(sky);
     w.halo.intensity = w.baseHalo * a.through;
     w.spot.color.copy(sky);
     w.spot.intensity = w.baseSpot * a.through;
-    w.shaft.visible = a.through > 0.05;
+    w.halo.visible = skyLit;
+    w.spot.visible = skyLit;
+    w.shaft.visible = skyLit;
   }
   if (shellPane) {
     shellPane.color.copy(sky);
@@ -225,8 +234,12 @@ export function applyAmbience(world: string | null, night: number) {
     shellPane.opacity = 0.12 + a.pane * 0.2;
   }
 
-  for (const l of lamps) l.light.intensity = l.base * a.interior;
-  for (const f of fills) f.intensity = 2.6 * a.fill;
+  for (const l of lamps) {
+    l.light.intensity = l.base * a.interior;
+    l.light.visible = a.interior > 0.05;
+  }
+  const fillLit = a.fill > 0.04;
+  for (const f of fills) { f.intensity = 2.6 * a.fill; f.visible = fillLit; }
   gain = a.interior;
 
   // Emissive props burn harder after dark. Captured once, on first use, so the

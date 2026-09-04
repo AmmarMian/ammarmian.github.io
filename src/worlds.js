@@ -93,8 +93,14 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
             vec3 rel = origin - cameraPosition;
             float along = dot(rel, ax) / L;
             float perp = length(rel - ax * (along * L));
-            vFade = smoothstep(0.02, 0.22, along) * (1.0 - smoothstep(0.78, 0.97, along))
-                  * (1.0 - smoothstep(uFadeRad, uFadeRad * 2.0, perp));
+            /* Hold the fade at full strength all the way to the tower and a
+               little past it, and let the softness happen radially instead.
+               Ramping it down over the last quarter of the approach left
+               leaves half-dissolved exactly where they overlap the tower —
+               ghosts hanging in front of the storeys — and leaves sitting at
+               the tower's own depth stayed fully opaque and grew through it. */
+            vFade = smoothstep(0.02, 0.18, along) * (1.0 - smoothstep(1.06, 1.30, along))
+                  * (1.0 - smoothstep(uFadeRad, uFadeRad * 1.7, perp));
             vFade = clamp(vFade * uFadeAmt, 0.0, 1.0);
           }` : ''}`);
       let fs = s.fragmentShader
@@ -346,7 +352,11 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
     applyLight(blendLight(w, curNight));
     if (w.night) w.night(curNight);
     applyGlass(w.glass);
-    refreshFog();
+    /* Deliberately no refreshFog() here. That walks the whole scene setting
+       needsUpdate on every material, which recompiles every shader in it —
+       and this runs on the five-minute clock tick and on every `light`
+       command. Only the fog *type* changes the defines, and only set() can
+       change that; the colour and density are plain uniform writes. */
     return curNight;
   }
 
@@ -1166,7 +1176,7 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
       fog,
       css: '#0e1a11',
       glass: { color: 0xfff0cc, emissive: 0xffc884, intensity: 2.0 },
-      fade: { on: 1, radius: 20, amount: 1.0 },
+      fade: { on: 1, radius: 13, amount: 1.0 },
       light: {
         hemi: { i: 0.95, sky: 0xa8d88f, gnd: 0x241c12 },
         key: { mul: 0.95, c: 0xffe6b0, p: [10, 46, 14] },
@@ -1296,6 +1306,13 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
              beach; only the window between the lip and the waterline is
              actually uncovered by the sea, which is exactly where surf goes. */
           float edge = d - run;
+          /* Everything from here is shore-band only. These are three more fbm
+             calls — fifteen octaves — on a plane 1200m across that fills half
+             the frame, and outside a few metres of the waterline every one of
+             them multiplies out to zero anyway. The branch is spatially
+             coherent, so it costs nothing and saves most of the beach. */
+          float foam = 0.0;
+          if (abs(edge) < 2.4) {
           // torn along the shore, not across it: the frequency is on x so the
           // lip breaks into fingers running up the beach
           float tear = 0.40 + 0.80 * fbm(vec2(p.x * 3.0, p.y * 0.9) - uT * 0.6);
@@ -1313,7 +1330,8 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
           // 3 · and the drained residue just above the lip, patchy and faint
           float residue = smoothstep(-0.7, 0.05, edge) * smoothstep(0.2, -0.1, edge)
                         * smoothstep(0.45, 0.95, fbm(p * 5.0 + uT * 0.25)) * 0.45;
-          float foam = clamp(lip * 0.9 + sheet + residue, 0.0, 1.0);
+          foam = clamp(lip * 0.9 + sheet + residue, 0.0, 1.0);
+          }
           diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.97,0.98,0.99), foam);
         `,
         // foam is bright in its own right — moonlit surf still reads white,
@@ -1404,6 +1422,9 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
              dissolve into static. */
           float swash = 0.5 + 0.5 * sin(uT * 0.34) + 0.12 * sin(uT * 1.1);
           float run = -0.9 - swash * 1.3;          // how far up the sand it reaches
+          float foam = 0.0;
+          // deep water has no surf in it; skip the four fbm calls out there
+          if (vDepth < 6.0) {
           // 1 · the break: where the shoaling crest oversteepens offshore
           float breakUp = smoothstep(0.5, 1.35, vCrest) * (0.45 + 0.55 * fbm(vWP.xz * 1.8 - uT * 1.5));
           // 2 · the sheet sliding up the sand behind it
@@ -1423,10 +1444,11 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
              its own foam into the last few metres for the join to read. */
           float shallow = smoothstep(1.9, -0.1, vDepth);
           float shoreFoam = shallow * (0.35 + 0.65 * fbm(vec2(vWP.x * 1.6, vWP.z * 2.4) + uT * 0.5));
-          float foam = clamp(breakUp * 1.0 + sheet * lace * 0.7 + lip * tear * 1.6
-                           + bubbles * 0.6 + shoreFoam * 0.85, 0.0, 1.0);
+          foam = clamp(breakUp * 1.0 + sheet * lace * 0.7 + lip * tear * 1.6
+                     + bubbles * 0.6 + shoreFoam * 0.85, 0.0, 1.0);
+          }
           vec3 foamCol = mix(vec3(0.95,0.97,0.98), vec3(0.34,0.40,0.52), uDark);
-          c = mix(c, foamCol * 0.75, shallow * 0.4);   // the water itself goes pale first
+          c = mix(c, foamCol * 0.75, smoothstep(1.9, -0.1, vDepth) * 0.4);
           c = mix(c, foamCol, foam);
           c = mix(c, uHaze, smoothstep(220.0, 620.0, length(vWP - cameraPosition)) * 0.85);
           /* Thin at the tip so the water dies on the sand instead of ending in

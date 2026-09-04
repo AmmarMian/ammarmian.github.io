@@ -54,25 +54,24 @@ export function createInteractionSystem(model: THREE.Group, floors: { g: THREE.G
   const ptr = new THREE.Vector2();
   let hovered: IXEntry | null = null;
 
-  function pickIX(camera: THREE.Camera, cv: HTMLElement, clientX: number, clientY: number) {
+  /** Both answers from one cast. Hovering asked for an interactable and then,
+   *  separately, for a floor — two full traversals of a model with several
+   *  thousand meshes in it, per pointer event. The ray is identical both
+   *  times, so this walks the hit list once and picks out each. */
+  function pickBoth(camera: THREE.Camera, cv: HTMLElement, clientX: number, clientY: number) {
     const r = cv.getBoundingClientRect();
     ptr.set(((clientX - r.left) / r.width) * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1);
     ray.setFromCamera(ptr, camera);
     const hits = ray.intersectObject(model, true);
-    for (const h of hits) if ((h.object.userData as any).ix) return (h.object.userData as any).ix as IXEntry;
-    return null;
-  }
-
-  function pickFloor(camera: THREE.Camera, cv: HTMLElement, clientX: number, clientY: number) {
-    const r = cv.getBoundingClientRect();
-    ptr.set(((clientX - r.left) / r.width) * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1);
-    ray.setFromCamera(ptr, camera);
-    const hits = ray.intersectObject(model, true);
+    let ix: IXEntry | null = null, floor = -1;
     for (const h of hits) {
-      const fi = floorOf(h.object);
-      if (fi >= 0) return fi;
+      const e = (h.object.userData as any).ix as IXEntry | undefined;
+      if (e && !ix) ix = e;
+      if (floor < 0) { const fi = floorOf(h.object); if (fi >= 0) floor = fi; }
+      if (ix && floor >= 0) break;
     }
-    return -1;
+    // an interactable under the cursor takes precedence over its storey
+    return { ix, floor: ix ? -1 : floor };
   }
 
   let hoveredFloor = -1;
@@ -84,14 +83,26 @@ export function createInteractionSystem(model: THREE.Group, floors: { g: THREE.G
     onHoverFloor?: (i: number) => void,
   ) {
     const cv = renderer.domElement;
-    cv.addEventListener('pointermove', (ev) => {
-      const e = pickIX(camera, cv, ev.clientX, ev.clientY);
+    /* Hover picking is throttled to one cast per frame. Pointer events arrive
+       far faster than the scene is drawn — a fast mouse fires well over a
+       hundred a second — and casting against the whole tower on each of them
+       was the single most expensive thing this page did while idle. Only the
+       last position of a frame can matter, so only that one is picked. */
+    let hoverX = 0, hoverY = 0, hoverQueued = false;
+    const doHover = () => {
+      hoverQueued = false;
+      const { ix: e, floor: fi } = pickBoth(camera, cv, hoverX, hoverY);
       hovered = e;
-      const fi = e ? -1 : pickFloor(camera, cv, ev.clientX, ev.clientY);
-      cv.style.cursor = e ? 'pointer' : fi >= 0 ? 'pointer' : '';
+      cv.style.cursor = e || fi >= 0 ? 'pointer' : '';
       if (fi !== hoveredFloor) { hoveredFloor = fi; onHoverFloor?.(fi); }
       const label = e ? e.label : fi >= 0 ? FLOOR_NAMES[fi] : null;
       window.dispatchEvent(new CustomEvent('lair-hover', { detail: label }));
+    };
+    cv.addEventListener('pointermove', (ev) => {
+      hoverX = ev.clientX; hoverY = ev.clientY;
+      if (hoverQueued) return;
+      hoverQueued = true;
+      requestAnimationFrame(doHover);
     });
     cv.addEventListener('pointerleave', () => {
       if (hoveredFloor !== -1) { hoveredFloor = -1; onHoverFloor?.(-1); }
@@ -109,13 +120,12 @@ export function createInteractionSystem(model: THREE.Group, floors: { g: THREE.G
     });
     cv.addEventListener('pointerup', (ev) => {
       if (dragging) return;
-      const e = pickIX(camera, cv, ev.clientX, ev.clientY);
+      const { ix: e, floor: fi } = pickBoth(camera, cv, ev.clientX, ev.clientY);
       if (e) {
         e.fn(e);
         window.dispatchEvent(new CustomEvent('lair-act', { detail: e.label }));
         return;
       }
-      const fi = pickFloor(camera, cv, ev.clientX, ev.clientY);
       if (fi >= 0) onNavigateFloor(fi);
     });
   }
