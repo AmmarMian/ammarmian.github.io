@@ -11,7 +11,16 @@ export function createStage(container: HTMLElement) {
   renderer.domElement.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none';
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, 1, 0.05, 500);
+  /* The far plane has to clear the whole sky, not just the tower. Every world
+     hangs its dome at radius 460 and the orbit can sit 48 out from the centre,
+     so the far side of the sky reaches ~508 — and the moon's gas giant, at 359
+     out with a radius of 104, reaches ~511. At the old far = 500 those parts
+     were clipped away, and because the canvas is alpha:true the clipped region
+     showed the page behind it: a hard-edged hole in the sky, white or black
+     depending on the backdrop, moving with the camera and flickering along its
+     boundary. Near goes up with it, so depth precision stays where it was —
+     nothing ever gets within 5.5 of the camera (see minDistance below). */
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.15, 1600);
   camera.position.set(10, 8, 14);
 
   const controls = new OrbitControls(camera, renderer.domElement);

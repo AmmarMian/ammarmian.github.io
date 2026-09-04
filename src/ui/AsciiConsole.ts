@@ -113,7 +113,11 @@ export function renderAsciiConsole(root: HTMLElement) {
     scene: null,
     // No 3D scene here, so nothing can hold a world; `jump` says so plainly
     // rather than pretending to work.
-    worlds: { kinds: JUMP_TARGETS.filter((k) => k !== 'none'), current: () => null, teleport: () => false },
+    worlds: {
+      kinds: JUMP_TARGETS.filter((k) => k !== 'none'),
+      current: () => null,
+      teleport: () => false,
+    },
     setShellOverride: () => {},
   };
 

@@ -189,6 +189,9 @@ const terminal = createTerminal(app, {
   scene: {
     setPixelMode: tower.setPixelMode,
     setLightMode: tower.setLightMode,
+    lightModeAvailable: tower.lightModeAvailable,
+    probe: tower.probe,
+    scan: tower.scan,
     setAutoRotate: tower.setAutoRotate,
     autoRotate: tower.autoRotate,
   },

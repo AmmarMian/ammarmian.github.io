@@ -30,6 +30,9 @@ export interface ConsoleHost {
   scene?: {
     setPixelMode: (scale: number | null) => number | null;
     setLightMode: (mode: 'auto' | 'day' | 'night') => string;
+    lightModeAvailable: () => boolean;
+    probe: (report: (line: string) => void, enable?: boolean) => string;
+    scan: (report: (line: string) => void) => string;
     setAutoRotate: (on: boolean) => boolean;
     autoRotate: () => boolean;
   } | null;
@@ -535,7 +538,7 @@ export const COMMANDS: Record<string, Command> = {
   light: {
     args: '<auto|day|night>',
     help: 'pin the day/night wash',
-    detail: 'The tower\'s lighting normally follows your own clock — brightest at 13:00, dimmest at 01:00. Pin it to day or night, or hand it back with auto.',
+    detail: 'The lighting normally follows your own clock — brightest at 13:00, dimmest at 01:00 — and every world answers to it: the beach\'s sun sets and its moon comes up, the forest turns blue and its flowers start to glow. Some places have no say in the matter: the ruined city is in eternal night, and deep space has no day at all. Pin it to day or night, or hand it back with auto.',
     examples: ['light night', 'light auto'],
     complete: () => LIGHT_TARGETS,
     run(args, ctx) {
@@ -544,7 +547,34 @@ export const COMMANDS: Record<string, Command> = {
       if (!v || !LIGHT_TARGETS.includes(v)) { ctx.print(`light: try ${LIGHT_TARGETS.join(', ')}`, 'err'); return; }
       ctx.scene.setLightMode(v as 'auto' | 'day' | 'night');
       ctx.print(v === 'auto' ? 'light: following your clock again.' : `light: pinned to ${v}.`, 'ok');
-      if (ctx.worlds.current()) ctx.print('(a world is active — this applies back at the tower.)', 'dim');
+      const here = ctx.worlds.current();
+      if (here && !ctx.scene.lightModeAvailable()) {
+        ctx.print(`(no effect in ${here} — there is no day out there. It will hold everywhere else.)`, 'dim');
+      } else if (here === 'city') {
+        ctx.print('(the ruined city is in eternal night; this holds everywhere else.)', 'dim');
+      }
+    },
+  },
+
+  probe: {
+    args: '',
+    help: 'identify whatever you click on in the scene',
+    detail: 'Arms a one-shot pick. The next click in the 3D view reports every mesh under the cursor, nearest first, with its place in the scene graph and how its material is drawn. Meant for chasing down stray geometry and rendering artifacts.',
+    examples: ['probe', 'probe off'],
+    run(args, ctx) {
+      if (!ctx.scene) { ctx.print('probe: no 3D scene in this view.', 'err'); return; }
+      ctx.print(ctx.scene.probe((line) => ctx.print(line, 'dim'), args[0] !== 'off'), 'ok');
+    },
+  },
+
+  scan: {
+    args: '',
+    help: 'list what is currently in the scene',
+    detail: 'Prints every object at the root of the 3D scene with whether it is switched on and how much it draws. Answers "is something rendering that should not be" without having to click anything.',
+    examples: ['scan'],
+    run(_args, ctx) {
+      if (!ctx.scene) { ctx.print('scan: no 3D scene in this view.', 'err'); return; }
+      ctx.print(ctx.scene.scan((line) => ctx.print(line, 'dim')), 'ok');
     },
   },
 

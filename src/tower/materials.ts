@@ -44,6 +44,14 @@ mat('candle', '#efe6cf');
 mat('flame', '#ffc857', { emissive: '#ff9d2f', emissiveIntensity: 1.5 });
 mat('brass', '#b8912f', { metalness: 0.35, roughness: 0.45 });
 mat('glow_pane', '#fff4d8', { emissive: '#ffe6ab', emissiveIntensity: 2.6 });
+/* Window glass is not a lamp. It is see-through, and what it carries — tint,
+   how much it glows, how much light it lets past — is written every time the
+   sky outside changes. See ambience.ts; do not set these here. */
+mat('window_glass', '#cfe6ff', {
+  emissive: '#ffe6ab', emissiveIntensity: 0.5,
+  transparent: true, opacity: 0.26, roughness: 0.12, metalness: 0,
+  side: THREE.DoubleSide, depthWrite: false,
+});
 mat('orb', '#9fe8ff', { emissive: '#4fc8ff', emissiveIntensity: 1.6, roughness: 0.3 });
 mat('portal_stone', '#6f6a72', { roughness: 0.8 });
 mat('portal_rim', '#9fdcff', { emissive: '#4fb8f0', emissiveIntensity: 1.1, roughness: 0.4 });

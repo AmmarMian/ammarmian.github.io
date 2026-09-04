@@ -1,5 +1,24 @@
 import * as THREE from 'three';
 
+/* three's points shader computes `gl_PointSize *= scale / -mvPosition.z` with
+   nothing guarding the divide. A particle that drifts to the camera plane —
+   or behind it — comes out colossal, negative or NaN, and because these
+   materials carry no map, each point is drawn as a *solid square*. One
+   unlucky mote is then a huge white block sitting over the scene, appearing
+   and vanishing as the camera turns. Clamped here for every point cloud we
+   make; the NaN arm is written as a negated comparison because every
+   comparison against NaN is false. */
+export function clampPointSize(m: THREE.PointsMaterial, maxPx = 24) {
+  m.onBeforeCompile = (s) => {
+    s.vertexShader = s.vertexShader.replace('#include <logdepthbuf_vertex>', `
+      if ( !( gl_PointSize < ${maxPx.toFixed(1)} ) ) gl_PointSize = ${maxPx.toFixed(1)};
+      if ( !( gl_PointSize > 0.0 ) ) gl_PointSize = 0.0;
+      #include <logdepthbuf_vertex>`);
+  };
+  m.customProgramCacheKey = () => 'ptclamp' + maxPx;
+  return m;
+}
+
 export function makePoints(parent: THREE.Object3D, count: number, color: number, size: number, spawn: (i: number) => { x: number; y: number; z: number; v: number }) {
   const pos = new Float32Array(count * 3), vel = new Float32Array(count);
   for (let i = 0; i < count; i++) {
@@ -8,15 +27,31 @@ export function makePoints(parent: THREE.Object3D, count: number, color: number,
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  const m = new THREE.Points(geo, new THREE.PointsMaterial({
+  const m = new THREE.Points(geo, clampPointSize(new THREE.PointsMaterial({
     color, size, transparent: true, opacity: 0.85, depthWrite: false,
     blending: THREE.AdditiveBlending, sizeAttenuation: true,
-  }));
+  }), 16));
   m.frustumCulled = false; parent.add(m);
   return { m, pos, vel, boost: 1 };
 }
 
 let groundPlane: THREE.Mesh | null = null, gridHelper: THREE.Mesh | null = null;
+let backdropKind: 'void' | 'blueprint' | 'meadow' = 'blueprint';
+/* The blueprint grid and the meadow ground belong to the tower standing on its
+   own. Inside a world they are somebody else's floor — a 64m grid plane lying
+   in the beach sand, z-fighting with it. Held back while a world is loaded,
+   and restored on the way home. */
+let backdropOff = false;
+function applyBackdropVisibility() {
+  if (groundPlane) groundPlane.visible = !backdropOff && backdropKind === 'meadow';
+  if (gridHelper) gridHelper.visible = !backdropOff && backdropKind === 'blueprint';
+}
+export function suppressBackdrop(on: boolean) {
+  if (backdropOff === on) return;
+  backdropOff = on;
+  applyBackdropVisibility();
+}
+
 export function setBackdrop(scene: THREE.Scene, kind: 'void' | 'blueprint' | 'meadow', persist = true) {
   if (!groundPlane) {
     groundPlane = new THREE.Mesh(
@@ -58,8 +93,8 @@ export function setBackdrop(scene: THREE.Scene, kind: 'void' | 'blueprint' | 'me
     gridHelper.position.y = -0.03;
     scene.add(gridHelper);
   }
-  groundPlane.visible = kind === 'meadow';
-  gridHelper.visible = kind === 'blueprint';
+  backdropKind = kind;
+  applyBackdropVisibility();
   document.body.dataset.backdrop = kind;
   if (persist) { try { localStorage.setItem('lair-backdrop', kind); } catch {} }
   return kind;

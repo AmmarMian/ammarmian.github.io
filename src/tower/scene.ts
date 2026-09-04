@@ -19,9 +19,10 @@ import { buildSanctum } from './floors/sanctum';
 import { buildKitchen } from './floors/kitchen';
 import { buildWizardMesh, createWizardController } from './wizard';
 import { buildFoxMesh, createFoxState, foxDecide } from './fox';
-import { makePoints, setBackdrop as setBackdropFx } from './fx';
+import { makePoints, setBackdrop as setBackdropFx, suppressBackdrop } from './fx';
 import { createFocusController } from './focus';
 import { createInteractionSystem } from './interactions';
+import { addFloorFill, registerInteriorLights, applyAmbience, addFlameLights, interiorGain, registerShellPane, NO_DAYNIGHT, clampNight } from './ambience';
 
 export type TowerScene = ReturnType<typeof createTowerScene>;
 
@@ -71,6 +72,9 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     ring.renderOrder = 10;
     (ring.userData as any).target = 0;
     fg.add(ring);
+    // Something to see by once the tower leaves a sunlit world — driven by
+    // ambience.ts, silent (intensity 0) in broad daylight.
+    addFloorFill(fg);
     return { g, fg, name: FLOOR_NAMES[k], ring };
   });
   floors.forEach((f, k) => {
@@ -112,7 +116,16 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   // the light rig (set up in createStage, above) as the "no world" baseline
   // and patches every existing mesh's material for the teleport clip effect,
   // so meshes added afterward wouldn't get patched.
-  const worlds = installWorlds({ THREE, scene, camera, model, fx, dims: { R, FH, NF, WH, ROT } });
+  const worlds = installWorlds({ THREE, scene, camera, model, fx, dims: { R, FH, NF, WH, ROT }, nightFor: clampNight });
+
+  // Every candle, brazier and hearth the floor builders placed, so the
+  // day/night wash can bring them up as the outside goes dark...
+  registerInteriorLights(fx);
+  // ...and a light for every flame that had none. Done after the sweep above
+  // so it can see which ones were already spoken for.
+  addFlameLights(floors, [M.flame]);
+  // the shell's own window panes answer to the same sky as the interior ones
+  registerShellPane(worlds.shellPaneMaterial());
 
   const TOP = FH * (NF - 1) + 2.5;
   const dust = makePoints(fx, 260, 0xffd9a8, 0.05, () => {
@@ -320,7 +333,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     wizard.visible = floors[wizFloor].g.visible;
     wizardLight.visible = wizard.visible;
     wizardLight.position.set(p.x, p.y + 2.1, p.z).add(model.position);
-    wizardLight.intensity = 5 + Math.sin(t * 2.2) * 1.2;
+    wizardLight.intensity = (5 + Math.sin(t * 2.2) * 1.2) * interiorGain();
 
     for (const it of anim.books) {
       const a = it.a0 + t * it.sp;
@@ -362,6 +375,17 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
       }
     }
 
+    if (anim.fire) {
+      for (const lg of anim.fire) {
+        const ph = (lg.userData as any).ph;
+        lg.scale.set(1, 0.55 + Math.abs(Math.sin(t * 5.5 + ph)) * 0.9, 1);
+        lg.rotation.z = Math.sin(t * 3.1 + ph) * 0.24;
+        const m = lg.material as THREE.Material & { opacity: number };
+        // the additive licks breathe; the solid tongues are left alone
+        if (m.transparent) m.opacity = 0.35 + Math.abs(Math.sin(t * 4.2 + ph * 1.3)) * 0.5;
+      }
+    }
+
     if (anim.spirit) {
       const sp2 = anim.spirit;
       sp2.tongues.forEach((tg, i) => {
@@ -371,7 +395,9 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
       });
       sp2.core.scale.set(1 + Math.sin(t * 4) * 0.05, 1 + Math.sin(t * 5.3) * 0.07, 1);
       sp2.g.position.y = 0.55 + Math.sin(t * 1.6) * 0.04;
-      if (anim.fireLight) anim.fireLight.intensity = 13 + Math.sin(t * 7) * 2.5 + Math.sin(t * 13) * 1.2;
+      // ...folding in the ambience gain, or the hearth would burn exactly as
+      // bright at midnight as at noon and the wash would look broken.
+      if (anim.fireLight) anim.fireLight.intensity = (13 + Math.sin(t * 7) * 2.5 + Math.sin(t * 13) * 1.2) * interiorGain();
     }
 
     /* fox AI */
@@ -557,19 +583,36 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     return 0.5 - 0.5 * Math.cos(((hour - 13 + 24) % 24) / 24 * Math.PI * 2);
   }
 
+  /* The wash now runs everywhere, not only at home. Two halves:
+     · the world's own rig — handed to worlds.js, which lerps between that
+       world's day and night light configs and moves its sun/moon about;
+     · the tower's own interior — ambience.ts, which decides how much light
+       gets in through the glass and how hard the candles have to work.
+     Worlds with no choice about the hour (the city's eternal night, deep
+     space) clamp the amount on their way through. */
   function applyDayNight() {
-    if (worlds.current()) return;   // a world owns the rig — leave it alone
-    const night = nightAmount();
-    hemi.color.copy(HEMI_SKY_DAY).lerp(HEMI_SKY_NIGHT, night);
-    hemi.groundColor.copy(HEMI_GROUND_DAY).lerp(HEMI_GROUND_NIGHT, night);
-    hemi.intensity = THREE.MathUtils.lerp(0.34, 0.13, night);
-    key.color.copy(KEY_DAY).lerp(KEY_NIGHT, night);
-    key.intensity = THREE.MathUtils.lerp(1.15, 0.32, night);
-    fill.intensity = THREE.MathUtils.lerp(0.5, 0.2, night);
-    // What the lights read now *is* the no-world baseline. Without this the
-    // world system would keep restoring whatever the rig happened to hold
-    // when it was installed, before the clock had ever been consulted.
-    worlds.rebase();
+    const world = worlds.current();
+    const night = clampNight(world, nightAmount());
+
+    // The world system always gets the raw hour, even at home: it clamps per
+    // world itself, so a teleport mid-flight already knows what time it is
+    // when it swaps the destination in.
+    worlds.setNight(nightAmount());
+    // the tower's own ground has no business inside somebody else's world
+    suppressBackdrop(!!world);
+    if (!world) {
+      hemi.color.copy(HEMI_SKY_DAY).lerp(HEMI_SKY_NIGHT, night);
+      hemi.groundColor.copy(HEMI_GROUND_DAY).lerp(HEMI_GROUND_NIGHT, night);
+      hemi.intensity = THREE.MathUtils.lerp(0.34, 0.13, night);
+      key.color.copy(KEY_DAY).lerp(KEY_NIGHT, night);
+      key.intensity = THREE.MathUtils.lerp(1.15, 0.32, night);
+      fill.intensity = THREE.MathUtils.lerp(0.5, 0.2, night);
+      // What the lights read now *is* the no-world baseline. Without this the
+      // world system would keep restoring whatever the rig happened to hold
+      // when it was installed, before the clock had ever been consulted.
+      worlds.rebase();
+    }
+    applyAmbience(world, night);
   }
 
   function setLightMode(mode: 'auto' | 'day' | 'night') {
@@ -578,11 +621,93 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     return lightMode;
   }
 
+  /** Arm a one-shot pick: the next click reports what is actually under the
+   *  cursor, nearest first, with each hit's world position and how it is
+   *  drawn. For chasing down "what *is* that thing" — a stray mesh reads very
+   *  differently from a shader artifact, and the two are impossible to tell
+   *  apart from a screenshot. */
+  let probeOff: (() => void) | null = null;
+  function probe(report: (line: string) => void, enable = true) {
+    probeOff?.();
+    probeOff = null;
+    if (!enable) return 'probe: off.';
+    const ray = new THREE.Raycaster();
+    const pt = new THREE.Vector2();
+    const once = (ev: PointerEvent) => {
+      // a probe click is a probe click: it must not also orbit the camera or
+      // navigate to whatever floor happens to be under it
+      ev.stopImmediatePropagation();
+      const r = renderer.domElement.getBoundingClientRect();
+      pt.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+      ray.setFromCamera(pt, camera);
+      // three's raycaster does NOT skip hidden objects, and it is an ancestor
+      // that gets hidden here, not the mesh — so the visibility test has to
+      // walk the whole chain or the report is full of things nobody can see.
+      const shown = (o: THREE.Object3D | null) => {
+        for (let p = o; p && p !== scene; p = p.parent) if (!p.visible) return false;
+        return true;
+      };
+      const all = ray.intersectObjects(scene.children, true);
+      const hits = all.filter((h) => shown(h.object));
+      if (!hits.length) {
+        report(`probe: nothing visible there (${all.length} hidden object(s) on the ray).`);
+        report('  So the black area is the sky dome itself, or the page behind the canvas.');
+        return;
+      }
+      report(`probe: ${hits.length} visible hit(s) of ${all.length}, nearest first —`);
+      for (const h of hits.slice(0, 6)) {
+        const o = h.object as THREE.Mesh;
+        const m: any = Array.isArray(o.material) ? o.material[0] : o.material;
+        const path: string[] = [];
+        for (let p: THREE.Object3D | null = o; p && p !== scene; p = p.parent) path.unshift(p.name || p.type);
+        report(`  ${h.distance.toFixed(1)}m  ${path.join(' / ')}  order=${o.renderOrder}`);
+        if (m) {
+          report(`      ${m.type}${m.name ? ' "' + m.name + '"' : ''}`
+            + ` colour #${m.color ? m.color.getHexString() : '—'}`
+            + ` transparent=${!!m.transparent} opacity=${m.opacity}`
+            + ` depthWrite=${m.depthWrite} fog=${m.fog} side=${m.side}`);
+        }
+      }
+    };
+    renderer.domElement.addEventListener('pointerdown', once, true);
+    probeOff = () => renderer.domElement.removeEventListener('pointerdown', once, true);
+    return 'probe: armed — click anything to identify it. "probe off" when done.';
+  }
+
+  /** Everything hanging off the scene root, with its visibility and size.
+   *  No clicking: this answers "is something rendering that should not be"
+   *  outright, which a screenshot cannot. */
+  function scan(report: (line: string) => void) {
+    report(`scan: ${scene.children.length} objects at the scene root —`);
+    for (const o of scene.children) {
+      let meshes = 0;
+      o.traverse((c) => { if ((c as any).isMesh || (c as any).isInstancedMesh || (c as any).isPoints || (c as any).isSprite) meshes++; });
+      report(`  ${o.visible ? 'ON ' : 'off'}  ${o.name || o.type}  (${meshes} drawable)`);
+    }
+    return `scan: world is "${worlds.current() || 'none'}", backdrop "${document.body.dataset.backdrop}".`;
+  }
+
+  /** Whether the current world answers to the clock at all — the console
+   *  uses this to say so rather than silently doing nothing. */
+  function lightModeAvailable() {
+    const w = worlds.current();
+    return !w || !NO_DAYNIGHT.has(w);
+  }
+
+  /* Arriving at a world without the teleport (the ?world= URL, say) skips the
+     'done' event, so the wash would stay on the world we never actually left. */
+  const rawSetWorld = worlds.set;
+  worlds.set = (kind: any, quiet?: boolean) => {
+    const r = rawSetWorld(kind, quiet);
+    applyDayNight();
+    return r;
+  };
+
   // Coming home from a world: the world system has just restored the
   // baseline, and the clock may have moved on considerably since it was
   // taken. Re-derive it from the current hour.
   window.addEventListener('lair-teleport', (e: any) => {
-    if (e.detail?.phase === 'done' && !worlds.current()) applyDayNight();
+    if (e.detail?.phase === 'done') applyDayNight();
   });
 
   function start() {
@@ -700,6 +825,9 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     setPixelMode,
     setLightMode,
     lightMode: () => lightMode,
+    lightModeAvailable,
+    probe,
+    scan,
     setAutoRotate: (on: boolean) => { controls.autoRotate = on; return on; },
     autoRotate: () => controls.autoRotate as boolean,
     pluckBook,

@@ -12,7 +12,12 @@ export function buildKitchen(g: THREE.Group, fg: THREE.Group, anim: Anim) {
 
   const hp = polar(150, 5.4 - 0.75);
   const hearth = new THREE.Group(); hearth.name = 'hearth';
-  hearth.position.set(hp.x, 0, hp.z); hearth.rotation.y = RAD(150);
+  /* Facing INWARD, at 150 + 180. The rest of this codebase places props with
+     arcBox, whose convention is local +z pointing radially outward — and the
+     hearth was built to that same convention, which put its 3.2m stone back
+     across the room and its opening, its fire and its kettle inside the tower
+     wall. Everything in the firebox was being drawn into the masonry. */
+  hearth.position.set(hp.x, 0, hp.z); hearth.rotation.y = RAD(330);
   addBox('hearth_back', 'stone', 2.6, 3.2, 0.3, 0, 1.6, -0.25, 0, hearth);
   for (const dx of [-1.1, 1.1]) addBox('hearth_pier', 'stone_light', 0.42, 2.0, 0.9, dx, 1.0, 0.15, 0, hearth);
   addBox('hearth_lintel', 'stone_light', 2.64, 0.36, 1.0, 0, 2.18, 0.15, 0, hearth);
@@ -21,8 +26,48 @@ export function buildKitchen(g: THREE.Group, fg: THREE.Group, anim: Anim) {
   addBox('hearth_floor', 'stone_warm', 2.2, 0.14, 1.1, 0, 0.07, 0.2, 0, hearth);
   for (let i = 0; i < 5; i++) addBox('firewood', 'wood_deep', 0.9, 0.14, 0.14, -0.3 + (i % 2) * 0.2, 0.2 + i * 0.13, 0.1 + (i % 3) * 0.09, RAD(6 + i * 9), hearth);
 
+  /* An actual fire in the grate. The hearth had a fire *spirit* living in it
+     and a point light called `fireLight`, but the logs themselves were stone
+     cold — nothing was burning. Tongues of M.flame so the emissive wash and
+     the flame-light sweep both find them, plus additive licks over the top for
+     the motion, and a bed of embers underneath. */
+  /* The fire itself. It sat *inside* the log pile at a third of a metre tall,
+     which at the scale the tower is usually seen from is a few pixels behind
+     an opaque wood box — hence "the hearth has no fire". It now stands proud
+     of the logs and is built the way the fire spirit is: solid emissive cores
+     for the body, additive licks over the top for the movement. */
+  const fire = new THREE.Group(); fire.name = 'hearth_fire';
+  fire.position.set(-0.05, 0.62, 0.16);
+  const licks: THREE.Mesh[] = [];
+  for (let i = 0; i < 7; i++) {
+    const w = 0.34 - i * 0.032;
+    const lg = addBox('fire_tongue', i < 4 ? 'flame' : 'candle', w, 0.55 + (i % 3) * 0.22, w * 0.8,
+      Math.sin(i * 2.3) * 0.32, 0.2 + (i % 4) * 0.16, Math.cos(i * 1.9) * 0.12, RAD(i * 26), fire);
+    (lg.userData as any).ph = i * 0.83;
+    licks.push(lg);
+  }
+  const glowMat = (c: number, o: number) => new THREE.MeshBasicMaterial({
+    color: c, transparent: true, opacity: o, blending: THREE.AdditiveBlending, depthWrite: false,
+  });
+  for (let i = 0; i < 5; i++) {
+    const lk = new THREE.Mesh(new THREE.BoxGeometry(0.2 - i * 0.02, 0.5 + (i % 3) * 0.3, 0.16), glowMat(i < 3 ? 0xffb040 : 0xffe27a, 0.7));
+    lk.name = 'fire_lick';
+    lk.position.set(Math.sin(i * 1.9) * 0.26, 0.34 + (i % 3) * 0.18, Math.cos(i * 2.4) * 0.1);
+    (lk.userData as any).ph = 1.7 + i * 1.1;
+    fire.add(lk); licks.push(lk);
+  }
+  // the bed of embers, sitting down among the logs where it belongs
+  for (let i = 0; i < 6; i++) {
+    const em = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.09, 0.2), glowMat(0xff6a1e, 0.9));
+    em.name = 'fire_ember';
+    em.position.set(-0.48 + i * 0.2, -0.34, Math.sin(i * 1.4) * 0.13);
+    fire.add(em);
+  }
+  hearth.add(fire);
+  anim.fire = licks;
+
   const spirit = new THREE.Group(); spirit.name = 'fire_spirit';
-  spirit.position.set(0, 0.55, 0.15);
+  spirit.position.set(0.62, 0.55, 0.2);
   const flameMat = (c: number, o: number) => new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: o, blending: THREE.AdditiveBlending, depthWrite: false });
   const tongues: THREE.Mesh[] = [];
   for (let i = 0; i < 7; i++) {

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { M, shaftMat } from './materials';
+import { registerWindow } from './ambience';
 
 export const R = 5.4;    // platform radius
 export const FH = 6.2;   // floor-to-floor height
@@ -111,7 +112,9 @@ export function roundWindow(g: THREE.Object3D, ang: number, y: number, r = 0.74)
   grp.rotation.y = RAD(ang);
   const frame = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 0.3, 16), M.stone_light);
   frame.name = 'window_frame'; frame.rotation.x = Math.PI / 2; grp.add(frame);
-  const pane = new THREE.Mesh(new THREE.CylinderGeometry(r - 0.13, r - 0.13, 0.2, 16), M.glow_pane);
+  // A thin disc of actual glass rather than a lit plug: it shows the world the
+  // tower is standing in, tinted by whatever ambience.ts last wrote into it.
+  const pane = new THREE.Mesh(new THREE.CylinderGeometry(r - 0.13, r - 0.13, 0.04, 16), M.window_glass);
   pane.name = 'window_pane'; pane.rotation.x = Math.PI / 2; grp.add(pane);
   const span = (r - 0.1) * 2;
   addBox('window_mullion_v', 'wood_ebony', 0.12, span, 0.34, 0, 0, 0, 0, grp);
@@ -120,15 +123,22 @@ export function roundWindow(g: THREE.Object3D, ang: number, y: number, r = 0.74)
   g.add(grp);
 }
 
+/** The light the window lets *in*: a halo just inside the glass, a visible
+ *  shaft across the room and a spot doing the actual lighting. All three are
+ *  handed to ambience.ts, which colours and dims them to match the sky the
+ *  tower currently stands under — bright noon on the beach, near nothing in
+ *  deep space. */
 export function windowGlow(fg: THREE.Object3D, ang: number, y: number, spread: number) {
   const halo = new THREE.PointLight(0xffe3b0, 14, 5, 2);
+  halo.name = 'window_halo';
   halo.position.copy(polar(ang, R - 1.0, y));
   fg.add(halo);
   const from = polar(ang, R - 0.5, y);
   const to = polar(ang - 18, 1.1, 0.06);
-  lightShaft(from, to, spread, spread * 2.4, fg);
+  const shaft = lightShaft(from, to, spread, spread * 2.4, fg);
   const spot = new THREE.SpotLight(0xffdcaa, 120, 18, 0.6, 0.7, 2);
   spot.position.copy(from);
   spot.target.position.copy(to);
   fg.add(spot, spot.target);
+  registerWindow({ halo, spot, shaft });
 }
