@@ -97,22 +97,15 @@
   })();
 </script>
 <div id="app"></div>
+<!-- The fallback below is REPLACED at build time by prerenderText() in
+     vite.config.ts, from the same module that renders /text. Editing it here
+     changes nothing in a build; edit src/ui/textHtml.ts instead. What is left
+     is the bare minimum that keeps `vite dev` honest. -->
 <noscript>
   <main class="text-page">
     <h1>Ammar Mian</h1>
-    <p>Associate professor (Maître de conférences) — LISTIC, Polytech Annecy-Chambéry, Université Savoie Mont-Blanc.</p>
-    <p>
-      Working on statistical signal processing and Riemannian-geometry methods for robust
-      and remote-sensing problems.
-    </p>
-    <p>This site is an interactive 3D scene and needs JavaScript. Everything it contains is
-      also available as plain text:</p>
-    <ul>
-      <li><a href="/text">Text version — full CV, publications, projects and contact</a></li>
-      <li><a href="https://hal.science/search/index/?q=*&amp;authIdHal_s=ammar-mian">Publications on HAL</a></li>
-      <li><a href="https://github.com/ammarmian">GitHub</a></li>
-      <li><a href="mailto:ammar.mian@univ-smb.fr">ammar.mian@univ-smb.fr</a></li>
-    </ul>
+    <p>This site needs JavaScript. Everything it contains is also at
+      <a href="/text">the text version</a>.</p>
   </main>
 </noscript>
 <script type="module" src="/src/main.ts"></script>

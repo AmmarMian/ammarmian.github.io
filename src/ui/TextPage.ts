@@ -1,9 +1,5 @@
-import { PROFILE, CONTACT } from '../data/profile';
-import students from '../data/students.json';
-import projects from '../data/projects.json';
-import { cachedHalPublications } from '../data/hal';
 import { BASE } from '../router';
-import { COLOPHON_TITLE, COLOPHON_BLOCK, COLOPHON_NOTE } from '../data/colophon';
+import { textPageHtml, TEXT_TITLE, TEXT_DESCRIPTION } from './textHtml';
 
 function setMeta(name: string, content: string) {
   let el = document.querySelector(`meta[name="${name}"]`);
@@ -12,102 +8,15 @@ function setMeta(name: string, content: string) {
 }
 
 /** A plain, semantic, screen-reader- and crawler-friendly version of the
- *  site's content — everything the 3D tower holds, without needing a
- *  camera, WebGL, or spatial navigation to reach it. */
+ *  site's content — everything the 3D tower holds, without needing a camera,
+ *  WebGL, or spatial navigation to reach it.
+ *
+ *  The markup itself lives in textHtml.ts, because the build emits the same
+ *  page as a static /text/index.html that needs no JavaScript at all. This
+ *  path now only runs if someone reaches /text through the SPA router — the
+ *  static file is what an ordinary visit gets. */
 export function renderTextPage(root: HTMLElement) {
-  document.title = `${PROFILE.name} — text version`;
-  setMeta('description', `${PROFILE.role}, ${PROFILE.affiliation}. ${PROFILE.bio}`);
-
-  const page = document.createElement('main');
-  page.className = 'text-page';
-  page.innerHTML = `
-    <p><a class="text-page-back" href="${BASE}/">&larr; view the interactive tower</a></p>
-    <h1>${esc(PROFILE.name)}</h1>
-    <p class="text-lede">${esc(PROFILE.role)} — ${esc(PROFILE.affiliation)}</p>
-    <p>${esc(PROFILE.bio)}</p>
-
-    <h2>Positions</h2>
-    <ul class="text-list"></ul>
-
-    <h2>Education</h2>
-    <ul class="text-list-edu"></ul>
-
-    <h2>Publications</h2>
-    <ul class="text-list-pubs"></ul>
-
-    <h2>Projects &amp; tools</h2>
-    <ul class="text-list-proj"></ul>
-
-    <h2>Students supervised</h2>
-    <ul class="text-list-students"></ul>
-
-    <h2>Contact</h2>
-    <ul class="text-list-contact">
-      <li>Email: <a href="mailto:${esc(CONTACT.email)}">${esc(CONTACT.email)}</a></li>
-      <li>Office: ${esc(CONTACT.office)}</li>
-      <li>HAL: <a href="${esc(CONTACT.hal)}" target="_blank" rel="noopener">search results</a></li>
-      <li>GitHub: <a href="${esc(CONTACT.github)}" target="_blank" rel="noopener">${esc(CONTACT.github)}</a></li>
-    </ul>
-
-    <h2>${esc(COLOPHON_TITLE)}</h2>
-    <dl class="text-colophon"></dl>
-  `;
-  root.appendChild(page);
-
-  const posList = page.querySelector('.text-list')!;
-  for (const p of PROFILE.positions) {
-    const li = document.createElement('li');
-    li.textContent = `${p.year} — ${p.role}, ${p.org}`;
-    posList.appendChild(li);
-  }
-  const eduList = page.querySelector('.text-list-edu')!;
-  for (const e of PROFILE.education) {
-    const li = document.createElement('li');
-    li.textContent = `${e.year} — ${e.role}, ${e.org}`;
-    eduList.appendChild(li);
-  }
-  const projList = page.querySelector('.text-list-proj')!;
-  for (const p of projects as any[]) {
-    const li = document.createElement('li');
-    li.innerHTML = `${esc(p.name)} — ${esc(p.description)} (<a href="${esc(p.url)}" target="_blank" rel="noopener">repository</a>)`;
-    projList.appendChild(li);
-  }
-  const studList = page.querySelector('.text-list-students')!;
-  for (const s of students as any[]) {
-    const li = document.createElement('li');
-    li.textContent = `${s.name} — ${s.topic} (${s.kind}, ${s.period}${s.status === 'current' ? ', current' : ''})`;
-    studList.appendChild(li);
-  }
-
-  /* The same colophon the grimoire in the library holds, from the same
-     source — a reader who never loads the 3D tower should not have to take
-     anyone's word for how it was made. */
-  const colo = page.querySelector('.text-colophon')!;
-  for (const row of COLOPHON_BLOCK) {
-    const dt = document.createElement('dt');
-    dt.textContent = row.field;
-    const dd = document.createElement('dd');
-    dd.textContent = row.note ? `${row.value} — ${row.note}` : row.value;
-    colo.append(dt, dd);
-  }
-  for (const para of COLOPHON_NOTE) {
-    const p = document.createElement('p');
-    p.textContent = para;
-    colo.parentElement!.appendChild(p);
-  }
-
-  /* Synchronous now that the records ship with the bundle. This page exists
-     to be read plainly and to be indexed, and both were undermined by a list
-     that appeared a network round-trip later — there is no longer a moment
-     where this page says "Loading from HAL…" instead of the publications. */
-  const pubList = page.querySelector('.text-list-pubs')!;
-  for (const d of cachedHalPublications() ?? []) {
-    const li = document.createElement('li');
-    li.innerHTML = `${esc(d.title)} — ${esc(d.authors)}. ${esc(d.venue)}, ${d.year || 'n.d.'} (${esc(d.kind)}). <a href="${esc(d.uri)}" target="_blank" rel="noopener">HAL</a>`;
-    pubList.appendChild(li);
-  }
-}
-
-function esc(s: string) {
-  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
+  document.title = TEXT_TITLE;
+  setMeta('description', TEXT_DESCRIPTION);
+  root.insertAdjacentHTML('beforeend', textPageHtml(BASE));
 }

@@ -1,5 +1,70 @@
 import { defineConfig, type Plugin } from 'vite';
 import { readFileSync } from 'node:fs';
+import { textPageHtml, noscriptHtml, TEXT_TITLE, TEXT_DESCRIPTION, esc } from './src/ui/textHtml';
+
+/* /text as a real HTML file, and the <noscript> block that points at it.
+ *
+ * /text used to be the SPA: an empty <div id="app"> plus 250KB of JavaScript
+ * whose first act was to build a page of static prose. A crawler that does
+ * not execute scripts — and the ones that matter for an academic page often
+ * do not — saw nothing at all on the one page written to be read plainly.
+ *
+ * It is emitted here as a complete document with no script tag of any kind.
+ * GitHub Pages serves /text/index.html for /text directly, so the 404 bounce
+ * never runs and the SPA is never loaded: the plain version is genuinely
+ * plain, and it is the fastest page on the site by a wide margin.
+ *
+ * The markup comes from src/ui/textHtml.ts, the same module the browser uses,
+ * so this cannot drift from the real thing the way the hand-written noscript
+ * block had already begun to. */
+function prerenderText(): Plugin {
+  const head = (title: string, description: string, canonical: string) => `
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(description)}">
+<meta name="author" content="Ammar Mian">
+<link rel="canonical" href="${esc(canonical)}">
+<meta name="theme-color" content="#0b0d16">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">`;
+
+  return {
+    name: 'prerender-text',
+    apply: 'build',
+    /* The <noscript> block used to be a hand-written copy of the opening of
+       the text page. Generated from the same module now, so a changed title
+       or affiliation reaches it without anyone remembering to look. */
+    transformIndexHtml(html) {
+      return html.replace(
+        /<noscript>[\s\S]*?<\/noscript>/,
+        `<noscript>\n${noscriptHtml()}\n</noscript>`,
+      );
+    },
+    generateBundle(_options, bundle) {
+      // Whatever hash the stylesheet was given this build.
+      const css = Object.keys(bundle).find((f) => f.endsWith('.css'));
+      const cssHref = css ? '/' + css : '';
+      this.emitFile({
+        type: 'asset',
+        fileName: 'text/index.html',
+        source: `<!DOCTYPE html>
+<html lang="en">
+<head>${head(TEXT_TITLE, TEXT_DESCRIPTION, 'https://ammarmian.fr/text')}
+<link rel="stylesheet" href="${esc(cssHref)}">
+</head>
+<body>
+${textPageHtml('')}
+</body>
+</html>
+`,
+      });
+    },
+  };
+}
 
 /* Every publication, as schema.org ScholarlyArticle, written into index.html
    at build time.
@@ -51,7 +116,7 @@ function publicationsJsonLd(): Plugin {
 // Served from https://ammarmian.fr/ (the user/org root site).
 export default defineConfig({
   base: '/',
-  plugins: [publicationsJsonLd()],
+  plugins: [publicationsJsonLd(), prerenderText(() => cssHref)],
   build: {
     rollupOptions: {
       output: {
