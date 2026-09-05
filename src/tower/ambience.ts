@@ -238,7 +238,7 @@ const mix = (day: number, night: number, n: number) => _a.set(day).lerp(_b.set(n
 const lerp = (a: number, b: number, n: number) => a + (b - a) * n;
 
 /** Blend a world's day and night profiles and push the result everywhere. */
-export function applyAmbience(world: string | null, night: number) {
+export function applyAmbience(world: string | null, night: number, lampGain = 1) {
   const pair = PROFILES[world || 'home'] || PROFILES.home;
   const n = clampNight(world, night);
   const sky = mix(pair.day.sky, pair.night.sky, n);
@@ -246,7 +246,7 @@ export function applyAmbience(world: string | null, night: number) {
     sky: sky.getHex(),
     through: lerp(pair.day.through, pair.night.through, n),
     pane: lerp(pair.day.pane, pair.night.pane, n),
-    interior: lerp(pair.day.interior, pair.night.interior, n),
+    interior: lerp(pair.day.interior, pair.night.interior, n) * lampGain,
     fill: lerp(pair.day.fill, pair.night.fill, n),
   };
 

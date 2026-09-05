@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { addBox, addCyl, arcBox, polar, RAD, rnd, slab, wall, railing, roundWindow, windowGlow } from '../util';
+import { addBox, addCyl, arcBox, polar, RAD, rnd, slab, wall, railing, roundWindow, windowGlow, potPlant } from '../util';
 import type { Anim } from '../anim';
 
 /* ===== sleeping quarters: warm oak, textiles, candlelight ===== */
@@ -84,6 +84,11 @@ export function buildQuarters(g: THREE.Group, fg: THREE.Group, anim: Anim) {
   addBox('boot_pair', 'wood_deep', 0.5, 0.18, 0.34, 0.6, 0.09, 2.9, 0.9, g);
   addBox('journal', 'cloth_red_dark', 0.34, 0.09, 0.26, -1.5, 0.85, 2.72, 0.4, g);
   addBox('quill', 'linen', 0.28, 0.04, 0.04, -1.5, 0.92, 2.72, 1.1, g);
+
+  // green in the bedroom too — a trailing one on the chest, a big one by the wall
+  potPlant(g, 44, 4.4, { kind: 0, scale: 1.25 });
+  potPlant(g, 84, 4.5, { kind: 1, scale: 1.0, pot: 'plant_pot_pale' });
+  potPlant(g, 300, 4.3, { kind: 2, scale: 0.9 });
 
   return { candleFlame, chestLid, cat, tapRod };
 }

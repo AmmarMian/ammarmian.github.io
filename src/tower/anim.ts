@@ -23,6 +23,11 @@ export interface Anim {
   fireLight?: THREE.PointLight;
   /** flame tongues that lick: scaled and swayed on their own phase */
   fire?: THREE.Mesh[];
+  /** the bathhouse: rocking water, a running tap, and the view out */
+  bath?: {
+    water: THREE.Mesh; stream: THREE.Mesh; tap: THREE.Group; lever: THREE.Mesh;
+    uVista: { value: number }; uT: { value: number }; vistaLight: THREE.PointLight;
+  };
   /** the kettle's steam, parented to the hearth */
   steam?: { m: THREE.Points; pos: Float32Array; vel: Float32Array };
   /** bound project jars: the brew turns over and the glass breathes */

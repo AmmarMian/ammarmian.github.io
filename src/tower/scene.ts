@@ -8,7 +8,7 @@ import anime from 'animejs';
 import { installWorlds } from '../worlds.js';
 import { createStage } from './stage';
 import { M, SPINE_STEPS } from './materials';
-import { R, FH, WH, ROT, RAD, polar, landing, spiralStair } from './util';
+import { R, FH, WH, ROT, RAD, polar, landing, spiralStair, addBox } from './util';
 import { F, NF, FLOOR_IDS, FLOOR_NAMES } from './scene-constants';
 import { createAnim } from './anim';
 import { buildQuarters } from './floors/quarters';
@@ -17,6 +17,7 @@ import { buildLaboratory, CAULDRON_LOCAL } from './floors/laboratory';
 import { buildObservatory } from './floors/observatory';
 import { buildSanctum } from './floors/sanctum';
 import { buildKitchen } from './floors/kitchen';
+import { buildBathhouse, VISTAS, type Vista } from './floors/bathhouse';
 import { buildWizardMesh, createWizardController } from './wizard';
 import { buildFoxMesh, createFoxState, foxDecide } from './fox';
 import { makePoints, setBackdrop as setBackdropFx, suppressBackdrop } from './fx';
@@ -32,6 +33,7 @@ const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)'
 // Which floor the wizard is keeping himself busy on, by hour of day.
 function stationForHour(hour: number): number {
   if (hour < 6) return F.quarters;      // deep night — asleep
+  if (hour < 7) return F.bath;          // first thing — the bathhouse
   if (hour < 9) return F.kitchen;       // early — breakfast
   if (hour < 13) return F.library;      // morning — reading
   if (hour < 18) return F.lab;          // afternoon — the work
@@ -46,9 +48,10 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   const fx = new THREE.Group();
   const anim = createAnim();
 
+  // one pair per flight, so NF - 1 of them
   const STAIR_MATS = [
-    ['stone_light', 'stone_warm'], ['wood_mid', 'wood_dark'], ['wood_mid', 'wood_deep'],
-    ['wood_dark', 'wood_deep'], ['stone_light', 'stone_warm'],
+    ['stone_light', 'stone_warm'], ['wood_mid', 'wood_dark'], ['tile_pale', 'tile_deep'],
+    ['wood_mid', 'wood_deep'], ['wood_dark', 'wood_deep'], ['stone_light', 'stone_warm'],
   ] as const;
 
   const ringGeo = new THREE.TorusGeometry(R + 0.14, 0.09, 8, 48);
@@ -89,6 +92,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   const observatory = buildObservatory(floors[F.observatory].g, floors[F.observatory].fg, anim);
   buildSanctum(floors[F.sanctum].g, floors[F.sanctum].fg, anim);
   const kitchen = buildKitchen(floors[F.kitchen].g, floors[F.kitchen].fg, anim);
+  const bathhouse = buildBathhouse(floors[F.bath].g, floors[F.bath].fg, anim);
 
   const { wizard, handL, staffOrb } = buildWizardMesh();
   model.add(wizard);
@@ -202,6 +206,15 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     const flame = q.getObjectByName('candle_flame');
     if (flame) interactions.interact(flame, 'Pinch the candle out', (e) => { e.on = !e.on; flame.visible = !e.on; });
     const cat = q.getObjectByName('familiar_cat');
+    if (bathhouse.lever) {
+      interactions.interact(bathhouse.lever, 'Throw the lever — change the view', () => { setVista('toggle'); });
+    }
+    if (bathhouse.tub) {
+      interactions.interact(bathhouse.tub, 'Test the water', (e) => { e.t = 2.4; }, (e, t, dt) => {
+        if (e.t > 0) { e.t -= dt; anim.bath!.water.position.y = 0.5 + Math.sin(t * 9) * 0.04; }
+      });
+    }
+
     if (cat) interactions.interact(cat, 'Scratch the cat', (e) => { e.t = 1.6; }, (e, t) => {
       const tail = cat.getObjectByName('cat_tail')!;
       tail.rotation.y = 0.5 + (e.t > 0 ? Math.sin(t * 12) * 0.5 : Math.sin(t * 1.2) * 0.08);
@@ -332,7 +345,8 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
        through the windows are full of it; at night there is almost nothing to
        catch, and a room full of glittering motes under a dead sky is the sort
        of detail that quietly makes a scene look wrong. */
-    dust.m.material.opacity = 0.12 + (1 - nightNow) * 0.34;
+    dust.m.material.opacity = (0.12 + (1 - nightNow) * 0.34) * sim.dust;
+    dust.m.visible = sim.dust > 0.02;
 
     const bp = bubbles.pos;
     for (let i = 0; i < bp.length; i += 3) {
@@ -353,7 +367,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     routineTimer -= dt;
     if (routineTimer <= 0) {
       routineTimer = 20;
-      const want = stationForHour(new Date().getHours() + new Date().getMinutes() / 60);
+      const want = stationForHour(towerHour());
       if (want !== wiz.wizTarget && !wizBusy) {
         wizBusy = true;
         void wiz.sendWizard({ to: want, hold: 1200 }).finally(() => { wizBusy = false; });
@@ -446,8 +460,8 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     /* wisps: a slow rise on a drifting helix, wrapping at the roof */
     {
       const lit = Math.max(0, nightNow - 0.28) / 0.72;
-      wisps.m.material.opacity = lit * 0.85;
-      wisps.m.visible = lit > 0.01;
+      wisps.m.material.opacity = lit * 0.85 * sim.wisps;
+      wisps.m.visible = lit > 0.01 && sim.wisps > 0.02;
       if (wisps.m.visible) {
         const wp2 = wisps.pos;
         for (let i = 0; i < WISPS; i++) {
@@ -464,6 +478,24 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
         }
         wisps.m.geometry.attributes.position.needsUpdate = true;
       }
+    }
+
+    if (anim.bath) {
+      const b = anim.bath;
+      b.uT.value = t;
+      // the vista eases between views rather than cutting, so the lever reads
+      // as opening onto somewhere else instead of switching a channel
+      b.uVista.value += (vistaTarget - b.uVista.value) * Math.min(1, dt * 2.2);
+      // the bathwater rocks, and the surface rises and falls a little
+      b.water.rotation.z = Math.sin(t * 0.9) * 0.014;
+      b.water.rotation.x = Math.sin(t * 0.67 + 1.1) * 0.01;
+      b.water.position.y = 0.5 + Math.sin(t * 0.8) * 0.012;
+      // the tap runs: the stream shivers and the water it lands in shivers back
+      b.stream.scale.set(0.85 + Math.sin(t * 21) * 0.15, 1, 0.85 + Math.sin(t * 17 + 2) * 0.15);
+      b.lever.rotation.x = -0.5 + vistaTarget * 1.0;
+      // the light off the view follows what the view is showing
+      b.vistaLight.color.copy(VISTA_LIGHT_MEADOW).lerp(VISTA_LIGHT_COAST, b.uVista.value);
+      b.vistaLight.intensity = 7 * (0.55 + 0.45 * (1 - nightNow));
     }
 
     if (anim.steam) {
@@ -637,10 +669,17 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   }
 
   let raf = 0, t0 = performance.now(), running = false, contextLost = false;
+  /* The simulation runs on its own clock rather than the wall clock, so it can
+     be slowed to a crawl or run fast without any animation having to know. It
+     accumulates instead of scaling `now` directly — otherwise changing the
+     rate would jump every sine in the building to a different phase. */
+  let simT = 0;
   function loop(now: number) {
-    const dt = Math.min((now - t0) / 1000, 0.05); t0 = now;
-    tick(now / 1000, dt);
-    worlds.tick(now / 1000, dt);
+    const raw = Math.min((now - t0) / 1000, 0.05); t0 = now;
+    const dt = raw * sim.speed;
+    simT += dt;
+    tick(simT, dt);
+    worlds.tick(simT, dt);
     autoPixel();
     controls.update();
     idleDrift(dt);
@@ -697,6 +736,58 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   // wash owns the no-world case only, and hands its result to the world
   // system as the baseline to restore when the visitor comes home.
   const WIZ_LIGHT_DAY = new THREE.Color(0x8fd8ff), WIZ_LIGHT_NIGHT = new THREE.Color(0xffb066);
+  const VISTA_LIGHT_MEADOW = new THREE.Color(0xcfe8c8), VISTA_LIGHT_COAST = new THREE.Color(0xffc79a);
+  let vistaTarget = 0;
+
+  /* ------------------------- simulation parameters -------------------------
+     The knobs the console can reach. Each one is a plain number with a range
+     and a line of prose; `sim` in the console lists them, reads them and sets
+     them, so adding a new one here is all it takes to expose it. Kept as one
+     object so the whole state can be printed, reset, or eventually saved. */
+  const SIM_DEFAULTS = {
+    speed: 1,        // how fast the tower's own time runs
+    wind: 1,         // how hard it blows in whatever world is loaded
+    lamps: 1,        // multiplier on every lamp, candle and hearth indoors
+    dust: 1,         // how much is drifting in the air
+    wisps: 1,        // the night lights, and whether there are any
+    clock: -1,       // pinned hour 0..24, or -1 to follow your own clock
+    fov: 45,         // the camera's field of view
+  };
+  const SIM_RANGE: Record<keyof typeof SIM_DEFAULTS, [number, number, string]> = {
+    speed: [0, 8, 'how fast the tower\'s own time runs — 0 freezes it'],
+    wind:  [0, 5, 'how hard it blows in the world outside'],
+    lamps: [0, 4, 'every lamp, candle and hearth indoors'],
+    dust:  [0, 3, 'motes drifting in the air'],
+    wisps: [0, 3, 'the lights that come out after dark'],
+    clock: [-1, 24, 'pin the hour, 0 to 24 — or -1 to follow your own clock'],
+    fov:   [20, 90, 'the camera\'s field of view, in degrees'],
+  };
+  const sim = { ...SIM_DEFAULTS };
+
+  function simSet(key: string, value: number) {
+    if (!(key in SIM_RANGE)) return null;
+    const [lo, hi] = SIM_RANGE[key as keyof typeof SIM_DEFAULTS];
+    const v = Math.max(lo, Math.min(hi, value));
+    (sim as any)[key] = v;
+    if (key === 'wind') worlds.wind(v);
+    if (key === 'fov') { camera.fov = v; camera.updateProjectionMatrix(); }
+    if (key === 'lamps' || key === 'clock') applyDayNight();
+    return v;
+  }
+  function simReset() {
+    for (const k of Object.keys(SIM_DEFAULTS)) simSet(k, (SIM_DEFAULTS as any)[k]);
+    return { ...sim };
+  }
+  function simList() {
+    return (Object.keys(SIM_RANGE) as (keyof typeof SIM_DEFAULTS)[]).map((k) => ({
+      key: k,
+      value: sim[k],
+      def: SIM_DEFAULTS[k],
+      min: SIM_RANGE[k][0],
+      max: SIM_RANGE[k][1],
+      help: SIM_RANGE[k][2],
+    }));
+  }
   /* The last night amount the wash computed, so the per-frame code can read it
      without recomputing the clock every frame. */
   let nightNow = 0;
@@ -709,9 +800,19 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   function nightAmount() {
     if (lightMode === 'day') return 0;
     if (lightMode === 'night') return 1;
-    const now = new Date();
-    const hour = now.getHours() + now.getMinutes() / 60;
+    // `sim clock` pins the hour outright, which is the only way to watch a
+    // sunset happen rather than waiting for one
+    let hour: number;
+    if (sim.clock >= 0) hour = sim.clock;
+    else { const now = new Date(); hour = now.getHours() + now.getMinutes() / 60; }
     return 0.5 - 0.5 * Math.cos(((hour - 13 + 24) % 24) / 24 * Math.PI * 2);
+  }
+
+  /** The hour the tower currently believes it is. */
+  function towerHour() {
+    if (sim.clock >= 0) return sim.clock;
+    const now = new Date();
+    return now.getHours() + now.getMinutes() / 60;
   }
 
   /* The wash now runs everywhere, not only at home. Two halves:
@@ -744,7 +845,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
       // when it was installed, before the clock had ever been consulted.
       worlds.rebase();
     }
-    applyAmbience(world, night);
+    applyAmbience(world, night, sim.lamps);
   }
 
   function setLightMode(mode: 'auto' | 'day' | 'night') {
@@ -889,6 +990,14 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
       });
     }
   }
+
+  /** Which view the bathhouse casement is showing. Lerped, not switched. */
+  function setVista(v: Vista | 'toggle') {
+    const want = v === 'toggle' ? (vistaTarget > 0.5 ? 'meadow' : 'coast') : v;
+    vistaTarget = want === 'coast' ? 1 : 0;
+    return want;
+  }
+  function vista(): Vista { return vistaTarget > 0.5 ? 'coast' : 'meadow'; }
 
   /** Hold a destination in the portal ring, or null to resume the idle tour.
    *  The gate is the one object in the tower that is explicitly about going
@@ -1058,23 +1167,78 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     await focus.flyTo(worldCam, worldShelf, 1400);
   }
 
+  /* Pulling a record off the shelf. The book slides out of its slot spine
+     first, turns to face you, opens, and hangs in the middle of the room for
+     as long as the record is open — then closes and files itself back. It is
+     the one moment where the shelf and the panel are plainly the same thing,
+     so it is worth the twenty lines. */
+  let openBook: THREE.Group | null = null;
+  function shelveBook() {
+    const b = openBook;
+    if (!b) return;
+    openBook = null;
+    const at = anim.books.findIndex((x) => x.o === b);
+    if (at >= 0) anim.books.splice(at, 1);
+    if (reducedMotion()) { b.parent?.remove(b); return; }
+    anime({
+      targets: b.position, y: (b.userData as any).homeY, x: (b.userData as any).homeX, z: (b.userData as any).homeZ,
+      duration: 520, easing: 'easeInQuad',
+    });
+    anime({ targets: b.scale, x: 0.01, y: 0.01, z: 0.01, duration: 520, easing: 'easeInQuad',
+      complete: () => b.parent?.remove(b) });
+  }
+
   async function pluckBook(shelf: { band: number; angle: number; row: number } | undefined) {
-    // Visual flourish: a small book detaches from the shelf toward the wizard's hand.
+    shelveBook();
     if (!shelf) return;
     const lib = floors[F.library].g;
     const y = SHELF_ROW_Y[shelf.row] ?? 1.62;
     const start = polar(shelf.angle, R - 0.56, y + 0.2);
-    const bookMesh = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.32, 0.3), M.cloth_red_dark);
-    bookMesh.position.copy(start);
-    lib.add(bookMesh);
+
+    /* An open book, hinged at the spine like the flying ones. Built here
+       rather than cloned so it can be opened by animating the leaves. */
+    const b = new THREE.Group();
+    b.name = 'plucked_book';
+    addBox('book_spine', 'cloth_red_dark', 0.09, 0.06, 0.4, 0, 0, 0, 0, b);
+    const leaves: THREE.Group[] = [];
+    for (const side of [-1, 1]) {
+      const leaf = new THREE.Group();
+      addBox('cover', 'cloth_red_dark', 0.26, 0.04, 0.4, side * 0.16, 0, 0, 0, leaf);
+      addBox('pages', 'paper', 0.24, 0.035, 0.37, side * 0.155, 0.036, 0, 0, leaf);
+      leaf.rotation.z = side * 0.02;              // shut, to begin with
+      b.add(leaf);
+      leaves.push(leaf);
+    }
+    b.position.copy(start);
+    b.rotation.y = RAD(shelf.angle);
+    (b.userData as any) = { homeX: start.x, homeY: start.y, homeZ: start.z };
+    lib.add(b);
+    openBook = b;
+
+    if (reducedMotion()) return;
+
+    // 1 · out of the slot, spine first
+    const out = polar(shelf.angle, R - 1.5, y + 0.25);
+    // 2 · and round to the middle of the room, at reading height
+    const front = polar(shelf.angle - 30, 1.9, 2.35);
     await new Promise<void>((resolve) => {
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { lib.remove(bookMesh); resolve(); return; }
       anime({
-        targets: bookMesh.position,
-        x: start.x * 0.3, y: start.y - 1.5, z: start.z * 0.3,
-        duration: 700, easing: 'easeInOutQuad',
-        complete: () => { lib.remove(bookMesh); resolve(); },
+        targets: b.position,
+        keyframes: [
+          { x: out.x, y: out.y, z: out.z, duration: 320, easing: 'easeOutQuad' },
+          { x: front.x, y: front.y, z: front.z, duration: 620, easing: 'easeInOutQuad' },
+        ],
+        complete: () => resolve(),
       });
+      anime({ targets: b.rotation, y: RAD(shelf.angle - 30) + Math.PI, duration: 940, easing: 'easeInOutQuad' });
+      // it opens as it travels
+      anime({ targets: leaves[0].rotation, z: -0.62, delay: 340, duration: 600, easing: 'easeOutQuad' });
+      anime({ targets: leaves[1].rotation, z: 0.62, delay: 340, duration: 600, easing: 'easeOutQuad' });
+    });
+    // and then it simply hangs there, turning slowly, until it is put back
+    if (openBook === b) anim.books.push({
+      o: b, r: 0, a0: 0, y: front.y, sp: 0,
+      c: new THREE.Vector3(front.x, front.y, front.z), tilt: true,
     });
   }
 
@@ -1098,11 +1262,18 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     setAutoRotate: (on: boolean) => { controls.autoRotate = on; return on; },
     autoRotate: () => controls.autoRotate as boolean,
     pluckBook,
+    shelveBook,
     focusShelf,
     bindPublications,
     bindProjects,
     bindRooms,
     previewWorld,
+    setVista,
+    vista,
+    VISTAS,
+    simSet,
+    simReset,
+    simList,
     playIntro,
     F, NF,
     start, stop,

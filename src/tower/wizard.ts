@@ -54,7 +54,8 @@ export function buildWizardMesh() {
 export function buildRoute(NF: number) {
   const route: THREE.Vector3[] = [];
   const stations: number[] = [];
-  const INTERIOR: [number, number][] = [[196, 2.2], [30, 2.3], [300, 2.4], [308, 2.4], [165, 1.7], [40, 2.3]];
+  // one interior standing-spot per storey, in floor order
+  const INTERIOR: [number, number][] = [[196, 2.2], [30, 2.3], [250, 2.1], [300, 2.4], [308, 2.4], [165, 1.7], [40, 2.3]];
   const pushP = (ang: number, rad: number, y: number) => route.push(polar(ang, rad, y));
 
   stations[0] = route.length;

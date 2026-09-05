@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { addBox, addCyl, arcBox, polar, RAD, rnd, pick, slab, wall, railing, roundWindow, windowGlow } from '../util';
+import { addBox, addCyl, arcBox, polar, RAD, rnd, pick, slab, wall, railing, roundWindow, windowGlow, potPlant } from '../util';
 import { M } from '../materials';
 import type { Anim } from '../anim';
 
@@ -182,6 +182,11 @@ export function buildLaboratory(g: THREE.Group, fg: THREE.Group, anim: Anim) {
     const rg = addBox('floating_reagent', pick(['glass_violet', 'glass_amber', 'glass_green', 'glass_blue']), 0.2, 0.26, 0.2, 0, 0, 0, 0, g);
     anim.books.push({ o: rg, r: 1.05, a0: (i / 5) * Math.PI * 2, y: 2.9, sp: -0.55, c: new THREE.Vector3(0.3, 0, -0.5), tilt: true });
   }
+
+  // specimens of another kind
+  potPlant(g, 268, 4.4, { kind: 0, scale: 1.1, pot: 'plant_pot_pale' });
+  potPlant(g, 324, 4.5, { kind: 1, scale: 0.9 });
+  potPlant(g, 190, 4.6, { kind: 2, scale: 0.8 });
 
   return { cauldronBelly, still, spell, hgUpper, slots };
 }

@@ -75,6 +75,29 @@ for (let i = 0; i < SPINE_STEPS; i++) {
 mat('specimen', '#7fe8c0', { emissive: '#2fc08f', emissiveIntensity: 1.6, roughness: 0.28 });
 mat('specimen_tag', '#e8dcb8', { roughness: 0.95 });
 
+/* --- the bathhouse: porcelain, glazed tile, and a great deal of green --- */
+mat('porcelain', '#eef1ec', { roughness: 0.3 });
+mat('porcelain_shade', '#d8ded6', { roughness: 0.35 });
+mat('tile_pale', '#cdd8d2', { roughness: 0.35 });
+mat('tile_deep', '#4a7f7a', { roughness: 0.35 });
+mat('tile_warm', '#c8a882', { roughness: 0.4 });
+mat('grout', '#8f9a92', { roughness: 0.95 });
+mat('bathwater', '#7fc8d8', {
+  transparent: true, opacity: 0.66, roughness: 0.12,
+  emissive: '#2f6f8f', emissiveIntensity: 0.3,
+});
+mat('copper', '#b87333', { metalness: 0.5, roughness: 0.35 });
+
+/* Plants, which now stand in every room in the tower. Three greens so a
+   grouping never reads as one cut-and-pasted object. */
+mat('plant_pot', '#a8593a', { roughness: 0.9 });
+mat('plant_pot_pale', '#c8a07a', { roughness: 0.9 });
+mat('plant_soil', '#3a2a1e', { roughness: 1 });
+mat('plant_leaf', '#3f8446', { roughness: 0.85 });
+mat('plant_leaf_dark', '#2c5c30', { roughness: 0.85 });
+mat('plant_leaf_pale', '#6faa55', { roughness: 0.85 });
+mat('plant_bloom', '#e8748f', { roughness: 0.8 });
+
 mat('fox_fur', '#c8622c');
 mat('fox_fur_dark', '#9c4720');
 mat('fox_cream', '#e8d7bd');

@@ -105,6 +105,78 @@ export function spiralStair(g: THREE.Object3D, treadA: string, treadB: string) {
   }
 }
 
+/** A potted plant, for any room that needs one — which is all of them. Built
+ *  from a handful of boxes on a fixed pseudo-random sequence, so the same
+ *  arguments always give the same plant and no two calls give the same one.
+ *  `kind` picks the silhouette: a tall spread, a low bushy one, or a trailer
+ *  that hangs over the rim of its pot. */
+export function potPlant(
+  g: THREE.Object3D, ang: number, rad: number,
+  { y = 0, scale = 1, kind = 0 as 0 | 1 | 2, pot = 'plant_pot' } = {},
+) {
+  const grp = new THREE.Group();
+  grp.name = 'plant';
+  grp.position.copy(polar(ang, rad, y));
+  grp.rotation.y = RAD(ang) + rnd() * 0.8;
+  grp.scale.setScalar(scale);
+
+  const pr = kind === 1 ? 0.34 : 0.26;
+  addCyl('plant_pot', pot, pr, pr * 0.78, 0.34, 9, 0, 0.17, 0, grp);
+  addCyl('plant_pot_lip', pot, pr + 0.04, pr + 0.02, 0.07, 9, 0, 0.35, 0, grp);
+  addCyl('plant_soil', 'plant_soil', pr - 0.05, pr - 0.05, 0.05, 9, 0, 0.36, 0, grp);
+
+  const greens = ['plant_leaf', 'plant_leaf_dark', 'plant_leaf_pale'];
+  if (kind === 0) {
+    // upright: a few stems fanning out, leaves paired along them
+    const n = 4 + Math.floor(rnd() * 3);
+    for (let i = 0; i < n; i++) {
+      const lean = (rnd() - 0.5) * 0.5;
+      const h = 0.5 + rnd() * 0.5;
+      const a = (i / n) * Math.PI * 2 + rnd();
+      const st = addBox('plant_stem', 'plant_leaf_dark', 0.045, h, 0.045,
+        Math.sin(a) * 0.06, 0.38 + h / 2, Math.cos(a) * 0.06, 0, grp);
+      st.rotation.z = lean; st.rotation.x = (rnd() - 0.5) * 0.4;
+      for (let k = 0; k < 3; k++) {
+        const ly = 0.45 + h * (0.35 + k * 0.24);
+        const sp = 0.14 + rnd() * 0.12;
+        addBox('plant_leaf', greens[k % 3], sp, 0.035, sp * 0.62,
+          Math.sin(a) * (0.08 + lean * ly) + (k % 2 ? sp : -sp) * 0.6, ly,
+          Math.cos(a) * 0.08, a + k, grp);
+      }
+    }
+  } else if (kind === 1) {
+    // bushy: a dome of overlapping leaves, no visible stems
+    for (let i = 0; i < 14; i++) {
+      const a = rnd() * Math.PI * 2, d = rnd() * 0.3;
+      const sp = 0.18 + rnd() * 0.16;
+      addBox('plant_leaf', greens[i % 3], sp, 0.05, sp * 0.7,
+        Math.sin(a) * d, 0.42 + rnd() * 0.36, Math.cos(a) * d, a, grp);
+    }
+    if (rnd() < 0.6) for (let i = 0; i < 3; i++) {
+      const a = rnd() * Math.PI * 2;
+      addBox('plant_bloom', 'plant_bloom', 0.08, 0.08, 0.08,
+        Math.sin(a) * 0.16, 0.62 + rnd() * 0.22, Math.cos(a) * 0.16, a, grp);
+    }
+  } else {
+    // trailing: leaves stepping down over the rim and past it
+    for (const side of [-1, 1]) {
+      let x = side * 0.16, ly = 0.42;
+      for (let k = 0; k < 6; k++) {
+        const sp = 0.15 - k * 0.012;
+        addBox('plant_leaf', greens[k % 3], sp, 0.04, sp * 0.7, x, ly, (rnd() - 0.5) * 0.12, k * 0.7, grp);
+        x += side * 0.075; ly -= 0.085;
+      }
+    }
+    for (let i = 0; i < 5; i++) {
+      const a = rnd() * Math.PI * 2;
+      addBox('plant_leaf', greens[i % 3], 0.16, 0.045, 0.11,
+        Math.sin(a) * 0.1, 0.5 + rnd() * 0.2, Math.cos(a) * 0.1, a, grp);
+    }
+  }
+  g.add(grp);
+  return grp;
+}
+
 export function roundWindow(g: THREE.Object3D, ang: number, y: number, r = 0.74) {
   const grp = new THREE.Group();
   grp.name = 'window';

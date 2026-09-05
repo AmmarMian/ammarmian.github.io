@@ -32,6 +32,12 @@ export interface ConsoleHost {
     setLightMode: (mode: 'auto' | 'day' | 'night') => string;
     lightModeAvailable: () => boolean;
     probe: (report: (line: string) => void, enable?: boolean) => string;
+    setVista: (v: 'meadow' | 'coast' | 'toggle') => string;
+    vista: () => string;
+    VISTAS: readonly string[];
+    simSet: (key: string, value: number) => number | null;
+    simReset: () => Record<string, number>;
+    simList: () => { key: string; value: number; def: number; min: number; max: number; help: string }[];
     scan: (report: (line: string) => void) => string;
     setAutoRotate: (on: boolean) => boolean;
     autoRotate: () => boolean;
@@ -564,6 +570,60 @@ export const COMMANDS: Record<string, Command> = {
     run(args, ctx) {
       if (!ctx.scene) { ctx.print('probe: no 3D scene in this view.', 'err'); return; }
       ctx.print(ctx.scene.probe((line) => ctx.print(line, 'dim'), args[0] !== 'off'), 'ok');
+    },
+  },
+
+  sim: {
+    args: '[<parameter> <value> | reset]',
+    help: 'read and set the simulation\'s parameters',
+    detail: 'The tower runs on a handful of numbers — how fast its own time passes, how hard the wind blows, how much light the lamps give, what hour it believes it is. With no arguments this lists them all with their ranges. With a name and a number it sets one; "sim reset" puts them all back. Nothing here is saved, so a reload is always a clean slate.',
+    examples: ['sim', 'sim speed 4', 'sim clock 19.5', 'sim wind 0', 'sim reset'],
+    complete: (ctx) => (ctx.scene ? ['reset', ...ctx.scene.simList().map((p) => p.key)] : []),
+    run(args, ctx) {
+      if (!ctx.scene) { ctx.print('sim: no 3D scene in this view.', 'err'); return; }
+      if (!args.length) {
+        ctx.print('the tower runs on these:', 'ok');
+        for (const p of ctx.scene.simList()) {
+          const at = p.value === p.def ? '' : '  (default ' + p.def + ')';
+          ctx.print(`  ${p.key.padEnd(7)} ${String(p.value).padEnd(7)} ${p.min}..${p.max}${at}`, 'ok');
+          ctx.print(`          ${p.help}`, 'dim');
+        }
+        ctx.print('set one with e.g. "sim clock 19.5", or "sim reset".', 'dim');
+        return;
+      }
+      if (args[0] === 'reset') {
+        ctx.scene.simReset();
+        ctx.print('sim: all parameters back to their defaults.', 'ok');
+        return;
+      }
+      const [key, raw] = args;
+      if (raw === undefined) {
+        const p = ctx.scene.simList().find((q) => q.key === key);
+        if (!p) { ctx.print(`sim: no parameter "${key}".`, 'err'); return; }
+        ctx.print(`${p.key} = ${p.value}   (${p.min}..${p.max}, default ${p.def})`, 'ok');
+        ctx.print(p.help, 'dim');
+        return;
+      }
+      const v = Number(raw);
+      if (!isFinite(v)) { ctx.print(`sim: "${raw}" is not a number.`, 'err'); return; }
+      const applied = ctx.scene.simSet(key, v);
+      if (applied === null) { ctx.print(`sim: no parameter "${key}". Try "sim" for the list.`, 'err'); return; }
+      ctx.print(`sim: ${key} = ${applied}${applied !== v ? ' (clamped)' : ''}.`, 'ok');
+    },
+  },
+
+  vista: {
+    args: '<meadow|coast>',
+    help: 'what the bathhouse window looks out on',
+    detail: 'The casement in the bathhouse does not open onto whatever world the tower is standing in. It opens onto a meadow with the wind crossing it, or a coast with the sun going down behind the mountains. The brass lever beside the frame does the same thing.',
+    examples: ['vista coast', 'vista meadow'],
+    complete: (ctx) => (ctx.scene ? [...ctx.scene.VISTAS] : []),
+    run(args, ctx) {
+      if (!ctx.scene) { ctx.print('vista: no 3D scene in this view.', 'err'); return; }
+      const v = args[0];
+      if (!v) { ctx.print(`vista: currently the ${ctx.scene.vista()}. Try ${ctx.scene.VISTAS.join(', ')}.`, 'ok'); return; }
+      if (!ctx.scene.VISTAS.includes(v)) { ctx.print(`vista: try ${ctx.scene.VISTAS.join(', ')}`, 'err'); return; }
+      ctx.print(`vista: the window looks out on the ${ctx.scene.setVista(v as any)}.`, 'ok');
     },
   },
 

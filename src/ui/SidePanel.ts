@@ -68,6 +68,7 @@ export class SidePanel {
 
   close() {
     this.openSlug = null;
+    this.tower.shelveBook();
     this.clearDetailHandler();
     this.el.classList.remove('callout-visible');
     window.setTimeout(() => { this.el.hidden = true; }, 280);
@@ -319,6 +320,8 @@ export class SidePanel {
     window.addEventListener('popstate', this.detailPopHandler);
   }
 
+  /** The plucked book has to go back on the shelf when the record is closed,
+   *  or the library slowly fills with them. */
   private closeDetail(popHash = true) {
     this.clearDetailHandler();
     // The record replaced the page title and canonical URL; the list is the
@@ -326,6 +329,7 @@ export class SidePanel {
     setRouteMeta(routeForSlug('publications'), 'publications');
     if (popHash && /^#doc-/.test(window.location.hash)) window.history.back();
     this.bodyEl.innerHTML = '';
+    this.tower.shelveBook();
     // Pull the camera back out from the shelf close-up to the general
     // library view instead of leaving it parked in on the book.
     void this.tower.focusFloor(this.tower.F.library);

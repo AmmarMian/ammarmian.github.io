@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { addBox, addCyl, arcBox, polar, RAD, rnd, pick, slab, wall, railing, roundWindow, windowGlow } from '../util';
+import { addBox, addCyl, arcBox, polar, RAD, rnd, pick, slab, wall, railing, roundWindow, windowGlow, potPlant } from '../util';
 import type { Anim } from '../anim';
 import { makePoints } from '../fx';
 
@@ -242,6 +242,11 @@ export function buildKitchen(g: THREE.Group, fg: THREE.Group, anim: Anim) {
   slate.rotation.y = RAD(228 + 180);
   slate.rotation.x = 0.05;                      // propped, not hung flush
   g.add(slate);
+
+  // herbs, which is what a kitchen's plants are
+  potPlant(g, 262, 4.5, { kind: 1, scale: 1.1, pot: 'plant_pot_pale' });
+  potPlant(g, 286, 4.4, { kind: 0, scale: 0.85 });
+  potPlant(g, 338, 4.2, { kind: 1, scale: 0.95 });
 
   return { spirit, soupPot: kettle, kettle, broomHandle, potRack: pr2, slate };
 }

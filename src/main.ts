@@ -112,7 +112,10 @@ app.appendChild(towerHost);
 const tower = createTowerScene(towerHost, {
   onNavigateFloor: (i) => {
     const route = routeForIndex(i);
-    if (route) navigate(route.slug);
+    // The bathhouse carries no section — it is the one room in the tower that
+    // is not about the work. Clicking it still takes you in; there is simply
+    // nothing to read when you get there.
+    if (route) navigate(route.slug); else tower.focusFloor(i);
   },
   onOpenDestinations: () => destModal.open(),
 });
@@ -195,6 +198,12 @@ const terminal = createTerminal(app, {
     lightModeAvailable: tower.lightModeAvailable,
     probe: tower.probe,
     scan: tower.scan,
+    setVista: tower.setVista,
+    vista: tower.vista,
+    VISTAS: tower.VISTAS,
+    simSet: tower.simSet,
+    simReset: tower.simReset,
+    simList: tower.simList,
     setAutoRotate: tower.setAutoRotate,
     autoRotate: tower.autoRotate,
   },

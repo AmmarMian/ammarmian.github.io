@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { addBox, addCyl, polar, RAD, slab, wall, railing } from '../util';
+import { addBox, addCyl, polar, RAD, slab, wall, railing, potPlant } from '../util';
 import { M } from '../materials';
 import type { Anim } from '../anim';
 
@@ -134,6 +134,10 @@ export function buildSanctum(sg: THREE.Group, sf: THREE.Group, anim: Anim) {
     // the rain itself: a lot of thin verticals, leaning together
     for (let i = 0; i < 22; i++) f(0xbcc8d8, 0.02, 0.5, -1.25 + i * 0.115, 0.15 + (i % 3) * 0.35, 0.06);
   });
+  // even the sanctum: something living beside the gate
+  potPlant(sg, 210, 4.5, { kind: 0, scale: 1.2 });
+  potPlant(sg, 120, 4.4, { kind: 1, scale: 0.95, pot: 'plant_pot_pale' });
+
   sg.add(portal);
   anim.portal = { view, worlds, i: 0, at: 0 };
   const pl = new THREE.PointLight(0x8fd8ff, 9, 6, 2);

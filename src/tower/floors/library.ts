@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { addBox, addCyl, arcBox, polar, RAD, rnd, pick, slab, wall, railing, roundWindow, windowGlow } from '../util';
+import { addBox, addCyl, arcBox, polar, RAD, rnd, pick, slab, wall, railing, roundWindow, windowGlow, potPlant } from '../util';
 import { M } from '../materials';
 import type { Anim } from '../anim';
 
@@ -154,6 +154,11 @@ export function buildLibrary(g: THREE.Group, fg: THREE.Group, anim: Anim) {
   }
   const bl = new THREE.PointLight(0xa8f2ff, 3, 4.5, 2);
   bl.position.copy(polar(176, 2.2, 3.1)); fg.add(bl);
+
+  // one by the desk and one trailing off the catalogue, nothing that would
+  // dare stand in front of a shelf
+  potPlant(g, 190, 4.5, { kind: 0, scale: 1.15 });
+  potPlant(g, 284, 4.3, { kind: 2, scale: 0.85, pot: 'plant_pot_pale' });
 
   return { cat2, lad, gb, lec, shelfBands, slots };
 }

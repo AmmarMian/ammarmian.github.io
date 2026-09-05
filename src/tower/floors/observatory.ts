@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { addBox, addCyl, arcBox, polar, RAD, rnd, pick, slab } from '../util';
+import { addBox, addCyl, arcBox, polar, RAD, rnd, pick, slab, potPlant } from '../util';
 import { M } from '../materials';
 import type { Anim } from '../anim';
 
@@ -192,6 +192,9 @@ export function buildObservatory(g: THREE.Group, fg: THREE.Group, anim: Anim) {
   g.add(rack);
   const rl = new THREE.PointLight(0xffd0a0, 4, 3.4, 2);
   rl.position.copy(polar(305, 3.0, 1.9)); fg.add(rl);
+
+  potPlant(g, 96, 4.4, { kind: 0, scale: 1.05 });
+  potPlant(g, 236, 4.5, { kind: 1, scale: 0.9, pot: 'plant_pot_pale' });
 
   return { telescopeTube: tube, orr, arm, bell, bellClapper, rack, contactTokens };
 }
