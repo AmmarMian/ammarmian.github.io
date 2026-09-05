@@ -451,7 +451,10 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     const foxFloor = Math.max(0, Math.min(NF - 1, Math.floor((fp.y + 0.5) / FH)));
     fox.visible = floors[foxFloor].g.visible;
     foxLight.visible = fox.visible;
-    foxLight.position.copy(fp).add(model.position).add(new THREE.Vector3(0, 0.5, 0));
+    // no temporary here: this runs every frame, and a Vector3 per frame is
+    // pure garbage for the collector to sweep up
+    foxLight.position.copy(fp).add(model.position);
+    foxLight.position.y += 0.5;
 
     for (const f of floors) {
       const mat = f.ring.material as THREE.MeshBasicMaterial;
