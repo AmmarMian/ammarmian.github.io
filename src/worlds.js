@@ -144,6 +144,43 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
     return mat;
   }
 
+  /* The same x-ray fade for an unlit material. patchStd cannot be used on one:
+     it needs `objectNormal`, which three's basic shader only defines when the
+     material has an envmap or skinning, so patching a plain MeshBasicMaterial
+     with it fails the compile and the surface renders black. This carries the
+     fade and nothing else. */
+  function patchFadeBasic(mat) {
+    mat.onBeforeCompile = (s) => {
+      s.uniforms.uFadeOn = uFadeOn;
+      s.uniforms.uFadeTgt = uFadeTgt;
+      s.uniforms.uFadeRad = uFadeRad;
+      s.uniforms.uFadeAmt = uFadeAmt;
+      s.vertexShader = `varying float vFade;\nuniform float uFadeOn;\nuniform vec3 uFadeTgt;\nuniform float uFadeRad;\nuniform float uFadeAmt;\n` +
+        s.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
+          ${IM}
+          vFade = 0.0;
+          if (uFadeOn > 0.5) {
+            vec3 origin = (modelMatrix * wIM * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+            vec3 ax = uFadeTgt - cameraPosition;
+            float L = max(length(ax), 0.001);
+            ax /= L;
+            vec3 rel = origin - cameraPosition;
+            float along = dot(rel, ax) / L;
+            float perp = length(rel - ax * (along * L));
+            vFade = smoothstep(0.02, 0.18, along) * (1.0 - smoothstep(1.06, 1.30, along))
+                  * (1.0 - smoothstep(uFadeRad, uFadeRad * 1.7, perp));
+            vFade = clamp(vFade * uFadeAmt, 0.0, 1.0);
+          }`);
+      s.fragmentShader = `varying float vFade;\n` + s.fragmentShader
+        .replace('#include <alphatest_fragment>', `
+          #include <alphatest_fragment>
+          diffuseColor.a *= 1.0 - vFade;
+          if (diffuseColor.a < 0.004) discard;`);
+    };
+    mat.customProgramCacheKey = () => 'fadebasic';
+    return mat;
+  }
+
   /* `bot` is the sky's lower hemisphere, and it is not decoration: every world
      here stands on a *square* ground plane inside this sphere, so from some
      camera angles you see straight over the plane's edge and the dome is what
@@ -2577,7 +2614,16 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
          the joints raked back into shadow — which is the whole reason stone
          reads as stone and not as a grey box. The running direction is picked
          from the dominant normal so the courses lie flat on every wall. */
-      stone: patchStd(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.94, flatShading: true }), {
+      /* `transparent` is not decoration on any of these: the occluder fade
+         writes into diffuseColor.a, and an opaque material throws that alpha
+         away. Without it a house between the eye and the tower stayed solid
+         right up to the discard threshold and then vanished in one frame.
+         depthWrite stays on and alphaTest is a hair above zero so the town
+         still occludes itself normally while it is not fading. */
+      stone: patchStd(new THREE.MeshStandardMaterial({
+        color: 0xffffff, roughness: 0.94, flatShading: true,
+        transparent: true, depthWrite: true, alphaTest: 0.002,
+      }), {
         frag: `
           vec3 Nn = normalize(vWN);
           float along = abs(Nn.x) > abs(Nn.z) ? vWP.z : vWP.x;
@@ -2599,7 +2645,10 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
          the rain running off the jetty above and stained where it meets the
          ground — a terrace of identical clean panels is what made these read
          as a field of white boxes. */
-      plaster: patchStd(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, flatShading: true }), {
+      plaster: patchStd(new THREE.MeshStandardMaterial({
+        color: 0xffffff, roughness: 0.95, flatShading: true,
+        transparent: true, depthWrite: true, alphaTest: 0.002,
+      }), {
         frag: `
           vec3 Np = normalize(vWN);
           float alongP = abs(Np.x) > abs(Np.z) ? vWP.z : vWP.x;
@@ -2615,14 +2664,26 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
           diffuseColor.rgb = wash;`,
         occluder: true,
       }),
-      beam: patchStd(new THREE.MeshStandardMaterial({ color: 0x3b2c20, roughness: 1, flatShading: true }), { occluder: true }),
-      roof: patchStd(new THREE.MeshStandardMaterial({ color: 0x4a3a3c, roughness: 0.5, flatShading: true }), {
+      beam: patchStd(new THREE.MeshStandardMaterial({
+        color: 0x3b2c20, roughness: 1, flatShading: true,
+        transparent: true, depthWrite: true, alphaTest: 0.002,
+      }), { occluder: true }),
+      roof: patchStd(new THREE.MeshStandardMaterial({
+        color: 0x4a3a3c, roughness: 0.5, flatShading: true,
+        transparent: true, depthWrite: true, alphaTest: 0.002,
+      }), {
         frag: `float course = fract(vWP.y * 3.2);
                diffuseColor.rgb *= 0.78 + 0.34 * step(0.5, course);
                diffuseColor.rgb += vec3(0.10,0.12,0.16) * pow(1.0 - abs(dot(normalize(vWN), normalize(cameraPosition - vWP))), 3.0);`,
         occluder: true,
       }),
-      lit: new THREE.MeshBasicMaterial({ color: 0xffc266, fog: false }),
+      /* The lit panes fade with the house they are set into — left opaque,
+         a dissolved terrace leaves a grid of little glowing rectangles
+         hanging in mid-air in front of the tower. */
+      lit: patchFadeBasic(new THREE.MeshBasicMaterial({
+        color: 0xffc266, fog: false,
+        transparent: true, depthWrite: true, alphaTest: 0.002,
+      })),
     };
 
     /* A gable roof is a triangular prism, not two tilted boxes. Boxes have to
