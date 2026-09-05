@@ -226,5 +226,22 @@ export function buildKitchen(g: THREE.Group, fg: THREE.Group, anim: Anim) {
     addBox('crumb', pick(['plank_ash', 'linen', 'leaf']), 0.1 + rnd() * 0.06, 0.03, 0.08 + rnd() * 0.05, p.x, 0.015, p.z, rnd() * Math.PI, g);
   }
 
-  return { spirit, soupPot: kettle, kettle, broomHandle, potRack: pr2 };
+  /* The slate by the hearth. Whatever the keeper is up to this month gets
+     chalked here — this is where the Now section lives, so it wants to be the
+     most domestic object in the room, not the most magical one. */
+  const slate = new THREE.Group(); slate.name = 'kitchen_slate';
+  addBox('slate_face', 'stone', 1.15, 0.85, 0.06, 0, 0, 0, 0, slate);
+  addBox('slate_frame_t', 'wood_mid', 1.28, 0.1, 0.1, 0, 0.47, 0, 0, slate);
+  addBox('slate_frame_b', 'wood_mid', 1.28, 0.1, 0.1, 0, -0.47, 0, 0, slate);
+  for (const dx of [-0.63, 0.63]) addBox('slate_frame_s', 'wood_mid', 0.1, 1.04, 0.1, dx, 0, 0, 0, slate);
+  // chalked lines, shorter as they go down the way handwriting does
+  for (let i = 0; i < 5; i++)
+    addBox('slate_chalk', 'linen', 0.82 - i * 0.11, 0.045, 0.03, -0.1 + i * 0.03, 0.28 - i * 0.14, 0.045, 0, slate);
+  addBox('slate_chalk_stub', 'linen', 0.12, 0.06, 0.06, 0.44, -0.43, 0.1, 0.2, slate);
+  slate.position.copy(polar(228, 4.55, 2.15));
+  slate.rotation.y = RAD(228 + 180);
+  slate.rotation.x = 0.05;                      // propped, not hung flush
+  g.add(slate);
+
+  return { spirit, soupPot: kettle, kettle, broomHandle, potRack: pr2, slate };
 }

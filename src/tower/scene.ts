@@ -86,9 +86,9 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   buildQuarters(floors[F.quarters].g, floors[F.quarters].fg, anim);
   const library = buildLibrary(floors[F.library].g, floors[F.library].fg, anim);
   const laboratory = buildLaboratory(floors[F.lab].g, floors[F.lab].fg, anim);
-  buildObservatory(floors[F.observatory].g, floors[F.observatory].fg, anim);
+  const observatory = buildObservatory(floors[F.observatory].g, floors[F.observatory].fg, anim);
   buildSanctum(floors[F.sanctum].g, floors[F.sanctum].fg, anim);
-  buildKitchen(floors[F.kitchen].g, floors[F.kitchen].fg, anim);
+  const kitchen = buildKitchen(floors[F.kitchen].g, floors[F.kitchen].fg, anim);
 
   const { wizard, handL, staffOrb } = buildWizardMesh();
   model.add(wizard);
@@ -408,6 +408,17 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     }
     if (anim.portal) {
       const p2 = anim.portal;
+      /* Pinned: the gate is showing one particular destination because the
+         visitor is hovering it in the list. Hold it, and let the cycle pick up
+         where it left off once they look away. */
+      if (p2.pin) {
+        for (const w of p2.worlds) {
+          const on = w.name === p2.pin;
+          w.g.visible = on;
+          if (on) w.g.scale.setScalar(1);
+        }
+        p2.at = 0;
+      } else {
       p2.at += dt;
       const dwell = 4.2, fade = 0.7;
       const cur = p2.worlds[p2.i % p2.worlds.length];
@@ -421,6 +432,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
       } else {
         cur.g.scale.setScalar(1);
         for (const w of p2.worlds) if (w !== cur) w.g.visible = false;
+      }
       }
       if (p2.flash && p2.flash > 0) {
         p2.flash = Math.max(0, p2.flash - dt * 1.6);
@@ -847,6 +859,44 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     return boundProjects;
   }
 
+  /* ------------- the remaining rooms hold their own sections -------------
+     Publications are the books and projects are the specimens; these three
+     have prose rather than a list, so each gets the one object in the room
+     that plainly *is* that section — the journal by the bed, the slate by the
+     hearth, the correspondence rack under the telescope. The contact tokens
+     go further and do the thing itself, so writing to the keeper means
+     picking up the sealed letter rather than finding a link. */
+  function bindRooms(cfg: {
+    onAbout: () => void;
+    onNow: () => void;
+    onContact: () => void;
+    /** in rack order: letter, scroll, sigil, disc */
+    channels: { label: string; open: () => void }[];
+  }) {
+    const journal = floors[F.quarters].g.getObjectByName('journal');
+    if (journal) interactions.interact(journal, 'Read the keeper\'s journal', cfg.onAbout);
+
+    if (kitchen.slate) interactions.interact(kitchen.slate, 'Read the slate — what he is up to', cfg.onNow);
+
+    if (observatory.rack) {
+      interactions.interact(observatory.rack, 'The correspondence rack', cfg.onContact);
+      // each token overrides the rack it sits in, since interact() takes the
+      // deepest match on the ray and the tokens are children of the rack
+      observatory.contactTokens.forEach((tk, i) => {
+        const ch = cfg.channels[i];
+        if (!ch) return;
+        interactions.interact(tk, ch.label, ch.open, undefined, { marker: false });
+      });
+    }
+  }
+
+  /** Hold a destination in the portal ring, or null to resume the idle tour.
+   *  The gate is the one object in the tower that is explicitly about going
+   *  somewhere, so it should show you where before you commit. */
+  function previewWorld(kind: string | null) {
+    if (anim.portal) anim.portal.pin = kind;
+  }
+
   /** Whether the current world answers to the clock at all — the console
    *  uses this to say so rather than silently doing nothing. */
   function lightModeAvailable() {
@@ -1051,6 +1101,8 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     focusShelf,
     bindPublications,
     bindProjects,
+    bindRooms,
+    previewWorld,
     playIntro,
     F, NF,
     start, stop,

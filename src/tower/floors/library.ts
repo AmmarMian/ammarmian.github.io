@@ -126,10 +126,29 @@ export function buildLibrary(g: THREE.Group, fg: THREE.Group, anim: Anim) {
 
   for (let i = 0; i < 7; i++) {
     const b = new THREE.Group(); b.name = 'flying_book_' + (i + 1);
-    addBox('cover', pick(['cloth_red_dark', 'glass_blue', 'leaf_dark', 'cloth_purple', 'glass_amber']), 0.44, 0.06, 0.34, 0, 0, 0, 0, b);
-    const pl2 = addBox('page_left', 'paper', 0.22, 0.03, 0.32, -0.14, 0.05, 0, 0, b);
-    const pr = addBox('page_right', 'paper', 0.22, 0.03, 0.32, 0.14, 0.05, 0, 0, b);
-    pl2.rotation.z = 0.4; pr.rotation.z = -0.4;
+    /* An open book is hinged at its spine. This was a flat cover slab with two
+       page slabs laid on top and turned about their own centres — so the pages
+       pivoted around their middles, left a gap where the spine should be, and
+       the cover stayed resolutely flat underneath while they moved.
+       Each half is now a group whose origin *is* the hinge: the cover and its
+       pages are children of it, offset outward, so they open together and meet
+       at the spine however far the book is spread. */
+    const skin = pick(['cloth_red_dark', 'glass_blue', 'leaf_dark', 'cloth_purple', 'glass_amber']);
+    addBox('book_spine', skin, 0.08, 0.055, 0.35, 0, 0, 0, 0, b);
+    const spread = 0.38 + rnd() * 0.16;
+    for (const side of [-1, 1]) {
+      const leaf = new THREE.Group();
+      leaf.name = side < 0 ? 'book_leaf_l' : 'book_leaf_r';
+      // cover half, inner edge on the hinge
+      addBox('cover', skin, 0.23, 0.035, 0.35, side * 0.145, 0, 0, 0, leaf);
+      // the block of pages riding on it, a shade smaller all round
+      addBox('pages', 'paper', 0.21, 0.03, 0.32, side * 0.14, 0.032, 0, 0, leaf);
+      // and the topmost leaf, curling a little away from the block
+      const curl = addBox('page_top', 'paper', 0.2, 0.012, 0.31, side * 0.14, 0.052, 0, 0, leaf);
+      curl.rotation.z = side * 0.07;
+      leaf.rotation.z = side * spread;
+      b.add(leaf);
+    }
     g.add(b);
     anim.books.push({ o: b, r: 1.5 + (i % 3) * 0.55, a0: (i / 7) * Math.PI * 2, y: 2.5 + (i % 4) * 0.4, sp: 0.35 + (i % 3) * 0.12, c: polar(176, 2.2) });
   }

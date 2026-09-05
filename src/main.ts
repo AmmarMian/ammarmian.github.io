@@ -3,6 +3,7 @@ import { createTowerScene } from './tower/scene';
 import { SidePanel } from './ui/SidePanel';
 import { fetchHalPublications, shelfFor } from './data/hal';
 import projects from './data/projects.json';
+import { CONTACT } from './data/profile';
 import { createHelpButton } from './ui/HelpModal';
 import { createTerminal } from './ui/Terminal';
 import { createDestinationModal } from './ui/DestinationModal';
@@ -116,7 +117,7 @@ const tower = createTowerScene(towerHost, {
   onOpenDestinations: () => destModal.open(),
 });
 
-const destModal = createDestinationModal(app, tower.worlds);
+const destModal = createDestinationModal(app, tower.worlds, tower.previewWorld);
 
 /* ---------- outer shell policy ----------
    Automatic: a ghost outline only from the whole-tower view, and only once
@@ -408,6 +409,21 @@ void fetchHalPublications()
 /* And the same for the laboratory: each project becomes a lit specimen on the
    alchemy shelves. This list is local, so it can be bound immediately. */
 tower.bindProjects(projects as { name: string; status?: string }[], () => navigate('projects'));
+
+/* The three prose rooms. Each gets the one object that plainly is its section
+   — and the correspondence rack's four tokens do the thing itself, so writing
+   to the keeper means picking up the sealed letter off the shelf. */
+tower.bindRooms({
+  onAbout: () => navigate('about'),
+  onNow: () => navigate('now'),
+  onContact: () => navigate('contact'),
+  channels: [
+    { label: `Write to the keeper — ${CONTACT.email}`, open: () => { window.location.href = `mailto:${CONTACT.email}`; } },
+    { label: 'The open archive — everything on HAL', open: () => window.open(CONTACT.hal, '_blank', 'noopener') },
+    { label: 'The workshop — code on GitHub', open: () => window.open(CONTACT.github, '_blank', 'noopener') },
+    { label: 'Where he is found — the tower itself', open: () => navigate('contact') },
+  ],
+});
 
 let navGen = 0;
 let appliedSlug: string | null | undefined;

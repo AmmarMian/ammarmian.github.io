@@ -140,5 +140,58 @@ export function buildObservatory(g: THREE.Group, fg: THREE.Group, anim: Anim) {
   const cl2 = new THREE.PointLight(0x9fd8ff, 5, 5, 2);
   cl2.position.set(0, 3.4, 0); fg.add(cl2);
 
-  return { telescopeTube: tube, orr, arm, bell, bellClapper };
+  /* The correspondence rack. Four pigeonholes, one token apiece — this is
+     where the Contact section actually lives, so each token is a real channel
+     rather than a prop. The floor builder stays free of data: it makes the
+     objects and hands them back in order, and scene.ts decides what each one
+     means. */
+  const rack = new THREE.Group(); rack.name = 'letter_rack';
+  addBox('rack_foot', 'wood_deep', 0.78, 0.12, 0.56, 0, 0.06, 0, 0, rack);
+  addCyl('rack_stand', 'wood_ebony', 0.09, 0.13, 0.86, 8, 0, 0.53, 0, rack);
+  addBox('rack_shelf', 'wood_dark', 1.62, 0.09, 0.38, 0, 1.0, 0, 0, rack);
+  addBox('rack_back', 'wood_deep', 1.62, 0.62, 0.07, 0, 1.32, -0.17, 0, rack);
+  addBox('rack_top', 'wood_deep', 1.68, 0.09, 0.4, 0, 1.66, 0, 0, rack);
+  for (const dx of [-0.79, -0.4, 0, 0.4, 0.79])
+    addBox('rack_divider', 'wood_dark', 0.06, 0.58, 0.34, dx, 1.33, 0, 0, rack);
+  const SLOT_X = [-0.6, -0.2, 0.2, 0.6];
+  const contactTokens: THREE.Group[] = [];
+
+  // 1 · a sealed letter
+  const tk0 = new THREE.Group(); tk0.name = 'token_letter';
+  addBox('letter_leaf', 'paper', 0.3, 0.4, 0.05, 0, 0, 0, 0, tk0);
+  addBox('letter_fold', 'linen', 0.3, 0.13, 0.06, 0, 0.1, 0.005, 0, tk0);
+  addBox('letter_seal', 'cloth_red', 0.09, 0.09, 0.03, 0, -0.02, 0.04, 0.5, tk0);
+  contactTokens.push(tk0);
+
+  // 2 · a rolled offprint, ribboned
+  const tk1 = new THREE.Group(); tk1.name = 'token_scroll';
+  addCyl('scroll_body', 'paper', 0.09, 0.09, 0.42, 10, 0, 0, 0, tk1);
+  addCyl('scroll_ribbon', 'cloth_purple', 0.1, 0.1, 0.06, 10, 0, 0.02, 0, tk1);
+  contactTokens.push(tk1);
+
+  // 3 · a graven sigil stone
+  const tk2 = new THREE.Group(); tk2.name = 'token_sigil';
+  addBox('sigil_stone', 'stone', 0.26, 0.34, 0.09, 0, 0, 0, 0, tk2);
+  addBox('sigil_mark', 'brass', 0.13, 0.13, 0.03, 0, 0.03, 0.05, 0.78, tk2);
+  contactTokens.push(tk2);
+
+  // 4 · a scrying disc, which is what a website is
+  const tk3 = new THREE.Group(); tk3.name = 'token_disc';
+  addCyl('disc_rim', 'brass', 0.16, 0.16, 0.04, 14, 0, 0, 0, tk3).rotation.x = Math.PI / 2;
+  addCyl('disc_face', 'glow_pane', 0.12, 0.12, 0.05, 14, 0, 0, 0.01, tk3).rotation.x = Math.PI / 2;
+  contactTokens.push(tk3);
+
+  contactTokens.forEach((tk, i) => {
+    tk.position.set(SLOT_X[i], 1.3, 0.04);
+    tk.rotation.z = (i % 2 ? -1 : 1) * 0.06;   // none of them stands quite straight
+    rack.add(tk);
+  });
+  // facing the room, not the wall — local +z is radially outward by convention
+  rack.position.copy(polar(305, 3.5));
+  rack.rotation.y = RAD(305 + 180);
+  g.add(rack);
+  const rl = new THREE.PointLight(0xffd0a0, 4, 3.4, 2);
+  rl.position.copy(polar(305, 3.0, 1.9)); fg.add(rl);
+
+  return { telescopeTube: tube, orr, arm, bell, bellClapper, rack, contactTokens };
 }

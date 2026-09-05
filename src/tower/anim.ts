@@ -12,7 +12,12 @@ export interface Anim {
   books: BookItem[];
   rings: RingItem[];
   candles: any[];
-  portal: null | { view: THREE.Group; worlds: { name: string; g: THREE.Group }[]; i: number; at: number; flash?: number };
+  portal: null | {
+    view: THREE.Group; worlds: { name: string; g: THREE.Group }[]; i: number; at: number; flash?: number;
+    /** a destination to hold in the ring instead of cycling — the gate's
+     *  preview, set while a row is hovered in the destination list */
+    pin?: string | null;
+  };
   dial?: { wheel: THREE.Group; lever: THREE.Group };
   spirit?: { g: THREE.Group; tongues: THREE.Mesh[]; core: THREE.Mesh; mouth: THREE.Mesh };
   fireLight?: THREE.PointLight;
