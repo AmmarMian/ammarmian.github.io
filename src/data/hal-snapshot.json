@@ -1,0 +1,781 @@
+[
+  {
+    "id": "https://hal.science/hal-05714371v1",
+    "title": "SPD Learn: A Geometric Deep Learning Python Library for Neural Decoding Through Trivialization",
+    "authors": "Bruno Aristimunha, Ce Ju, Antoine Collas, Florent Bouchard, Ammar Mian, Bertrand Thirion, Sylvain Chevallier, Reinmar Kobler",
+    "authorList": [
+      "Bruno Aristimunha",
+      "Ce Ju",
+      "Antoine Collas",
+      "Florent Bouchard",
+      "Ammar Mian",
+      "Bertrand Thirion",
+      "Sylvain Chevallier",
+      "Reinmar Kobler"
+    ],
+    "year": 2026,
+    "venue": "HAL",
+    "kind": "Preprint",
+    "uri": "https://hal.science/hal-05714371v1",
+    "doi": "",
+    "pdf": "",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.science/hal-05626565v2",
+    "title": "Robust Multiping Forward-Looking Sonar Coherent Detection",
+    "authors": "Olivier Lerda, Guillaume Ginolhac, Ammar Mian, Jean-Philippe Ovarlez, Guillaume Matte, Didier Charlot",
+    "authorList": [
+      "Olivier Lerda",
+      "Guillaume Ginolhac",
+      "Ammar Mian",
+      "Jean-Philippe Ovarlez",
+      "Guillaume Matte",
+      "Didier Charlot"
+    ],
+    "year": 2026,
+    "venue": "doi:10.1109/JOE.2026.3693862",
+    "kind": "Preprint",
+    "uri": "https://hal.science/hal-05626565v2",
+    "doi": "10.1109/JOE.2026.3693862",
+    "pdf": "https://hal.science/hal-05626565/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.science/hal-05676137v1",
+    "title": "pyRiemann",
+    "authors": "Alexandre Barachant, Quentin Barthélemy, Gabriel Wagner Vom Berg, Alexandre Gramfort, Sylvain Chevallier, Jean-Rémi King, Pedro Rodrigues, Grégoire Cattan, Emanuele Olivetti, Vladislav Goncharenko, Anton Andreev, Tim Näher, Apolline Mellot, Ammar Mian, Steven Mortier, Marie-Constance Corsi, Jona Sassenhagen, Thibault de Surrel, Richard Höchenberger, Pierre Clisson, Igor Carrara, Frida Heskebeck",
+    "authorList": [
+      "Alexandre Barachant",
+      "Quentin Barthélemy",
+      "Gabriel Wagner Vom Berg",
+      "Alexandre Gramfort",
+      "Sylvain Chevallier",
+      "Jean-Rémi King",
+      "Pedro Rodrigues",
+      "Grégoire Cattan",
+      "Emanuele Olivetti",
+      "Vladislav Goncharenko",
+      "Anton Andreev",
+      "Tim Näher",
+      "Apolline Mellot",
+      "Ammar Mian",
+      "Steven Mortier",
+      "Marie-Constance Corsi",
+      "Jona Sassenhagen",
+      "Thibault de Surrel",
+      "Richard Höchenberger",
+      "Pierre Clisson",
+      "Igor Carrara",
+      "Frida Heskebeck"
+    ],
+    "year": 2026,
+    "venue": "doi:10.5281/zenodo.593816",
+    "kind": "SOFTWARE",
+    "uri": "https://hal.science/hal-05676137v1",
+    "doi": "10.5281/zenodo.593816",
+    "pdf": "",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.science/hal-05321266v1",
+    "title": "Generalized Nonnegative Structured Kruskal Tensor Regression",
+    "authors": "Xinjue Wang, Esa Ollila, Sergiy Vorobyov, Ammar Mian",
+    "authorList": [
+      "Xinjue Wang",
+      "Esa Ollila",
+      "Sergiy Vorobyov",
+      "Ammar Mian"
+    ],
+    "year": 2026,
+    "venue": "Signal Processing",
+    "kind": "Journal",
+    "uri": "https://hal.science/hal-05321266v1",
+    "doi": "10.1016/j.sigpro.2025.110338",
+    "pdf": "https://hal.science/hal-05321266/document",
+    "volume": "240",
+    "issue": "",
+    "pages": "110338"
+  },
+  {
+    "id": "https://hal.science/hal-05529546v1",
+    "title": "ARMAGNAC: A New Parametric Batch Normalization Layer for SPDNet Architecture",
+    "authors": "Matthieu Gallet, Florent Bouchard, Ammar Mian, Guillaume Ginolhac",
+    "authorList": [
+      "Matthieu Gallet",
+      "Florent Bouchard",
+      "Ammar Mian",
+      "Guillaume Ginolhac"
+    ],
+    "year": 2026,
+    "venue": "HAL",
+    "kind": "Preprint",
+    "uri": "https://hal.science/hal-05529546v1",
+    "doi": "",
+    "pdf": "https://hal.science/hal-05529546/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.science/hal-05154984v1",
+    "title": "Détection et Localisation des Fissures Volcaniques dans les Interférogrammes par IA",
+    "authors": "Thomas Petellat, Christophe Lin Kwong Chon, Yajing Yan, Ammar Mian",
+    "authorList": [
+      "Thomas Petellat",
+      "Christophe Lin Kwong Chon",
+      "Yajing Yan",
+      "Ammar Mian"
+    ],
+    "year": 2025,
+    "venue": "Rencontre Scientifique Volcanologique",
+    "kind": "Conference",
+    "uri": "https://hal.science/hal-05154984v1",
+    "doi": "",
+    "pdf": "",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.science/hal-04902720v1",
+    "title": "Classification of Buried Objects From Ground Penetrating Radar Images by Using Second-Order Deep Learning Models",
+    "authors": "Douba Jafuno, Ammar Mian, Guillaume Ginolhac, Nickolas Stelzenmuller",
+    "authorList": [
+      "Douba Jafuno",
+      "Ammar Mian",
+      "Guillaume Ginolhac",
+      "Nickolas Stelzenmuller"
+    ],
+    "year": 2025,
+    "venue": "IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing",
+    "kind": "Journal",
+    "uri": "https://hal.science/hal-04902720v1",
+    "doi": "10.1109/JSTARS.2024.3524424",
+    "pdf": "https://hal.science/hal-04902720/document",
+    "volume": "18",
+    "issue": "",
+    "pages": "3185-3197"
+  },
+  {
+    "id": "https://hal.science/hal-05314112v1",
+    "title": "EFFECTS OF CLASS DISTRIBUTION SHIFT IN MULTI-LABEL CLASSIFICATION SPLITS: A STUDY CASE ON BIGEARTHNET",
+    "authors": "Matthieu Verlynde, Ammar Mian, Yajing Yan",
+    "authorList": [
+      "Matthieu Verlynde",
+      "Ammar Mian",
+      "Yajing Yan"
+    ],
+    "year": 2025,
+    "venue": "IGARSS",
+    "kind": "Conference",
+    "uri": "https://hal.science/hal-05314112v1",
+    "doi": "",
+    "pdf": "https://hal.science/hal-05314112/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.science/hal-04651458v1",
+    "title": "Robust Detection for Mills Cross Sonar",
+    "authors": "Olivier Lerda, Ammar Mian, Guillaume Ginolhac, Jean-Philippe Ovarlez, Didier Charlot",
+    "authorList": [
+      "Olivier Lerda",
+      "Ammar Mian",
+      "Guillaume Ginolhac",
+      "Jean-Philippe Ovarlez",
+      "Didier Charlot"
+    ],
+    "year": 2024,
+    "venue": "IEEE Journal of Oceanic Engineering",
+    "kind": "Journal",
+    "uri": "https://hal.science/hal-04651458v1",
+    "doi": "10.1109/JOE.2024.3374958",
+    "pdf": "https://hal.science/hal-04651458/document",
+    "volume": "49",
+    "issue": [
+      "3"
+    ],
+    "pages": ""
+  },
+  {
+    "id": "https://hal.science/hal-04629670v1",
+    "title": "RENYI DIVERGENCES LEARNING FOR EXPLAINABLE CLASSIFICATION OF SAR IMAGE PAIRS",
+    "authors": "Matthieu Gallet, Ammar Mian, Abdourrahmane Atto",
+    "authorList": [
+      "Matthieu Gallet",
+      "Ammar Mian",
+      "Abdourrahmane Atto"
+    ],
+    "year": 2024,
+    "venue": "ICASSP 2024 - 2024 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)",
+    "kind": "Conference",
+    "uri": "https://hal.science/hal-04629670v1",
+    "doi": "10.1109/ICASSP48485.2024.10448227",
+    "pdf": "https://hal.science/hal-04629670/document",
+    "volume": "",
+    "issue": "",
+    "pages": "7445-7449"
+  },
+  {
+    "id": "https://hal.science/hal-04694884v1",
+    "title": "Random matrix theory improved Fréchet mean of symmetric positive definite matrices",
+    "authors": "Florent Bouchard, Ammar Mian, Malik Tiomoko, Guillaume Ginolhac, Frédéric Pascal",
+    "authorList": [
+      "Florent Bouchard",
+      "Ammar Mian",
+      "Malik Tiomoko",
+      "Guillaume Ginolhac",
+      "Frédéric Pascal"
+    ],
+    "year": 2024,
+    "venue": "Forty-first International Conference on Machine Learning (ICML 2024)",
+    "kind": "Conference",
+    "uri": "https://hal.science/hal-04694884v1",
+    "doi": "",
+    "pdf": "https://hal.science/hal-04694884/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.science/hal-04694905v1",
+    "title": "Online change detection in SAR time-series with Kronecker product structured scaled Gaussian models",
+    "authors": "Ammar Mian, Guillaume Ginolhac, Florent Bouchard, Arnaud Breloy",
+    "authorList": [
+      "Ammar Mian",
+      "Guillaume Ginolhac",
+      "Florent Bouchard",
+      "Arnaud Breloy"
+    ],
+    "year": 2024,
+    "venue": "Signal Processing",
+    "kind": "Journal",
+    "uri": "https://hal.science/hal-04694905v1",
+    "doi": "10.1016/j.sigpro.2024.109589",
+    "pdf": "https://hal.science/hal-04694905/document",
+    "volume": "224",
+    "issue": "",
+    "pages": "109589"
+  },
+  {
+    "id": "https://hal.univ-grenoble-alpes.fr/hal-04770269v1",
+    "title": "Buried Object Classification from GPR Data by using Second Order Deep Learning Models",
+    "authors": "Douba Jafuno, Ammar Mian, Guillaume Ginolhac, Nickolas Stelzenmuller",
+    "authorList": [
+      "Douba Jafuno",
+      "Ammar Mian",
+      "Guillaume Ginolhac",
+      "Nickolas Stelzenmuller"
+    ],
+    "year": 2024,
+    "venue": "International Geoscience and Remote Sensing Symposium (IGARSS)",
+    "kind": "Conference",
+    "uri": "https://hal.univ-grenoble-alpes.fr/hal-04770269v1",
+    "doi": "",
+    "pdf": "https://hal.univ-grenoble-alpes.fr/hal-04770269/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.science/hal-04228029v1",
+    "title": "Optimisation Riemannienne pour l'apprentissage de graphes structurés",
+    "authors": "Alexandre Hippert-Ferrer, Florent Bouchard, Ammar Mian, Titouan Vayer, Arnaud Breloy",
+    "authorList": [
+      "Alexandre Hippert-Ferrer",
+      "Florent Bouchard",
+      "Ammar Mian",
+      "Titouan Vayer",
+      "Arnaud Breloy"
+    ],
+    "year": 2023,
+    "venue": "GRETSI 2023 - XXIXème Colloque Francophone de Traitement du Signal et des Images",
+    "kind": "Conference",
+    "uri": "https://hal.science/hal-04228029v1",
+    "doi": "",
+    "pdf": "https://hal.science/hal-04228029/document",
+    "volume": "",
+    "issue": "",
+    "pages": "585-588"
+  },
+  {
+    "id": "https://hal.science/hal-04234464v1",
+    "title": "Détecteur de Rao robuste pour un sonar à croix de Mills",
+    "authors": "Olivier Lerda, Ammar Mian, Guillaume Ginolhac, Jean-Philippe Ovarlez",
+    "authorList": [
+      "Olivier Lerda",
+      "Ammar Mian",
+      "Guillaume Ginolhac",
+      "Jean-Philippe Ovarlez"
+    ],
+    "year": 2023,
+    "venue": "GRETSI",
+    "kind": "Conference",
+    "uri": "https://hal.science/hal-04234464v1",
+    "doi": "",
+    "pdf": "https://hal.science/hal-04234464/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.science/hal-04075772v1",
+    "title": "New Robust Sparse Convolutional Coding Inversion Algorithm for Ground Penetrating Radar Images",
+    "authors": "Matthieu Gallet, Ammar Mian, Guillaume Ginolhac, Esa Ollila, Nickolas Stelzenmuller",
+    "authorList": [
+      "Matthieu Gallet",
+      "Ammar Mian",
+      "Guillaume Ginolhac",
+      "Esa Ollila",
+      "Nickolas Stelzenmuller"
+    ],
+    "year": 2023,
+    "venue": "IEEE Transactions on Geoscience and Remote Sensing",
+    "kind": "Journal",
+    "uri": "https://hal.science/hal-04075772v1",
+    "doi": "10.1109/TGRS.2023.3268477",
+    "pdf": "https://hal.science/hal-04075772/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.science/hal-04249001v1",
+    "title": "Learning Graphical Factor Models with Riemannian Optimization",
+    "authors": "Alexandre Hippert-Ferrer, Florent Bouchard, Ammar Mian, Titouan Vayer, Arnaud Breloy",
+    "authorList": [
+      "Alexandre Hippert-Ferrer",
+      "Florent Bouchard",
+      "Ammar Mian",
+      "Titouan Vayer",
+      "Arnaud Breloy"
+    ],
+    "year": 2023,
+    "venue": "Joint European Conference on Machine Learning and Knowledge Discovery in Databases (ECML PKDD 2023)",
+    "kind": "Conference",
+    "uri": "https://hal.science/hal-04249001v1",
+    "doi": "10.1007/978-3-031-43421-1_21",
+    "pdf": "https://hal.science/hal-04249001/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.science/hal-04234436v1",
+    "title": "Classification d'objets enfouis par un modèle du second d'ordre en utilisant des données GPR",
+    "authors": "Douba Jafuno, Ammar Mian, Guillaume Ginolhac, Nickolas Stelzenmuller",
+    "authorList": [
+      "Douba Jafuno",
+      "Ammar Mian",
+      "Guillaume Ginolhac",
+      "Nickolas Stelzenmuller"
+    ],
+    "year": 2023,
+    "venue": "GRETSI",
+    "kind": "Conference",
+    "uri": "https://hal.science/hal-04234436v1",
+    "doi": "",
+    "pdf": "https://hal.science/hal-04234436/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.science/hal-03856816v1",
+    "title": "Riemannian classification of EEG signals with missing values",
+    "authors": "Alexandre Hippert-Ferrer, Ammar Mian, Florent Bouchard, Frédéric Pascal",
+    "authorList": [
+      "Alexandre Hippert-Ferrer",
+      "Ammar Mian",
+      "Florent Bouchard",
+      "Frédéric Pascal"
+    ],
+    "year": 2022,
+    "venue": "30th European Signal Processing Conference (EUSIPCO 2022)",
+    "kind": "Conference",
+    "uri": "https://hal.science/hal-03856816v1",
+    "doi": "10.23919/eusipco55093.2022.9909703",
+    "pdf": "https://hal.science/hal-03856816/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.science/hal-03726282v1",
+    "title": "Nouvel algorithme d'inversion robuste pour le RADAR GPR",
+    "authors": "Matthieu Gallet, Ammar Mian, Guillaume Ginolhac, Nickolas Stelzenmuller",
+    "authorList": [
+      "Matthieu Gallet",
+      "Ammar Mian",
+      "Guillaume Ginolhac",
+      "Nickolas Stelzenmuller"
+    ],
+    "year": 2022,
+    "venue": "GRETSI, XXVIIIème Colloque Francophone de Traitement du Signal et des Images",
+    "kind": "Conference",
+    "uri": "https://hal.science/hal-03726282v1",
+    "doi": "",
+    "pdf": "https://hal.science/hal-03726282/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.science/hal-03726277v1",
+    "title": "Classification of GPR Signals via Covariance Pooling on CNN Features within a Riemannian Framework",
+    "authors": "Matthieu Gallet, Ammar Mian, Guillaume Ginolhac, Nickolas Stelzenmuller",
+    "authorList": [
+      "Matthieu Gallet",
+      "Ammar Mian",
+      "Guillaume Ginolhac",
+      "Nickolas Stelzenmuller"
+    ],
+    "year": 2022,
+    "venue": "International Geoscience and Remote Sensing Symposium",
+    "kind": "Conference",
+    "uri": "https://hal.science/hal-03726277v1",
+    "doi": "10.1109/IGARSS46834.2022.9884684",
+    "pdf": "https://hal.science/hal-03726277/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://centralesupelec.hal.science/hal-04014783v1",
+    "title": "Détection de changements basée sur les covariances de séries d’images SAR",
+    "authors": "Ammar Mian, Arnaud Breloy, Frédéric Pascal",
+    "authorList": [
+      "Ammar Mian",
+      "Arnaud Breloy",
+      "Frédéric Pascal"
+    ],
+    "year": 2022,
+    "venue": "Détection de changements et analyse des séries temporelles d’images 1: Méthodes non supervisées",
+    "kind": "Chapter",
+    "uri": "https://centralesupelec.hal.science/hal-04014783v1",
+    "doi": "",
+    "pdf": "",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://centralesupelec.hal.science/hal-03519611v1",
+    "title": "A Comparative Study of Statistical-Based Change Detection Methods for Multidimensional and Multitemporal SAR Images",
+    "authors": "Ammar Mian, Frédéric Pascal",
+    "authorList": [
+      "Ammar Mian",
+      "Frédéric Pascal"
+    ],
+    "year": 2021,
+    "venue": "Advances in Condition Monitoring and Structural Health Monitoring",
+    "kind": "Chapter",
+    "uri": "https://centralesupelec.hal.science/hal-03519611v1",
+    "doi": "10.1007/978-981-15-9199-0_18",
+    "pdf": "",
+    "volume": "",
+    "issue": "",
+    "pages": "189-206"
+  },
+  {
+    "id": "https://centralesupelec.hal.science/hal-03519630v1",
+    "title": "An Overview of Covariance‐based Change Detection Methodologies in Multivariate SAR Image Time Series",
+    "authors": "Ammar Mian, Guillaume Ginolhac, Jean-Philippe Ovarlez, Arnaud Breloy, Frédéric Pascal",
+    "authorList": [
+      "Ammar Mian",
+      "Guillaume Ginolhac",
+      "Jean-Philippe Ovarlez",
+      "Arnaud Breloy",
+      "Frédéric Pascal"
+    ],
+    "year": 2021,
+    "venue": "Change Detection and Image Time Series Analysis 1",
+    "kind": "Chapter",
+    "uri": "https://centralesupelec.hal.science/hal-03519630v1",
+    "doi": "10.1002/9781119882268.ch3",
+    "pdf": "",
+    "volume": "",
+    "issue": [
+      "1"
+    ],
+    "pages": ""
+  },
+  {
+    "id": "https://hal.univ-grenoble-alpes.fr/hal-03521267v1",
+    "title": "On-line Kronecker Product Structured Covariance Estimation with Riemannian geometry for t-distributed data",
+    "authors": "Florent Bouchard, Arnaud Breloy, Ammar Mian, Guillaume Ginolhac",
+    "authorList": [
+      "Florent Bouchard",
+      "Arnaud Breloy",
+      "Ammar Mian",
+      "Guillaume Ginolhac"
+    ],
+    "year": 2021,
+    "venue": "The 29th European Signal Processing Conference (EUSIPCO 2021)",
+    "kind": "Conference",
+    "uri": "https://hal.univ-grenoble-alpes.fr/hal-03521267v1",
+    "doi": "10.23919/EUSIPCO54536.2021.9616101",
+    "pdf": "https://hal.univ-grenoble-alpes.fr/hal-03521267/document",
+    "volume": "",
+    "issue": "",
+    "pages": "856-859"
+  },
+  {
+    "id": "https://hal.science/hal-02345330v2",
+    "title": "Robust Low-rank Change Detection for SAR Image Time Series",
+    "authors": "Ammar Mian, Antoine Collas, Arnaud Breloy, Guillaume Ginolhac, Jean-Philippe Ovarlez",
+    "authorList": [
+      "Ammar Mian",
+      "Antoine Collas",
+      "Arnaud Breloy",
+      "Guillaume Ginolhac",
+      "Jean-Philippe Ovarlez"
+    ],
+    "year": 2020,
+    "venue": "IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing",
+    "kind": "Journal",
+    "uri": "https://hal.science/hal-02345330v2",
+    "doi": "10.1109/JSTARS.2020.2999615",
+    "pdf": "https://hal.science/hal-02345330/document",
+    "volume": "13",
+    "issue": "",
+    "pages": "3545-3556"
+  },
+  {
+    "id": "https://hal.univ-grenoble-alpes.fr/hal-02972691v1",
+    "title": "Riemannian geometry for compound Gaussian distributions: Application to recursive change detection",
+    "authors": "Florent Bouchard, Ammar Mian, Jialun Zhou, Salem Said, Guillaume Ginolhac, Yannick Berthoumieu",
+    "authorList": [
+      "Florent Bouchard",
+      "Ammar Mian",
+      "Jialun Zhou",
+      "Salem Said",
+      "Guillaume Ginolhac",
+      "Yannick Berthoumieu"
+    ],
+    "year": 2020,
+    "venue": "Signal Processing",
+    "kind": "Journal",
+    "uri": "https://hal.univ-grenoble-alpes.fr/hal-02972691v1",
+    "doi": "10.1016/j.sigpro.2020.107716",
+    "pdf": "https://hal.univ-grenoble-alpes.fr/hal-02972691/document",
+    "volume": "176",
+    "issue": "",
+    "pages": "107716"
+  },
+  {
+    "id": "https://hal.science/hal-02305115v1",
+    "title": "Detection Methods Based on Structured Covariance Matrices for Multivariate SAR Images Processing",
+    "authors": "Rayen Ben Abdallah, Ammar Mian, Arnaud Breloy, Abigaël Taylor, Mohammed Nabil El Korso, David Lautru",
+    "authorList": [
+      "Rayen Ben Abdallah",
+      "Ammar Mian",
+      "Arnaud Breloy",
+      "Abigaël Taylor",
+      "Mohammed Nabil El Korso",
+      "David Lautru"
+    ],
+    "year": 2019,
+    "venue": "IEEE Geoscience and Remote Sensing Letters",
+    "kind": "Journal",
+    "uri": "https://hal.science/hal-02305115v1",
+    "doi": "10.1109/LGRS.2018.2890155",
+    "pdf": "",
+    "volume": "16",
+    "issue": [
+      "7"
+    ],
+    "pages": "1160-1164"
+  },
+  {
+    "id": "https://hal.univ-grenoble-alpes.fr/hal-02057622v1",
+    "title": "Design of New Wavelet Packets Adapted to High-Resolution SAR Images With an Application to Target Detection",
+    "authors": "Ammar Mian, Jean-Philippe Ovarlez, Abdourrahmane Atto, Guillaume Ginolhac",
+    "authorList": [
+      "Ammar Mian",
+      "Jean-Philippe Ovarlez",
+      "Abdourrahmane Atto",
+      "Guillaume Ginolhac"
+    ],
+    "year": 2019,
+    "venue": "IEEE Transactions on Geoscience and Remote Sensing",
+    "kind": "Journal",
+    "uri": "https://hal.univ-grenoble-alpes.fr/hal-02057622v1",
+    "doi": "10.1109/tgrs.2018.2888993",
+    "pdf": "https://hal.univ-grenoble-alpes.fr/hal-02057622/document",
+    "volume": "57",
+    "issue": [
+      "6"
+    ],
+    "pages": "3919-3932"
+  },
+  {
+    "id": "https://theses.hal.science/tel-02464840v1",
+    "title": "Contributions to SAR Image Time Series Analysis",
+    "authors": "Ammar Mian",
+    "authorList": [
+      "Ammar Mian"
+    ],
+    "year": 2019,
+    "venue": "doi:10.70675/1537eeccz247fz46b4za4c7z294c82ecd5c7",
+    "kind": "Thesis",
+    "uri": "https://theses.hal.science/tel-02464840v1",
+    "doi": "10.70675/1537eeccz247fz46b4za4c7z294c82ecd5c7",
+    "pdf": "https://theses.hal.science/tel-02464840/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.univ-grenoble-alpes.fr/hal-02388708v1",
+    "title": "Détection de Changement Robuste en Rang Faible pour les Séries Temporelles d'Images SAR",
+    "authors": "Ammar Mian, Arnaud Breloy, Guillaume Ginolhac, Jean-Philippe Ovarlez",
+    "authorList": [
+      "Ammar Mian",
+      "Arnaud Breloy",
+      "Guillaume Ginolhac",
+      "Jean-Philippe Ovarlez"
+    ],
+    "year": 2019,
+    "venue": "GRETSI 2019",
+    "kind": "Conference",
+    "uri": "https://hal.univ-grenoble-alpes.fr/hal-02388708v1",
+    "doi": "",
+    "pdf": "https://hal.univ-grenoble-alpes.fr/hal-02388708/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.univ-grenoble-alpes.fr/hal-01975924v1",
+    "title": "New Robust Statistics for Change Detection in Time Series of Multivariate SAR Images",
+    "authors": "Ammar Mian, Guillaume Ginolhac, Jean-Philippe Ovarlez, Abdourrahmane Atto",
+    "authorList": [
+      "Ammar Mian",
+      "Guillaume Ginolhac",
+      "Jean-Philippe Ovarlez",
+      "Abdourrahmane Atto"
+    ],
+    "year": 2019,
+    "venue": "IEEE Transactions on Signal Processing",
+    "kind": "Journal",
+    "uri": "https://hal.univ-grenoble-alpes.fr/hal-01975924v1",
+    "doi": "10.1109/tsp.2018.2883011",
+    "pdf": "https://hal.univ-grenoble-alpes.fr/hal-01975924/document",
+    "volume": "67",
+    "issue": [
+      "2"
+    ],
+    "pages": "520-534"
+  },
+  {
+    "id": "https://hal.science/hal-02152199v2",
+    "title": "Designing Sar Images Change-point Estimation Strategies Using an Mse Lower Bound",
+    "authors": "Ammar Mian, Lucien Bacharach, Guillaume Ginolhac, Alexandre Renaux, Mohammed Nabil El Korso, Jean-Philippe Ovarlez",
+    "authorList": [
+      "Ammar Mian",
+      "Lucien Bacharach",
+      "Guillaume Ginolhac",
+      "Alexandre Renaux",
+      "Mohammed Nabil El Korso",
+      "Jean-Philippe Ovarlez"
+    ],
+    "year": 2019,
+    "venue": "2019 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP 2019)",
+    "kind": "Conference",
+    "uri": "https://hal.science/hal-02152199v2",
+    "doi": "10.1109/ICASSP.2019.8682875",
+    "pdf": "https://hal.science/hal-02152199/document",
+    "volume": "",
+    "issue": "",
+    "pages": "5312-5316"
+  },
+  {
+    "id": "https://hal.univ-grenoble-alpes.fr/hal-01840793v1",
+    "title": "Robust Detection and Estimation of Change-Points in a Time Series of Multivariate Images",
+    "authors": "Ammar Mian, Jean-Philippe Ovarlez, Guillaume Ginolhac, Abdourrahmane Atto",
+    "authorList": [
+      "Ammar Mian",
+      "Jean-Philippe Ovarlez",
+      "Guillaume Ginolhac",
+      "Abdourrahmane Atto"
+    ],
+    "year": 2018,
+    "venue": "EUSIPCO 2018",
+    "kind": "Conference",
+    "uri": "https://hal.univ-grenoble-alpes.fr/hal-01840793v1",
+    "doi": "10.23919/eusipco.2018.8553285",
+    "pdf": "https://hal.univ-grenoble-alpes.fr/hal-01840793/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.univ-grenoble-alpes.fr/hal-01840783v1",
+    "title": "A Robust Change Detector for Highly Heterogeneous Multivariate Images",
+    "authors": "Ammar Mian, Jean-Philippe Ovarlez, Guillaume Ginolhac, Abdourahmane M Atto",
+    "authorList": [
+      "Ammar Mian",
+      "Jean-Philippe Ovarlez",
+      "Guillaume Ginolhac",
+      "Abdourahmane M Atto"
+    ],
+    "year": 2018,
+    "venue": "2018 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)",
+    "kind": "Conference",
+    "uri": "https://hal.univ-grenoble-alpes.fr/hal-01840783v1",
+    "doi": "10.1109/icassp.2018.8462253",
+    "pdf": "https://hal.univ-grenoble-alpes.fr/hal-01840783/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.univ-grenoble-alpes.fr/hal-01617069v1",
+    "title": "Multivariate Change Detection on High Resolution Monovariate SAR Image Using Linear Time-Frequency Analysis",
+    "authors": "Ammar Mian, Jean-Philippe Ovarlez, Guillaume Ginolhac, A Atto",
+    "authorList": [
+      "Ammar Mian",
+      "Jean-Philippe Ovarlez",
+      "Guillaume Ginolhac",
+      "A Atto"
+    ],
+    "year": 2017,
+    "venue": "25th European Signal Processing Conference (EUSIPCO 2017)",
+    "kind": "Conference",
+    "uri": "https://hal.univ-grenoble-alpes.fr/hal-01617069v1",
+    "doi": "10.23919/EUSIPCO.2017.8081548",
+    "pdf": "https://hal.univ-grenoble-alpes.fr/hal-01617069/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  },
+  {
+    "id": "https://hal.univ-grenoble-alpes.fr/hal-01617062v1",
+    "title": "Détection de changement sur images SAR monovariées par analyse temps-fréquence linéaire",
+    "authors": "Ammar Mian, Jean-Philippe Ovarlez, Guillaume Ginolhac, Abdourrahmane Atto",
+    "authorList": [
+      "Ammar Mian",
+      "Jean-Philippe Ovarlez",
+      "Guillaume Ginolhac",
+      "Abdourrahmane Atto"
+    ],
+    "year": 2017,
+    "venue": "GRETSI 2017",
+    "kind": "Conference",
+    "uri": "https://hal.univ-grenoble-alpes.fr/hal-01617062v1",
+    "doi": "",
+    "pdf": "https://hal.univ-grenoble-alpes.fr/hal-01617062/document",
+    "volume": "",
+    "issue": "",
+    "pages": ""
+  }
+]

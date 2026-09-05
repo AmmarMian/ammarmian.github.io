@@ -746,7 +746,6 @@ export const COMMANDS: Record<string, Command> = {
         ['lair-quality', 'the detail level you pinned'],
         ['lair-fps', 'the frame counter being shown'],
         ['lair-backdrop', 'the ground the tower stands on'],
-        ['lair-hal-v2', 'a cached copy of the publication list'],
         ['lair-console-history', 'the commands you have typed'],
       ];
       let any = false;

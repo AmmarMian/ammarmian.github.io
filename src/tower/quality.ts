@@ -202,6 +202,11 @@ export interface Quality {
   settle: (ms: number) => void;
   /** Called on every change with the new profile and why it changed. */
   onChange: (fn: (p: Profile, reason: 'initial' | 'pinned' | 'demoted' | 'promoted') => void) => void;
+  /** Fired once, when the lowest tier still cannot hold a playable rate.
+   *  There is nothing further to turn down at that point — the honest thing
+   *  is to stop trying and offer the visitor a lighter way to read the same
+   *  content. */
+  onStruggle: (fn: (fps: number) => void) => void;
   /** Rolling frame time and rate, for `perf`. */
   stats: () => { ms: number; fps: number };
 }
@@ -216,6 +221,8 @@ export function createQuality(): Quality {
      not blamed: if it guessed low we are allowed to try medium once. */
   const failed = new Set<Tier>();
   const listeners: ((p: Profile, reason: 'initial' | 'pinned' | 'demoted' | 'promoted') => void)[] = [];
+  const struggleListeners: ((fps: number) => void)[] = [];
+  let struggled = false;
 
   let winStart = performance.now(), winFrames = 0, winMs = 0;
   let badRun = 0, goodRun = 0, settleUntil = performance.now() + SETTLE_MS;
@@ -253,8 +260,18 @@ export function createQuality(): Quality {
     if (avgMs > BAD_MS) { badRun++; goodRun = 0; }
     else if (avgMs < GOOD_MS) { goodRun++; badRun = 0; }
     else { badRun = goodRun = 0; }
-    if (badRun >= BAD_RUN) step(-1, 'demoted');
-    else if (goodRun >= GOOD_RUN) step(1, 'promoted');
+    if (badRun >= BAD_RUN) {
+      /* step() returns false when there is no lower tier left. Three bad
+         windows at the bottom of the scale is not a hiccup — it is a machine
+         that is not going to run this scene, however little we ask of it. */
+      if (!step(-1, 'demoted')) {
+        badRun = 0;
+        if (!struggled) {
+          struggled = true;
+          for (const fn of struggleListeners) fn(avgFps);
+        }
+      }
+    } else if (goodRun >= GOOD_RUN) step(1, 'promoted');
   }
 
   function set(next: Tier | null) {
@@ -263,8 +280,9 @@ export function createQuality(): Quality {
       if (next) localStorage.setItem(STORE_KEY, next);
       else localStorage.removeItem(STORE_KEY);
     } catch {}
+    struggled = true;   // an explicit choice ends the offer for this visit
     if (next) { tier = next; failed.clear(); emit('pinned'); }
-    else { tier = guessTier(); failed.clear(); emit('pinned'); }
+    else { struggled = false; tier = guessTier(); failed.clear(); emit('pinned'); }
     return tier;
   }
 
@@ -280,6 +298,7 @@ export function createQuality(): Quality {
       badRun = goodRun = 0;
     },
     onChange: (fn) => { listeners.push(fn); },
+    onStruggle: (fn) => { struggleListeners.push(fn); },
     stats: () => ({ ms: avgMs, fps: avgFps }),
   };
 }

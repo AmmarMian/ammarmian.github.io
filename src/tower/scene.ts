@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import anime from 'animejs';
-// Kept a static import on purpose. Loading the worlds lazily splits out a
-// 22KB (gzipped) chunk but costs ~150KB in the entry chunk: installWorlds
-// takes the whole THREE namespace as an argument, and once that namespace
-// escapes across a lazy-chunk boundary Rollup can no longer prove which of
-// three.js is unused, so it retains all of it. Measured, not assumed.
+// worlds.js now imports three itself rather than being handed the namespace,
+// which is what previously defeated tree-shaking across a chunk boundary (see
+// the note at the top of that file). Still imported statically here: the scene
+// touches the world system in its constructor — the shell's window pane is
+// registered with the ambience before the first frame — so making it lazy is a
+// separate change with an async seam through it, not a one-line swap.
 import { installWorlds } from '../worlds.js';
 import { createStage } from './stage';
 import { M, SPINE_STEPS } from './materials';
@@ -141,7 +142,7 @@ export function createTowerScene(container: HTMLElement, opts: {
   // and patches every existing mesh's material for the teleport clip effect,
   // so meshes added afterward wouldn't get patched.
   // the shell is built from the storeys above ground only
-  const worlds = installWorlds({ THREE, scene, camera, model, fx, dims: { R, FH, NF: NF_ABOVE, WH, ROT, GROUND }, nightFor: clampNight });
+  const worlds = installWorlds({ scene, camera, model, fx, dims: { R, FH, NF: NF_ABOVE, WH, ROT, GROUND }, nightFor: clampNight });
 
   // Every candle, brazier and hearth the floor builders placed, so the
   // day/night wash can bring them up as the outside goes dark...
@@ -945,6 +946,12 @@ export function createTowerScene(container: HTMLElement, opts: {
      the site is broken rather than that it just made itself playable. The
      host listens for this and shows a note; `quality` in the console says the
      same thing on demand. */
+  /* Nothing left to turn down. The host offers a lighter way in — the tower
+     does not decide that for anybody, it just says so. */
+  quality.onStruggle((fps) => {
+    window.dispatchEvent(new CustomEvent('lair-struggling', { detail: { fps } }));
+  });
+
   quality.onChange((p, reason) => {
     applyQuality(p);
     window.dispatchEvent(new CustomEvent('lair-quality', { detail: { tier: p.tier, reason, blurb: p.blurb } }));

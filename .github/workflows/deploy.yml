@@ -4,6 +4,11 @@ on:
   push:
     branches: [master]
   workflow_dispatch:
+  # The publication list is baked into the bundle at build time, so a new
+  # paper on HAL only reaches the site when the site is rebuilt. Monday
+  # mornings, so the shelves are never more than a week behind the archive.
+  schedule:
+    - cron: '0 6 * * 1'
 
 permissions:
   contents: read
@@ -24,6 +29,12 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      # Refresh the snapshot from HAL before building. Deliberately not
+      # committed back: the file in the repo is the offline fallback, and a
+      # bot pushing to master on a schedule would retrigger this workflow.
+      # If HAL is unreachable the script says so and leaves the snapshot
+      # alone rather than failing the deploy.
+      - run: npm run hal
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

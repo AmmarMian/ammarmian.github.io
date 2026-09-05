@@ -1,7 +1,7 @@
 import { PROFILE, CONTACT } from '../data/profile';
 import students from '../data/students.json';
 import projects from '../data/projects.json';
-import { fetchHalPublications } from '../data/hal';
+import { cachedHalPublications } from '../data/hal';
 import { BASE } from '../router';
 import { COLOPHON_TITLE, COLOPHON_BLOCK, COLOPHON_NOTE } from '../data/colophon';
 
@@ -33,7 +33,6 @@ export function renderTextPage(root: HTMLElement) {
     <ul class="text-list-edu"></ul>
 
     <h2>Publications</h2>
-    <p class="text-status">Loading from HAL&hellip;</p>
     <ul class="text-list-pubs"></ul>
 
     <h2>Projects &amp; tools</h2>
@@ -97,18 +96,16 @@ export function renderTextPage(root: HTMLElement) {
     colo.parentElement!.appendChild(p);
   }
 
-  const pubStatus = page.querySelector('.text-status') as HTMLElement;
+  /* Synchronous now that the records ship with the bundle. This page exists
+     to be read plainly and to be indexed, and both were undermined by a list
+     that appeared a network round-trip later — there is no longer a moment
+     where this page says "Loading from HAL…" instead of the publications. */
   const pubList = page.querySelector('.text-list-pubs')!;
-  fetchHalPublications()
-    .then((docs) => {
-      pubStatus.remove();
-      for (const d of docs) {
-        const li = document.createElement('li');
-        li.innerHTML = `${esc(d.title)} — ${esc(d.authors)}. ${esc(d.venue)}, ${d.year || 'n.d.'} (${esc(d.kind)}). <a href="${esc(d.uri)}" target="_blank" rel="noopener">HAL</a>`;
-        pubList.appendChild(li);
-      }
-    })
-    .catch(() => { pubStatus.textContent = 'HAL did not answer — see the link above.'; });
+  for (const d of cachedHalPublications() ?? []) {
+    const li = document.createElement('li');
+    li.innerHTML = `${esc(d.title)} — ${esc(d.authors)}. ${esc(d.venue)}, ${d.year || 'n.d.'} (${esc(d.kind)}). <a href="${esc(d.uri)}" target="_blank" rel="noopener">HAL</a>`;
+    pubList.appendChild(li);
+  }
 }
 
 function esc(s: string) {

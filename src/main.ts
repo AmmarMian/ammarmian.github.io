@@ -1,5 +1,4 @@
 import './style.css';
-import { createTowerScene } from './tower/scene';
 import { SidePanel } from './ui/SidePanel';
 import { fetchHalPublications, shelfFor } from './data/hal';
 import projects from './data/projects.json';
@@ -30,72 +29,22 @@ if (entry === 'text') {
   renderTextPage(app);
 } else if (entry === 'console') {
   renderAsciiConsole(app);
-} else if (isMobileDevice()) {
-  promptForMode();
 } else {
-  bootTower();
+  void bootTower();
 }
 
-/** Coarse pointer + narrow viewport reads as "phone-shaped" — the 3D tower
- *  is heavy on mobile GPUs/CPUs and often unwelcome on metered data, so
- *  those visitors get asked instead of dropped straight into it. */
-function isMobileDevice(): boolean {
-  const coarse = window.matchMedia('(pointer: coarse)').matches;
-  const narrow = window.innerWidth <= 820;
-  const uaMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-  return uaMobile || (coarse && narrow);
-}
+/* Phones used to be met with a five-second countdown that defaulted to plain
+   text — a guess made from the user agent, before a single frame had been
+   drawn, at a time when the scene had one setting of effort and that setting
+   was "all of it". Neither half of that holds now: there is a low tier most
+   phones carry comfortably, and the 3D code is a lazy chunk, so arriving here
+   costs 31KB until the tower is actually wanted.
+   So everyone gets the tower, and the thing that decides whether it is
+   working is the frame clock rather than a regular expression. If the lowest
+   tier still cannot hold a rate, `lair-struggling` fires and the offer below
+   appears — by then it is a measurement, not a prophecy. */
 
-/** A five-second choice between the three views. No answer in time still
- *  defaults to text — the safest, lightest option on a phone. */
-function promptForMode() {
-  const overlay = document.createElement('div');
-  overlay.className = 'mode-prompt';
-  overlay.innerHTML = `
-    <div class="mode-prompt-card">
-      <div class="kicker">choose a view</div>
-      <p>This site is an interactive 3D tower. On a phone it can be slow to load and awkward to navigate — there's a text console that walks the same tower, or a plain text page.</p>
-      <div class="mode-prompt-actions">
-        <button type="button" class="mode-btn mode-btn-primary" data-choice="3d">Load 3D scene</button>
-        <button type="button" class="mode-btn" data-choice="console">Text console</button>
-        <button type="button" class="mode-btn" data-choice="text">Plain text</button>
-      </div>
-      <div class="mode-prompt-timer">Plain text in <span class="mode-prompt-count">5</span>s&hellip;</div>
-    </div>
-  `;
-  document.body.appendChild(overlay);
-
-  const countEl = overlay.querySelector('.mode-prompt-count')!;
-  let remaining = 5;
-  const tick = window.setInterval(() => {
-    remaining -= 1;
-    countEl.textContent = String(Math.max(remaining, 0));
-    if (remaining <= 0) settle('text');
-  }, 1000);
-
-  let settled = false;
-  function settle(choice: '3d' | 'text' | 'console') {
-    if (settled) return;
-    settled = true;
-    window.clearInterval(tick);
-    overlay.remove();
-    if (choice === 'text') {
-      navigate('text', { replace: true });
-      renderTextPage(app);
-    } else if (choice === 'console') {
-      navigate('console', { replace: true });
-      renderAsciiConsole(app);
-    } else {
-      bootTower();
-    }
-  }
-
-  overlay.querySelectorAll<HTMLButtonElement>('.mode-btn').forEach((btn) => {
-    btn.addEventListener('click', () => settle(btn.dataset.choice as '3d' | 'text' | 'console'));
-  });
-}
-
-function bootTower() {
+async function bootTower() {
 /* ---------- loading screen (shown while the scene builds, with a welcome once it's ready) ---------- */
 const loading = document.createElement('div');
 loading.className = 'loading-veil';
@@ -110,6 +59,10 @@ document.body.appendChild(loading);
 const towerHost = document.createElement('div');
 towerHost.id = 'tower-host';
 app.appendChild(towerHost);
+
+// The veil is up before this line, so the download happens under "raising the
+// tower…" rather than in front of a blank page.
+const { createTowerScene } = await import('./tower/scene');
 
 const tower = createTowerScene(towerHost, {
   onNavigateFloor: (i) => {
@@ -383,6 +336,40 @@ dotRow.addEventListener('pointerup', (e) => {
   if (idx >= 0) { showDotLabel(dotStops[idx].label); navigate(dotStops[idx].slug); }
 });
 dotRow.addEventListener('pointercancel', () => { clearPreview(); dragging = false; });
+
+/* ---------- and when turning it down was not enough ----------
+   Fired once, from the bottom of the quality scale. Deliberately not a modal:
+   the tower is still there behind it and may be perfectly usable to look at
+   even at fifteen frames a second — this is an offer, not an eviction. */
+window.addEventListener('lair-struggling', (e: any) => {
+  const fps = Math.round(e.detail?.fps ?? 0);
+  const offer = document.createElement('div');
+  offer.className = 'perf-offer';
+  offer.setAttribute('role', 'status');
+  offer.innerHTML = `
+    <div class="kicker">slow going</div>
+    <p>The tower is drawing at about ${fps} frames a second here, and it is already as simple as it goes. The same content reads well without the 3D.</p>
+    <div class="perf-offer-actions">
+      <button type="button" class="mode-btn mode-btn-primary" data-go="console">Text console</button>
+      <button type="button" class="mode-btn" data-go="text">Plain text</button>
+      <button type="button" class="mode-btn perf-offer-stay" data-go="stay">Stay here</button>
+    </div>
+  `;
+  document.body.appendChild(offer);
+  requestAnimationFrame(() => offer.classList.add('perf-offer-in'));
+  const dismiss = () => {
+    offer.classList.remove('perf-offer-in');
+    setTimeout(() => offer.remove(), 400);
+  };
+  offer.querySelectorAll<HTMLButtonElement>('.mode-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const go = btn.dataset.go;
+      if (go === 'stay') { dismiss(); return; }
+      window.location.href = BASE + '/' + go;
+    });
+  });
+  announce(`This device is drawing about ${fps} frames a second. A lighter text version is available.`);
+});
 
 /* ---------- when the tower quietly turns itself down ----------
    The frame clock can drop the scene a tier mid-visit. It is a visible

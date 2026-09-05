@@ -4,7 +4,7 @@
  * Self-contained: nothing here reaches into lair.js. Drop-in usage:
  *
  *   import { installWorlds } from './worlds.js';
- *   const worlds = installWorlds({ THREE, scene, camera, model, fx, dims });
+ *   const worlds = installWorlds({ scene, camera, model, fx, dims });
  *   worlds.set('seafloor');            // 'seafloor' | 'moon' | 'forest' | 'beach' | 'city' | 'space' | 'rain' | null
  *   worlds.shell('ghost');             // 'off' | 'ghost' | 'solid'
  *   worlds.teleport('forest');         // rise into light, swap world, descend
@@ -14,7 +14,17 @@
  * dims: { R, FH, NF, WH, TOP? }
  */
 
-export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor }) {
+/* three is imported here rather than handed in as an argument, which is not a
+   style preference — it is the whole reason this file used to cost so much.
+   A namespace passed as a *value* escapes into the call graph, and Rollup can
+   no longer prove which of three.js is unreachable, so it keeps all of it.
+   Imported statically and only ever read as `THREE.Foo`, the same namespace is
+   resolved at build time to the forty-odd classes below and the rest is
+   dropped. Keep it this way: reintroducing the parameter silently adds a
+   couple of hundred kilobytes to the entry chunk with nothing to show for it. */
+import * as THREE from 'three';
+
+export function installWorlds({ scene, camera, model, fx, dims, nightFor }) {
   /* NF here is the number of storeys *above ground*: the shell is masonry the
      world can see, and the tower's cellar is not one of those. GROUND is how
      many storeys sit below it, which the interior floor groups have been

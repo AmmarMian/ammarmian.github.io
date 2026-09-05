@@ -14,77 +14,40 @@ export interface HalDoc {
   pages: string;
 }
 
-const KINDS: Record<string, string> = {
-  ART: 'Journal', COMM: 'Conference', UNDEFINED: 'Preprint', OTHER: 'Other',
-  COUV: 'Chapter', THESE: 'Thesis', HDR: 'HDR', POSTER: 'Poster', REPORT: 'Report', OUV: 'Book',
-};
+/* The publication list is fetched from HAL once, at build time, by
+ * scripts/fetch-hal.mjs, and imported here as data.
+ *
+ * It used to be fetched from the browser on every visit. That put a request to
+ * a service this site does not control on the critical path of every first
+ * paint, for a list that changes a few times a year — and left the shelves
+ * standing anonymous whenever HAL was slow. Worse, it made the records
+ * invisible to anything that does not run JavaScript, which is most of what
+ * indexes an academic page.
+ *
+ * CI re-runs the query before every deploy and on a weekly schedule, so the
+ * list is never more than a few days behind the archive, and the snapshot is
+ * committed so a clone builds correctly with no network at all. Nothing here
+ * touches the network any more, and nothing needs caching: the records are in
+ * the bundle, already parsed.
+ *
+ * The two functions keep their old shapes — one async, one sync — so every
+ * caller is unchanged, and so a live path could be restored here alone if the
+ * publication list ever needed to be fresher than a deploy.
+ */
+import snapshot from './hal-snapshot.json';
 
-/** Live-fetched from HAL — the same open archive query the reference site
- *  uses (idHAL ammar-mian) — so the shelf never drifts from the real record.
- *  The site is static, so there is no build-time snapshot to fall back on;
- *  instead the result is memoised for the page's lifetime and mirrored into
- *  sessionStorage, so a floor revisit (or the console) is instant and a
- *  transient HAL outage mid-session doesn't blank the shelves. */
-const CACHE_KEY = 'lair-hal-v2';
-let inflight: Promise<HalDoc[]> | null = null;
-let memo: HalDoc[] | null = null;
+const DOCS = snapshot as HalDoc[];
 
+/** The records, synchronously. Never null now; the signature is kept so the
+ *  console's "have we got them yet" branch still reads correctly. */
 export function cachedHalPublications(): HalDoc[] | null {
-  if (memo) return memo;
-  try {
-    const raw = sessionStorage.getItem(CACHE_KEY);
-    if (raw) { memo = JSON.parse(raw) as HalDoc[]; return memo; }
-  } catch {}
-  return null;
+  return DOCS;
 }
 
+/** Kept async: every caller already awaits it, and an await on a resolved
+ *  value costs a microtask. */
 export async function fetchHalPublications(): Promise<HalDoc[]> {
-  if (memo) return memo;
-  const cached = cachedHalPublications();
-  if (cached) return cached;
-  if (inflight) return inflight;
-
-  const fl = [
-    'title_s', 'authFullName_s', 'producedDateY_i', 'journalTitle_s', 'conferenceTitle_s',
-    'bookTitle_s', 'docType_s', 'uri_s', 'doiId_s', 'fileMain_s', 'volume_s', 'issue_s', 'page_s',
-  ].join(',');
-  const url = `https://api.archives-ouvertes.fr/search/?q=authIdHal_s:ammar-mian&fl=${fl}&rows=500&sort=producedDateY_i%20desc&wt=json`;
-
-  inflight = (async () => {
-    const ctrl = new AbortController();
-    const to = setTimeout(() => ctrl.abort(), 12000);
-    try {
-      const res = await fetch(url, { signal: ctrl.signal });
-      if (!res.ok) throw new Error(String(res.status));
-      const j = await res.json();
-      const raw = ((j.response && j.response.docs) || []) as any[];
-      const docs: HalDoc[] = raw.map((d, i) => {
-        const authorList: string[] = d.authFullName_s || [];
-        return {
-          id: d.uri_s || String(i),
-          title: Array.isArray(d.title_s) ? d.title_s[0] : (d.title_s || 'Untitled'),
-          authors: authorList.join(', '),
-          authorList,
-          year: d.producedDateY_i || 0,
-          venue: d.journalTitle_s || d.conferenceTitle_s || d.bookTitle_s || (d.doiId_s ? 'doi:' + d.doiId_s : 'HAL'),
-          kind: KINDS[d.docType_s] || d.docType_s || 'Other',
-          uri: d.uri_s || '#',
-          doi: d.doiId_s || '',
-          pdf: d.fileMain_s || '',
-          volume: d.volume_s || '',
-          issue: d.issue_s || '',
-          pages: d.page_s || '',
-        };
-      });
-      memo = docs;
-      try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(docs)); } catch {}
-      return docs;
-    } finally {
-      clearTimeout(to);
-      inflight = null;
-    }
-  })();
-  return inflight;
+  return DOCS;
 }
 
 export function filterHalDocs(docs: HalDoc[], query: string): HalDoc[] {
