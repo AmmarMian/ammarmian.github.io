@@ -868,6 +868,8 @@ export function createTowerScene(container: HTMLElement, opts: {
   // 'auto' follows the clock; the console can pin it either way.
   let lightMode: 'auto' | 'day' | 'night' = 'auto';
 
+  /** How far into the night it is, 0..1. Keep the pins here in step with
+   *  towerHour() below — they are two views of the same clock. */
   function nightAmount() {
     if (lightMode === 'day') return 0;
     if (lightMode === 'night') return 1;
@@ -879,8 +881,17 @@ export function createTowerScene(container: HTMLElement, opts: {
     return 0.5 - 0.5 * Math.cos(((hour - 13 + 24) % 24) / 24 * Math.PI * 2);
   }
 
-  /** The hour the tower currently believes it is. */
+  /** The hour the tower currently believes it is.
+   *
+   *  This has to agree with nightAmount(), or the two halves of the wash
+   *  contradict each other: pinning `light night` set the night amount to 1
+   *  while this went on reporting the real wall-clock hour, so anything
+   *  driven by the hour — the town's sky, most obviously — carried on drawing
+   *  two in the afternoon underneath a midnight rig. The pins are the same
+   *  pins, and 13:00 and 01:00 are the peak and trough of the curve below. */
   function towerHour() {
+    if (lightMode === 'day') return 13;
+    if (lightMode === 'night') return 1;
     if (sim.clock >= 0) return sim.clock;
     const now = new Date();
     return now.getHours() + now.getMinutes() / 60;
