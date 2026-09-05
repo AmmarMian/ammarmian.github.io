@@ -114,7 +114,7 @@ export function buildLibrary(g: THREE.Group, fg: THREE.Group, anim: Anim) {
   meridian.name = 'globe_meridian'; meridian.position.y = 1.2; meridian.rotation.y = 0.4; gb.add(meridian);
   const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.38, 14, 10), M.glass_blue);
   sphere.name = 'globe_sphere'; sphere.position.y = 1.2; gb.add(sphere);
-  anim.rings.push({ o: sphere, spin: 0.25 });
+  anim.rings.push({ o: sphere, spin: 0.25, axis: 'y' });   // a globe turns on its pole
   gb.position.copy(polar(300, 3.4)); g.add(gb);
 
   addBox('chair_seat', 'cloth_red_dark', 0.75, 0.2, 0.7, 0, 0.5, 0, 0, g).position.copy(polar(340, 1.9, 0.5));

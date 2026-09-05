@@ -5,7 +5,14 @@ export interface BookItem {
   face?: boolean; tilt?: boolean;
 }
 export interface RingItem {
-  o: THREE.Object3D; spin?: number; bob?: number; phase?: number;
+  o: THREE.Object3D;
+  spin?: number;
+  /** Which axis `spin` turns about. Defaults to z, which is right for a flat
+   *  ring lying in the XY plane and catastrophically wrong for anything that
+   *  stands on a base — a Z spin topples it over sideways. */
+  axis?: 'x' | 'y' | 'z';
+  bob?: number;
+  phase?: number;
 }
 
 export interface Anim {
@@ -26,7 +33,11 @@ export interface Anim {
   /** the bathhouse: rocking water, a running tap, and the view out */
   bath?: {
     water: THREE.Mesh; stream: THREE.Mesh; tap: THREE.Group; lever: THREE.Mesh;
+    tray: THREE.Group; petals: THREE.Mesh[];
+    steam: { m: THREE.Points; pos: Float32Array; vel: Float32Array };
     uVista: { value: number }; uT: { value: number }; vistaLight: THREE.PointLight;
+    /** 0 = empty, 1 = brim-full. `filling` is seconds of tap left to run. */
+    fill: number; filling: number;
   };
   /** the kettle's steam, parented to the hearth */
   steam?: { m: THREE.Points; pos: Float32Array; vel: Float32Array };

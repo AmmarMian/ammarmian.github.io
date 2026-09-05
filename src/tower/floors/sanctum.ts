@@ -134,6 +134,26 @@ export function buildSanctum(sg: THREE.Group, sf: THREE.Group, anim: Anim) {
     // the rain itself: a lot of thin verticals, leaning together
     for (let i = 0; i < 22; i++) f(0xbcc8d8, 0.02, 0.5, -1.25 + i * 0.115, 0.15 + (i % 3) * 0.35, 0.06);
   });
+  /* The way down. There is a storey below this one that cannot be seen from
+     outside the tower, and this is the only sign of it: a trapdoor set into
+     the flags with a tub cut into its ring. */
+  const trap = new THREE.Group(); trap.name = 'bath_trapdoor';
+  const tdp = polar(64, 3.2);
+  addCyl('trap_ring', 'brass', 1.02, 1.02, 0.07, 20, 0, 0.04, 0, trap);
+  addCyl('trap_leaf', 'wood_deep', 0.92, 0.92, 0.09, 20, 0, 0.05, 0, trap);
+  for (let i = 0; i < 5; i++) addBox('trap_plank', i % 2 ? 'wood_dark' : 'wood_mid', 1.7, 0.06, 0.3, 0, 0.1, -0.62 + i * 0.31, 0, trap);
+  addBox('trap_strap', 'iron', 1.7, 0.05, 0.1, 0, 0.14, -0.32, 0, trap);
+  addBox('trap_strap', 'iron', 1.7, 0.05, 0.1, 0, 0.14, 0.32, 0, trap);
+  addCyl('trap_pull', 'iron', 0.16, 0.16, 0.04, 10, 0.52, 0.16, 0, trap).rotation.x = Math.PI / 2;
+  // the tub, engraved on the leaf: a shallow basin on four feet
+  addBox('trap_glyph_basin', 'brass', 0.44, 0.03, 0.2, -0.06, 0.15, 0, 0, trap);
+  addBox('trap_glyph_rim', 'brass', 0.52, 0.03, 0.06, -0.06, 0.15, -0.12, 0, trap);
+  for (const dx of [-0.2, 0.16]) addBox('trap_glyph_foot', 'brass', 0.05, 0.03, 0.07, -0.06 + dx, 0.15, 0.13, 0, trap);
+  for (let i = 0; i < 3; i++) addBox('trap_glyph_steam', 'brass', 0.05, 0.03, 0.14, -0.2 + i * 0.14, 0.15, -0.24 - i * 0.02, 0.3, trap);
+  trap.position.set(tdp.x, 0.02, tdp.z);
+  trap.rotation.y = RAD(64);
+  sg.add(trap);
+
   // even the sanctum: something living beside the gate
   potPlant(sg, 210, 4.5, { kind: 0, scale: 1.2 });
   potPlant(sg, 120, 4.4, { kind: 1, scale: 0.95, pot: 'plant_pot_pale' });
@@ -195,5 +215,5 @@ export function buildSanctum(sg: THREE.Group, sf: THREE.Group, anim: Anim) {
   const torch = new THREE.PointLight(0xff9a55, 9, 8, 2);
   torch.position.copy(polar(300, 3.0, 1.6)); sf.add(torch);
 
-  return { dial, portal };
+  return { dial, portal, trap };
 }

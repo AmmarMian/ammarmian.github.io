@@ -9,7 +9,7 @@ import { installWorlds } from '../worlds.js';
 import { createStage } from './stage';
 import { M, SPINE_STEPS } from './materials';
 import { R, FH, WH, ROT, RAD, polar, landing, spiralStair, addBox } from './util';
-import { F, NF, FLOOR_IDS, FLOOR_NAMES } from './scene-constants';
+import { F, NF, GROUND, NF_ABOVE, floorY, FLOOR_IDS, FLOOR_NAMES } from './scene-constants';
 import { createAnim } from './anim';
 import { buildQuarters } from './floors/quarters';
 import { buildLibrary } from './floors/library';
@@ -41,7 +41,13 @@ function stationForHour(hour: number): number {
   return F.observatory;                 // late — stargazing
 }
 
-export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor: (i: number) => void; onOpenDestinations: () => void }) {
+export function createTowerScene(container: HTMLElement, opts: {
+  onNavigateFloor: (i: number) => void;
+  onOpenDestinations: () => void;
+  /** the plug in the bath cellar — the host decides what "clean" means */
+  onReset?: () => void;
+}) {
+  const onResetRequest = opts.onReset;
   const { renderer, scene, camera, controls, setPixel, applyPixel, hemi, key, fill } = createStage(container);
 
   const model = new THREE.Group();
@@ -57,7 +63,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   const ringGeo = new THREE.TorusGeometry(R + 0.14, 0.09, 8, 48);
   const floors = FLOOR_IDS.map((id, k) => {
     const g = new THREE.Group(); g.name = id;
-    g.position.y = k * FH; g.rotation.y = RAD(k * ROT);
+    g.position.y = floorY(k); g.rotation.y = RAD(k * ROT);
     model.add(g);
     const fg = new THREE.Group();
     fg.position.copy(g.position); fg.rotation.copy(g.rotation);
@@ -90,7 +96,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   const library = buildLibrary(floors[F.library].g, floors[F.library].fg, anim);
   const laboratory = buildLaboratory(floors[F.lab].g, floors[F.lab].fg, anim);
   const observatory = buildObservatory(floors[F.observatory].g, floors[F.observatory].fg, anim);
-  buildSanctum(floors[F.sanctum].g, floors[F.sanctum].fg, anim);
+  const sanctum = buildSanctum(floors[F.sanctum].g, floors[F.sanctum].fg, anim);
   const kitchen = buildKitchen(floors[F.kitchen].g, floors[F.kitchen].fg, anim);
   const bathhouse = buildBathhouse(floors[F.bath].g, floors[F.bath].fg, anim);
 
@@ -111,10 +117,14 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   const foxState = createFoxState(wiz.stations[F.library]);
   let routineTimer = 6, wizBusy = false;
 
-  /* place model at origin, attach fx rig */
+  /* Place the model at the origin. Vertically it is pinned by the *ground*
+     storey, not by the model's lowest point: the bath cellar hangs below that,
+     and measuring from the bottom of the model would push the whole tower up
+     out of the ground by a full storey. */
   const box3 = new THREE.Box3().setFromObject(model);
   const c0 = box3.getCenter(new THREE.Vector3());
-  model.position.set(-c0.x, -box3.min.y, -c0.z);
+  const groundBox = new THREE.Box3().setFromObject(floors[GROUND].g);
+  model.position.set(-c0.x, -groundBox.min.y, -c0.z);
   fx.position.copy(model.position);
   scene.add(model);
   scene.add(fx);
@@ -123,7 +133,8 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   // the light rig (set up in createStage, above) as the "no world" baseline
   // and patches every existing mesh's material for the teleport clip effect,
   // so meshes added afterward wouldn't get patched.
-  const worlds = installWorlds({ THREE, scene, camera, model, fx, dims: { R, FH, NF, WH, ROT }, nightFor: clampNight });
+  // the shell is built from the storeys above ground only
+  const worlds = installWorlds({ THREE, scene, camera, model, fx, dims: { R, FH, NF: NF_ABOVE, WH, ROT, GROUND }, nightFor: clampNight });
 
   // Every candle, brazier and hearth the floor builders placed, so the
   // day/night wash can bring them up as the outside goes dark...
@@ -134,7 +145,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   // the shell's own window panes answer to the same sky as the interior ones
   registerShellPane(worlds.shellPaneMaterial());
 
-  const TOP = FH * (NF - 1) + 2.5;
+  const TOP = floorY(NF - 1) + 2.5;
   const dust = makePoints(fx, 260, 0xffd9a8, 0.05, () => {
     const a = Math.random() * Math.PI * 2, r = Math.random() * (R - 0.6);
     return { x: Math.sin(a) * r, y: Math.random() * TOP, z: Math.cos(a) * r, v: 0.06 + Math.random() * 0.16 };
@@ -142,7 +153,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   dust.m.material.opacity = 0.4;
   let dustLo = 0, dustHi = TOP;
   const cauldronWorld = CAULDRON_LOCAL.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), RAD(F.lab * ROT));
-  cauldronWorld.y = F.lab * FH + 1.1;
+  cauldronWorld.y = floorY(F.lab) + 1.1;
   const bubbles = makePoints(fx, 110, 0x8dfba6, 0.1, () => ({
     x: cauldronWorld.x + (Math.random() - 0.5) * 0.7,
     y: cauldronWorld.y + Math.random() * 1.8,
@@ -209,9 +220,20 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     if (bathhouse.lever) {
       interactions.interact(bathhouse.lever, 'Throw the lever — change the view', () => { setVista('toggle'); });
     }
-    if (bathhouse.tub) {
-      interactions.interact(bathhouse.tub, 'Test the water', (e) => { e.t = 2.4; }, (e, t, dt) => {
-        if (e.t > 0) { e.t -= dt; anim.bath!.water.position.y = 0.5 + Math.sin(t * 9) * 0.04; }
+    if (sanctum.trap) {
+      interactions.interact(sanctum.trap, 'Down to the bath cellar', () => { focusFloor(F.bath); });
+    }
+    if (bathhouse.drain) {
+      /* Pulling the plug empties the tower as well as the bath: it is the one
+         object in the building that undoes things, so it is the honest place
+         to put a reset. Confirmed first — it discards saved preferences. */
+      interactions.interact(bathhouse.drain, 'Pull the plug — wash everything clean', () => {
+        onResetRequest?.();
+      });
+    }
+    if (bathhouse.tapG) {
+      interactions.interact(bathhouse.tapG, 'Run the bath', () => {
+        if (anim.bath) anim.bath.filling = Math.max(anim.bath.filling, 6);
       });
     }
 
@@ -393,7 +415,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
       while (dd < -Math.PI) dd += Math.PI * 2;
       wizard.rotation.y += dd * Math.min(dt * 5, 1);
     }
-    const wizFloor = Math.max(0, Math.min(NF - 1, Math.floor((p.y + 0.5) / FH)));
+    const wizFloor = Math.max(0, Math.min(NF - 1, Math.round(p.y / FH) + GROUND));
     wizard.visible = floors[wizFloor].g.visible;
     wizardLight.visible = wizard.visible;
     wizardLight.position.set(p.x, p.y + 2.1, p.z).add(model.position);
@@ -413,7 +435,10 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
       else it.o.rotation.set(Math.sin(t * 0.9 + it.a0) * 0.18, -a + Math.PI / 2, Math.sin(t * 1.4 + it.a0) * 0.12);
     }
     for (const it of anim.rings) {
-      if (it.spin) it.o.rotation.z = (it.o.rotation.z || 0) + it.spin * dt;
+      if (it.spin) {
+        const ax = it.axis ?? 'z';
+        it.o.rotation[ax] += it.spin * dt;
+      }
       if (it.bob) it.o.position.y = 2.5 + Math.sin(t * 0.9) * it.bob;
       if (it.phase !== undefined) {
         const k = 0.55 + 0.45 * Math.sin(t * 2 + it.phase);
@@ -486,16 +511,56 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
       // the vista eases between views rather than cutting, so the lever reads
       // as opening onto somewhere else instead of switching a channel
       b.uVista.value += (vistaTarget - b.uVista.value) * Math.min(1, dt * 2.2);
-      // the bathwater rocks, and the surface rises and falls a little
-      b.water.rotation.z = Math.sin(t * 0.9) * 0.014;
-      b.water.rotation.x = Math.sin(t * 0.67 + 1.1) * 0.01;
-      b.water.position.y = 0.5 + Math.sin(t * 0.8) * 0.012;
-      // the tap runs: the stream shivers and the water it lands in shivers back
-      b.stream.scale.set(0.85 + Math.sin(t * 21) * 0.15, 1, 0.85 + Math.sin(t * 17 + 2) * 0.15);
+
+      /* Filling and draining are a real level, not a flourish: the tap adds to
+         it while it runs, the plug takes it away, and everything floating on
+         the surface rides whatever it currently is. */
+      if (b.filling > 0) { b.filling -= dt; b.fill = Math.min(1, b.fill + dt * 0.22); }
+      const D = 1.15;                                   // the well's depth
+      const surface = -D + b.fill * (D + 0.08);
+      b.water.scale.y = Math.max(0.02, b.fill);
+      b.water.position.y = -D + (b.fill * (D + 0.08)) / 2;
+      b.water.rotation.z = Math.sin(t * 0.9) * 0.012 * b.fill;
+      b.water.rotation.x = Math.sin(t * 0.67 + 1.1) * 0.009 * b.fill;
+
+      // the tray floats on it, and tips a little as the water moves
+      b.tray.position.y = surface + 0.03;
+      b.tray.rotation.z = Math.sin(t * 0.9) * 0.03;
+      b.tray.rotation.x = Math.sin(t * 0.67 + 1.1) * 0.024;
+      b.tray.visible = b.fill > 0.12;
+
+      // blossoms, each on its own slow circuit of the water
+      for (const p of b.petals) {
+        const u = p.userData as any;
+        u.a += dt * u.sp;
+        p.position.set(Math.cos(u.a) * u.r, surface + 0.02, Math.sin(u.a) * u.r);
+        p.rotation.y = u.a * 0.6;
+        p.rotation.z = Math.sin(t * 1.4 + u.a) * 0.12;
+        p.visible = b.fill > 0.12;
+      }
+
+      // the tap only runs while it is running
+      b.stream.visible = b.filling > 0;
+      if (b.stream.visible) {
+        b.stream.scale.set(0.8 + Math.sin(t * 23) * 0.2, 1, 0.8 + Math.sin(t * 19 + 2) * 0.2);
+      }
+
+      // steam, rising off the water and thinning as it goes
+      const st = b.steam.pos;
+      for (let i = 0; i < st.length; i += 3) {
+        st[i + 1] += b.steam.vel[i / 3] * dt;
+        st[i] += Math.sin(t * 0.5 + i) * dt * 0.16;
+        st[i + 2] += Math.cos(t * 0.42 + i) * dt * 0.14;
+        if (st[i + 1] > 3.4) st[i + 1] = surface + 0.2;
+      }
+      b.steam.m.geometry.attributes.position.needsUpdate = true;
+      const sm = b.steam.m.material as THREE.PointsMaterial;
+      sm.opacity = 0.13 * b.fill + (b.filling > 0 ? 0.06 : 0);
+
       b.lever.rotation.x = -0.5 + vistaTarget * 1.0;
       // the light off the view follows what the view is showing
       b.vistaLight.color.copy(VISTA_LIGHT_MEADOW).lerp(VISTA_LIGHT_COAST, b.uVista.value);
-      b.vistaLight.intensity = 7 * (0.55 + 0.45 * (1 - nightNow));
+      b.vistaLight.intensity = 8 * (0.55 + 0.45 * (1 - nightNow));
     }
 
     if (anim.steam) {
@@ -604,7 +669,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
       fox.rotation.y += dt * 0.5;
       tail.rotation.y = Math.sin(t * 3) * 0.3;
     }
-    const foxFloor = Math.max(0, Math.min(NF - 1, Math.floor((fp.y + 0.5) / FH)));
+    const foxFloor = Math.max(0, Math.min(NF - 1, Math.round(fp.y / FH) + GROUND));
     fox.visible = floors[foxFloor].g.visible;
     foxLight.visible = fox.visible;
     // no temporary here: this runs every frame, and a Vector3 per frame is
@@ -991,6 +1056,24 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     }
   }
 
+  /* Looking at a storey below ground means the world's own ground is in the
+     way. Sink a shaft through it while we are down there, and fill it back in
+     on the way up — and hold back the tower's blueprint grid for the same
+     reason, since it lies at ground level too. */
+  function focusFloor(k: number | null) {
+    const under = k !== null && k < GROUND;
+    worlds.cutaway(under ? 26 : 0);
+    suppressBackdrop(under || !!worlds.current());
+    return focus.focusFloor(k);
+  }
+
+  /** Take the visitor down to the cellar. */
+  function goBath() { focusFloor(F.bath); }
+  /** Start the tap. */
+  function runBath() { if (anim.bath) anim.bath.filling = Math.max(anim.bath.filling, 6); }
+  /** Empty the bath. Called by the host as part of its own reset. */
+  function drainBath() { if (anim.bath) { anim.bath.fill = 0; anim.bath.filling = 0; } }
+
   /** Which view the bathhouse casement is showing. Lerped, not switched. */
   function setVista(v: Vista | 'toggle') {
     const want = v === 'toggle' ? (vistaTarget > 0.5 ? 'meadow' : 'coast') : v;
@@ -1246,7 +1329,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     renderer, scene, camera, controls,
     floors, floorNames: floors.map((f) => f.name),
     worlds,
-    focusFloor: focus.focusFloor,
+    focusFloor,
     setPanelOpen: focus.setPanelOpen,
     reframe: focus.reframe,
     sendWizard: wiz.sendWizard,
@@ -1268,6 +1351,9 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     bindProjects,
     bindRooms,
     previewWorld,
+    goBath,
+    runBath,
+    drainBath,
     setVista,
     vista,
     VISTAS,

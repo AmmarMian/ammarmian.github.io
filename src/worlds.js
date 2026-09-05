@@ -15,7 +15,12 @@
  */
 
 export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor }) {
+  /* NF here is the number of storeys *above ground*: the shell is masonry the
+     world can see, and the tower's cellar is not one of those. GROUND is how
+     many storeys sit below it, which the interior floor groups have been
+     rotated by and which the bay angles therefore have to account for. */
   const { R, FH, NF, WH } = dims;
+  const GROUND = dims.GROUND ?? 0;
   const ROT = dims.ROT ?? 102;   // degrees each storey is rotated
   const TOP = dims.TOP ?? FH * (NF - 1) + WH;
   const RAD = (a) => (a * Math.PI) / 180;
@@ -63,6 +68,12 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
   const uFadeTgt = { value: new THREE.Vector3(0, TOP * 0.45, 0) };
   const uFadeRad = { value: 15 };
   const uFadeAmt = { value: 0.9 };
+  /* Cutaway: a cylindrical shaft sunk through the world around the tower, so
+     the storey below ground can actually be looked at. Anything the world owns
+     that stands inside this radius and above the waterline simply is not
+     drawn — ground, grass, trees, paving, the lot. The sky is untouched, since
+     the dome is not one of these materials. 0 turns it off. */
+  const uCutR = { value: 0 };
 
   /* Keep three's lighting/shadow/fog pipeline and inject only what we need:
      world position, a world normal, and a hook in the diffuse stage. Far
@@ -75,6 +86,7 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
       s.uniforms.uFadeTgt = uFadeTgt;
       s.uniforms.uFadeRad = uFadeRad;
       s.uniforms.uFadeAmt = uFadeAmt;
+      s.uniforms.uCutR = uCutR;
       for (const k in uniforms) s.uniforms[k] = uniforms[k];
       s.vertexShader = `varying vec3 vWP;\nvarying vec3 vWN;\nvarying float vFade;\nuniform float uT;\nuniform float uWind;\nuniform float uFadeOn;\nuniform vec3 uFadeTgt;\nuniform float uFadeRad;\nuniform float uFadeAmt;\n${NOISE}\n` +
         s.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
@@ -115,7 +127,14 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
           diffuseColor.a *= 1.0 - vFade;
           if (diffuseColor.a < 0.004) discard;`);
       }
-      s.fragmentShader = `varying vec3 vWP;\nvarying vec3 vWN;\nvarying float vFade;\nuniform float uT;\nuniform float uFadeAmt;\n${NOISE}\n` + fs;
+      fs = fs.replace('#include <clipping_planes_fragment>', `
+        #include <clipping_planes_fragment>
+        // the cutaway shaft, sunk around the tower to expose its cellar
+        if (uCutR > 0.0 && vWP.y > -0.3) {
+          float rr = length(vWP.xz);
+          if (rr < uCutR) discard;
+        }`);
+      s.fragmentShader = `varying vec3 vWP;\nvarying vec3 vWN;\nvarying float vFade;\nuniform float uT;\nuniform float uFadeAmt;\nuniform float uCutR;\n${NOISE}\n` + fs;
     };
     mat.customProgramCacheKey = () => 'w' + (frag.length * 31 + vert.length * 7 + emis.length) + (occluder ? 'o' : '');
     return mat;
@@ -2816,7 +2835,7 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
       { k: 4, la: 178, r: 0.88, y: 3.5 },   // lab
     ].map((b) => ({
       ...b,
-      a: b.la + b.k * ROT,
+      a: b.la + (b.k + GROUND) * ROT,   // the interior group's own rotation
       rr: b.r * (SR / R),                    // same angular size seen from the axis
       wy: b.k * FH + b.y,
     }));
@@ -3097,6 +3116,8 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
     shellFocus(hidden) { shellHidden = !!hidden; if (shell) setShell(); },
     cssFor: (kind) => (built[kind] ? built[kind].css : null),
     wind: (v) => { uWind.value = v; },
+    /* sink a shaft through the world so the cellar can be seen; 0 fills it in */
+    cutaway: (r) => { uCutR.value = r || 0; },
     current: () => current,
   };
 }

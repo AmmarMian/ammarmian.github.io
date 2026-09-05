@@ -33,6 +33,9 @@ export interface ConsoleHost {
     lightModeAvailable: () => boolean;
     probe: (report: (line: string) => void, enable?: boolean) => string;
     setVista: (v: 'meadow' | 'coast' | 'toggle') => string;
+    goBath: () => void;
+    runBath: () => void;
+    drainBath: () => void;
     vista: () => string;
     VISTAS: readonly string[];
     simSet: (key: string, value: number) => number | null;
@@ -609,6 +612,21 @@ export const COMMANDS: Record<string, Command> = {
       const applied = ctx.scene.simSet(key, v);
       if (applied === null) { ctx.print(`sim: no parameter "${key}". Try "sim" for the list.`, 'err'); return; }
       ctx.print(`sim: ${key} = ${applied}${applied !== v ? ' (clamped)' : ''}.`, 'ok');
+    },
+  },
+
+  bath: {
+    args: '[run|drain]',
+    help: 'go down to the bath cellar',
+    detail: 'There is a storey below the sanctum that cannot be seen from outside the tower. With no argument this takes you down to it; "bath run" starts the tap and "bath drain" pulls the plug. The trapdoor in the sanctum floor does the same thing.',
+    examples: ['bath', 'bath run'],
+    complete: () => ['run', 'drain'],
+    run(args, ctx) {
+      if (!ctx.scene) { ctx.print('bath: no 3D scene in this view.', 'err'); return; }
+      if (args[0] === 'run') { ctx.scene.runBath(); ctx.print('bath: the tap is running.', 'ok'); return; }
+      if (args[0] === 'drain') { ctx.scene.drainBath(); ctx.print('bath: the plug is out.', 'ok'); return; }
+      ctx.scene.goBath();
+      ctx.print('bath: down the trapdoor. It is warmer than the rest of the tower.', 'ok');
     },
   },
 

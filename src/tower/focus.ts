@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import anime from 'animejs';
 import { RAD, R, FH, WH, ROT } from './util';
-import { F } from './scene-constants';
+import { F, NF, floorY } from './scene-constants';
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 // Below this width the callout becomes a bottom sheet, not a side panel —
@@ -28,7 +28,7 @@ export function createFocusController(opts: {
 }) {
   const { camera, controls, model, floors, dust, bubbles, markerList, onDustRange } = opts;
   const NF = floors.length;
-  const TOP = FH * (NF - 1) + 2.5;
+  const TOP = floorY(NF - 1) + 2.5;
   let panelSide: 'left' | 'right' | null = null;
 
   function flyTo(pos: THREE.Vector3, tgt: THREE.Vector3, dur = 2200): Promise<void> {
@@ -69,11 +69,11 @@ export function createFocusController(opts: {
     markerList.forEach((m) => { m.visible = k !== null && (m.userData as any).floor === k; });
     dust.m.visible = true;
     bubbles.m.visible = k === null || k === 2;
-    onDustRange(k === null ? 0 : k * FH, k === null ? TOP : k * FH + WH);
+    onDustRange(k === null ? floorY(0) : floorY(k), k === null ? TOP : floorY(k) + WH);
 
     const box = new THREE.Box3();
     if (k === null) box.setFromObject(model); else box.setFromObject(floors[k].g);
-    if (k !== null) box.max.y = Math.min(box.max.y, k * FH + WH + 0.5);
+    if (k !== null) box.max.y = Math.min(box.max.y, floorY(k) + WH + 0.5);
     const sph = box.getBoundingSphere(new THREE.Sphere());
     const dist = (sph.radius / Math.tan((camera.fov * Math.PI) / 360)) * (k === null ? 1.25 : 1.05);
     const elev = k === null ? 0.5 : (ELEVATION[k] ?? 0.5);
@@ -111,7 +111,7 @@ export function createFocusController(opts: {
     const k = framedFloor;
     const box = new THREE.Box3();
     if (k === null) box.setFromObject(model); else box.setFromObject(floors[k].g);
-    if (k !== null) box.max.y = Math.min(box.max.y, k * FH + WH + 0.5);
+    if (k !== null) box.max.y = Math.min(box.max.y, floorY(k) + WH + 0.5);
     const sph = box.getBoundingSphere(new THREE.Sphere());
     const target = sph.center.clone();
     // Keep the visitor's own azimuth — they may have turned the tower since

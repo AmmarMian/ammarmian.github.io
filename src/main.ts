@@ -118,7 +118,26 @@ const tower = createTowerScene(towerHost, {
     if (route) navigate(route.slug); else tower.focusFloor(i);
   },
   onOpenDestinations: () => destModal.open(),
+  onReset: () => resetEverything(),
 });
+
+/* Pulling the plug in the bath cellar. Everything this site remembers about
+   you lives in localStorage and sessionStorage — the chosen backdrop, the
+   cached archive, display preferences — so "clean" means all of it, and then
+   a reload so the tower comes back exactly as a stranger would find it.
+   Confirmed first: it is destructive and there is no undo. */
+function resetEverything() {
+  const ok = window.confirm(
+    'Pull the plug?\n\nThis empties everything the tower remembers — your chosen '
+    + 'backdrop, display settings and the cached publication list — and reloads it '
+    + 'as a stranger would find it.',
+  );
+  if (!ok) return;
+  try { localStorage.clear(); } catch {}
+  try { sessionStorage.clear(); } catch {}
+  tower.drainBath();
+  window.location.href = BASE + '/';
+}
 
 const destModal = createDestinationModal(app, tower.worlds, tower.previewWorld);
 
@@ -199,6 +218,9 @@ const terminal = createTerminal(app, {
     probe: tower.probe,
     scan: tower.scan,
     setVista: tower.setVista,
+    goBath: tower.goBath,
+    runBath: tower.runBath,
+    drainBath: tower.drainBath,
     vista: tower.vista,
     VISTAS: tower.VISTAS,
     simSet: tower.simSet,

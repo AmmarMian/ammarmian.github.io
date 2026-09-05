@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { addBox, polar, RAD, R, FH, ROT, STAIR_A, STAIR_N } from './util';
+import { GROUND } from './scene-constants';
 
 export function buildWizardMesh() {
   const w = new THREE.Group();
@@ -52,11 +53,14 @@ export function buildWizardMesh() {
 
 /* wizard/fox route: interior of each floor, out to the spiral, up, in again */
 export function buildRoute(NF: number) {
+  /* Route points are laid out in storey units and then dropped by the number
+     of cellars, so the whole path sits at the same heights the floors do. */
+  const YOFF = -GROUND * FH;
   const route: THREE.Vector3[] = [];
   const stations: number[] = [];
   // one interior standing-spot per storey, in floor order
   const INTERIOR: [number, number][] = [[196, 2.2], [30, 2.3], [250, 2.1], [300, 2.4], [308, 2.4], [165, 1.7], [40, 2.3]];
-  const pushP = (ang: number, rad: number, y: number) => route.push(polar(ang, rad, y));
+  const pushP = (ang: number, rad: number, y: number) => route.push(polar(ang, rad, y + YOFF));
 
   stations[0] = route.length;
   pushP(INTERIOR[0][0], INTERIOR[0][1], 0.02);

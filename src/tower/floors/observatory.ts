@@ -61,7 +61,8 @@ export function buildObservatory(g: THREE.Group, fg: THREE.Group, anim: Anim) {
   sun.name = 'orrery_sun'; sun.position.y = 1.1; orr.add(sun);
   orr.position.copy(polar(210, 2.6));
   g.add(orr);
-  anim.rings.push({ o: orr, spin: 0.12 });
+  // about Y: a Z spin tips the whole armature over and drags it through the floor
+  anim.rings.push({ o: orr, spin: 0.12, axis: 'y' });
   const ol = new THREE.PointLight(0xffc06a, 5, 4, 2); ol.position.copy(polar(210, 2.6, 1.5)); fg.add(ol);
 
   const ct = new THREE.Group(); ct.name = 'chart_table';
@@ -112,7 +113,7 @@ export function buildObservatory(g: THREE.Group, fg: THREE.Group, anim: Anim) {
   armCore.name = 'armillary_core'; arm.add(armCore);
   addCyl('armillary_post', 'wood_dark', 0.08, 0.11, 0.95, 10, polar(74, 3.5).x, 0.6, polar(74, 3.5).z, g);
   g.add(arm);
-  anim.rings.push({ o: arm, spin: 0.2 });
+  anim.rings.push({ o: arm, spin: 0.2, axis: 'y' });
 
   const sd = polar(340, 2.9);
   addCyl('sundial_plinth', 'stone_warm', 0.34, 0.42, 0.85, 12, sd.x, 0.42, sd.z, g);
