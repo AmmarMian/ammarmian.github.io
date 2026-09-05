@@ -1,10 +1,23 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { M } from './materials';
+import type { Profile } from './quality';
 
-export function createStage(container: HTMLElement) {
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+export function createStage(container: HTMLElement, quality: Profile) {
+  /* powerPreference is the only say a page gets in *which* GPU draws it. On a
+     laptop with two adapters the browser otherwise picks the integrated one to
+     save battery, and this scene is well past what that can hold. Asking for
+     the fast one is a hint, not a guarantee — gpuInfo() reports what actually
+     answered, and `gpu` in the console prints it.
+
+     antialias is fixed at context creation and cannot be changed afterwards,
+     so it follows the *opening* tier only. Dropping to low later coarsens the
+     pixels instead, which is the bigger saving anyway. */
+  const renderer = new THREE.WebGLRenderer({
+    antialias: quality.antialias, alpha: true, powerPreference: 'high-performance',
+  });
+  let maxRatio = quality.maxPixelRatio;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxRatio));
   container.appendChild(renderer.domElement);
   // touch-action:none hands pinch/drag entirely to OrbitControls instead of
   // letting the browser also try to scroll or zoom the page underneath it.
@@ -55,7 +68,7 @@ export function createStage(container: HTMLElement) {
   let pixelOn = true, pixelScale = 4;
   let flatApplied: boolean | null = null;
   function applyPixel() {
-    const ratio = pixelOn ? 1 / pixelScale : Math.min(window.devicePixelRatio || 1, 2);
+    const ratio = pixelOn ? 1 / pixelScale : Math.min(window.devicePixelRatio || 1, maxRatio);
     renderer.setPixelRatio(ratio);
     fit();
     renderer.domElement.style.imageRendering = pixelOn ? 'pixelated' : 'auto';
@@ -74,5 +87,14 @@ export function createStage(container: HTMLElement) {
   }
   window.addEventListener('resize', () => setTimeout(applyPixel, 60));
 
-  return { renderer, scene, camera, controls, fit, setPixel, applyPixel, hemi, key, fill };
+  /** The quality tier moved: re-cap the device pixel ratio. Only bites when
+   *  the pixel-art downscale is off, which is where a 3x phone screen would
+   *  otherwise be rendering nine times the pixels of a 1x one. */
+  function setMaxPixelRatio(r: number) {
+    if (maxRatio === r) return;
+    maxRatio = r;
+    applyPixel();
+  }
+
+  return { renderer, scene, camera, controls, fit, setPixel, applyPixel, setMaxPixelRatio, hemi, key, fill };
 }

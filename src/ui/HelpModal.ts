@@ -10,9 +10,10 @@ const ROWS: [string, string][] = [
 
 const KEYS: [string, string][] = [
   ['↑ / ↓', 'Previous / next floor'],
-  ['1 – 6', 'Jump straight to a floor'],
+  ['1 – 7', 'Jump straight to a floor'],
   ['H', 'Back to the whole tower'],
   ['G', 'Open the destination gate'],
+  ['S', 'Display and performance settings'],
   ['/', 'Open the console'],
   ['?', 'This panel'],
   ['Esc', 'Close whatever is open'],

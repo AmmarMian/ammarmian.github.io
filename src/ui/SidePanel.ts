@@ -11,6 +11,7 @@ import { WORLD_LABELS, WORLD_BLURBS } from '../data/worlds';
 import { createYearRangeSlider } from './YearRange';
 import type { FloorRoute } from '../router';
 import { PROFILE, CONTACT } from '../data/profile';
+import { COLOPHON_TITLE, COLOPHON_BLOCK, COLOPHON_NOTE } from '../data/colophon';
 import students from '../data/students.json';
 import projects from '../data/projects.json';
 
@@ -23,9 +24,18 @@ const LEADER_SVG = `
     <circle cx="10" cy="140" r="4" />
   </svg>`;
 
+/** The two things this panel needs that live outside it: emptying the site's
+ *  storage (destructive, and the host owns the confirmation and the reload)
+ *  and opening the gear panel, which is the host's overlay, not the tower's. */
+export interface PanelActions {
+  onReset?: () => void;
+  openSettings?: () => void;
+}
+
 export class SidePanel {
   el: HTMLElement;
   private tower: TowerScene;
+  private actions: PanelActions;
   private bodyEl!: HTMLElement;
   private detailPopHandler: (() => void) | null = null;
   private halCache: HalDoc[] | null = null;
@@ -36,12 +46,13 @@ export class SidePanel {
   private pendingDeepLink = false;
   private openSlug: string | null = null;
 
-  constructor(root: HTMLElement, tower: TowerScene) {
+  constructor(root: HTMLElement, tower: TowerScene, actions: PanelActions = {}) {
     this.el = document.createElement('aside');
     this.el.className = 'callout';
     this.el.hidden = true;
     root.appendChild(this.el);
     this.tower = tower;
+    this.actions = actions;
   }
 
   /** Open one record by its HAL id, from wherever the visitor happens to be.
@@ -64,6 +75,22 @@ export class SidePanel {
     const docs = await fetchHalPublications();
     const doc = docs.find((d) => d.id === id);
     if (doc) this.openPublication(doc, false);
+  }
+
+  /* The grimoire on the library lectern. Reached the same way a book on the
+     shelf is: if we are not on that floor yet, put the hash in place and let
+     the router take us there — renderPublications picks the deep link up on
+     arrival. The colophon is a detail view *of the library*, not a room of
+     its own; it is a book, and it sits behind the shelves exactly as a
+     publication record does. */
+  openColophon() {
+    if (this.openSlug !== 'publications') {
+      window.history.replaceState({}, '', `${BASE}/publications#colophon`);
+      navigate('publications');
+      return;
+    }
+    window.history.replaceState({}, '', `${BASE}/publications#colophon`);
+    this.renderColophon(false);
   }
 
   close() {
@@ -98,6 +125,7 @@ export class SidePanel {
       case 'contact': this.renderContact(); break;
       case 'elsewhere': this.renderElsewhere(); break;
       case 'now': this.renderNow(); break;
+      case 'settings': this.renderSettings(); break;
     }
   }
 
@@ -254,6 +282,7 @@ export class SidePanel {
     // but only on the render that follows actually visiting this floor.
     if (this.pendingDeepLink) {
       this.pendingDeepLink = false;
+      if (window.location.hash === '#colophon') { this.renderColophon(false); return; }
       const hashMatch = /^#doc-(.+)$/.exec(window.location.hash);
       if (hashMatch) {
         const target = docs.find((d) => docSlugFor(d.id) === decodeURIComponent(hashMatch[1]));
@@ -320,6 +349,61 @@ export class SidePanel {
     window.addEventListener('popstate', this.detailPopHandler);
   }
 
+  /* The grimoire, opened. Built as a detail view of the library so it shares
+     the record's whole apparatus — the back link, the popstate handler, the
+     hash that makes it linkable — and so closing it lands you back on the
+     shelves rather than somewhere the router has to guess at. */
+  private renderColophon(pushHistory = true) {
+    void this.tower.focusFloor(this.tower.F.library);
+    void this.tower.readGrimoire();
+
+    this.bodyEl.innerHTML = `
+      <button class="back-link" type="button">&larr; back to the shelves</button>
+      <h2>${escapeHtml(COLOPHON_TITLE)}</h2>
+      <dl class="colophon-block"></dl>
+    `;
+    this.bodyEl.querySelector('.back-link')!.addEventListener('click', () => this.closeDetail());
+
+    /* A title block, so it is read as one: the field names in the small caps
+       the rest of the site uses for labels, the values against them, and the
+       quiet second line where a field needs one. */
+    const dl = this.bodyEl.querySelector('.colophon-block') as HTMLElement;
+    for (const row of COLOPHON_BLOCK) {
+      const dt = document.createElement('dt');
+      dt.textContent = row.field;
+      const dd = document.createElement('dd');
+      dd.textContent = row.value;
+      if (row.note) {
+        const note = document.createElement('span');
+        note.className = 'colophon-note';
+        note.textContent = row.note;
+        dd.appendChild(note);
+      }
+      dl.append(dt, dd);
+    }
+
+    for (const para of COLOPHON_NOTE) {
+      const p = document.createElement('p');
+      p.textContent = para;
+      this.bodyEl.appendChild(p);
+    }
+
+    const src = document.createElement('p');
+    src.className = 'pub-links';
+    src.innerHTML = `<a class="read-link" href="${escapeAttr(CONTACT.github)}/ammarmian.github.io" target="_blank" rel="noopener">The source, in full &rarr;</a>`;
+    this.bodyEl.appendChild(src);
+
+    setRouteMeta(routeForSlug('publications'), 'publications');
+    document.title = `${COLOPHON_TITLE} — ${PROFILE.name}`;
+
+    this.clearDetailHandler();
+    if (pushHistory && window.location.hash !== '#colophon') {
+      window.history.pushState({}, '', window.location.pathname + '#colophon');
+    }
+    this.detailPopHandler = () => { if (window.location.hash !== '#colophon') this.closeDetail(false); };
+    window.addEventListener('popstate', this.detailPopHandler);
+  }
+
   /** The plucked book has to go back on the shelf when the record is closed,
    *  or the library slowly fills with them. */
   private closeDetail(popHash = true) {
@@ -327,7 +411,7 @@ export class SidePanel {
     // The record replaced the page title and canonical URL; the list is the
     // publications floor again.
     setRouteMeta(routeForSlug('publications'), 'publications');
-    if (popHash && /^#doc-/.test(window.location.hash)) window.history.back();
+    if (popHash && /^(#doc-|#colophon$)/.test(window.location.hash)) window.history.back();
     this.bodyEl.innerHTML = '';
     this.tower.shelveBook();
     // Pull the camera back out from the shelf close-up to the general
@@ -408,6 +492,118 @@ export class SidePanel {
     note.className = 'pub-meta';
     note.textContent = 'The dial in this room and the telescope in the observatory reach the same places.';
     this.bodyEl.appendChild(note);
+  }
+
+  /* ------------------------------ the cellar ------------------------------
+     The bath is the only room in the tower that is not about the work, which
+     makes it the right place for the machinery: how hard the scene is trying,
+     the other two ways into the same content, everything the site has written
+     down about this visitor, and the plug that washes all of it away.
+
+     Deliberately not a second copy of the gear panel. The gear is for
+     adjusting the scene while you are looking at it; this is the room where
+     you find out what the state actually *is* and reset it. */
+  private renderSettings() {
+    const p = document.createElement('p');
+    p.textContent = 'The one room down here that is not about the work. It is where the tower keeps its plumbing: how hard it is trying to draw itself, and everything it has written down about your visit.';
+    this.bodyEl.appendChild(p);
+
+    const q = this.tower.qualityState();
+    const gpu = this.tower.gpu();
+
+    /* What the machine settled on, in prose. The numbers matter less than the
+       one fact a slow visit hinges on: whether a GPU is drawing any of it. */
+    const state = document.createElement('p');
+    state.className = 'pub-meta';
+    state.textContent = [
+      `Drawing at ${q.tier} detail${q.pinned ? ', pinned by you' : ', chosen automatically'}`,
+      q.fps ? `${q.fps.toFixed(0)} frames a second` : null,
+      gpu.ok ? (gpu.software ? 'on the CPU — no GPU in use' : 'on the graphics card') : 'not at all — no WebGL',
+    ].filter(Boolean).join(' · ') + '.';
+    this.bodyEl.appendChild(state);
+
+    this.groupLabel('Display');
+    this.actionList([
+      {
+        label: 'Detail, resolution and the frame counter',
+        blurb: 'The gear, bottom right — or press S from anywhere',
+        run: () => this.actions.openSettings?.(),
+      },
+      {
+        label: 'Text version',
+        blurb: 'One plain page, everything on it, no 3D at all',
+        run: () => { window.location.href = BASE + '/text'; },
+      },
+      {
+        label: 'ASCII console',
+        blurb: 'The same tower drawn in type, driven by typing',
+        run: () => { window.location.href = BASE + '/console'; },
+      },
+    ]);
+
+    /* Everything the site has written into this browser, named in plain words
+       rather than by storage key. Rendered from what is actually there, so an
+       empty list is the honest answer for a first visit. */
+    this.groupLabel('What the tower remembers');
+    const REMEMBERED: [string, string][] = [
+      ['lair-quality', 'the detail level you pinned'],
+      ['lair-fps', 'the frame counter being shown'],
+      ['lair-backdrop', 'the ground the tower stands on'],
+      ['lair-hal-v2', 'a cached copy of the publication list'],
+      ['lair-console-history', 'the commands you have typed'],
+    ];
+    const held: string[] = [];
+    for (const [key, what] of REMEMBERED) {
+      let v: string | null = null;
+      try { v = localStorage.getItem(key); } catch {}
+      if (v !== null) held.push(what);
+    }
+    const mem = document.createElement('p');
+    mem.className = 'pub-meta';
+    mem.textContent = held.length
+      ? `In this browser only, never sent anywhere: ${held.join('; ')}.`
+      : 'Nothing yet. Everything this site remembers stays in this browser and is never sent anywhere.';
+    this.bodyEl.appendChild(mem);
+
+    this.groupLabel('Start again');
+    this.actionList([
+      {
+        label: 'Pull the plug',
+        blurb: 'Empties all of the above and reloads the tower as a stranger would find it',
+        danger: true,
+        run: () => this.actions.onReset?.(),
+      },
+    ]);
+
+    const note = document.createElement('p');
+    note.className = 'pub-meta';
+    note.textContent = 'The drain in the floor of this room does the same thing.';
+    this.bodyEl.appendChild(note);
+  }
+
+  private groupLabel(text: string) {
+    const el = document.createElement('div');
+    el.className = 'group-label';
+    el.textContent = text;
+    this.bodyEl.appendChild(el);
+  }
+
+  /** The same row the destination list and the correspondence rack use — a
+   *  bold label over a line of explanation, the whole row a button. */
+  private actionList(rows: { label: string; blurb: string; danger?: boolean; run: () => void }[]) {
+    const list = document.createElement('ul');
+    list.className = 'pub-list';
+    for (const r of rows) {
+      const li = document.createElement('li');
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pub-item' + (r.danger ? ' pub-item-danger' : '');
+      btn.innerHTML = `<strong>${escapeHtml(r.label)}</strong><span>${escapeHtml(r.blurb)}</span>`;
+      btn.addEventListener('click', r.run);
+      li.appendChild(btn);
+      list.appendChild(li);
+    }
+    this.bodyEl.appendChild(list);
   }
 
   private renderNow() {

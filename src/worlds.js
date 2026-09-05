@@ -3668,6 +3668,45 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
     // A world that is not in the graph cannot render, cannot be raycast and
     // cannot be half-hidden by a missed transition.
     built[kind].group.visible = true;
+    applyDetail(built[kind].group);
+  }
+
+  /* ------------------------------ detail ---------------------------------
+   * How much of a world's scenery actually draws, as a fraction. Every world
+   * is built the same way whatever the quality tier — one pass over the graph
+   * afterwards thins it, which means the tier can move at any time without
+   * rebuilding anything, and moving it back restores the world exactly.
+   *
+   * Two things are worth thinning and nothing else is:
+   *
+   *   InstancedMesh — grass, trees, rubble, cars, the belt of asteroids.
+   *     `count` is the number of instances the draw call submits, and the
+   *     per-frame loops that animate them are written against it too, so
+   *     lowering it saves on both sides. Only sets of a dozen or more are
+   *     touched: a scatter of five is a composition, not a crowd.
+   *
+   *   Points — rain, snow, spores, dust. The draw range does the same job for
+   *     a buffer, and these are additively blended and overlapping, which is
+   *     exactly the fill-rate cost a weak GPU cannot absorb.
+   *
+   * The full count is remembered on the object the first time it is thinned,
+   * so repeated passes compound nothing.
+   */
+  let detailF = 1;
+  function applyDetail(group) {
+    group.traverse((o) => {
+      if (o.isInstancedMesh) {
+        if (o.userData.fullCount === undefined) o.userData.fullCount = o.count;
+        const full = o.userData.fullCount;
+        if (full < 12) return;
+        o.count = Math.max(1, Math.round(full * detailF));
+      } else if (o.isPoints && o.geometry?.attributes?.position) {
+        if (o.userData.fullCount === undefined) o.userData.fullCount = o.geometry.attributes.position.count;
+        const full = o.userData.fullCount;
+        if (full < 12) return;
+        o.geometry.setDrawRange(0, Math.max(1, Math.round(full * detailF)));
+      }
+    });
   }
 
   function set(kind, quiet) {
@@ -3747,6 +3786,13 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
        simply ignore the call. */
     reflections: (on) => { rtOn = !!on; const w = current && built[current]; if (w && w.rt) w.rt(rtOn); return rtOn; },
     reflectionsOn: () => rtOn,
+    /* How much of the scenery draws, 0..1 — see applyDetail. Applies to every
+       world already built and to every one built after. */
+    detail(f) {
+      detailF = Math.max(0.05, Math.min(1, f));
+      for (const k in built) applyDetail(built[k].group);
+      return detailF;
+    },
     /* sink a shaft through the world so the cellar can be seen; 0 fills it in */
     cutaway: (r) => { uCutR.value = r || 0; },
     current: () => current,

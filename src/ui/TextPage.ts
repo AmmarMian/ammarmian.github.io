@@ -3,6 +3,7 @@ import students from '../data/students.json';
 import projects from '../data/projects.json';
 import { fetchHalPublications } from '../data/hal';
 import { BASE } from '../router';
+import { COLOPHON_TITLE, COLOPHON_BLOCK, COLOPHON_NOTE } from '../data/colophon';
 
 function setMeta(name: string, content: string) {
   let el = document.querySelector(`meta[name="${name}"]`);
@@ -48,6 +49,9 @@ export function renderTextPage(root: HTMLElement) {
       <li>HAL: <a href="${esc(CONTACT.hal)}" target="_blank" rel="noopener">search results</a></li>
       <li>GitHub: <a href="${esc(CONTACT.github)}" target="_blank" rel="noopener">${esc(CONTACT.github)}</a></li>
     </ul>
+
+    <h2>${esc(COLOPHON_TITLE)}</h2>
+    <dl class="text-colophon"></dl>
   `;
   root.appendChild(page);
 
@@ -74,6 +78,23 @@ export function renderTextPage(root: HTMLElement) {
     const li = document.createElement('li');
     li.textContent = `${s.name} — ${s.topic} (${s.kind}, ${s.period}${s.status === 'current' ? ', current' : ''})`;
     studList.appendChild(li);
+  }
+
+  /* The same colophon the grimoire in the library holds, from the same
+     source — a reader who never loads the 3D tower should not have to take
+     anyone's word for how it was made. */
+  const colo = page.querySelector('.text-colophon')!;
+  for (const row of COLOPHON_BLOCK) {
+    const dt = document.createElement('dt');
+    dt.textContent = row.field;
+    const dd = document.createElement('dd');
+    dd.textContent = row.note ? `${row.value} — ${row.note}` : row.value;
+    colo.append(dt, dd);
+  }
+  for (const para of COLOPHON_NOTE) {
+    const p = document.createElement('p');
+    p.textContent = para;
+    colo.parentElement!.appendChild(p);
   }
 
   const pubStatus = page.querySelector('.text-status') as HTMLElement;

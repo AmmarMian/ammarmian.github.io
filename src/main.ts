@@ -10,6 +10,8 @@ import { createDestinationModal } from './ui/DestinationModal';
 import { renderTextPage } from './ui/TextPage';
 import { renderAsciiConsole } from './ui/AsciiConsole';
 import { createViewMenu } from './ui/ViewMenu';
+import { createSettingsButton } from './ui/SettingsPanel';
+import { createFpsMeter } from './ui/FpsMeter';
 import { setRouteMeta } from './ui/meta';
 import { announce } from './ui/io';
 import {
@@ -112,9 +114,9 @@ app.appendChild(towerHost);
 const tower = createTowerScene(towerHost, {
   onNavigateFloor: (i) => {
     const route = routeForIndex(i);
-    // The bathhouse carries no section — it is the one room in the tower that
-    // is not about the work. Clicking it still takes you in; there is simply
-    // nothing to read when you get there.
+    // Every storey has a route now, the bath cellar included. The fallback is
+    // kept as a guard: a floor the router does not know about must still be
+    // enterable, it just cannot be linked to.
     if (route) navigate(route.slug); else tower.focusFloor(i);
   },
   onOpenDestinations: () => destModal.open(),
@@ -191,6 +193,19 @@ destBtn.setAttribute('aria-haspopup', 'dialog');
 destBtn.addEventListener('click', () => destModal.open());
 app.appendChild(destBtn);
 
+/* The counter is what makes the detail settings legible: turn the tier down
+   and the scene visibly coarsens, but whether that bought any frames is not
+   something you can see. Created before the panel, which offers the toggle. */
+const fpsMeter = createFpsMeter(app, tower);
+
+// The same dials the console's display commands turn, for visitors who are
+// never going to open a console.
+const settings = createSettingsButton(app, {
+  ...tower,
+  showFps: (on: boolean) => fpsMeter.set(on),
+  fpsShown: fpsMeter.on,
+});
+
 // The console takes the right-hand column, so the tower steps aside for it
 // exactly as it does for a floor callout — otherwise the two overlap and
 // the text sits on the busiest part of the scene.
@@ -218,6 +233,13 @@ const terminal = createTerminal(app, {
     probe: tower.probe,
     scan: tower.scan,
     perf: tower.perf,
+    openColophon: () => panel.openColophon(),
+    setQuality: tower.setQuality,
+    qualityState: tower.qualityState,
+    pixelMode: tower.pixelMode,
+    gpu: tower.gpu,
+    showFps: (on: boolean) => fpsMeter.set(on),
+    fpsShown: fpsMeter.on,
     setVista: tower.setVista,
     goBath: tower.goBath,
     runBath: tower.runBath,
@@ -362,6 +384,36 @@ dotRow.addEventListener('pointerup', (e) => {
 });
 dotRow.addEventListener('pointercancel', () => { clearPreview(); dragging = false; });
 
+/* ---------- when the tower quietly turns itself down ----------
+   The frame clock can drop the scene a tier mid-visit. It is a visible
+   change — coarser pixels, fewer lights, thinner scenery — and a visitor who
+   is not told why reasonably concludes the site has broken rather than that
+   it has just made itself playable. So it says so, once, in the same floating
+   voice the rest of the tower uses, and tells them how to overrule it. Only
+   automatic changes announce themselves: a tier the visitor pinned needs no
+   explanation. */
+window.addEventListener('lair-quality', (e: any) => {
+  const { tier, reason, blurb } = e.detail || {};
+  if (reason !== 'demoted' && reason !== 'promoted') return;
+  const note = document.createElement('div');
+  note.className = 'quality-note';
+  note.setAttribute('role', 'status');
+  note.innerHTML = `
+    <div class="kicker">${reason === 'demoted' ? 'easing off' : 'more room'}</div>
+    <p>Detail set to <strong>${tier}</strong> — ${blurb} — to keep the tower moving smoothly.</p>
+    <p class="quality-note-keys">Type <kbd>quality high</kbd> in the console to overrule it.</p>
+  `;
+  document.body.appendChild(note);
+  requestAnimationFrame(() => note.classList.add('quality-note-in'));
+  const dismiss = () => {
+    note.classList.remove('quality-note-in');
+    setTimeout(() => note.remove(), 500);
+  };
+  setTimeout(dismiss, 6500);
+  note.addEventListener('click', dismiss);
+  announce(`Detail set to ${tier} to keep the frame rate up.`);
+});
+
 /* ---------- hover/act hint ---------- */
 const hint = document.createElement('div');
 hint.id = 'hint';
@@ -414,12 +466,13 @@ window.addEventListener('keydown', (e) => {
     case 'ArrowDown': e.preventDefault(); stepFloor(-1); break;
     case 'Home': case 'h': case 'H': e.preventDefault(); navigate(null); break;
     case 'g': case 'G': e.preventDefault(); destModal.open(); break;
+    case 's': case 'S': e.preventDefault(); settings.toggle(); break;
     // '/' — the search-and-command key everything else uses. preventDefault
     // matters here: Firefox's quick-find would otherwise steal it.
     case '/': e.preventDefault(); terminal.toggle(); break;
     case '?': e.preventDefault(); help.toggle(); break;
     default:
-      if (/^[1-6]$/.test(e.key)) {
+      if (/^[1-7]$/.test(e.key)) {
         e.preventDefault();
         navigate(FLOOR_ORDER[Number(e.key) - 1]);
       }
@@ -427,7 +480,10 @@ window.addEventListener('keydown', (e) => {
 });
 
 /* ---------- panel + router ---------- */
-const panel = new SidePanel(app, tower);
+const panel = new SidePanel(app, tower, {
+  onReset: () => resetEverything(),
+  openSettings: () => settings.toggle(),
+});
 
 /* The shelves are the index. Once HAL answers, every record takes a real
    spine in the library — hover one to read its title, click it to open the
@@ -449,6 +505,7 @@ tower.bindRooms({
   onAbout: () => navigate('about'),
   onNow: () => navigate('now'),
   onContact: () => navigate('contact'),
+  onColophon: () => panel.openColophon(),
   channels: [
     { label: `Write to the keeper — ${CONTACT.email}`, open: () => { window.location.href = `mailto:${CONTACT.email}`; } },
     { label: 'The open archive — everything on HAL', open: () => window.open(CONTACT.hal, '_blank', 'noopener') },

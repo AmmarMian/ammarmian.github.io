@@ -32,7 +32,20 @@ export function makePoints(parent: THREE.Object3D, count: number, color: number,
     blending: THREE.AdditiveBlending, sizeAttenuation: true,
   }), 16));
   m.frustumCulled = false; parent.add(m);
-  return { m, pos, vel, boost: 1 };
+  /* A cloud can be thinned without being rebuilt: the buffer keeps its full
+     length and the draw range decides how much of it reaches the GPU. `active`
+     is the same number for the tick loops, so a thinned cloud costs less on
+     the CPU as well — the motes past the range would otherwise still be
+     integrated every frame for nothing. Fractions are of the original count,
+     so raising the quality tier gets the full cloud back exactly. */
+  const cloud = {
+    m, pos, vel, boost: 1, count, active: count,
+    setDensity(f: number) {
+      cloud.active = Math.max(1, Math.min(count, Math.round(count * f)));
+      geo.setDrawRange(0, cloud.active);
+    },
+  };
+  return cloud;
 }
 
 let groundPlane: THREE.Mesh | null = null, gridHelper: THREE.Mesh | null = null;

@@ -18,6 +18,12 @@ export const FLOORS: FloorRoute[] = [
   { index: F.observatory, slug: 'contact', label: 'Contact', title: 'Observatory', side: 'right' },
   { index: F.sanctum, slug: 'elsewhere', label: 'Elsewhere', title: 'Portal sanctum', side: 'left' },
   { index: F.kitchen, slug: 'now', label: 'Now', title: 'Kitchen', side: 'right' },
+  /* The bath cellar is the one storey that is not about the work, so it is
+     the one that holds the machinery: what the tower remembers about you, and
+     the plug that empties it. It used to have no route at all, which meant
+     visiting it left the URL on `/` — and Home, being already there, then did
+     nothing at all. A room you can walk into needs an address. */
+  { index: F.bath, slug: 'settings', label: 'Settings', title: 'Bath cellar', side: 'right' },
 ];
 
 export function routeForSlug(slug: string | null): FloorRoute | null {

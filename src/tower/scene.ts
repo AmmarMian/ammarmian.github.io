@@ -22,6 +22,7 @@ import { buildWizardMesh, createWizardController } from './wizard';
 import { buildFoxMesh, createFoxState, foxDecide } from './fox';
 import { makePoints, setBackdrop as setBackdropFx, suppressBackdrop } from './fx';
 import { createFocusController } from './focus';
+import { createQuality, gpuInfo, gpuSummary, type Tier, type Profile } from './quality';
 import { createInteractionSystem } from './interactions';
 import { addFloorFill, registerInteriorLights, applyAmbience, addFlameLights, interiorGain, registerShellPane,
          registerLamp, setOccupiedFloor, tickLamps, NO_DAYNIGHT, clampNight,
@@ -49,7 +50,12 @@ export function createTowerScene(container: HTMLElement, opts: {
   onReset?: () => void;
 }) {
   const onResetRequest = opts.onReset;
-  const { renderer, scene, camera, controls, setPixel, applyPixel, hemi, key, fill } = createStage(container);
+  /* Chosen before the context exists, because antialias cannot be changed
+     after it does. Everything else the tier decides is applied in
+     applyQuality() below, and can move at any time. */
+  const quality = createQuality();
+  const { renderer, scene, camera, controls, setPixel, applyPixel, setMaxPixelRatio, hemi, key, fill } =
+    createStage(container, quality.profile());
 
   const model = new THREE.Group();
   const fx = new THREE.Group();
@@ -222,7 +228,11 @@ export function createTowerScene(container: HTMLElement, opts: {
       interactions.interact(bathhouse.lever, 'Throw the lever — change the view', () => { setVista('toggle'); });
     }
     if (sanctum.trap) {
-      interactions.interact(sanctum.trap, 'Down to the bath cellar', () => { focusFloor(F.bath); });
+      /* Through the host, not straight to the camera. The cellar has its own
+         route now, and moving the camera behind the router's back leaves the
+         URL claiming you are still where you were — which is what made Home
+         do nothing at all once you were down here. */
+      interactions.interact(sanctum.trap, 'Down to the bath cellar', () => { opts.onNavigateFloor(F.bath); });
     }
     if (bathhouse.drain) {
       /* Pulling the plug empties the tower as well as the bath: it is the one
@@ -257,11 +267,21 @@ export function createTowerScene(container: HTMLElement, opts: {
     if (globe) interactions.interact(globe, 'Spin the globe', (e) => { e.t = 3.0; }, (e, t, dt) => {
       globe.rotation.y += (e.t > 0 ? 4.5 : 0.25) * dt;
     });
+    /* The grimoire is the one book in the tower that is not a publication,
+       and it is the book about the tower — so it holds the colophon. It used
+       to lift, turn and say nothing at all, which is a poor thing for an
+       object whose hover text is "Read the grimoire". */
     const lect = lib.getObjectByName('lectern');
-    if (lect) interactions.interact(lect, 'Read the grimoire', (e) => { e.t = 3.0; }, (e, t) => {
+    if (lect) interactions.interact(lect, 'Read the grimoire — how this was built', () => {
+      grimoireLift = 3.0;
+      onColophonRequest?.();
+    }, (_e, t, dt) => {
+      // The system decays its own entry timers; this one is ours, because the
+      // panel raises it as well as the click does.
+      if (grimoireLift > 0) grimoireLift = Math.max(0, grimoireLift - dt);
       const gr = lect.getObjectByName('grimoire')!;
-      gr.position.y = 1.4 + (e.t > 0 ? 0.5 + Math.sin(t * 3) * 0.06 : 0);
-      gr.rotation.y += (e.t > 0 ? 1.2 : 0) * 0.016;
+      gr.position.y = 1.4 + (grimoireLift > 0 ? 0.5 + Math.sin(t * 3) * 0.06 : 0);
+      gr.rotation.y += (grimoireLift > 0 ? 1.2 : 0) * 0.016;
     });
     const lad = lib.getObjectByName('library_ladder');
     if (lad) interactions.interact(lad, 'Slide the ladder', (e) => { e.t = 2.2; }, (e, t) => {
@@ -356,7 +376,7 @@ export function createTowerScene(container: HTMLElement, opts: {
 
   function tick(t: number, dt: number) {
     const dp = dust.pos;
-    for (let i = 0; i < dp.length; i += 3) {
+    for (let i = 0, n = dust.active * 3; i < n; i += 3) {
       dp[i + 1] += dust.vel[i / 3] * dt * 0.5;
       dp[i] += Math.sin(t * 0.4 + i) * dt * 0.06;
       dp[i + 2] += Math.cos(t * 0.33 + i) * dt * 0.06;
@@ -372,7 +392,7 @@ export function createTowerScene(container: HTMLElement, opts: {
     dust.m.visible = sim.dust > 0.02;
 
     const bp = bubbles.pos;
-    for (let i = 0; i < bp.length; i += 3) {
+    for (let i = 0, n = bubbles.active * 3; i < n; i += 3) {
       bp[i + 1] += bubbles.vel[i / 3] * dt * (bubbles.boost || 1);
       bp[i] += Math.sin(t * 2 + i) * dt * 0.1;
       if (bp[i + 1] > cauldronWorld.y + 2.4) {
@@ -490,7 +510,7 @@ export function createTowerScene(container: HTMLElement, opts: {
       wisps.m.visible = lit > 0.01 && sim.wisps > 0.02;
       if (wisps.m.visible) {
         const wp2 = wisps.pos;
-        for (let i = 0; i < WISPS; i++) {
+        for (let i = 0; i < wisps.active; i++) {
           const j = i * 3;
           wp2[j + 1] += wisps.vel[i] * dt;
           // the same band the dust is held to, so focusing a storey does not
@@ -701,18 +721,22 @@ export function createTowerScene(container: HTMLElement, opts: {
   // Pinned by the console's `pixel` command; null hands the choice back to
   // the distance rule below.
   let pixelOverride: number | null = null;
+  /* The two scales the distance rule picks between. A lower quality tier
+     moves both up together, so the whole range gets coarser and cheaper
+     without the close/far distinction being lost. */
+  const autoScale = () => (pixelNear ? quality.profile().pixelNear : quality.profile().pixelFar);
   function autoPixel() {
     if (pixelOverride !== null) return;
     const dist = camera.position.distanceTo(controls.target);
     const wantNear = pixelNear ? dist < 27 : dist < 23;
-    if (wantNear !== pixelNear) { pixelNear = wantNear; setPixel(pixelNear ? 4 : 2); }
+    if (wantNear !== pixelNear) { pixelNear = wantNear; setPixel(autoScale()); }
   }
   function setPixelMode(scale: number | null) {
     pixelOverride = scale;
     if (scale === null) {
       const dist = camera.position.distanceTo(controls.target);
       pixelNear = dist < 25;
-      setPixel(pixelNear ? 4 : 2);
+      setPixel(autoScale());
     } else setPixel(scale);
     return pixelOverride;
   }
@@ -767,7 +791,12 @@ export function createTowerScene(container: HTMLElement, opts: {
        a second is not worth being clever about. */
     if (cullTimer <= 0) { cullTimer = 0.25; setLightTarget(controls.target); cullLights(); }
     if (!contextLost) renderer.render(scene, camera);
-    sampleFrame(performance.now() - now);
+    /* Wall time across the whole frame — update, culling, draw submission and
+       whatever the browser did in between — because that is what the visitor
+       experiences. renderer.info would only account for the draw. */
+    const cost = performance.now() - now;
+    sampleFrame(cost);
+    quality.sample(cost);
     raf = requestAnimationFrame(loop);
   }
 
@@ -850,10 +879,18 @@ export function createTowerScene(container: HTMLElement, opts: {
   };
   const sim = { ...SIM_DEFAULTS };
 
+  /* Knobs the visitor has turned by hand. The quality tier drives some of the
+     same numbers — `lights` above all — and an automatic demotion quietly
+     undoing something that was just typed into the console is the sort of
+     thing that reads as a bug. Once a knob is pinned here, the tier leaves it
+     alone until `sim reset`. */
+  const simPinned = new Set<string>();
+
   function simSet(key: string, value: number) {
     if (!(key in SIM_RANGE)) return null;
     const [lo, hi] = SIM_RANGE[key as keyof typeof SIM_DEFAULTS];
     const v = Math.max(lo, Math.min(hi, value));
+    simPinned.add(key);
     (sim as any)[key] = v;
     if (key === 'wind') worlds.wind(v);
     if (key === 'fov') { camera.fov = v; camera.updateProjectionMatrix(); }
@@ -863,6 +900,8 @@ export function createTowerScene(container: HTMLElement, opts: {
   }
   function simReset() {
     for (const k of Object.keys(SIM_DEFAULTS)) simSet(k, (SIM_DEFAULTS as any)[k]);
+    simPinned.clear();
+    applyQuality(quality.profile());
     return { ...sim };
   }
   function simList() {
@@ -874,6 +913,50 @@ export function createTowerScene(container: HTMLElement, opts: {
       max: SIM_RANGE[k][1],
       help: SIM_RANGE[k][2],
     }));
+  }
+
+  /* ---------------------------- quality tiers ----------------------------
+     One place where a tier becomes actual settings. Everything it touches is
+     something that can be moved at any moment on a live scene — no geometry
+     is rebuilt and no material is recompiled, so a demotion mid-orbit costs
+     one frame and is not visible as a hitch. What it reaches:
+
+       pixels    the two automatic pixel-art scales, and the cap on device
+                 pixel ratio for when the downscale is off entirely
+       lights    the interior shortlist — the single biggest lever, because
+                 every one is another loop in every lit fragment on screen
+       particles dust, cauldron bubbles and wisps, thinned by draw range
+       detail    the active world's scattered instances (see worlds.js)
+
+     Antialiasing is the one thing it cannot reach: it is fixed when the GL
+     context is created. */
+  function applyQuality(p: Profile) {
+    setMaxPixelRatio(p.maxPixelRatio);
+    if (pixelOverride === null) setPixel(autoScale());
+    if (!simPinned.has('lights')) { sim.lights = p.lights; setLightBudget(p.lights); }
+    dust.setDensity(p.particles);
+    bubbles.setDensity(p.particles);
+    wisps.setDensity(p.particles);
+    worlds.detail(p.detail);
+  }
+
+  /* An automatic change is announced rather than done silently: the scene
+     visibly coarsens, and a visitor who is not told why reasonably concludes
+     the site is broken rather than that it just made itself playable. The
+     host listens for this and shows a note; `quality` in the console says the
+     same thing on demand. */
+  quality.onChange((p, reason) => {
+    applyQuality(p);
+    window.dispatchEvent(new CustomEvent('lair-quality', { detail: { tier: p.tier, reason, blurb: p.blurb } }));
+  });
+
+  function setQuality(tier: Tier | null) {
+    return quality.set(tier);
+  }
+  function qualityState() {
+    const p = quality.profile();
+    const s = quality.stats();
+    return { tier: p.tier, blurb: p.blurb, pinned: quality.pinned(), fps: s.fps, ms: s.ms, gpu: gpuSummary() };
   }
   /* The last night amount the wash computed, so the per-frame code can read it
      without recomputing the clock every frame. */
@@ -1056,7 +1139,12 @@ export function createTowerScene(container: HTMLElement, opts: {
     report(`  draws     ${info.render.calls} calls, ${(info.render.triangles / 1000).toFixed(0)}k triangles`);
     report(`  lights    ${point} point, ${spot} spot, ${dir} directional  (${hidden} switched off)`);
     report(`  memory    ${info.memory.geometries} geometries, ${info.memory.textures} textures, ${info.programs?.length ?? 0} shaders`);
-    report(`  pixels    1/${pixelOverride ?? (pixelNear ? 4 : 2)} resolution, budget ${lightBudget()} lights`);
+    report(`  pixels    1/${pixelOverride ?? autoScale()} resolution, budget ${lightBudget()} lights`);
+    const g = gpuInfo();
+    const p = quality.profile();
+    report(`  quality   ${p.tier}${quality.pinned() ? ' (pinned)' : ' (automatic)'} — ${p.blurb}`);
+    report(`  gpu       ${gpuSummary()}`);
+    if (g.software) report('            (a software rasteriser — the CPU is drawing this, and it will be slow)');
     return `perf: world "${worlds.current() || 'none'}".`;
   }
 
@@ -1107,13 +1195,26 @@ export function createTowerScene(container: HTMLElement, opts: {
      hearth, the correspondence rack under the telescope. The contact tokens
      go further and do the thing itself, so writing to the keeper means
      picking up the sealed letter rather than finding a link. */
+  /* How long the grimoire stays up off the lectern. Held here rather than in
+     the interaction's own state because the panel raises it too — opening the
+     colophon from the console, or from a #colophon link, should lift the book
+     exactly as clicking it does. */
+  let grimoireLift = 0;
+  let onColophonRequest: (() => void) | undefined;
+  /** Lift the grimoire, from wherever the colophon was actually opened. */
+  function readGrimoire() { grimoireLift = 3.0; }
+
   function bindRooms(cfg: {
     onAbout: () => void;
     onNow: () => void;
     onContact: () => void;
+    /** the grimoire on the library lectern — the colophon */
+    onColophon?: () => void;
     /** in rack order: letter, scroll, sigil, disc */
     channels: { label: string; open: () => void }[];
   }) {
+    onColophonRequest = cfg.onColophon;
+
     const journal = floors[F.quarters].g.getObjectByName('journal');
     if (journal) interactions.interact(journal, 'Read the keeper\'s journal', cfg.onAbout);
 
@@ -1146,7 +1247,8 @@ export function createTowerScene(container: HTMLElement, opts: {
   }
 
   /** Take the visitor down to the cellar. */
-  function goBath() { focusFloor(F.bath); }
+  // Same reasoning as the trapdoor above: the router owns where you are.
+  function goBath() { opts.onNavigateFloor(F.bath); }
   /** Start the tap. */
   function runBath() { if (anim.bath) anim.bath.filling = Math.max(anim.bath.filling, 6); }
   /** Empty the bath. Called by the host as part of its own reset. */
@@ -1195,7 +1297,14 @@ export function createTowerScene(container: HTMLElement, opts: {
       const savedBackdrop = localStorage.getItem('lair-backdrop') as any;
       setBackdropFx(scene, savedBackdrop || 'blueprint');
     } catch { setBackdropFx(scene, 'blueprint'); }
-    setPixel(4);
+    // The tier's own opening settings, including which pixel scale to start on.
+    applyQuality(quality.profile());
+    /* Nothing measured during the rise means anything: every material in the
+       tower compiles its shader on its first frame, every buffer uploads, and
+       the intro animates all seven storeys at once. Judging the machine on
+       that would demote a perfectly capable one before it drew a real frame. */
+    quality.settle(7000);
+    setPixel(pixelOverride ?? autoScale());
     applyDayNight();
     window.setInterval(applyDayNight, 5 * 60 * 1000);
     resume();
@@ -1429,6 +1538,7 @@ export function createTowerScene(container: HTMLElement, opts: {
     bindPublications,
     bindProjects,
     bindRooms,
+    readGrimoire,
     previewWorld,
     goBath,
     runBath,
@@ -1439,6 +1549,10 @@ export function createTowerScene(container: HTMLElement, opts: {
     simSet,
     simReset,
     simList,
+    setQuality,
+    qualityState,
+    pixelMode: () => pixelOverride,
+    gpu: gpuInfo,
     playIntro,
     F, NF,
     start, stop,

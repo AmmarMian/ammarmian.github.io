@@ -9,6 +9,7 @@ import { FLOORS, navigate } from '../router';
 import { FLOOR_NAMES } from '../tower/scene-constants';
 import { copyText, downloadText } from './io';
 import { WORLD_BLURBS } from '../data/worlds';
+import { COLOPHON_TITLE, COLOPHON_BLOCK, COLOPHON_NOTE } from '../data/colophon';
 
 export interface WorldsApi {
   kinds: string[];
@@ -45,6 +46,21 @@ export interface ConsoleHost {
     simList: () => { key: string; value: number; def: number; min: number; max: number; help: string }[];
     scan: (report: (line: string) => void) => string;
     perf: (report: (line: string) => void) => string;
+    /** Open the grimoire on the library lectern — the 3D tower only. */
+    openColophon?: () => void;
+    setQuality: (tier: 'low' | 'medium' | 'high' | null) => string;
+    pixelMode: () => number | null;
+    showFps: (on: boolean) => boolean;
+    fpsShown: () => boolean;
+    qualityState: () => {
+      tier: string; blurb: string; pinned: string | null;
+      fps: number; ms: number; gpu: string;
+    };
+    gpu: () => {
+      ok: boolean; webgl2: boolean; vendor: string; renderer: string;
+      software: boolean; masked: boolean; maxTextureSize: number;
+      antialias: boolean; cores: number; memory: number;
+    };
     setAutoRotate: (on: boolean) => boolean;
     autoRotate: () => boolean;
   } | null;
@@ -89,6 +105,7 @@ export const JUMP_TARGETS = ['none', 'seafloor', 'moon', 'forest', 'beach', 'cit
 const SHELL_TARGETS = ['off', 'ghost', 'solid', 'auto'];
 const LIGHT_TARGETS = ['auto', 'day', 'night'];
 const PIXEL_TARGETS = ['auto', '0', '2', '4', '6'];
+const QUALITY_TARGETS = ['auto', 'low', 'medium', 'high'];
 
 const OPEN_TARGETS: Record<string, string> = {
   github: CONTACT.github,
@@ -164,6 +181,15 @@ export async function describeFloor(slug: string, ctx: Ctx) {
     case 'now':
       ctx.print('Simmering in the kitchen — students currently under supervision.', 'dim');
       return COMMANDS.cat.run(['students.txt'], ctx);
+    case 'settings':
+      /* The one storey below ground, and the one that is not about the work.
+         In the 3D tower it holds the display controls and the plug; here
+         there is nothing to draw, so it holds the honest inventory of what
+         this site has written into your browser. */
+      ctx.print('The storey below the sanctum, and the only room here that is not', 'dim');
+      ctx.print('about the work. It is where the plumbing lives.', 'dim');
+      ctx.print('');
+      return COMMANDS.remembers.run([], ctx);
     case 'elsewhere':
       ctx.print('The portal here opens onto other worlds. In the 3D tower you can', 'dim');
       ctx.print('step the whole building through it:', 'dim');
@@ -665,11 +691,121 @@ export const COMMANDS: Record<string, Command> = {
     },
   },
 
+  quality: {
+    args: '[auto|low|medium|high]',
+    help: 'how hard the scene tries',
+    detail: 'The tower runs at one of three settings of effort — high draws everything at full resolution, low uses chunky pixels, a handful of lights and about half the scenery. On auto it guesses from your machine and then watches the frame rate: a setting that cannot hold a playable rate is dropped, and one that is coasting is raised. Naming a setting pins it and switches the automatic side off; auto hands the choice back. The choice is remembered.',
+    examples: ['quality', 'quality low', 'quality auto'],
+    complete: () => QUALITY_TARGETS,
+    run(args, ctx) {
+      if (!ctx.scene) { ctx.print('quality: no 3D scene in this view.', 'err'); return; }
+      const v = args[0]?.toLowerCase();
+      if (!v) {
+        const q = ctx.scene.qualityState();
+        ctx.print(`quality: ${q.tier} — ${q.blurb}`, 'ok');
+        ctx.print(`  ${q.pinned ? 'pinned by you' : 'chosen automatically, and adjusted as the frame rate moves'}`, 'dim');
+        if (q.fps) ctx.print(`  running at ${q.fps.toFixed(0)} fps (${q.ms.toFixed(1)} ms a frame)`, 'dim');
+        ctx.print(`  drawn by ${q.gpu}`, 'dim');
+        return;
+      }
+      if (!QUALITY_TARGETS.includes(v)) { ctx.print(`quality: try ${QUALITY_TARGETS.join(', ')}`, 'err'); return; }
+      const now = ctx.scene.setQuality(v === 'auto' ? null : (v as 'low' | 'medium' | 'high'));
+      ctx.print(v === 'auto'
+        ? `quality: back to automatic — starting at ${now}.`
+        : `quality: pinned at ${now}.`, 'ok');
+    },
+  },
+
+  colophon: {
+    args: '',
+    help: 'what this site was built with',
+    detail: 'The note at the end of the book: who designed the tower, who wrote the code, and every tool it stands on. In the 3D view this is the grimoire on the lectern in the library — this command opens it there as well as printing it here.',
+    examples: ['colophon', 'goto publications'],
+    run(_args, ctx) {
+      ctx.print(COLOPHON_TITLE.toUpperCase(), 'head');
+      ctx.print('');
+      for (const row of COLOPHON_BLOCK) {
+        ctx.print(`  ${pad(row.field.toLowerCase(), 10)}${row.value}`, 'cmd');
+        if (row.note) ctx.print(`  ${pad('', 10)}${row.note}`, 'dim');
+      }
+      ctx.print('');
+      for (const para of COLOPHON_NOTE) { ctx.print(`  ${para}`); ctx.print(''); }
+      // In the tower the book itself should open; in the ASCII console there
+      // is no book, and the text above is the whole of it.
+      ctx.scene?.openColophon?.();
+    },
+  },
+
+  remembers: {
+    args: '',
+    help: 'what this site has stored in your browser',
+    detail: 'Everything the tower writes down about a visit, named in plain words. All of it lives in this browser and none of it is sent anywhere. To empty it, pull the plug in the bath cellar of the 3D tower — the drain in the floor, or the "Pull the plug" row in that room.',
+    examples: ['remembers', 'goto settings'],
+    run(_args, ctx) {
+      const REMEMBERED: [string, string][] = [
+        ['lair-quality', 'the detail level you pinned'],
+        ['lair-fps', 'the frame counter being shown'],
+        ['lair-backdrop', 'the ground the tower stands on'],
+        ['lair-hal-v2', 'a cached copy of the publication list'],
+        ['lair-console-history', 'the commands you have typed'],
+      ];
+      let any = false;
+      for (const [key, what] of REMEMBERED) {
+        let v: string | null = null;
+        try { v = localStorage.getItem(key); } catch {}
+        if (v === null) continue;
+        any = true;
+        ctx.print(`  ${what}`, 'cmd');
+      }
+      if (!any) { ctx.print('Nothing yet — this browser holds none of it.', 'ok'); return; }
+      ctx.print('');
+      ctx.print('All of it stays in this browser and is never sent anywhere.', 'dim');
+      ctx.print('The plug in the bath cellar of the 3D tower empties the lot.', 'dim');
+    },
+  },
+
+  fps: {
+    args: '[on|off]',
+    help: 'show the frame counter',
+    detail: 'Puts the frame rate, the frame time and the quality tier in force in the corner of the screen. Worth having on while you try the detail settings — the scene visibly coarsens either way, and this is the only way to see whether that actually bought you anything. With no argument it toggles.',
+    examples: ['fps', 'fps on', 'quality low'],
+    complete: () => ['on', 'off'],
+    run(args, ctx) {
+      if (!ctx.scene) { ctx.print('fps: no 3D scene in this view.', 'err'); return; }
+      const v = args[0]?.toLowerCase();
+      if (v && v !== 'on' && v !== 'off') { ctx.print('fps: try on or off.', 'err'); return; }
+      const on = ctx.scene.showFps(v ? v === 'on' : !ctx.scene.fpsShown());
+      ctx.print(on ? 'fps: counter shown, bottom left.' : 'fps: counter hidden.', 'ok');
+    },
+  },
+
+  gpu: {
+    args: '',
+    help: 'what is actually drawing this',
+    detail: 'Which adapter answered, and whether it is a real GPU at all. A machine with no working driver does not fail — it quietly falls back to a software rasteriser and draws every frame on the CPU at a fraction of the speed, with nothing on screen to say so. This is where you find out. Some browsers withhold the adapter\'s name for fingerprinting reasons, in which case only the WebGL version is shown.',
+    examples: ['gpu', 'quality', 'perf'],
+    run(_args, ctx) {
+      if (!ctx.scene) { ctx.print('gpu: no 3D scene in this view.', 'err'); return; }
+      const g = ctx.scene.gpu();
+      if (!g.ok) {
+        ctx.print('gpu: no WebGL context at all — this view cannot draw.', 'err');
+        return;
+      }
+      ctx.print(`  adapter   ${g.renderer || '(withheld by the browser)'}`, 'dim');
+      if (g.vendor) ctx.print(`  vendor    ${g.vendor}`, 'dim');
+      ctx.print(`  api       ${g.webgl2 ? 'WebGL 2' : 'WebGL 1'}, ${g.antialias ? 'antialiased' : 'no antialiasing'}, textures to ${g.maxTextureSize}px`, 'dim');
+      ctx.print(`  machine   ${g.cores || '?'} cores${g.memory ? `, ${g.memory} GB` : ''}`, 'dim');
+      if (g.software) { ctx.print('gpu: a software rasteriser — the CPU is drawing every frame. Try `quality low`.', 'err'); return; }
+      if (g.masked) { ctx.print('gpu: hardware accelerated, but the browser will not name the adapter.', 'ok'); return; }
+      ctx.print('gpu: hardware accelerated.', 'ok');
+    },
+  },
+
   perf: {
     args: '',
     help: 'what the last frame cost',
-    detail: 'Frame time, draw calls and — the number that usually explains a slow frame — how many lights are burning. Every visible light is another loop in every lit pixel on screen, so `sim lights` is the dial worth turning first.',
-    examples: ['perf', 'sim lights 6'],
+    detail: 'Frame time, draw calls and — the number that usually explains a slow frame — how many lights are burning. Every visible light is another loop in every lit pixel on screen, so `sim lights` is the dial worth turning first. `quality` turns all of them at once, and `gpu` says what is drawing this.',
+    examples: ['perf', 'quality low', 'sim lights 6'],
     run(_args, ctx) {
       if (!ctx.scene) { ctx.print('perf: no 3D scene in this view.', 'err'); return; }
       ctx.print(ctx.scene.perf((line) => ctx.print(line, 'dim')), 'ok');

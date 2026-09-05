@@ -15,6 +15,7 @@ const DESCRIPTIONS: Record<string, string> = {
   contact: `How to reach ${NAME} — email, office at LISTIC, Polytech Annecy-Chambéry, and profiles elsewhere.`,
   elsewhere: `The portal sanctum in ${NAME}'s tower — step the whole building through the gate into another world.`,
   now: `What ${NAME} is working on right now — students currently under supervision and ongoing topics.`,
+  settings: `Display, performance and privacy settings for ${NAME}'s homepage — detail level, frame rate, and what the site remembers about you.`,
   text: `${PROFILE.role}, ${PROFILE.affiliation}. ${PROFILE.bio}`,
   console: `A text console for ${NAME}'s homepage — browse the tower, search publications and export citations without the 3D scene.`,
 };
