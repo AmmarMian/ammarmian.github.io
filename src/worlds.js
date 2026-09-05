@@ -312,6 +312,11 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
      already had it clamped for them before it arrives. */
   let rtOn = false;     // wet-surface reflections, opt-in
   let rawNight = 0;     // what the host's clock says
+  /* And the hour itself. `night` alone is symmetric about 13:00 — 16:00 and
+     10:00 give the identical value — so a world that wants to know whether it
+     is morning or evening cannot work it out from the wash. Anything that
+     moves the sun across the sky needs this rather than that. */
+  let curHour = 12;
   let curNight = 0;     // ...after the active world has had its say
   /* Some worlds do not get a vote on the hour — the city is in eternal night,
      deep space has no day at all. The host owns that table (it applies the
@@ -368,13 +373,14 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
   /* The host's day/night wash, arriving for whatever world is loaded: it
      re-lights the rig and lets the world move its own sun, moon, sky and
      glowing things. Cheap enough to call on every clock tick. */
-  function setNight(n) {
+  function setNight(n, hour) {
+    if (typeof hour === 'number') curHour = hour;
     rawNight = Math.max(0, Math.min(1, n));
     curNight = clampNight(current, rawNight);
     const w = current && built[current];
     if (!w) return curNight;
     applyLight(blendLight(w, curNight));
-    if (w.night) w.night(curNight);
+    if (w.night) w.night(curNight, curHour);
     applyGlass(w.glass);
     /* Deliberately no refreshFog() here. That walks the whole scene setting
        needsUpdate on every material, which recompiles every shader in it —
@@ -2327,7 +2333,86 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
   function buildRain() {
     const g = new THREE.Group();
     g.name = 'world_rain';
-    const dome = skyDome(0x2b3340, 0x39424f, 0x232a34, 460);
+    /* The sky. A flat gradient is fine for a world where nothing changes, but
+       this one runs on the clock, so it wants real weather: a moving deck of
+       cloud, a break in it where the sun or moon is, and the whole thing
+       repainted from dawn through to the small hours. Overcast throughout —
+       it is raining — but overcast at eight in the morning and overcast at
+       midnight are not remotely the same colour. */
+    const uHour = { value: 9 };         // 0..24, driven by the host's clock
+    const skyMat = new THREE.ShaderMaterial({
+      side: THREE.BackSide, depthWrite: false, fog: false,
+      uniforms: { uT, uHour },
+      vertexShader: `varying vec3 vP;
+        void main(){ vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+      fragmentShader: `${NOISE}
+        varying vec3 vP; uniform float uT; uniform float uHour;
+        void main(){
+          vec3 d = normalize(vP);
+          float h = d.y;
+
+          /* Four keys through the day, blended by the hour. Dawn and dusk are
+             narrow and warm; day is a flat pale grey; night is very dark and
+             blue. Written as weights so the transitions are smooth and none of
+             them ever fully wins. */
+          float H = uHour;
+          float wDawn  = exp(-pow((H - 7.0) / 2.0, 2.0));
+          float wDay   = exp(-pow((H - 13.0) / 4.2, 2.0));
+          float wDusk  = exp(-pow((H - 19.0) / 2.2, 2.0));
+          float nH = min(abs(H - 1.0), min(abs(H - 25.0), abs(H + 23.0)));
+          float wNight = exp(-pow(nH / 4.6, 2.0));
+          float wsum = wDawn + wDay + wDusk + wNight + 1e-4;
+
+          vec3 zen = (vec3(0.30,0.34,0.46) * wDawn
+                    + vec3(0.44,0.50,0.58) * wDay
+                    + vec3(0.24,0.22,0.32) * wDusk
+                    + vec3(0.035,0.045,0.075) * wNight) / wsum;
+          vec3 hor = (vec3(0.62,0.52,0.46) * wDawn
+                    + vec3(0.66,0.69,0.72) * wDay
+                    + vec3(0.60,0.36,0.26) * wDusk
+                    + vec3(0.075,0.085,0.125) * wNight) / wsum;
+          vec3 grd = (vec3(0.22,0.21,0.22) * wDawn
+                    + vec3(0.36,0.37,0.38) * wDay
+                    + vec3(0.20,0.16,0.16) * wDusk
+                    + vec3(0.03,0.035,0.05) * wNight) / wsum;
+
+          vec3 c = h > 0.0 ? mix(hor, zen, pow(clamp(h, 0.0, 1.0), 0.55))
+                           : mix(hor, grd, pow(clamp(-h, 0.0, 1.0), 0.5));
+
+          /* The cloud deck, seen in projection: the further down you look the
+             more of it you see through, which is what puts the horizon behind
+             a wall of it and leaves the zenith relatively open. */
+          float t2 = clamp(h, 0.02, 1.0);
+          vec2 cp = d.xz / t2 * 0.9;
+          float deck = fbm(cp * 0.45 + vec2(uT * 0.006, uT * 0.004));
+          deck = deck * 0.65 + fbm(cp * 1.5 - vec2(uT * 0.011, 0.0)) * 0.35;
+          float cover = smoothstep(0.34, 0.72, deck) * smoothstep(-0.05, 0.16, h);
+          vec3 cloudLit = (vec3(0.42,0.40,0.44) * wDawn
+                         + vec3(0.70,0.72,0.75) * wDay
+                         + vec3(0.40,0.30,0.30) * wDusk
+                         + vec3(0.055,0.065,0.095) * wNight) / wsum;
+          vec3 cloudDark = cloudLit * 0.45;
+          c = mix(c, mix(cloudDark, cloudLit, smoothstep(0.4, 0.85, deck)), cover * 0.92);
+
+          /* The break where the light is coming from. It travels with the hour
+             — east at dawn, round to the west by dusk — and after dark it is
+             the moon instead, colder and much weaker. */
+          float az = radians((H - 6.0) / 12.0 * 180.0 - 30.0);
+          float elev = sin(clamp((H - 6.0) / 12.0, 0.0, 1.0) * 3.14159) * 0.55 + 0.06;
+          vec3 sunDir = normalize(vec3(sin(az) * cos(elev), elev, -cos(az) * cos(elev)));
+          float ang = max(dot(d, sunDir), 0.0);
+          float day = clamp((wDawn + wDay + wDusk) / wsum, 0.0, 1.0);
+          vec3 glowCol = mix(vec3(0.55,0.62,0.80), vec3(1.0,0.82,0.55), day);
+          c += glowCol * pow(ang, 6.0) * (0.10 + 0.55 * day) * (0.4 + 0.6 * (1.0 - cover));
+          c += glowCol * pow(ang, 40.0) * (0.05 + 0.5 * day) * (1.0 - cover);
+
+          float dither = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898,78.233))) * 43758.5453) - 0.5;
+          gl_FragColor = vec4(c + dither * 0.008, 1.0);
+        }`,
+    });
+    const dome = new THREE.Mesh(new THREE.SphereGeometry(460, 40, 24), skyMat);
+    dome.renderOrder = -10;
+    dome.setSky = () => {};      // this world paints its own; the hour drives it
     g.add(dome);
 
     const PLACE_R = 17;           // the round place the tower stands in
@@ -2411,7 +2496,7 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
       float mud = smoothstep(190.0, 300.0, rr0);
       dry = mix(dry, mix(vec3(0.20,0.17,0.13), vec3(0.30,0.26,0.19), fbm(vWP.xz * 0.4)), mud);
       // standing water, in the joints and in the ruts
-      float pool = clamp((1.0 - stone) * 0.6 + smoothstep(0.55, 1.0, fbm(vWP.xz * 0.55)) * 0.55, 0.0, 1.0);
+      float pool = clamp((1.0 - stone) * 0.55 + smoothstep(0.42, 0.92, fbm(vWP.xz * 0.5)) * 0.85, 0.0, 1.0);
       vec3 V = normalize(cameraPosition - vWP);
       float fres = pow(1.0 - clamp(V.y, 0.0, 1.0), 3.0);
     `;
@@ -2426,10 +2511,17 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
       color: 0xffffff, roughness: 0.5, metalness: 0.0,
     }), {
       frag: PAVE_COMMON + `
-        vec3 c = mix(dry, dry * 0.42, pool);
-        // no reflection pass: a plain grazing sheen, so it still reads as wet
-        c += vec3(0.26,0.30,0.38) * fres * pool * 0.9;
+        vec3 c = mix(dry, dry * 0.34, pool);
+        // a plain grazing sheen on top of the specular the lights already give
+        c += vec3(0.28,0.33,0.42) * fres * pool * 1.1;
       ` + PAVE_TAIL,
+      /* And the part that actually sells it: where the water stands, the stone
+         is mirror-smooth, so every real light in the scene throws a proper
+         specular highlight off it. Injected after roughnessmap_fragment, which
+         is where roughnessFactor exists to be overwritten — `pool` is declared
+         above in the same main(), so it is simply in scope. */
+      emis: `roughnessFactor = mix(0.62, 0.045, pool);
+             metalnessFactor = mix(0.0, 0.35, pool);`,
     });
 
     /* The reflective version. Same paving, plus the lamps' mirror images
@@ -2467,6 +2559,8 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
         // and the sky, mirrored: wet ground is never black
         c += vec3(0.20,0.24,0.32) * fres * pool * 0.8;
       ` + PAVE_TAIL,
+      emis: `roughnessFactor = mix(0.5, 0.02, pool);
+             metalnessFactor = mix(0.0, 0.5, pool);`,
     });
 
     const ground = new THREE.Mesh(ggeo, paveMat);
@@ -2568,23 +2662,26 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
       for (const side of [-1, 1]) {
         let d = PLACE_R + 3;
         while (d < 250) {
-          const frontage = rnd(7.5, 4.2);        // how much of the street it takes
+          const frontage = rnd(6.4, 3.8);        // how much of the street it takes
           const depth = rnd(11, 6.5);
           const off = side * (STREET_W * 0.5 + depth * 0.5);
           const cx = dirX * (d + frontage / 2) + perpX * off;
           const cz = dirZ * (d + frontage / 2) + perpZ * off;
-          // gable end to the street, so the ridge runs back from the road
-          plots.push({ x: cx, z: cz, w: frontage, dp: depth, ry: rad, front: side });
-          d += frontage + rnd(0.7, 0.05);        // party walls, with the odd gap
+          /* Face the street. The house's local +z is its front, and the front
+             has to point *across* the road, not along it — with ry = rad every
+             window and door was put on the gable end, which is buried in the
+             next house along, which is why the terraces had blank walls. */
+          plots.push({ x: cx, z: cz, w: frontage, dp: depth, ry: rad - side * Math.PI / 2, front: side });
+          d += frontage + rnd(0.35, 0.02);       // party walls, with the odd gap
         }
       }
     }
     // and the backland: whatever fits behind the frontages, at any angle
-    for (let i = 0; i < 520; i++) {
+    for (let i = 0; i < 900; i++) {
       const a = rnd(6.28);
       const d = PLACE_R + 14 + Math.pow(Math.random(), 0.5) * 230;
       const x = Math.cos(a) * d, z = Math.sin(a) * d;
-      if (streetDist(x, z) < STREET_W * 0.5 + 13) continue;
+      if (streetDist(x, z) < STREET_W * 0.5 + 12) continue;
       plots.push({ x, z, w: rnd(8, 4.5), dp: rnd(8, 4.5), ry: rnd(6.28), front: 0 });
     }
     // a ring of houses facing the place itself
@@ -2594,7 +2691,7 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
       const rad = RAD(a);
       plots.push({
         x: Math.sin(rad) * (PLACE_R + 5.5), z: Math.cos(rad) * (PLACE_R + 5.5),
-        w: rnd(6.5, 4.6), dp: rnd(9, 6), ry: rad, front: 1,
+        w: rnd(6.5, 4.6), dp: rnd(9, 6), ry: rad + Math.PI, front: 1,   // facing the place
       });
     }
 
@@ -2911,7 +3008,7 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
     bolt.position.set(120, 190, -160);
     g.add(bolt);
 
-    const fog = new THREE.FogExp2(0x39424f, 0.0068);
+    const fog = new THREE.FogExp2(0x5a6470, 0.0062);
     let dayK = 1;
     const _lampV = new THREE.Vector3();
     return {
@@ -2930,10 +3027,11 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
         key: { mul: 0.1, c: 0x7f92b8, p: [-30, 70, 30] },
         fill: { mul: 0.16, c: 0x28314a },
       },
-      night(n) {
+      night(n, hour) {
         dayK = 1 - n * 0.72;
-        dome.setSky(mixC(0x2b3340, 0x080b12, n), mixC(0x39424f, 0x10151d, n), mixC(0x232a34, 0x090b10, n));
-        fog.color.set(mixC(0x39424f, 0x0d1119, n));
+        // the real hour, so the light crosses the sky instead of turning back
+        uHour.value = typeof hour === 'number' ? hour : 12;
+        fog.color.set(mixC(0x5a6470, 0x0d1119, n));
         fog.density = mixN(0.0068, 0.0092, n);
         rainNear.material.uniforms.uTint.value.set(mixC(0xbcc8d8, 0x7183a0, n));
         rainFar.material.uniforms.uTint.value.set(mixC(0xbcc8d8, 0x7183a0, n));
@@ -3536,7 +3634,7 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
     // the incoming world may clamp the hour differently from the one we left
     curNight = clampNight(kind, rawNight);
     w.group.visible = true;
-    if (w.night) w.night(curNight);
+    if (w.night) w.night(curNight, curHour);
     scene.fog = w.fog;
     applyLight(blendLight(w, curNight));
     uFadeOn.value = w.fade ? w.fade.on : 0;
@@ -3570,6 +3668,7 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
     /* ...and this pushes that same wash *into* the active world */
     setNight,
     night: () => curNight,
+    hour: () => curHour,
     teleport,
     teleporting: () => tp.active,
     shell: setShell,

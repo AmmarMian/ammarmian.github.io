@@ -901,7 +901,7 @@ export function createTowerScene(container: HTMLElement, opts: {
     // The world system always gets the raw hour, even at home: it clamps per
     // world itself, so a teleport mid-flight already knows what time it is
     // when it swaps the destination in.
-    worlds.setNight(nightAmount());
+    worlds.setNight(nightAmount(), towerHour());
     // the tower's own ground has no business inside somebody else's world
     suppressBackdrop(!!world);
     if (!world) {
