@@ -1,6 +1,7 @@
 import './style.css';
 import { createTowerScene } from './tower/scene';
 import { SidePanel } from './ui/SidePanel';
+import { fetchHalPublications, shelfFor } from './data/hal';
 import { createHelpButton } from './ui/HelpModal';
 import { createTerminal } from './ui/Terminal';
 import { createDestinationModal } from './ui/DestinationModal';
@@ -393,6 +394,15 @@ window.addEventListener('keydown', (e) => {
 
 /* ---------- panel + router ---------- */
 const panel = new SidePanel(app, tower);
+
+/* The shelves are the index. Once HAL answers, every record takes a real
+   spine in the library — hover one to read its title, click it to open the
+   record — so the collection lives in the tower rather than only beside it.
+   Deliberately not awaited: the tower is usable long before the archive
+   replies, and a slow or failed fetch just leaves the shelf anonymous. */
+void fetchHalPublications()
+  .then((docs) => tower.bindPublications(docs, shelfFor, (id) => void panel.openDoc(id)))
+  .catch(() => {});
 
 let navGen = 0;
 let appliedSlug: string | null | undefined;

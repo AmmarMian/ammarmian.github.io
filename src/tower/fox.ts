@@ -36,7 +36,21 @@ export function createFoxState(startStation: number) {
   return { at: startStation, target: 0, mode: 'read' as FoxMode, timer: 5 };
 }
 
-export function foxDecide(state: ReturnType<typeof createFoxState>, NF: number) {
+/** `homeTo` is the storey the fox should stay near — the wizard's, after
+ *  dark. Pass -1 and it roams as before. */
+export function foxDecide(state: ReturnType<typeof createFoxState>, NF: number, homeTo = -1) {
+  if (homeTo >= 0) {
+    // night: settle wherever he is, and only move if he has moved
+    if (state.target !== homeTo) {
+      state.target = homeTo;
+      state.mode = 'travel';
+      state.timer = 30;
+    } else {
+      state.mode = 'sleep';
+      state.timer = 20 + Math.random() * 25;
+    }
+    return;
+  }
   if (Math.random() < 0.55) {
     state.target = Math.floor(Math.random() * NF);
     state.mode = 'travel';

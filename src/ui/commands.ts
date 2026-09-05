@@ -73,7 +73,7 @@ Object.assign(GOTO_TARGETS, {
   pubs: GOTO_TARGETS.publications,
 });
 
-export const JUMP_TARGETS = ['none', 'seafloor', 'moon', 'forest', 'beach', 'city', 'space'];
+export const JUMP_TARGETS = ['none', 'seafloor', 'moon', 'forest', 'beach', 'city', 'space', 'rain'];
 const SHELL_TARGETS = ['off', 'ghost', 'solid', 'auto'];
 const LIGHT_TARGETS = ['auto', 'day', 'night'];
 const PIXEL_TARGETS = ['auto', '0', '2', '4', '6'];

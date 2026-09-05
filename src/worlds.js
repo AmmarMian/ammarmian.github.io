@@ -5,7 +5,7 @@
  *
  *   import { installWorlds } from './worlds.js';
  *   const worlds = installWorlds({ THREE, scene, camera, model, fx, dims });
- *   worlds.set('seafloor');            // 'seafloor' | 'moon' | 'forest' | 'beach' | 'city' | 'space' | null
+ *   worlds.set('seafloor');            // 'seafloor' | 'moon' | 'forest' | 'beach' | 'city' | 'space' | 'rain' | null
  *   worlds.shell('ghost');             // 'off' | 'ghost' | 'solid'
  *   worlds.teleport('forest');         // rise into light, swap world, descend
  *   worlds.tick(tSeconds, dtSeconds);  // once per frame
@@ -1471,12 +1471,22 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
     function disc(size, colour, glowColour, glowSize, glowOpacity) {
       const grp = new THREE.Group();
       const body = new THREE.Mesh(new THREE.CircleGeometry(size, 24),
-        new THREE.MeshBasicMaterial({ color: colour, fog: false, transparent: true, opacity: 0.9 }));
+        new THREE.MeshBasicMaterial({
+          color: colour, fog: false, transparent: true, opacity: 0.9, depthWrite: false,
+        }));
       const glow = new THREE.Mesh(new THREE.PlaneGeometry(glowSize, glowSize), new THREE.MeshBasicMaterial({
         map: softTex, color: glowColour, transparent: true, opacity: glowOpacity,
         blending: THREE.AdditiveBlending, depthWrite: false, fog: false,
       }));
-      grp.add(body, glow);
+      /* The disc and its halo were both at the group's origin — two coplanar
+         transparent quads, which z-fight and flicker as the camera moves. The
+         group is turned to face the tower, so local +z is the viewer's side:
+         the disc sits in front of its own glow, and neither writes depth,
+         since nothing in the sky needs to occlude anything. */
+      body.position.z = 0.5;
+      body.renderOrder = -8;
+      glow.renderOrder = -9;
+      grp.add(glow, body);
       g.add(grp);
       return { grp, body, glow };
     }
@@ -1502,14 +1512,23 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
 
     // two gulls, high and slow. nothing else is added to this world.
     const gullMat = new THREE.MeshStandardMaterial({ color: 0xf0f0ea, roughness: 0.9, flatShading: true });
+    // one pair of shared geometries, each with its root on the origin
+    const wingGeoR = new THREE.BoxGeometry(2.6, 0.1, 0.7); wingGeoR.translate(1.3, 0, 0);
+    const wingGeoL = new THREE.BoxGeometry(2.6, 0.1, 0.7); wingGeoL.translate(-1.3, 0, 0);
     const gulls = [];
     for (let i = 0; i < 11; i++) {
       const gg = new THREE.Group();
       const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 1.6), gullMat);
-      const wl = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.1, 0.7), gullMat);
-      const wr = wl.clone();
-      wl.position.set(-1.4, 0.12, 0.1);
-      wr.position.set(1.4, 0.12, 0.1);
+      /* Wings hinge at the shoulder, not at their own middle. A 2.6m box
+         centred at x = ±1.4 and turned with rotation.z pivots about its
+         centre, so the inboard end swings up and down clear of the body —
+         which is exactly why they read as detached. Translating the geometry
+         puts the joint at the mesh's origin, so the root stays put and only
+         the tip travels. */
+      const wl = new THREE.Mesh(wingGeoL, gullMat);
+      const wr = new THREE.Mesh(wingGeoR, gullMat);
+      wl.position.set(-0.2, 0.14, 0.1);
+      wr.position.set(0.2, 0.14, 0.1);
       const head = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.34, 0.4), gullMat);
       head.position.set(0, 0.24, 1.0);
       gg.add(body, wl, wr, head);
@@ -1585,9 +1604,11 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
           b.m.position.set(Math.cos(a) * b.r, b.y + Math.sin(t * 0.4 + b.ph) * 3, Math.sin(a) * b.r - 70);
           b.m.rotation.y = -a + Math.PI / 2 + (b.sp < 0 ? Math.PI : 0);
           b.m.rotation.z = Math.sin(t * 0.5 + b.ph) * 0.28;
-          const flap = Math.sin(t * 3.2 + b.ph) * 0.45;
-          b.wl.rotation.z = flap;
-          b.wr.rotation.z = -flap;
+          /* Both tips rise together — that is a wingbeat. Equal and opposite
+             is a bank, which is what it was doing. */
+          const flap = Math.sin(t * 3.2 + b.ph) * 0.5 + 0.12;   // a little dihedral at rest
+          b.wl.rotation.z = -flap;
+          b.wr.rotation.z = flap;
         }
       },
     };
@@ -2266,6 +2287,284 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
     };
   }
 
+  /* ============================ 7 · endless rain ========================= */
+  /* A drowned moor under a sky that has never once cleared. Everything here
+     is about water arriving: it falls, it lands, it stands, it runs off. The
+     day/night wash still applies — it just moves between a bright grey
+     overcast and a near-black one, because the sun never appears either way. */
+
+  function buildRain() {
+    const g = new THREE.Group();
+    g.name = 'world_rain';
+    const dome = skyDome(0x39414f, 0x4a5462, 0x2b303a, 460);
+    g.add(dome);
+
+    /* the moor: low, sodden, and almost flat — standing water needs a bed
+       that barely tilts, or every puddle drains to one corner */
+    const ggeo = new THREE.PlaneGeometry(1100, 1100, 200, 200);
+    const gp = ggeo.attributes.position;
+    for (let i = 0; i < gp.count; i++) {
+      const x = gp.getX(i), y = gp.getY(i);
+      const r = Math.hypot(x, y);
+      let h = Math.sin(x * 0.013) * Math.cos(y * 0.011) * 2.6
+            + Math.sin(x * 0.041 + y * 0.033) * 0.9;
+      h *= Math.min(1, r / 26);                    // flat where the tower stands
+      gp.setZ(i, h);
+    }
+    ggeo.computeVertexNormals();
+    const groundMat = patchStd(new THREE.MeshStandardMaterial({
+      color: 0x4a4a3e, roughness: 0.72, metalness: 0.05, flatShading: true,
+    }), {
+      frag: `
+        vec2 p = vWP.xz;
+        float peat = fbm(p * 0.07) * 0.6 + fbm(p * 0.31) * 0.4;
+        vec3 dry = mix(vec3(0.20,0.20,0.15), vec3(0.34,0.33,0.24), peat);
+        vec3 grass = mix(vec3(0.17,0.23,0.14), vec3(0.28,0.34,0.19), fbm(p * 0.9));
+        diffuseColor.rgb = mix(dry, grass, smoothstep(0.35, 0.75, fbm(p * 0.12 + 4.0)));
+        /* standing water: wherever the ground dips below the water table it
+           fills, and the sheen is a plain vertical-facing term rather than a
+           reflection — flat, dark and bright at grazing angles, which is what
+           a puddle under a grey sky actually looks like */
+        float pool = smoothstep(0.25, -0.35, vWP.y);
+        vec3 V = normalize(cameraPosition - vWP);
+        float graze = pow(1.0 - clamp(V.y, 0.0, 1.0), 3.0);
+        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.10,0.12,0.14), pool * 0.85);
+        diffuseColor.rgb += vec3(0.30,0.34,0.40) * pool * graze * 0.9;
+        // rings spreading where drops land, only on the wet
+        float ring = sin(fbm(p * 2.2) * 40.0 - uT * 9.0);
+        diffuseColor.rgb += vec3(0.10,0.12,0.14) * pool * smoothstep(0.86, 1.0, ring);
+      `,
+    });
+    const groundMesh = new THREE.Mesh(ggeo, groundMat);
+    groundMesh.rotation.x = -Math.PI / 2;
+    groundMesh.receiveShadow = true;
+    g.add(groundMesh);
+
+    /* reeds — sparse, bowed, and heavier than the forest's ferns: this is a
+       wind that has been pushing the same way for a very long time */
+    const reedGeo = new THREE.PlaneGeometry(0.16, 2.4, 1, 4);
+    reedGeo.translate(0, 1.2, 0);
+    (() => {
+      const pa = reedGeo.attributes.position;
+      for (let i = 0; i < pa.count; i++) {
+        const u = pa.getY(i) / 2.4;
+        pa.setZ(i, pa.getZ(i) + u * u * 0.9);
+        pa.setX(i, pa.getX(i) * (1 - u * 0.6));
+      }
+      reedGeo.computeVertexNormals();
+    })();
+    const RN = 26000;
+    const reeds = new THREE.InstancedMesh(reedGeo, patchStd(
+      new THREE.MeshStandardMaterial({ color: 0x53523a, roughness: 1, flatShading: true, side: THREE.DoubleSide }), {
+        vert: `
+          vec3 base = (modelMatrix * wIM * vec4(0.0,0.0,0.0,1.0)).xyz;
+          float k = pow(clamp(position.y / 2.4, 0.0, 1.0), 1.4);
+          float gust = sin(uT * 1.1 + base.x * 0.07 + base.z * 0.05) * 0.6
+                     + sin(uT * 2.7 + base.x * 0.22) * 0.2;
+          transformed.x += (0.55 + gust) * k * 1.1 * uWind;
+          transformed.z += (0.25 + gust * 0.4) * k * uWind;
+          vGH = clamp(position.y / 2.4, 0.0, 1.0);
+        `,
+        frag: `diffuseColor.rgb *= 0.45 + 0.65 * vGH;`,
+      }), RN);
+    reeds.material.onBeforeCompile = ((prev) => (sh, r) => {
+      if (prev) prev(sh, r);
+      sh.vertexShader = 'varying float vGH;\n' + sh.vertexShader;
+      sh.fragmentShader = 'varying float vGH;\n' + sh.fragmentShader;
+    })(reeds.material.onBeforeCompile);
+    reeds.material.customProgramCacheKey = () => 'rainreed';
+    let ri = 0;
+    for (let i = 0; i < RN; i++) {
+      const a = rnd(6.28), d = 9 + Math.pow(Math.random(), 0.55) * 240;
+      const x = Math.cos(a) * d, z = Math.sin(a) * d;
+      const sc = rnd(1.5, 0.5);
+      _e.set(0, rnd(6.28), 0);
+      reeds.setMatrixAt(ri++, _m4.compose(_v.set(x, 0, z), _q.setFromEuler(_e), _s.set(sc, sc, sc)));
+    }
+    reeds.count = ri;
+    reeds.frustumCulled = false;
+    g.add(reeds);
+
+    /* dead trees, bare and leaning — the only thing tall enough to read as
+       distance once the murk closes in */
+    /* transparent + alphaTest, same as the forest's trunks: the x-ray fade
+       needs real blending to dissolve rather than pop, and depthWrite keeps
+       them sorting against each other correctly all the same. */
+    const barkMat = patchStd(new THREE.MeshStandardMaterial({
+      color: 0x2e2a26, roughness: 1, flatShading: true,
+      transparent: true, depthWrite: true, alphaTest: 0.002,
+    }), { occluder: true });
+    const trunkGeo = new THREE.CylinderGeometry(0.16, 0.62, 11, 6, 1);
+    trunkGeo.translate(0, 5.5, 0);
+    const limbGeo = new THREE.CylinderGeometry(0.06, 0.2, 4.4, 5, 1);
+    limbGeo.translate(0, 2.2, 0);
+    const TN = 90, LN = TN * 5;
+    const trunks = new THREE.InstancedMesh(trunkGeo, barkMat, TN);
+    const limbs = new THREE.InstancedMesh(limbGeo, barkMat, LN);
+    let li = 0;
+    for (let i = 0; i < TN; i++) {
+      const a = rnd(6.28), d = 22 + Math.pow(Math.random(), 0.6) * 210;
+      const x = Math.cos(a) * d, z = Math.sin(a) * d;
+      const lean = rnd(0.22, -0.22);
+      const sc = rnd(1.35, 0.7);
+      _e.set(lean, rnd(6.28), rnd(0.16, -0.16));
+      trunks.setMatrixAt(i, _m4.compose(_v.set(x, 0, z), _q.setFromEuler(_e), _s.set(sc, sc, sc)));
+      for (let k = 0; k < 5 && li < LN; k++) {
+        _e.set(rnd(1.5, 0.5), rnd(6.28), rnd(0.7, -0.7));
+        limbs.setMatrixAt(li++, _m4.compose(
+          _v.set(x, (4.5 + k * 1.3) * sc, z), _q.setFromEuler(_e), _s.set(sc, sc, sc)));
+      }
+    }
+    limbs.count = li;
+    trunks.frustumCulled = false; limbs.frustumCulled = false;
+    g.add(trunks, limbs);
+
+    /* THE RAIN. Two shells of streaks around the camera rather than a volume
+       filling the world: rain is only ever visible near the eye, and a shell
+       that follows the camera costs a few thousand verts instead of millions.
+       Each streak is a stretched quad falling on its own phase, wrapped in a
+       tall cylinder — so it never runs out and never needs respawning on the
+       CPU. */
+    const rainMat = (count, radius, height, len, wide, alpha, speed) => {
+      const geo = new THREE.InstancedBufferGeometry();
+      const q = new THREE.PlaneGeometry(wide, len);
+      geo.setIndex(q.index);
+      geo.attributes.position = q.attributes.position;
+      geo.attributes.uv = q.attributes.uv;
+      const off = new Float32Array(count * 3);
+      for (let i = 0; i < count; i++) {
+        const a = Math.random() * 6.28318;
+        const d = radius * Math.sqrt(Math.random());
+        off.set([Math.cos(a) * d, Math.random() * height, Math.sin(a) * d], i * 3);
+      }
+      geo.setAttribute('aOff', new THREE.InstancedBufferAttribute(off, 3));
+      geo.instanceCount = count;
+      const mat = new THREE.ShaderMaterial({
+        transparent: true, depthWrite: false, fog: false, side: THREE.DoubleSide,
+        blending: THREE.NormalBlending,
+        uniforms: { uT, uAlpha: { value: alpha }, uTint: { value: new THREE.Color(0xbcc8d8) } },
+        vertexShader: `
+          attribute vec3 aOff; uniform float uT; varying vec2 vUv;
+          void main(){
+            vUv = uv;
+            // fall, and wrap in a column that rides with the camera
+            vec3 c = aOff;
+            c.y = mod(c.y - uT * ${speed.toFixed(1)}, ${height.toFixed(1)});
+            c += vec3(cameraPosition.x, 0.0, cameraPosition.z);
+            // billboard on Y only: a streak stays vertical however you look
+            vec3 toEye = normalize(vec3(cameraPosition.x - c.x, 0.0, cameraPosition.z - c.z));
+            vec3 right = normalize(cross(vec3(0.0,1.0,0.0), toEye));
+            vec3 wp = c + right * position.x + vec3(0.0, position.y, 0.0);
+            gl_Position = projectionMatrix * viewMatrix * vec4(wp, 1.0);
+          }`,
+        fragmentShader: `
+          uniform float uAlpha; uniform vec3 uTint; varying vec2 vUv;
+          void main(){
+            // taper both ends so a streak has no hard start or stop
+            float a = smoothstep(0.0, 0.22, vUv.y) * smoothstep(1.0, 0.72, vUv.y);
+            a *= smoothstep(0.0, 0.5, vUv.x) * smoothstep(1.0, 0.5, vUv.x);
+            gl_FragColor = vec4(uTint, a * uAlpha);
+          }`,
+      });
+      const m = new THREE.Mesh(geo, mat);
+      m.frustumCulled = false;
+      m.renderOrder = 5;
+      g.add(m);
+      return m;
+    };
+    // near: few, long, and clearly readable. far: many, short, a grey veil.
+    const rainNear = rainMat(900, 34, 46, 2.6, 0.045, 0.5, 34);
+    const rainFar = rainMat(2600, 130, 90, 1.5, 0.05, 0.22, 26);
+
+    /* splashes: a ring of short-lived vertical ticks on the ground plane, so
+       the rain visibly *lands* instead of passing through */
+    const splash = pointCloud(g, 900, () => {
+      const a = rnd(6.28), d = rnd(70, 2);
+      return { x: Math.cos(a) * d, y: 0.06, z: Math.sin(a) * d, v: rnd(6.28) };
+    }, { color: 0xc8d4e4, size: 0.34, opacity: 0.5 });
+
+    // mist lying in the hollows, and the drifting curtain of heavier rain
+    const mist = pointCloud(g, 420, () => ({
+      x: rnd(230, -230), y: rnd(7, 0.4), z: rnd(230, -230), v: rnd(0.5, 0.08),
+    }), { color: 0x9fb0c0, size: 5.5, opacity: 0.055, additive: false });
+
+    // lightning, seen rather than heard: the whole sky lifts for a few frames
+    const flash = { t: -1, next: rnd(26, 9), power: 0 };
+    const bolt = new THREE.PointLight(0xcfe0ff, 0, 900, 1.4);
+    bolt.position.set(120, 190, -160);
+    g.add(bolt);
+
+    const fog = new THREE.FogExp2(0x424b57, 0.0075);
+    let dayK = 1;
+    return {
+      group: g,
+      fog,
+      css: '#2b303a',
+      glass: { color: 0xffe9c0, emissive: 0xffc47a, intensity: 2.2 },
+      fade: { on: 1, radius: 13, amount: 1.0 },
+      light: {
+        // overcast: the sky *is* the light source, so the hemisphere carries
+        // it and the key is barely a key at all
+        hemi: { i: 1.15, sky: 0x9fb0c4, gnd: 0x2a2a24 },
+        key: { mul: 0.35, c: 0xc8d4e4, p: [-20, 60, 24] },
+        fill: { mul: 0.45, c: 0x6f7f96 },
+      },
+      lightNight: {
+        hemi: { i: 0.42, sky: 0x3f4a60, gnd: 0x0e0f12 },
+        key: { mul: 0.12, c: 0x7f92b8, p: [-20, 60, 24] },
+        fill: { mul: 0.18, c: 0x2a3346 },
+      },
+      night(n) {
+        dayK = 1 - n * 0.72;
+        dome.setSky(mixC(0x39414f, 0x0a0d14, n), mixC(0x4a5462, 0x11151e, n), mixC(0x2b303a, 0x090b10, n));
+        fog.color.set(mixC(0x424b57, 0x0e1219, n));
+        fog.density = mixN(0.0075, 0.0098, n);
+        rainNear.material.uniforms.uTint.value.set(mixC(0xbcc8d8, 0x6f7f98, n));
+        rainFar.material.uniforms.uTint.value.set(mixC(0xbcc8d8, 0x6f7f98, n));
+        splash.m.material.color.set(mixC(0xc8d4e4, 0x7f8ea8, n));
+        this.css = n > 0.5 ? '#0b0e14' : '#2b303a';
+      },
+      tick(t, dt) {
+        // splashes: each tick pops on its own phase and dies immediately
+        const sp2 = splash.pos;
+        for (let i = 0; i < sp2.length; i += 3) {
+          const ph = splash.vel[i / 3];
+          const u = (t * 2.4 + ph) % 1;
+          sp2[i + 1] = u < 0.3 ? 0.06 + u * 0.9 : -50;   // parked below the bed between hits
+        }
+        splash.m.geometry.attributes.position.needsUpdate = true;
+        splash.m.material.opacity = 0.5 * dayK;
+
+        const mp = mist.pos;
+        for (let i = 0; i < mp.length; i += 3) {
+          mp[i] += Math.sin(t * 0.2 + i) * dt * 1.6;
+          mp[i + 2] += Math.cos(t * 0.17 + i) * dt * 1.2;
+        }
+        mist.m.geometry.attributes.position.needsUpdate = true;
+
+        /* lightning: a fast double-strike, then a long wait. The light does
+           the work; there is no bolt geometry, because at this distance you
+           would only ever see the sky change. */
+        flash.next -= dt;
+        if (flash.t < 0 && flash.next <= 0) {
+          flash.t = 0;
+          flash.next = rnd(30, 11);
+          bolt.position.set(rnd(260, -260), rnd(230, 130), rnd(260, -260));
+        }
+        if (flash.t >= 0) {
+          flash.t += dt;
+          const u = flash.t;
+          // strike, a dip, then the second stroke — the shape is most of it
+          const env = Math.exp(-u * 7.0) + 0.65 * Math.exp(-Math.abs(u - 0.16) * 26.0);
+          flash.power = Math.max(0, env);
+          if (u > 1.2) { flash.t = -1; flash.power = 0; }
+        }
+        bolt.intensity = flash.power * 2600;
+        bolt.visible = flash.power > 0.004;
+      },
+    };
+  }
+
   /* ============================== teleport =============================== */
 
   const tp = {
@@ -2685,7 +2984,7 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
   /* ============================== switching ============================== */
 
   const built = {};
-  const BUILDERS = { seafloor: buildSeafloor, moon: buildMoon, forest: buildForest, beach: buildBeach, city: buildCity, space: buildSpace };
+  const BUILDERS = { seafloor: buildSeafloor, moon: buildMoon, forest: buildForest, beach: buildBeach, city: buildCity, space: buildSpace, rain: buildRain };
   const savedFog = scene.fog;
   let current = null;
 
@@ -2779,7 +3078,7 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
   }
 
   return {
-    kinds: ['seafloor', 'moon', 'forest', 'beach', 'city', 'space'],
+    kinds: ['seafloor', 'moon', 'forest', 'beach', 'city', 'space', 'rain'],
     set,
     tick,
     /* the host owns the tower's own light rig (it runs a day/night wash on

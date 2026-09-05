@@ -26,11 +26,15 @@ export function createInteractionSystem(model: THREE.Group, floors: { g: THREE.G
     return p ? FLOOR_IDS.indexOf(p.name) : -1;
   }
 
-  function interact(root: THREE.Object3D, label: string, fn: (e: IXEntry) => void, tick?: IXEntry['tick']) {
+  /** `marker: false` registers the click and the hover label but no floating
+   *  dot. The shelves bind one of these per publication, and fifty markers
+   *  would bury the library in fireflies. */
+  function interact(root: THREE.Object3D, label: string, fn: (e: IXEntry) => void, tick?: IXEntry['tick'],
+                    opts: { marker?: boolean } = {}) {
     const entry: IXEntry = { root, label, fn, tick, t: 0, on: false };
     root.traverse((o) => { (o.userData as any).ix = entry; });
     IX.push(entry);
-    const fi = floorOf(root);
+    const fi = opts.marker === false ? -1 : floorOf(root);
     if (fi >= 0) {
       model.updateMatrixWorld(true);
       const fg2 = floors[fi].g;

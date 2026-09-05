@@ -8,6 +8,7 @@ export const WORLD_LABELS: Record<string, string> = {
   beach: 'Beach',
   city: 'Abandoned city',
   space: 'Deep space',
+  rain: 'Endless rain',
 };
 
 export const WORLD_BLURBS: Record<string, string> = {
@@ -17,4 +18,5 @@ export const WORLD_BLURBS: Record<string, string> = {
   beach: 'Shoaling waves, sun glitter, a surf line',
   city: 'Lit windows, stopped cars, a patrolling eye',
   space: 'Nebulae, a red sun, an ocean world adrift',
+  rain: 'A drowned moor, dead trees, a sky that never clears',
 };

@@ -58,6 +58,17 @@ mat('portal_rim', '#9fdcff', { emissive: '#4fb8f0', emissiveIntensity: 1.1, roug
 mat('marker', '#ffe6a8', { emissive: '#ffc65a', emissiveIntensity: 1.4 });
 mat('rune_glow', '#6fd0e8', { emissive: '#2f9fcf', emissiveIntensity: 0.9, roughness: 0.4 });
 mat('rune_violet', '#b98ee0', { emissive: '#7a45c8', emissiveIntensity: 0.85, roughness: 0.4 });
+/* Spines for the bound publications: eight buckets from the oldest record on
+   the shelf to the newest, so the library reads as a timeline once you notice
+   it. They live in M rather than being cloned per book — eight materials
+   instead of fifty, and the pixel-mode flatShading sweep finds them. */
+export const SPINE_STEPS = 8;
+for (let i = 0; i < SPINE_STEPS; i++) {
+  const t = i / (SPINE_STEPS - 1);
+  const c = new THREE.Color().setHSL(0.58 - t * 0.52, 0.42 + t * 0.2, 0.26 + t * 0.16);
+  mat('spine_' + i, '#' + c.getHexString(), { roughness: 0.82 });
+}
+
 mat('fox_fur', '#c8622c');
 mat('fox_fur_dark', '#9c4720');
 mat('fox_cream', '#e8d7bd');

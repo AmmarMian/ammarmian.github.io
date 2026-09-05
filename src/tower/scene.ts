@@ -7,7 +7,7 @@ import anime from 'animejs';
 // three.js is unused, so it retains all of it. Measured, not assumed.
 import { installWorlds } from '../worlds.js';
 import { createStage } from './stage';
-import { M } from './materials';
+import { M, SPINE_STEPS } from './materials';
 import { R, FH, WH, ROT, RAD, polar, landing, spiralStair } from './util';
 import { F, NF, FLOOR_IDS, FLOOR_NAMES } from './scene-constants';
 import { createAnim } from './anim';
@@ -22,7 +22,7 @@ import { buildFoxMesh, createFoxState, foxDecide } from './fox';
 import { makePoints, setBackdrop as setBackdropFx, suppressBackdrop } from './fx';
 import { createFocusController } from './focus';
 import { createInteractionSystem } from './interactions';
-import { addFloorFill, registerInteriorLights, applyAmbience, addFlameLights, interiorGain, registerShellPane, NO_DAYNIGHT, clampNight } from './ambience';
+import { addFloorFill, registerInteriorLights, applyAmbience, addFlameLights, interiorGain, registerShellPane, setOccupiedFloor, NO_DAYNIGHT, clampNight } from './ambience';
 
 export type TowerScene = ReturnType<typeof createTowerScene>;
 
@@ -83,7 +83,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   });
 
   buildQuarters(floors[F.quarters].g, floors[F.quarters].fg, anim);
-  buildLibrary(floors[F.library].g, floors[F.library].fg, anim);
+  const library = buildLibrary(floors[F.library].g, floors[F.library].fg, anim);
   buildLaboratory(floors[F.lab].g, floors[F.lab].fg, anim);
   buildObservatory(floors[F.observatory].g, floors[F.observatory].fg, anim);
   buildSanctum(floors[F.sanctum].g, floors[F.sanctum].fg, anim);
@@ -103,6 +103,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   const foxLight = new THREE.PointLight(0xffb070, 2.2, 2.6, 2);
   fx.add(foxLight);
   const foxState = createFoxState(wiz.stations[F.library]);
+  let routineTimer = 6, wizBusy = false;
 
   /* place model at origin, attach fx rig */
   const box3 = new THREE.Box3().setFromObject(model);
@@ -319,6 +320,19 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     }
     bubbles.m.geometry.attributes.position.needsUpdate = true;
 
+    /* His routine is a routine, not a starting position. It used to be read
+       once at load and never again — so whatever hour you arrived at, that is
+       where he stayed. Now the clock is consulted as it turns and he walks
+       there, which is the whole point of having given him a day. */
+    routineTimer -= dt;
+    if (routineTimer <= 0) {
+      routineTimer = 20;
+      const want = stationForHour(new Date().getHours() + new Date().getMinutes() / 60);
+      if (want !== wiz.wizTarget && !wizBusy) {
+        wizBusy = true;
+        void wiz.sendWizard({ to: want, hold: 1200 }).finally(() => { wizBusy = false; });
+      }
+    }
     wiz.update(dt, () => {});
     const p = wiz.pathPoint(wiz.wizAt, _wp, _wt);
     wizard.position.set(p.x, p.y + (Math.abs(Math.sin(t * 6)) * 0.045), p.z);
@@ -334,6 +348,10 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     wizardLight.visible = wizard.visible;
     wizardLight.position.set(p.x, p.y + 2.1, p.z).add(model.position);
     wizardLight.intensity = (5 + Math.sin(t * 2.2) * 1.2) * interiorGain();
+    /* After dark he is carrying the light rather than merely glowing near it,
+       so it warms right down to candle colour. */
+    wizardLight.color.copy(WIZ_LIGHT_DAY).lerp(WIZ_LIGHT_NIGHT, nightNow);
+    setOccupiedFloor(wizFloor);
 
     for (const it of anim.books) {
       const a = it.a0 + t * it.sp;
@@ -401,13 +419,22 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     }
 
     /* fox AI */
+    /* After dark the fox stops touring the tower and goes wherever the wizard
+       is, then settles. A cat-sized animal asleep in the same room as the only
+       other living thing in the building says more about the place than any
+       amount of wandering does. */
+    if (nightNow > 0.72 && foxState.mode !== 'travel' && foxState.target !== wiz.wizTarget) {
+      foxState.target = wiz.wizTarget;
+      foxState.mode = 'travel';
+      foxState.timer = 30;
+    }
     foxState.timer -= dt;
     if (foxState.mode === 'travel') {
       const fgoal = wiz.stations[foxState.target];
       const fstep = wiz.advance(foxState.at, fgoal, 2.6, dt);
       foxState.at = fstep.at;
-      if (!fstep.moving) { foxDecide(foxState, NF); }
-    } else if (foxState.timer <= 0) foxDecide(foxState, NF);
+      if (!fstep.moving) { foxDecide(foxState, NF, nightNow > 0.72 ? wiz.wizTarget : -1); }
+    } else if (foxState.timer <= 0) foxDecide(foxState, NF, nightNow > 0.72 ? wiz.wizTarget : -1);
 
     const fp = wiz.pathPoint(foxState.at, _fp, _ft);
     const trotting = foxState.mode === 'travel';
@@ -572,6 +599,10 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   // world's carefully-set rig a few minutes after arriving. Instead the
   // wash owns the no-world case only, and hands its result to the world
   // system as the baseline to restore when the visitor comes home.
+  const WIZ_LIGHT_DAY = new THREE.Color(0x8fd8ff), WIZ_LIGHT_NIGHT = new THREE.Color(0xffb066);
+  /* The last night amount the wash computed, so the per-frame code can read it
+     without recomputing the clock every frame. */
+  let nightNow = 0;
   const HEMI_SKY_DAY = new THREE.Color(0x9fb0ff), HEMI_SKY_NIGHT = new THREE.Color(0x1a2040);
   const HEMI_GROUND_DAY = new THREE.Color(0x2a2038), HEMI_GROUND_NIGHT = new THREE.Color(0x0c0d1a);
   const KEY_DAY = new THREE.Color(0xffffff), KEY_NIGHT = new THREE.Color(0x8fa8ff);
@@ -596,6 +627,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   function applyDayNight() {
     const world = worlds.current();
     const night = clampNight(world, nightAmount());
+    nightNow = night;
 
     // The world system always gets the raw hour, even at home: it clamps per
     // world itself, so a teleport mid-flight already knows what time it is
@@ -778,6 +810,63 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
 
   const SHELF_ROW_Y = [0.95, 1.62, 2.29, 2.96, 3.63, 4.3];
 
+  /* ---------------- the shelves hold the actual publications --------------
+     Until now the library was scenery and the record lived in a side panel:
+     the panel could point at the tower (pluckBook, focusShelf) but the tower
+     could not point back. Binding closes that loop — every HAL record takes a
+     real spine on a real shelf, so the books can be read, hovered and opened
+     where they stand. The rest of the shelf stays anonymous, which is what
+     makes the bound ones feel like the collection rather than the wallpaper. */
+  let boundDocs = 0;
+  function bindPublications(
+    docs: { id: string; title: string; year: number }[],
+    shelfFor: (id: string) => { band: number; angle: number; row: number },
+    onOpen: (id: string) => void,
+  ) {
+    if (boundDocs || !docs.length) return boundDocs;   // once per page life
+    const slots = library.slots;
+    // the run of years actually on the shelf, so the gradient always spans it
+    let YEAR_MIN = Infinity, YEAR_MAX = -Infinity;
+    for (const d of docs) {
+      if (!d.year) continue;
+      if (d.year < YEAR_MIN) YEAR_MIN = d.year;
+      if (d.year > YEAR_MAX) YEAR_MAX = d.year;
+    }
+    if (!isFinite(YEAR_MIN)) { YEAR_MIN = 2015; YEAR_MAX = 2026; }
+    for (const doc of docs) {
+      const want = shelfFor(doc.id);
+      // its own slot if free, else the nearest free one on the same shelf,
+      // else anywhere — a record never fails to get a spine
+      let best: typeof slots[number] | null = null, bestScore = Infinity;
+      for (const sl of slots) {
+        if (sl.taken) continue;
+        const sameShelf = sl.band === want.band && sl.row === want.row;
+        const score = (sameShelf ? 0 : 1000) + Math.abs(sl.angle - want.angle);
+        if (score < bestScore) { bestScore = score; best = sl; }
+      }
+      if (!best) break;
+      best.taken = true;
+      /* Spine colour by year, oldest to newest, so the shelf reads as a
+         timeline once you know to look — and the bound books stand a little
+         proud of the anonymous ones, the way a row that gets handled does. */
+      const span = Math.max(1, YEAR_MAX - YEAR_MIN);
+      const t01 = Math.min(1, Math.max(0, (doc.year - YEAR_MIN) / span));
+      best.mesh.material = M['spine_' + Math.round(t01 * (SPINE_STEPS - 1))];
+      best.mesh.scale.z = 1.22;
+      best.mesh.name = 'publication';
+      const label = doc.title.length > 74 ? doc.title.slice(0, 72) + '…' : doc.title;
+      interactions.interact(
+        best.mesh,
+        `${label}${doc.year ? '  (' + doc.year + ')' : ''}`,
+        () => onOpen(doc.id),
+        undefined,
+        { marker: false },
+      );
+      boundDocs++;
+    }
+    return boundDocs;
+  }
+
   /** Fly the camera to look closely at a specific shelf slot — both points
    *  are worked out in the library floor's own local space, then carried
    *  through its world matrix together so the rotation offset between
@@ -835,6 +924,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     autoRotate: () => controls.autoRotate as boolean,
     pluckBook,
     focusShelf,
+    bindPublications,
     playIntro,
     F, NF,
     start, stop,

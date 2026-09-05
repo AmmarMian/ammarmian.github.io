@@ -3,6 +3,17 @@ import { addBox, addCyl, arcBox, polar, RAD, rnd, pick, slab, wall, railing, rou
 import { M } from '../materials';
 import type { Anim } from '../anim';
 
+/** One book-sized gap on the library shelves, and whether a publication has
+ *  claimed it. */
+export interface ShelfSlot {
+  mesh: THREE.Mesh;
+  band: number;
+  angle: number;
+  row: number;
+  height: number;
+  taken: boolean;
+}
+
 /* ===== library: dark ebony shelving, books everywhere ===== */
 export function buildLibrary(g: THREE.Group, fg: THREE.Group, anim: Anim) {
   slab(g, 'plank_oak', 'plank_oak_dark', 'wood_deep', 'stone');
@@ -11,16 +22,24 @@ export function buildLibrary(g: THREE.Group, fg: THREE.Group, anim: Anim) {
   roundWindow(g, 175, 3.4, 0.82);
   windowGlow(fg, 175, 3.4, 0.68);
 
+  /* Every spine on these shelves is a slot a real publication can move into.
+     The shelf is built first and filled with anonymous books, then the HAL
+     records are bound to the nearest matching slot once they arrive — see
+     bindPublications in scene.ts. Keeping the record of where each one sits
+     is what lets a visitor read the shelf instead of a list. */
   const shelfBands: { a0: number; a1: number }[] = [];
-  for (const [a0, a1] of [[104, 158], [194, 248]] as const) {
+  const slots: ShelfSlot[] = [];
+  const ROWS = [0.95, 1.62, 2.29, 2.96, 3.63, 4.3];
+  for (const [bi, [a0, a1]] of ([[104, 158], [194, 248]] as const).entries()) {
     shelfBands.push({ a0, a1 });
-    for (const sy of [0.95, 1.62, 2.29, 2.96, 3.63, 4.3]) {
+    for (const [ri, sy] of ROWS.entries()) {
       for (let a = a0; a <= a1; a += 4.4) arcBox('shelf_board', 'wood_dark', 0.4, 0.12, 0.66, a, 5.4 - 0.54, sy, g);
       for (let a = a0 + 1; a <= a1 - 1; a += 2.0) {
         if (rnd() < 0.2) continue;
         const h = 0.3 + rnd() * 0.18;
-        arcBox('book', pick(['cloth_red_dark', 'glass_blue', 'leaf_dark', 'cloth_purple', 'linen', 'glass_green', 'cloth_red', 'glass_amber']),
+        const mesh = arcBox('book', pick(['cloth_red_dark', 'glass_blue', 'leaf_dark', 'cloth_purple', 'linen', 'glass_green', 'cloth_red', 'glass_amber']),
           0.16, h, 0.3, a, 5.4 - 0.56, sy + 0.06 + h / 2, g, rnd() < 0.12 ? 0.3 : 0);
+        slots.push({ mesh, band: bi, angle: a, row: ri, height: h, taken: false });
       }
     }
     for (const a of [a0 - 1, a1 + 1]) arcBox('shelf_end', 'wood_ebony', 0.24, 4.7, 0.7, a, 5.4 - 0.54, 2.6, g);
@@ -117,5 +136,5 @@ export function buildLibrary(g: THREE.Group, fg: THREE.Group, anim: Anim) {
   const bl = new THREE.PointLight(0xa8f2ff, 3, 4.5, 2);
   bl.position.copy(polar(176, 2.2, 3.1)); fg.add(bl);
 
-  return { cat2, lad, gb, lec, shelfBands };
+  return { cat2, lad, gb, lec, shelfBands, slots };
 }

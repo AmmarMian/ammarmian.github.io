@@ -6,7 +6,7 @@ import {
 } from '../data/hal';
 import { copyText, downloadText, flashLabel, announce } from './io';
 import { setRecordMeta, setRouteMeta } from './meta';
-import { routeForSlug } from '../router';
+import { routeForSlug, navigate, BASE } from '../router';
 import { WORLD_LABELS, WORLD_BLURBS } from '../data/worlds';
 import { createYearRangeSlider } from './YearRange';
 import type { FloorRoute } from '../router';
@@ -34,6 +34,7 @@ export class SidePanel {
   // the shelves" (which re-renders the list) can race history.back()'s
   // async hash update and immediately reopen the same detail.
   private pendingDeepLink = false;
+  private openSlug: string | null = null;
 
   constructor(root: HTMLElement, tower: TowerScene) {
     this.el = document.createElement('aside');
@@ -43,7 +44,30 @@ export class SidePanel {
     this.tower = tower;
   }
 
+  /** Open one record by its HAL id, from wherever the visitor happens to be.
+   *  This is what a click on a book in the library calls — the shelf is the
+   *  index, so the tower has to be able to drive the panel and not only the
+   *  other way round. */
+  async openDoc(id: string) {
+    const slug = docSlugFor(id);
+    const hash = `#doc-${encodeURIComponent(slug)}`;
+    if (this.openSlug !== 'publications') {
+      // put the deep link in place first, then navigate: open() arms
+      // pendingDeepLink and renderPublications reads the hash on arrival
+      window.history.replaceState({}, '', `${BASE}/publications${hash}`);
+      navigate('publications');
+      return;
+    }
+    // already on the shelves — go straight there, since the router would
+    // treat a same-slug navigation as a no-op
+    window.history.replaceState({}, '', `${BASE}/publications${hash}`);
+    const docs = await fetchHalPublications();
+    const doc = docs.find((d) => d.id === id);
+    if (doc) this.openPublication(doc, false);
+  }
+
   close() {
+    this.openSlug = null;
     this.clearDetailHandler();
     this.el.classList.remove('callout-visible');
     window.setTimeout(() => { this.el.hidden = true; }, 280);
@@ -64,6 +88,7 @@ export class SidePanel {
     this.bodyEl = this.el.querySelector('.callout-body')!;
     requestAnimationFrame(() => this.el.classList.add('callout-visible'));
     this.pendingDeepLink = true;
+    this.openSlug = route.slug;
 
     switch (route.slug) {
       case 'about': this.renderAbout(); break;

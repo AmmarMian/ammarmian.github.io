@@ -59,6 +59,12 @@ export const PROFILES: Record<string, Pair> = {
     day:   P(0xffa64a, 0.32, 0.20, 2.30, 1.15),
     night: P(0xffa64a, 0.30, 0.19, 2.40, 1.20),
   },
+  rain: {
+    // an overcast day is still daylight, but flat, cold and grey — and the
+    // wizard keeps more candles going than he would under a clear sky
+    day:   P(0xbcc8dc, 0.55, 0.28, 1.25, 0.62),
+    night: P(0x6f82a8, 0.13, 0.08, 2.45, 1.20),
+  },
   space: {
     // no sun, no clock — starlight and whatever the wizard lit himself
     day:   P(0x9fc0ff, 0.16, 0.10, 2.60, 1.35),
@@ -89,6 +95,24 @@ type WindowRig = {
   baseHalo: number;
   baseSpot: number;
 };
+/* Which storey the wizard is on. The room he is in is brighter than the rest
+   — from outside, the lit window moves up and down the tower as his day goes
+   by, which is the cheapest possible way of saying somebody lives here. */
+let occupied = -1;
+let lastFill = 0;
+export function setOccupiedFloor(i: number) {
+  if (i === occupied) return;
+  occupied = i;
+  applyFills();
+}
+function applyFills() {
+  const lit = lastFill > 0.04;
+  fills.forEach((f, i) => {
+    f.intensity = 2.6 * lastFill * (i === occupied ? 2.0 : 0.7);
+    f.visible = lit;
+  });
+}
+
 const windows: WindowRig[] = [];
 const lamps: { light: THREE.Light; base: number }[] = [];
 const fills: THREE.PointLight[] = [];
@@ -238,8 +262,8 @@ export function applyAmbience(world: string | null, night: number) {
     l.light.intensity = l.base * a.interior;
     l.light.visible = a.interior > 0.05;
   }
-  const fillLit = a.fill > 0.04;
-  for (const f of fills) { f.intensity = 2.6 * a.fill; f.visible = fillLit; }
+  lastFill = a.fill;
+  applyFills();
   gain = a.interior;
 
   // Emissive props burn harder after dark. Captured once, on first use, so the
