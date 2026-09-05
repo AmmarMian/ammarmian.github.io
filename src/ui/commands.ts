@@ -44,6 +44,7 @@ export interface ConsoleHost {
     simReset: () => Record<string, number>;
     simList: () => { key: string; value: number; def: number; min: number; max: number; help: string }[];
     scan: (report: (line: string) => void) => string;
+    perf: (report: (line: string) => void) => string;
     setAutoRotate: (on: boolean) => boolean;
     autoRotate: () => boolean;
   } | null;
@@ -661,6 +662,17 @@ export const COMMANDS: Record<string, Command> = {
       if (!v) { ctx.print(`vista: currently the ${ctx.scene.vista()}. Try ${ctx.scene.VISTAS.join(', ')}.`, 'ok'); return; }
       if (!ctx.scene.VISTAS.includes(v)) { ctx.print(`vista: try ${ctx.scene.VISTAS.join(', ')}`, 'err'); return; }
       ctx.print(`vista: the window looks out on the ${ctx.scene.setVista(v as any)}.`, 'ok');
+    },
+  },
+
+  perf: {
+    args: '',
+    help: 'what the last frame cost',
+    detail: 'Frame time, draw calls and — the number that usually explains a slow frame — how many lights are burning. Every visible light is another loop in every lit pixel on screen, so `sim lights` is the dial worth turning first.',
+    examples: ['perf', 'sim lights 6'],
+    run(_args, ctx) {
+      if (!ctx.scene) { ctx.print('perf: no 3D scene in this view.', 'err'); return; }
+      ctx.print(ctx.scene.perf((line) => ctx.print(line, 'dim')), 'ok');
     },
   },
 

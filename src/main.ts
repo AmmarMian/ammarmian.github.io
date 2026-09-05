@@ -217,6 +217,7 @@ const terminal = createTerminal(app, {
     lightModeAvailable: tower.lightModeAvailable,
     probe: tower.probe,
     scan: tower.scan,
+    perf: tower.perf,
     setVista: tower.setVista,
     goBath: tower.goBath,
     runBath: tower.runBath,

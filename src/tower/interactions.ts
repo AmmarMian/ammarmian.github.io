@@ -103,6 +103,12 @@ export function createInteractionSystem(model: THREE.Group, floors: { g: THREE.G
       window.dispatchEvent(new CustomEvent('lair-hover', { detail: label }));
     };
     cv.addEventListener('pointermove', (ev) => {
+      /* Not while the camera is being dragged. The cast walks several thousand
+         meshes, and orbiting fires pointermove on every single frame — so the
+         one moment the scene most needs its budget is exactly when this was
+         taking the largest share of it. Nothing is hoverable mid-drag anyway;
+         the click handler already refuses to act on a drag. */
+      if (ev.buttons) return;
       hoverX = ev.clientX; hoverY = ev.clientY;
       if (hoverQueued) return;
       hoverQueued = true;

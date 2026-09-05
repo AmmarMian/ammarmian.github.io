@@ -109,12 +109,25 @@ function applyFills() {
   const lit = lastFill > 0.04;
   fills.forEach((f, i) => {
     f.intensity = 2.6 * lastFill * (i === occupied ? 2.0 : 0.7);
-    f.visible = lit;
+    f.userData.want = lit;
+    // whichever storey he is on is never a candidate for being culled
+    f.userData.pin = lit && i === occupied;
   });
+  cullLights();
 }
 
+type Lamp = {
+  light: THREE.Light;
+  base: number;
+  phase: number;
+  steady?: boolean;
+  /** what the wash wants of it — the budget below has the final say */
+  want?: boolean;
+  /** on this frame's shortlist */
+  lit?: boolean;
+};
 const windows: WindowRig[] = [];
-const lamps: { light: THREE.Light; base: number; phase: number; steady?: boolean }[] = [];
+const lamps: Lamp[] = [];
 const fills: THREE.PointLight[] = [];
 /* The outer shell's window panes. Same idea as the interior oculi — glass,
    not lamps — but the shell lives in worlds.js, which hands its material over
@@ -217,6 +230,70 @@ export function addFlameLights(
   return added;
 }
 
+/* ------------------------------ the budget -------------------------------
+ * A point light is not a cost you pay once. three compiles the count into
+ * every lit material, so each one is another iteration of the lighting loop
+ * in *every* fragment on screen — and the fragment that hurts is not a candle
+ * flame two rooms away, it is the world's ground plane filling the window.
+ * Seven storeys of candles, sconces, braziers, hearths, flame lights and floor
+ * fills came to well over forty, which the town's paving shader was paying for
+ * on every pixel of every frame.
+ *
+ * So only the ones that are actually doing something get to be on. The score
+ * is a light's own falloff evaluated at the point the camera is looking at:
+ * a light contributes what it contributes there, and the brightest handful
+ * win. Nothing here changes what a lit room looks like when you are in it —
+ * the storey you are looking at keeps its lights, because they are the ones
+ * nearest the target.
+ *
+ * The count is what must stay stable, not the membership: three only rebuilds
+ * the lighting uniforms (and re-keys the programs) when the *number* of lights
+ * changes, so swapping which ten are on is free, while going from ten to nine
+ * is not. Hence the shortlist is always filled right up to the budget, even
+ * with lights that are contributing almost nothing, and it is only rebuilt
+ * when the camera target actually moves.
+ */
+let BUDGET = 10;
+export function setLightBudget(n: number) {
+  BUDGET = Math.max(0, Math.round(n));
+  cullLights();
+  return BUDGET;
+}
+export const lightBudget = () => BUDGET;
+
+const _target = new THREE.Vector3();
+const _lp = new THREE.Vector3();
+/** Where the camera is looking. Scores are taken here rather than at the
+ *  camera, so an orbit does not reshuffle the shortlist under you. */
+export function setLightTarget(v: THREE.Vector3) { _target.copy(v); }
+
+function ancestorsVisible(o: THREE.Object3D) {
+  for (let p: THREE.Object3D | null = o; p; p = p.parent) if (!p.visible) return false;
+  return true;
+}
+
+type Cand = { light: THREE.Light; score: number };
+const _cands: Cand[] = [];
+export function cullLights() {
+  _cands.length = 0;
+  const consider = (light: THREE.Light, base: number, want: boolean, pin = false) => {
+    if (!want) { light.visible = false; return; }
+    /* A light under a hidden storey is never uploaded at all, so it neither
+       costs anything nor deserves a place on the shortlist. Its own `visible`
+       is left alone — putting it back is the storey's business, not ours. */
+    if (!ancestorsVisible(light.parent!)) { light.visible = true; return; }
+    light.getWorldPosition(_lp);
+    const d2 = _lp.distanceToSquared(_target);
+    const r = (light as THREE.PointLight).distance || 8;
+    // the light's own inverse-square falloff, evaluated where we are looking
+    _cands.push({ light, score: pin ? Infinity : base * (r * r) / (r * r + d2 * 4) });
+  };
+  for (const l of lamps) consider(l.light, l.base, l.want !== false);
+  for (const f of fills) consider(f, f.intensity, !!f.userData.want, !!f.userData.pin);
+  _cands.sort((a, b) => b.score - a.score);
+  for (let i = 0; i < _cands.length; i++) _cands[i].light.visible = i < BUDGET;
+}
+
 /* A candle is never steady. Every lamp gets its own phase and two
    incommensurate wobbles, so a room full of them shimmers rather than
    pulsing in unison — this is most of what separates a lit room from a room
@@ -287,10 +364,10 @@ export function applyAmbience(world: string | null, night: number, lampGain = 1)
   flickerGain = a.interior;
   for (const l of lamps) {
     l.light.intensity = l.base * a.interior;
-    l.light.visible = a.interior > 0.05;
+    l.want = a.interior > 0.05;
   }
   lastFill = a.fill;
-  applyFills();
+  applyFills();          // ends in cullLights(), which decides what is on
   gain = a.interior;
 
   // Emissive props burn harder after dark. Captured once, on first use, so the

@@ -52,6 +52,14 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
       float a=hash21(i), b=hash21(i+vec2(1.0,0.0)), c=hash21(i+vec2(0.0,1.0)), d=hash21(i+vec2(1.0,1.0));
       return mix(mix(a,b,f.x), mix(c,d,f.x), f.y); }
     float fbm(vec2 p){ float s=0.0, a=0.5; for(int i=0;i<5;i++){ s+=a*vnoise(p); p*=2.03; a*=0.5; } return s; }
+    /* 4x4 ordered dither, built from the recursive Bayer definition rather
+       than a lookup table — a const array is GLSL ES 3.0 and three's shaders
+       are written in 1.0 and transpiled. Returns 0..15/16. */
+    float m2_(float x, float y){ return 2.0*x + 3.0*y - 4.0*x*y; }
+    float bayer4(vec2 p){
+      vec2 a = mod(p, 2.0), b = mod(floor(p * 0.5), 2.0);
+      return (4.0 * m2_(a.x, a.y) + m2_(b.x, b.y)) * 0.0625;
+    }
   `;
 
   // instanceMatrix is only declared on instanced draws, so guard it
@@ -82,7 +90,7 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
      binding a uniform the shader never declares does nothing, and *using* one
      that was never declared fails the compile outright, which three reports
      only to the console and which shows up on screen as a black surface. */
-  function patchStd(mat, { frag = '', vert = '', emis = '', occluder = false, uniforms = {}, decl = '' } = {}) {
+  function patchStd(mat, { frag = '', vert = '', emis = '', occluder = false, dither = false, uniforms = {}, decl = '' } = {}) {
     mat.onBeforeCompile = (s) => {
       s.uniforms.uT = uT;
       s.uniforms.uWind = uWind;
@@ -123,10 +131,18 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
         .replace('#include <color_fragment>', `#include <color_fragment>\n${frag}`)
         .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>\n${emis}`);
       if (occluder) {
-        /* occluders between eye and tower fade right out. alphaTest runs
-           first so the leaf silhouette survives; then the whole surface is
-           blended down — true transparency, no dither pattern. */
-        fs = fs.replace('#include <alphatest_fragment>', `
+        /* Two ways to dissolve an occluder, and the choice is about cost, not
+           looks. Blending it out is smoother, but a blended material leaves
+           the opaque pass: it is drawn back-to-front with no early-z, so every
+           wall behind every other wall is shaded in full. That is affordable
+           for a scatter of leaf cards and ruinous for a town, where it means
+           shading the whole of it several times over at forty-odd lights a
+           fragment. The dithered path stays opaque, keeps early-z, and costs
+           one compare — and at this render resolution a screen-door stipple
+           reads as of a piece with everything else here. */
+        fs = fs.replace('#include <alphatest_fragment>', dither ? `
+          #include <alphatest_fragment>
+          if (vFade > 0.002 && bayer4(gl_FragCoord.xy) < vFade) discard;` : `
           #include <alphatest_fragment>
           diffuseColor.a *= 1.0 - vFade;
           if (diffuseColor.a < 0.004) discard;`);
@@ -140,7 +156,7 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
         }`);
       s.fragmentShader = `varying vec3 vWP;\nvarying vec3 vWN;\nvarying float vFade;\nuniform float uT;\nuniform float uFadeAmt;\nuniform float uCutR;\n${decl}\n${NOISE}\n` + fs;
     };
-    mat.customProgramCacheKey = () => 'w' + (frag.length * 31 + vert.length * 7 + emis.length + decl.length * 3) + (occluder ? 'o' : '');
+    mat.customProgramCacheKey = () => 'w' + (frag.length * 31 + vert.length * 7 + emis.length + decl.length * 3) + (occluder ? (dither ? 'd' : 'o') : '');
     return mat;
   }
 
@@ -171,11 +187,11 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
                   * (1.0 - smoothstep(uFadeRad, uFadeRad * 1.7, perp));
             vFade = clamp(vFade * uFadeAmt, 0.0, 1.0);
           }`);
-      s.fragmentShader = `varying float vFade;\n` + s.fragmentShader
+      // dithered, like the walls these panes are set into — see patchStd
+      s.fragmentShader = `varying float vFade;\n${NOISE}\n` + s.fragmentShader
         .replace('#include <alphatest_fragment>', `
           #include <alphatest_fragment>
-          diffuseColor.a *= 1.0 - vFade;
-          if (diffuseColor.a < 0.004) discard;`);
+          if (vFade > 0.002 && bayer4(gl_FragCoord.xy) < vFade) discard;`);
     };
     mat.customProgramCacheKey = () => 'fadebasic';
     return mat;
@@ -1097,11 +1113,8 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
     trunkGeo.translate(0, 0.5, 0);
     const TN = 140;
     const trunks = new THREE.InstancedMesh(trunkGeo, patchStd(
-      new THREE.MeshStandardMaterial({
-        color: 0x4a3a2a, roughness: 1, flatShading: true,
-        transparent: true, depthWrite: true, alphaTest: 0.002,
-      }), {
-        occluder: true,
+      new THREE.MeshStandardMaterial({ color: 0x4a3a2a, roughness: 1, flatShading: true }), {
+        occluder: true, dither: true,
         frag: `
           float bark = fbm(vec2(atan(vWN.z, vWN.x) * 6.0, vWP.y * 1.7));
           diffuseColor.rgb *= 0.6 + 0.75 * bark;
@@ -1128,11 +1141,16 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
        over the tower, so it sits half-buried in leaves. wind per-vertex,
        colour per-instance, vertical tint fakes canopy occlusion. */
     const cardGeo = new THREE.PlaneGeometry(1, 1);
+    /* Cut out, not blended. alphaTest alone gives the leaf its silhouette and
+       leaves the material in the opaque pass, where thousands of overlapping
+       cards are depth-tested instead of being sorted and shaded on top of one
+       another. `transparent: true` here bought nothing — the test was already
+       hard-edged at 0.42 — and cost the canopy its early-z. */
     const foliage = (tint) => patchStd(new THREE.MeshStandardMaterial({
       color: 0xffffff, map: leafTex, alphaMap: leafTex, alphaTest: 0.42,
-      roughness: 1, side: THREE.DoubleSide, transparent: true, depthWrite: true,
+      roughness: 1, side: THREE.DoubleSide,
     }), {
-      occluder: true,
+      occluder: true, dither: true,
       vert: `
         vec3 base = (modelMatrix * wIM * vec4(0.0,0.0,0.0,1.0)).xyz;
         float sway = sin(uT * 0.34 + base.x * 0.16 + base.z * 0.13) * 0.5
@@ -2614,16 +2632,10 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
          the joints raked back into shadow — which is the whole reason stone
          reads as stone and not as a grey box. The running direction is picked
          from the dominant normal so the courses lie flat on every wall. */
-      /* `transparent` is not decoration on any of these: the occluder fade
-         writes into diffuseColor.a, and an opaque material throws that alpha
-         away. Without it a house between the eye and the tower stayed solid
-         right up to the discard threshold and then vanished in one frame.
-         depthWrite stays on and alphaTest is a hair above zero so the town
-         still occludes itself normally while it is not fading. */
-      stone: patchStd(new THREE.MeshStandardMaterial({
-        color: 0xffffff, roughness: 0.94, flatShading: true,
-        transparent: true, depthWrite: true, alphaTest: 0.002,
-      }), {
+      /* Every wall material here fades on the dithered path: the town is far
+         too much geometry to hand to the transparent pass, where it would be
+         drawn back-to-front and shaded several times over. */
+      stone: patchStd(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.94, flatShading: true }), {
         frag: `
           vec3 Nn = normalize(vWN);
           float along = abs(Nn.x) > abs(Nn.z) ? vWP.z : vWP.x;
@@ -2639,16 +2651,13 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
           // soaked at the foot, and streaked where the rain runs down it
           diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.20,0.21,0.22), smoothstep(2.6, 0.0, vWP.y) * 0.45);
           diffuseColor.rgb *= 0.86 + 0.22 * smoothstep(0.45, 0.9, fbm(vec2(along * 2.2, vWP.y * 0.5)));`,
-        occluder: true,
+        occluder: true, dither: true,
       }),
       /* Limewash over daub. Every house a slightly different wash, streaked by
          the rain running off the jetty above and stained where it meets the
          ground — a terrace of identical clean panels is what made these read
          as a field of white boxes. */
-      plaster: patchStd(new THREE.MeshStandardMaterial({
-        color: 0xffffff, roughness: 0.95, flatShading: true,
-        transparent: true, depthWrite: true, alphaTest: 0.002,
-      }), {
+      plaster: patchStd(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, flatShading: true }), {
         frag: `
           vec3 Np = normalize(vWN);
           float alongP = abs(Np.x) > abs(Np.z) ? vWP.z : vWP.x;
@@ -2662,28 +2671,20 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
           wash *= 0.9 + 0.2 * fbm(vec2(alongP, vWP.y) * 2.6);
           wash = mix(wash, vec3(0.26,0.26,0.23), smoothstep(2.2, 0.0, vWP.y) * 0.55);
           diffuseColor.rgb = wash;`,
-        occluder: true,
+        occluder: true, dither: true,
       }),
-      beam: patchStd(new THREE.MeshStandardMaterial({
-        color: 0x3b2c20, roughness: 1, flatShading: true,
-        transparent: true, depthWrite: true, alphaTest: 0.002,
-      }), { occluder: true }),
-      roof: patchStd(new THREE.MeshStandardMaterial({
-        color: 0x4a3a3c, roughness: 0.5, flatShading: true,
-        transparent: true, depthWrite: true, alphaTest: 0.002,
-      }), {
+      beam: patchStd(new THREE.MeshStandardMaterial({ color: 0x3b2c20, roughness: 1, flatShading: true }),
+        { occluder: true, dither: true }),
+      roof: patchStd(new THREE.MeshStandardMaterial({ color: 0x4a3a3c, roughness: 0.5, flatShading: true }), {
         frag: `float course = fract(vWP.y * 3.2);
                diffuseColor.rgb *= 0.78 + 0.34 * step(0.5, course);
                diffuseColor.rgb += vec3(0.10,0.12,0.16) * pow(1.0 - abs(dot(normalize(vWN), normalize(cameraPosition - vWP))), 3.0);`,
-        occluder: true,
+        occluder: true, dither: true,
       }),
       /* The lit panes fade with the house they are set into — left opaque,
          a dissolved terrace leaves a grid of little glowing rectangles
          hanging in mid-air in front of the tower. */
-      lit: patchFadeBasic(new THREE.MeshBasicMaterial({
-        color: 0xffc266, fog: false,
-        transparent: true, depthWrite: true, alphaTest: 0.002,
-      })),
+      lit: patchFadeBasic(new THREE.MeshBasicMaterial({ color: 0xffc266, fog: false })),
     };
 
     /* A gable roof is a triangular prism, not two tilted boxes. Boxes have to

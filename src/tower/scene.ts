@@ -24,7 +24,8 @@ import { makePoints, setBackdrop as setBackdropFx, suppressBackdrop } from './fx
 import { createFocusController } from './focus';
 import { createInteractionSystem } from './interactions';
 import { addFloorFill, registerInteriorLights, applyAmbience, addFlameLights, interiorGain, registerShellPane,
-         registerLamp, setOccupiedFloor, tickLamps, NO_DAYNIGHT, clampNight } from './ambience';
+         registerLamp, setOccupiedFloor, tickLamps, NO_DAYNIGHT, clampNight,
+         cullLights, setLightTarget, lightBudget, setLightBudget } from './ambience';
 
 export type TowerScene = ReturnType<typeof createTowerScene>;
 
@@ -745,6 +746,11 @@ export function createTowerScene(container: HTMLElement, opts: {
      accumulates instead of scaling `now` directly — otherwise changing the
      rate would jump every sine in the building to a different phase. */
   let simT = 0;
+  /* The shortlist is re-scored a few times a second rather than every frame.
+     It only changes when the camera target moves or a storey is shown or
+     hidden, and both of those are slow events; four times a second is already
+     faster than either can happen. */
+  let cullTimer = 0;
   function loop(now: number) {
     const raw = Math.min((now - t0) / 1000, 0.05); t0 = now;
     const dt = raw * sim.speed;
@@ -754,7 +760,14 @@ export function createTowerScene(container: HTMLElement, opts: {
     autoPixel();
     controls.update();
     idleDrift(dt);
+    cullTimer -= raw;
+    /* Re-run unconditionally rather than only when the target has moved: a
+       storey can be shown or hidden by something other than navigation — the
+       opening reveal, a teleport — and a sort of forty-odd numbers four times
+       a second is not worth being clever about. */
+    if (cullTimer <= 0) { cullTimer = 0.25; setLightTarget(controls.target); cullLights(); }
     if (!contextLost) renderer.render(scene, camera);
+    sampleFrame(performance.now() - now);
     raf = requestAnimationFrame(loop);
   }
 
@@ -823,6 +836,7 @@ export function createTowerScene(container: HTMLElement, opts: {
     wisps: 1,        // the night lights, and whether there are any
     clock: -1,       // pinned hour 0..24, or -1 to follow your own clock
     fov: 45,         // the camera's field of view
+    lights: 10,      // how many interior lights may burn at once (see ambience)
   };
   const SIM_RANGE: Record<keyof typeof SIM_DEFAULTS, [number, number, string]> = {
     speed: [0, 8, 'how fast the tower\'s own time runs — 0 freezes it'],
@@ -832,6 +846,7 @@ export function createTowerScene(container: HTMLElement, opts: {
     wisps: [0, 3, 'the lights that come out after dark'],
     clock: [-1, 24, 'pin the hour, 0 to 24 — or -1 to follow your own clock'],
     fov:   [20, 90, 'the camera\'s field of view, in degrees'],
+    lights: [2, 48, 'how many lamps may burn at once — the frame rate lives here'],
   };
   const sim = { ...SIM_DEFAULTS };
 
@@ -843,6 +858,7 @@ export function createTowerScene(container: HTMLElement, opts: {
     if (key === 'wind') worlds.wind(v);
     if (key === 'fov') { camera.fov = v; camera.updateProjectionMatrix(); }
     if (key === 'lamps' || key === 'clock') applyDayNight();
+    if (key === 'lights') setLightBudget(v);
     return v;
   }
   function simReset() {
@@ -1002,6 +1018,48 @@ export function createTowerScene(container: HTMLElement, opts: {
     return `scan: world is "${worlds.current() || 'none'}", backdrop "${document.body.dataset.backdrop}".`;
   }
 
+  /* ---------------------------- the frame budget ---------------------------
+     Guessing at what is slow in a scene like this is how you spend an
+     afternoon optimising something that never cost anything. Every number
+     here is one the renderer already keeps; the only thing measured on
+     purpose is the frame time, sampled over the last two seconds so a single
+     hitch does not read as the steady state.
+
+     The two that actually matter are `lights` and `calls`. A point light is
+     not a cost paid once — it is a loop iteration in *every* lit fragment on
+     screen, so a world's full-screen ground pays for every candle burning six
+     storeys up in the tower. */
+  let frames = 0, frameAccum = 0, frameWorst = 0, frameFps = 0, frameMs = 0;
+  function sampleFrame(ms: number) {
+    frames++; frameAccum += ms;
+    if (ms > frameWorst) frameWorst = ms;
+    if (frameAccum >= 2000) {
+      frameFps = (frames * 1000) / frameAccum;
+      frameMs = frameAccum / frames;
+      frames = 0; frameAccum = 0; frameWorst = frameWorst * 0.5;
+    }
+  }
+  function perf(report: (line: string) => void) {
+    const info = renderer.info;
+    let point = 0, spot = 0, dir = 0, hidden = 0;
+    scene.traverse((o: any) => {
+      if (!o.isLight) return;
+      // a light under a hidden parent is never uploaded, so it costs nothing
+      let vis = true;
+      for (let p: any = o; p; p = p.parent) if (!p.visible) { vis = false; break; }
+      if (!vis) { hidden++; return; }
+      if (o.isPointLight) point++;
+      else if (o.isSpotLight) spot++;
+      else if (o.isDirectionalLight) dir++;
+    });
+    report(`  frame     ${frameMs.toFixed(1)} ms  (${frameFps.toFixed(0)} fps, worst ${frameWorst.toFixed(0)} ms)`);
+    report(`  draws     ${info.render.calls} calls, ${(info.render.triangles / 1000).toFixed(0)}k triangles`);
+    report(`  lights    ${point} point, ${spot} spot, ${dir} directional  (${hidden} switched off)`);
+    report(`  memory    ${info.memory.geometries} geometries, ${info.memory.textures} textures, ${info.programs?.length ?? 0} shaders`);
+    report(`  pixels    1/${pixelOverride ?? (pixelNear ? 4 : 2)} resolution, budget ${lightBudget()} lights`);
+    return `perf: world "${worlds.current() || 'none'}".`;
+  }
+
   /* ---------------- and the shelves hold the actual projects --------------
      The same idea as the library, in the room where the work happens: each
      project becomes a lit specimen on the alchemy shelves, with a tag on the
@@ -1081,7 +1139,10 @@ export function createTowerScene(container: HTMLElement, opts: {
     const under = k !== null && k < GROUND;
     worlds.cutaway(under ? 26 : 0);
     suppressBackdrop(under || !!worlds.current());
-    return focus.focusFloor(k);
+    const r = focus.focusFloor(k);
+    // showing or hiding a storey changes which lights are even candidates
+    cullLights();
+    return r;
   }
 
   /** Take the visitor down to the cellar. */
@@ -1347,6 +1408,7 @@ export function createTowerScene(container: HTMLElement, opts: {
     floors, floorNames: floors.map((f) => f.name),
     worlds,
     focusFloor,
+    perf,
     setPanelOpen: focus.setPanelOpen,
     reframe: focus.reframe,
     sendWizard: wiz.sendWizard,
