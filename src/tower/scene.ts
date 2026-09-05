@@ -522,6 +522,12 @@ export function createTowerScene(container: HTMLElement, opts: {
       b.water.position.y = -D + (b.fill * (D + 0.08)) / 2;
       b.water.rotation.z = Math.sin(t * 0.9) * 0.012 * b.fill;
       b.water.rotation.x = Math.sin(t * 0.67 + 1.1) * 0.009 * b.fill;
+      // the surface skin rides on top of whatever the level currently is
+      b.surface.position.y = surface + 0.01;
+      b.surface.rotation.z = b.water.rotation.z;
+      b.surface.rotation.x = b.water.rotation.x;
+      b.surface.visible = b.fill > 0.05;
+      b.surface.scale.set(1 + Math.sin(t * 1.7) * 0.004, 1, 1 + Math.sin(t * 1.3) * 0.004);
 
       // the tray floats on it, and tips a little as the water moves
       b.tray.position.y = surface + 0.03;

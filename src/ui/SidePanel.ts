@@ -81,7 +81,7 @@ export class SidePanel {
     this.el.innerHTML = `
       <div class="leader-wrap">${LEADER_SVG}</div>
       <div class="callout-inner">
-        <div class="kicker">${String(route.index + 1).padStart(2, '0')} &middot; ${escapeHtml(route.title.toUpperCase())}</div>
+        <div class="kicker">${String(route.index).padStart(2, '0')} &middot; ${escapeHtml(route.title.toUpperCase())}</div>
         <h1>${escapeHtml(route.label)}</h1>
         <div class="callout-body"></div>
       </div>

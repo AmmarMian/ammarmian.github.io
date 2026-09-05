@@ -70,6 +70,8 @@ export function buildBathhouse(g: THREE.Group, fg: THREE.Group, anim: Anim) {
   /* The water. Its top face rides up and down as the bath fills, so `fill`
      is a real state and not a flourish — see the tap, below. */
   const water = addBox('ofuro_water', 'bathwater', TW - 0.2, 1.0, TD - 0.2, 0, -0.45, 0, 0, tub);
+  // and its surface, a separate skin that catches the light and moves
+  const surface = addBox('ofuro_surface', 'bathwater_top', TW - 0.22, 0.05, TD - 0.22, 0, 0, 0, 0, tub);
 
   /* The floating board: a slat tray with a flask, a cup, and blossoms. */
   const tray = new THREE.Group(); tray.name = 'bath_tray';
@@ -341,7 +343,7 @@ export function buildBathhouse(g: THREE.Group, fg: THREE.Group, anim: Anim) {
   g.add(drain);
 
   anim.bath = {
-    water, stream, tap: tapG, lever: leverArm, tray, petals, steam,
+    water, surface, stream, tap: tapG, lever: leverArm, tray, petals, steam,
     uVista, uT, vistaLight,
     fill: 0.62, filling: 0,
   };

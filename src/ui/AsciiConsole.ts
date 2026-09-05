@@ -117,6 +117,8 @@ export function renderAsciiConsole(root: HTMLElement) {
       kinds: JUMP_TARGETS.filter((k) => k !== 'none'),
       current: () => null,
       teleport: () => false,
+      reflections: () => false,
+      reflectionsOn: () => false,
     },
     setShellOverride: () => {},
   };

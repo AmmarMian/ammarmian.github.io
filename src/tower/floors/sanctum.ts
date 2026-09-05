@@ -122,17 +122,23 @@ export function buildSanctum(sg: THREE.Group, sf: THREE.Group, anim: Anim) {
     [[-0.9, 0.9], [-0.3, 1.15], [0.6, 1.0], [1.05, 0.2], [-1.0, -0.4], [0.15, -0.95]]
       .forEach(([x, y]) => f(0xe8f0ff, 0.05, 0.05, x, y, 0.05));
   });
-  world('rain', 0x2b303a, (f) => {
-    f(0x4a5462, 2.8, 2.8, 0, 0.3);
-    f(0x2f3a2a, 2.8, 1.0, 0, -0.85, 0.02);
-    f(0x10171e, 2.2, 0.18, -0.1, -0.62, 0.03);   // standing water
-    f(0x10171e, 1.0, 0.12, 0.75, -0.38, 0.03);
-    [[-0.95, 0.22], [-0.3, 0.18], [0.45, 0.24], [1.0, 0.16]].forEach(([x, w]) => {
-      f(0x2e2a26, w, 1.7, x, 0.35, 0.04);        // bare trunks
-      f(0x2e2a26, w * 2.2, 0.06, x, 0.95, 0.05);
+  world('rain', 0x232a34, (f) => {
+    f(0x39424f, 2.8, 2.8, 0, 0.3);
+    f(0x2b3038, 1.5, 0.75, -0.6, 0.75, 0.02);    // the castle on its hill
+    f(0x2b3038, 0.3, 1.1, -1.05, 0.9, 0.03);
+    f(0x2b3038, 0.3, 1.1, -0.2, 0.9, 0.03);
+    f(0xffc266, 0.06, 0.09, -1.05, 1.05, 0.04);
+    f(0xffc266, 0.06, 0.09, -0.5, 0.85, 0.04);
+    // the street: gables either side, closing toward the middle
+    [[-1.0, 1.5], [-0.62, 1.15], [0.66, 1.25], [1.02, 1.6]].forEach(([x, h], i) => {
+      f(i < 2 ? 0x3b3730 : 0x443f36, 0.5, h, x, -0.35 + h / 2, 0.04);
+      f(0x2e2a2c, 0.62, 0.3, x, -0.35 + h + 0.12, 0.05);   // the roof
+      f(0xffc266, 0.09, 0.11, x, -0.1 + h * 0.4, 0.06);
     });
-    // the rain itself: a lot of thin verticals, leaning together
-    for (let i = 0; i < 22; i++) f(0xbcc8d8, 0.02, 0.5, -1.25 + i * 0.115, 0.15 + (i % 3) * 0.35, 0.06);
+    f(0x22262c, 2.8, 0.9, 0, -0.85, 0.05);       // wet cobbles
+    f(0xffb466, 0.1, 0.7, -0.3, -0.6, 0.06);     // and the lamps reflected in them
+    f(0xffb466, 0.08, 0.5, 0.42, -0.7, 0.06);
+    for (let i = 0; i < 20; i++) f(0xbcc8d8, 0.02, 0.42, -1.25 + i * 0.13, 0.2 + (i % 3) * 0.3, 0.07);
   });
   /* The way down. There is a storey below this one that cannot be seen from
      outside the tower, and this is the only sign of it: a trapdoor set into

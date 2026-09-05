@@ -29,6 +29,12 @@ export function createFocusController(opts: {
   const { camera, controls, model, floors, dust, bubbles, markerList, onDustRange } = opts;
   const NF = floors.length;
   const TOP = floorY(NF - 1) + 2.5;
+
+  /* Per-storey correction to the default viewing angle. Every floor is looked
+     at from the same bearing relative to its own rotation, which is right for
+     the rooms that were laid out around that assumption and wrong for any that
+     were not — the cellar's tub and window face a different quarter. */
+  const VIEW_TURN: Record<number, number> = { [F.bath]: 90 };
   let panelSide: 'left' | 'right' | null = null;
 
   function flyTo(pos: THREE.Vector3, tgt: THREE.Vector3, dur = 2200): Promise<void> {
@@ -79,7 +85,10 @@ export function createFocusController(opts: {
     const elev = k === null ? 0.5 : (ELEVATION[k] ?? 0.5);
     const dir = k === null
       ? new THREE.Vector3(1, elev, 1.2).normalize()
-      : new THREE.Vector3(Math.sin(RAD(355 + k * ROT)), elev, Math.cos(RAD(355 + k * ROT))).normalize();
+      : (() => {
+        const a = 355 + k * ROT + (VIEW_TURN[k] ?? 0);
+        return new THREE.Vector3(Math.sin(RAD(a)), elev, Math.cos(RAD(a))).normalize();
+      })();
     const target = sph.center.clone();
     if (panelSide && !isNarrowViewport()) {
       // Push the tower well clear of the panel's side, in *screen* space —

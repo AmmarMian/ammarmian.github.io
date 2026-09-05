@@ -306,6 +306,7 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
   /* How far into night the active world is, 0..1. The host owns the clock and
      pushes it in; worlds with no say in the matter (the city, deep space) have
      already had it clamped for them before it arrives. */
+  let rtOn = false;     // wet-surface reflections, opt-in
   let rawNight = 0;     // what the host's clock says
   let curNight = 0;     // ...after the active world has had its say
   /* Some worlds do not get a vote on the hour — the city is in eternal night,
@@ -2306,145 +2307,437 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
     };
   }
 
-  /* ============================ 7 · endless rain ========================= */
-  /* A drowned moor under a sky that has never once cleared. Everything here
-     is about water arriving: it falls, it lands, it stands, it runs off. The
-     day/night wash still applies — it just moves between a bright grey
-     overcast and a near-black one, because the sun never appears either way. */
+  /* ====================== 7 · the city in the rain ======================
+     A medieval town on a wet night. The tower stands in the middle of a round
+     cobbled place; five streets run off it between blocks of timber-framed
+     houses, and a castle sits on the hill above, lit from within.
+
+     The lighting is the point. Every wet surface here reflects the lamps
+     analytically: the paving shader is handed the position and colour of the
+     lanterns and works out, per fragment, where each one's reflected image
+     would fall — a real mirror image stretched by the roughness of the stone,
+     not a blurred copy of the scene. That is what makes it read as wet rather
+     than as shiny. It is off by default (see `rt` in the console) because it
+     costs a loop over every lamp in every ground fragment. */
 
   function buildRain() {
     const g = new THREE.Group();
     g.name = 'world_rain';
-    const dome = skyDome(0x39414f, 0x4a5462, 0x2b303a, 460);
+    const dome = skyDome(0x2b3340, 0x39424f, 0x232a34, 460);
     g.add(dome);
 
-    /* the moor: low, sodden, and almost flat — standing water needs a bed
-       that barely tilts, or every puddle drains to one corner */
-    const ggeo = new THREE.PlaneGeometry(1100, 1100, 200, 200);
+    const PLACE_R = 26;           // the round place the tower stands in
+    const NSTREET = 5;
+    const STREET_A = [];
+    for (let i = 0; i < NSTREET; i++) STREET_A.push((i * 360) / NSTREET + 12);
+    const STREET_W = 7.5;
+    const HILL = new THREE.Vector2(-150, -210);   // where the castle stands
+
+    /** How far a point is from the middle of the nearest street, and the
+     *  ground height there. Shared by the paving and by everything placed on
+     *  it, so nothing ever ends up buried in a road. */
+    function streetDist(x, z) {
+      const r = Math.hypot(x, z);
+      if (r < PLACE_R) return 0;
+      let best = 1e9;
+      for (const a of STREET_A) {
+        const rad = RAD(a);
+        const along = x * Math.sin(rad) + z * Math.cos(rad);
+        if (along < 0) continue;
+        const perp = Math.abs(x * Math.cos(rad) - z * Math.sin(rad));
+        best = Math.min(best, perp);
+      }
+      return best;
+    }
+    const hillH = (x, z) => {
+      const d = Math.hypot(x - HILL.x, z - HILL.y);
+      return 46 * Math.exp(-(d * d) / (2 * 96 * 96));
+    };
+    const groundH = (x, z) => {
+      const h = hillH(x, z);
+      // the town itself is flat; the hill only lifts what is out on it
+      return h * Math.min(1, Math.max(0, (Math.hypot(x, z) - 90) / 60));
+    };
+
+    /* ------------------------------ the paving ------------------------------ */
+    const uLampPos = { value: new Array(10).fill(0).map(() => new THREE.Vector3()) };
+    const uLampCol = { value: new Array(10).fill(0).map(() => new THREE.Color()) };
+    const uLampN = { value: 0 };
+    const uRT = { value: 0 };
+    const uWet = { value: 1 };
+
+    const ggeo = new THREE.PlaneGeometry(900, 900, 300, 300);
     const gp = ggeo.attributes.position;
     for (let i = 0; i < gp.count; i++) {
-      const x = gp.getX(i), y = gp.getY(i);
-      const r = Math.hypot(x, y);
-      let h = Math.sin(x * 0.013) * Math.cos(y * 0.011) * 2.6
-            + Math.sin(x * 0.041 + y * 0.033) * 0.9;
-      h *= Math.min(1, r / 26);                    // flat where the tower stands
-      gp.setZ(i, h);
+      const x = gp.getX(i), y = -gp.getY(i);
+      gp.setZ(i, groundH(x, y) + Math.sin(x * 0.7) * 0.012 + Math.sin(y * 0.6) * 0.012);
     }
     ggeo.computeVertexNormals();
-    const groundMat = patchStd(new THREE.MeshStandardMaterial({
-      color: 0x4a4a3e, roughness: 0.72, metalness: 0.05, flatShading: true,
+
+    const paveMat = patchStd(new THREE.MeshStandardMaterial({
+      color: 0x6a6a68, roughness: 0.42, metalness: 0.0, flatShading: false,
     }), {
+      uniforms: { uLampPos, uLampCol, uLampN, uRT, uWet },
       frag: `
-        vec2 p = vWP.xz;
-        float peat = fbm(p * 0.07) * 0.6 + fbm(p * 0.31) * 0.4;
-        vec3 dry = mix(vec3(0.20,0.20,0.15), vec3(0.34,0.33,0.24), peat);
-        vec3 grass = mix(vec3(0.17,0.23,0.14), vec3(0.28,0.34,0.19), fbm(p * 0.9));
-        diffuseColor.rgb = mix(dry, grass, smoothstep(0.35, 0.75, fbm(p * 0.12 + 4.0)));
-        /* standing water: wherever the ground dips below the water table it
-           fills, and the sheen is a plain vertical-facing term rather than a
-           reflection — flat, dark and bright at grazing angles, which is what
-           a puddle under a grey sky actually looks like */
-        float pool = smoothstep(0.25, -0.35, vWP.y);
+        vec2 P = vWP.xz;
+        float rr = length(P);
+
+        /* Cobbles. A jittered grid of rounded stones, laid in rings inside the
+           place and in courses along the streets, because that is how they are
+           actually laid — and the seams are where the water stands. */
+        float ang = atan(P.y, P.x);
+        vec2 cellUV = rr < ${PLACE_R.toFixed(1)}
+          ? vec2(ang * (2.2 + rr * 0.5), rr * 1.55)
+          : P * 1.55;
+        vec2 cid = floor(cellUV);
+        vec2 cf = fract(cellUV) - 0.5;
+        float jitter = hash21(cid);
+        cf += (vec2(hash21(cid + 3.1), hash21(cid + 7.7)) - 0.5) * 0.22;
+        float stone = 1.0 - smoothstep(0.26, 0.46, length(cf * vec2(1.0, 1.15)));
+        vec3 dry = mix(vec3(0.30,0.30,0.29), vec3(0.46,0.45,0.42), jitter);
+        dry = mix(dry * 0.55, dry, stone);          // dark mortar in the joints
+
+        // the streets are worn paler down their middles by cartwheels
+        float wear = 1.0 - smoothstep(0.0, 3.4, sd);
+        dry = mix(dry, dry * 1.22, wear * 0.5);
+
+        // standing water: it gathers in the joints and in the ruts
+        float pool = (1.0 - stone) * 0.7 + smoothstep(0.55, 1.0, fbm(P * 0.6)) * 0.5;
+        pool = clamp(pool * uWet, 0.0, 1.0);
+        vec3 c = mix(dry, dry * 0.34, pool);
+
+        /* The reflections. For each lamp, the image of it in a horizontal
+           mirror at this fragment's height sits at the mirrored position; the
+           closer this fragment is to the line between the eye and that image,
+           the brighter it burns. Stretching that falloff along the view
+           direction is what gives wet stone its long vertical smears. */
         vec3 V = normalize(cameraPosition - vWP);
-        float graze = pow(1.0 - clamp(V.y, 0.0, 1.0), 3.0);
-        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.10,0.12,0.14), pool * 0.85);
-        diffuseColor.rgb += vec3(0.30,0.34,0.40) * pool * graze * 0.9;
-        // rings spreading where drops land, only on the wet
-        float ring = sin(fbm(p * 2.2) * 40.0 - uT * 9.0);
-        diffuseColor.rgb += vec3(0.10,0.12,0.14) * pool * smoothstep(0.86, 1.0, ring);
+        if (uRT > 0.5) {
+          for (int i = 0; i < 10; i++) {
+            if (i >= uLampN) break;
+            vec3 L = uLampPos[i];
+            vec3 mirrored = vec3(L.x, 2.0 * vWP.y - L.y, L.z);
+            vec3 D = normalize(mirrored - cameraPosition);
+            // distance from this fragment to the eye-to-image ray
+            vec3 rel = vWP - cameraPosition;
+            float alng = dot(rel, D);
+            float perp = length(rel - D * alng);
+            float lampD = distance(L.xz, vWP.xz);
+            float fall = 1.0 / (1.0 + lampD * lampD * 0.02);
+            float streak = exp(-perp * perp * 5.5) * fall;
+            c += uLampCol[i] * streak * pool * 2.6 * uRT;
+          }
+          // and the sky itself, mirrored: wet ground is never black
+          float fres = pow(1.0 - clamp(V.y, 0.0, 1.0), 4.0);
+          c += vec3(0.18,0.22,0.30) * fres * pool * 0.7;
+        } else {
+          // without it, a plain grazing sheen so it still reads as wet
+          float fres = pow(1.0 - clamp(V.y, 0.0, 1.0), 3.0);
+          c += vec3(0.24,0.27,0.33) * fres * pool * 0.85;
+        }
+
+        // and the rings the rain makes where it lands in standing water
+        float ring = sin(fbm(P * 2.4) * 46.0 - uT * 10.0);
+        c += vec3(0.16,0.19,0.24) * pool * smoothstep(0.9, 1.0, ring);
+        diffuseColor.rgb = c;
       `,
     });
-    const groundMesh = new THREE.Mesh(ggeo, groundMat);
-    groundMesh.rotation.x = -Math.PI / 2;
-    groundMesh.receiveShadow = true;
-    g.add(groundMesh);
-
-    /* reeds — sparse, bowed, and heavier than the forest's ferns: this is a
-       wind that has been pushing the same way for a very long time */
-    const reedGeo = new THREE.PlaneGeometry(0.16, 2.4, 1, 4);
-    reedGeo.translate(0, 1.2, 0);
-    (() => {
-      const pa = reedGeo.attributes.position;
-      for (let i = 0; i < pa.count; i++) {
-        const u = pa.getY(i) / 2.4;
-        pa.setZ(i, pa.getZ(i) + u * u * 0.9);
-        pa.setX(i, pa.getX(i) * (1 - u * 0.6));
-      }
-      reedGeo.computeVertexNormals();
-    })();
-    const RN = 26000;
-    const reeds = new THREE.InstancedMesh(reedGeo, patchStd(
-      new THREE.MeshStandardMaterial({ color: 0x53523a, roughness: 1, flatShading: true, side: THREE.DoubleSide }), {
-        vert: `
-          vec3 base = (modelMatrix * wIM * vec4(0.0,0.0,0.0,1.0)).xyz;
-          float k = pow(clamp(position.y / 2.4, 0.0, 1.0), 1.4);
-          float gust = sin(uT * 1.1 + base.x * 0.07 + base.z * 0.05) * 0.6
-                     + sin(uT * 2.7 + base.x * 0.22) * 0.2;
-          transformed.x += (0.55 + gust) * k * 1.1 * uWind;
-          transformed.z += (0.25 + gust * 0.4) * k * uWind;
-          vGH = clamp(position.y / 2.4, 0.0, 1.0);
-        `,
-        frag: `diffuseColor.rgb *= 0.45 + 0.65 * vGH;`,
-      }), RN);
-    reeds.material.onBeforeCompile = ((prev) => (sh, r) => {
+    // the street-distance term has to be computed before it is used
+    paveMat.onBeforeCompile = ((prev) => (sh, r) => {
       if (prev) prev(sh, r);
-      sh.vertexShader = 'varying float vGH;\n' + sh.vertexShader;
-      sh.fragmentShader = 'varying float vGH;\n' + sh.fragmentShader;
-    })(reeds.material.onBeforeCompile);
-    reeds.material.customProgramCacheKey = () => 'rainreed';
-    let ri = 0;
-    for (let i = 0; i < RN; i++) {
-      const a = rnd(6.28), d = 9 + Math.pow(Math.random(), 0.55) * 240;
-      const x = Math.cos(a) * d, z = Math.sin(a) * d;
-      const sc = rnd(1.5, 0.5);
-      _e.set(0, rnd(6.28), 0);
-      reeds.setMatrixAt(ri++, _m4.compose(_v.set(x, 0, z), _q.setFromEuler(_e), _s.set(sc, sc, sc)));
-    }
-    reeds.count = ri;
-    reeds.frustumCulled = false;
-    g.add(reeds);
+      let decl = 'float sd = 1e9;\\n';
+      decl += 'float rr0 = length(vWP.xz);\\n';
+      decl += 'if (rr0 < ' + PLACE_R.toFixed(1) + ') sd = 0.0; else {\\n';
+      for (const a of STREET_A) {
+        const rad = RAD(a);
+        decl += '{ float al = vWP.x * ' + Math.sin(rad).toFixed(5) + ' + vWP.z * ' + Math.cos(rad).toFixed(5) + ';\\n';
+        decl += '  if (al > 0.0) sd = min(sd, abs(vWP.x * ' + Math.cos(rad).toFixed(5) + ' - vWP.z * ' + Math.sin(rad).toFixed(5) + ')); }\\n';
+      }
+      decl += '}\\n';
+      sh.fragmentShader = sh.fragmentShader.replace('vec2 P = vWP.xz;', decl + 'vec2 P = vWP.xz;');
+    })(paveMat.onBeforeCompile);
+    paveMat.customProgramCacheKey = () => 'rainpave';
 
-    /* dead trees, bare and leaning — the only thing tall enough to read as
-       distance once the murk closes in */
-    /* transparent + alphaTest, same as the forest's trunks: the x-ray fade
-       needs real blending to dissolve rather than pop, and depthWrite keeps
-       them sorting against each other correctly all the same. */
-    const barkMat = patchStd(new THREE.MeshStandardMaterial({
-      color: 0x2e2a26, roughness: 1, flatShading: true,
-      transparent: true, depthWrite: true, alphaTest: 0.002,
-    }), { occluder: true });
-    const trunkGeo = new THREE.CylinderGeometry(0.16, 0.62, 11, 6, 1);
-    trunkGeo.translate(0, 5.5, 0);
-    const limbGeo = new THREE.CylinderGeometry(0.06, 0.2, 4.4, 5, 1);
-    limbGeo.translate(0, 2.2, 0);
-    const TN = 90, LN = TN * 5;
-    const trunks = new THREE.InstancedMesh(trunkGeo, barkMat, TN);
-    const limbs = new THREE.InstancedMesh(limbGeo, barkMat, LN);
-    let li = 0;
-    for (let i = 0; i < TN; i++) {
-      const a = rnd(6.28), d = 22 + Math.pow(Math.random(), 0.6) * 210;
+    const ground = new THREE.Mesh(ggeo, paveMat);
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    g.add(ground);
+
+    /* ------------------------------ the town ------------------------------
+       Timber-framed blocks between the streets: a plastered body, a dark frame,
+       a steep tiled roof and a jettied upper storey that leans over the road.
+       Instanced by part, so the whole town is five draw calls. */
+    const MW = {
+      /* Coursed rubble. Horizontal courses with jittered blocks along each and
+         the joints raked back into shadow — which is the whole reason stone
+         reads as stone and not as a grey box. The running direction is picked
+         from the dominant normal so the courses lie flat on every wall. */
+      stone: patchStd(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.94, flatShading: true }), {
+        frag: `
+          vec3 Nn = normalize(vWN);
+          float along = abs(Nn.x) > abs(Nn.z) ? vWP.z : vWP.x;
+          float course = vWP.y * 2.3;
+          float ci = floor(course), cf = fract(course);
+          float bx = along * 1.35 + hash21(vec2(ci, 4.0)) * 3.0;   // break-jointed
+          float bi = floor(bx), bf = fract(bx);
+          float joint = smoothstep(0.0, 0.07, cf) * smoothstep(1.0, 0.93, cf)
+                      * smoothstep(0.0, 0.06, bf) * smoothstep(1.0, 0.94, bf);
+          vec3 st = mix(vec3(0.30,0.29,0.26), vec3(0.55,0.53,0.48), hash21(vec2(bi, ci)));
+          st *= 0.9 + 0.2 * fbm(vec2(bx, course) * 3.0);
+          diffuseColor.rgb = mix(st * 0.5, st, joint);
+          // soaked at the foot, and streaked where the rain runs down it
+          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.20,0.21,0.22), smoothstep(2.6, 0.0, vWP.y) * 0.45);
+          diffuseColor.rgb *= 0.86 + 0.22 * smoothstep(0.45, 0.9, fbm(vec2(along * 2.2, vWP.y * 0.5)));`,
+        occluder: true,
+      }),
+      plaster: patchStd(new THREE.MeshStandardMaterial({ color: 0xb9ac96, roughness: 0.92, flatShading: true }), {
+        frag: `diffuseColor.rgb *= 0.82 + 0.3 * fbm(vWP.xz * 1.4 + vWP.y);
+               diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.32,0.33,0.30), smoothstep(2.0, 0.0, vWP.y) * 0.5);`,
+        occluder: true,
+      }),
+      beam: patchStd(new THREE.MeshStandardMaterial({ color: 0x3b2c20, roughness: 1, flatShading: true }), { occluder: true }),
+      roof: patchStd(new THREE.MeshStandardMaterial({ color: 0x4a3a3c, roughness: 0.5, flatShading: true }), {
+        frag: `float course = fract(vWP.y * 3.2);
+               diffuseColor.rgb *= 0.78 + 0.34 * step(0.5, course);
+               diffuseColor.rgb += vec3(0.10,0.12,0.16) * pow(1.0 - abs(dot(normalize(vWN), normalize(cameraPosition - vWP))), 3.0);`,
+        occluder: true,
+      }),
+      lit: new THREE.MeshBasicMaterial({ color: 0xffc266, fog: false }),
+    };
+
+    /* A gable roof is a triangular prism, not two tilted boxes. Boxes have to
+       be rotated and offset to meet along a ridge, which is fiddly to get
+       right and was not right — the pitches did not meet and the ridge sat
+       across them. A prism is correct by construction and is one instanced
+       draw for the whole town. Unit: 1 wide, 1 tall, 1 deep, ridge along z,
+       base on y = 0. */
+    const roofGeo = (() => {
+      const v = [];
+      const quad = (a, b, c, d) => { v.push(...a, ...b, ...c, ...a, ...c, ...d); };
+      const A = [-0.5, 0, -0.5], B = [-0.5, 0, 0.5], C = [0.5, 0, 0.5], D = [0.5, 0, -0.5];
+      const RA = [0, 1, -0.5], RB = [0, 1, 0.5];
+      quad(A, B, RB, RA);                 // one pitch
+      quad(C, D, RA, RB);                 // and the other
+      v.push(...B, ...C, ...RB);          // the two gable ends
+      v.push(...D, ...A, ...RA);
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(v, 3));
+      geo.computeVertexNormals();
+      return geo;
+    })();
+
+    const stones = [], bodies = [], beams = [], roofs = [], panes = [];
+    const push = (arr, x, y, z, sx, sy, sz, ry) => arr.push({ x, y, z, sx, sy, sz, ry });
+
+    for (let i = 0; i < 460; i++) {
+      const a = rnd(6.28);
+      const d = 30 + Math.pow(Math.random(), 0.55) * 240;
       const x = Math.cos(a) * d, z = Math.sin(a) * d;
-      const lean = rnd(0.22, -0.22);
-      const sc = rnd(1.35, 0.7);
-      _e.set(lean, rnd(6.28), rnd(0.16, -0.16));
-      trunks.setMatrixAt(i, _m4.compose(_v.set(x, 0, z), _q.setFromEuler(_e), _s.set(sc, sc, sc)));
-      for (let k = 0; k < 5 && li < LN; k++) {
-        _e.set(rnd(1.5, 0.5), rnd(6.28), rnd(0.7, -0.7));
-        limbs.setMatrixAt(li++, _m4.compose(
-          _v.set(x, (4.5 + k * 1.3) * sc, z), _q.setFromEuler(_e), _s.set(sc, sc, sc)));
+      if (streetDist(x, z) < STREET_W * 0.5 + 3) continue;   // keep the roads clear
+      if (Math.hypot(x, z) < PLACE_R + 3) continue;
+      const gy = groundH(x, z);
+      const w = rnd(9, 5), dp = rnd(8, 4.5);
+      const storeys = 2 + Math.floor(rnd(2.4));
+      const ry = Math.atan2(x, z) + rnd(0.3, -0.3);
+      let y = gy;
+      for (let k = 0; k < storeys; k++) {
+        const sh = rnd(3.4, 2.6);
+        // the upper storeys jetty out over the street
+        const jw = w + k * 0.5, jd = dp + k * 0.5;
+        // ground storey in stone, the jettied ones above in timber and plaster
+        push(k === 0 ? stones : bodies, x, y + sh / 2, z, jw, sh, jd, ry);
+        // frame: corner posts and a rail at each floor
+        push(beams, x, y + 0.12, z, jw + 0.14, 0.28, jd + 0.14, ry);
+        push(beams, x, y + sh - 0.14, z, jw + 0.2, 0.3, jd + 0.2, ry);
+        for (const sx2 of [-1, 1]) for (const sz2 of [-1, 1]) {
+          const ox = sx2 * jw * 0.46, oz = sz2 * jd * 0.46;
+          push(beams,
+            x + ox * Math.cos(ry) + oz * Math.sin(ry), y + sh / 2, z - ox * Math.sin(ry) + oz * Math.cos(ry),
+            0.3, sh, 0.3, ry);
+        }
+        // a lit window or two, facing the street
+        if (Math.random() < 0.62) {
+          const ox = 0, oz = jd * 0.5;
+          panes.push({
+            x: x + oz * Math.sin(ry), y: y + sh * 0.58, z: z + oz * Math.cos(ry),
+            sx: rnd(1.2, 0.7), sy: rnd(1.0, 0.6), sz: 0.14, ry,
+          });
+        }
+        y += sh;
+      }
+      // the roof: one prism, sitting on the top storey and oversailing it
+      const rh = rnd(3.6, 2.6);
+      push(roofs, x, y, z, w + storeys * 0.5 + 1.1, rh, dp + storeys * 0.5 + 1.1, ry);
+      // a chimney on about half of them
+      if (Math.random() < 0.5) push(bodies, x + rnd(1.5, -1.5), y + rh * 0.8, z + rnd(1.5, -1.5), 0.9, rh * 1.5, 0.9, ry);
+    }
+
+    function instanced(list, mat, geo) {
+      const im = new THREE.InstancedMesh(geo || new THREE.BoxGeometry(1, 1, 1), mat, Math.max(1, list.length));
+      list.forEach((b, i) => {
+        _q.setFromAxisAngle(YUP, b.ry);
+        im.setMatrixAt(i, _m4.compose(_v.set(b.x, b.y, b.z), _q, _s.set(b.sx, b.sy, b.sz)));
+      });
+      im.count = list.length;
+      im.frustumCulled = false;
+      im.castShadow = true; im.receiveShadow = true;
+      g.add(im);
+      return im;
+    }
+    instanced(stones, MW.stone);
+    instanced(bodies, MW.plaster);
+    instanced(beams, MW.beam);
+    instanced(roofs, MW.roof, roofGeo);
+    instanced(panes, MW.lit);
+
+    /* ----------------------------- the castle -----------------------------
+       On the hill, and deliberately simple: at this distance it is a
+       silhouette with lit windows, and anything more is wasted. */
+    const castle = new THREE.Group();
+    castle.position.set(HILL.x, hillH(HILL.x, HILL.y), HILL.y);
+    const cst = (mx, my, mz, sx, sy, sz, mat = MW.stone) => {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), mat);
+      m.position.set(mx, my, mz);
+      castle.add(m);
+      return m;
+    };
+    cst(0, 11, 0, 34, 22, 26);                       // the keep
+    cst(0, 24, 0, 36, 3, 28);                        // its parapet
+    for (let i = 0; i < 12; i++) cst(-16 + i * 3, 27, 13, 1.8, 3, 1.8);   // merlons
+    for (const [tx, tz] of [[-19, -14], [19, -14], [-19, 14], [19, 14]]) {
+      cst(tx, 16, tz, 9, 32, 9);
+      cst(tx, 33, tz, 11, 2.4, 11);
+      const roof = new THREE.Mesh(new THREE.ConeGeometry(7.6, 11, 8), MW.roof);
+      roof.position.set(tx, 40, tz);
+      castle.add(roof);
+    }
+    cst(0, 4, 24, 44, 9, 3);                         // the curtain wall
+    cst(-30, 5, 6, 3, 11, 40);
+    cst(30, 5, 6, 3, 11, 40);
+    // lit windows, and a beacon on the tallest tower
+    const castleLit = [];
+    for (let i = 0; i < 26; i++) {
+      const w2 = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.7, 0.5), MW.lit);
+      const side = Math.floor(rnd(4));
+      const px = side < 2 ? rnd(15, -15) : (side === 2 ? -17.2 : 17.2);
+      const pz = side < 2 ? (side === 0 ? -13.2 : 13.2) : rnd(11, -11);
+      w2.position.set(px, rnd(20, 4), pz);
+      w2.rotation.y = side < 2 ? 0 : Math.PI / 2;
+      castle.add(w2); castleLit.push(w2);
+    }
+    g.add(castle);
+    const beacon = new THREE.PointLight(0xffb060, 90, 190, 1.6);
+    beacon.position.set(HILL.x + 19, hillH(HILL.x, HILL.y) + 46, HILL.y - 14);
+    g.add(beacon);
+
+    /* ---------------------------- street lamps ----------------------------
+       These are the lights the paving reflects, so there are deliberately few
+       of them and they are placed where they will be seen: round the place,
+       and down the streets at intervals. */
+    const lamps = [];
+    const lampMat = new THREE.MeshBasicMaterial({ color: 0xffc266, fog: false });
+    function lamp(x, z, h = 4.4) {
+      const y = groundH(x, z);
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.2, h, 6), MW.beam);
+      post.position.set(x, y + h / 2, z); g.add(post);
+      const arm = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 0.9), MW.beam);
+      arm.position.set(x, y + h, z); g.add(arm);
+      const box = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.62, 0.5), lampMat);
+      box.position.set(x, y + h - 0.2, z); g.add(box);
+      const cap = new THREE.Mesh(new THREE.ConeGeometry(0.46, 0.4, 4), MW.beam);
+      cap.position.set(x, y + h + 0.24, z); g.add(cap);
+      const pl = new THREE.PointLight(0xffb066, 26, 26, 1.8);
+      pl.position.set(x, y + h - 0.2, z); g.add(pl);
+      lamps.push({ light: pl, box, ph: rnd(6.28) });
+    }
+    for (let i = 0; i < NSTREET; i++) {
+      const a = RAD(STREET_A[i] + 36);
+      lamp(Math.sin(a) * (PLACE_R - 3), Math.cos(a) * (PLACE_R - 3));
+      const sa = RAD(STREET_A[i]);
+      for (const d of [46, 74, 104]) {
+        lamp(Math.sin(sa) * d + Math.cos(sa) * (STREET_W * 0.6),
+             Math.cos(sa) * d - Math.sin(sa) * (STREET_W * 0.6));
       }
     }
-    limbs.count = li;
-    trunks.frustumCulled = false; limbs.frustumCulled = false;
-    g.add(trunks, limbs);
 
-    /* THE RAIN. Two shells of streaks around the camera rather than a volume
-       filling the world: rain is only ever visible near the eye, and a shell
-       that follows the camera costs a few thousand verts instead of millions.
-       Each streak is a stretched quad falling on its own phase, wrapped in a
-       tall cylinder — so it never runs out and never needs respawning on the
-       CPU. */
-    const rainMat = (count, radius, height, len, wide, alpha, speed) => {
+    /* --------------------------- carts and horses ---------------------------
+       Two of them, going round the place at a walk. A cart is a box, two big
+       wheels and a pair of shafts; the horse in front is boxes too, with legs
+       that swing. At this scale that is entirely enough. */
+    const carts = [];
+    for (let i = 0; i < 3; i++) {
+      const c = new THREE.Group();
+      const bed = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.9, 3.4), MW.beam);
+      bed.position.y = 1.25; c.add(bed);
+      const tilt = new THREE.Mesh(new THREE.BoxGeometry(2.0, 1.3, 3.0), MW.plaster);
+      tilt.position.y = 2.3; c.add(tilt);
+      for (const sx of [-1, 1]) {
+        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.18, 12), MW.beam);
+        wheel.rotation.z = Math.PI / 2;
+        wheel.position.set(sx * 1.1, 0.95, -0.8);
+        c.add(wheel);
+        const w2 = wheel.clone(); w2.position.z = 1.2; c.add(w2);
+      }
+      for (const sx of [-0.5, 0.5]) {
+        const shaft = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 2.6), MW.beam);
+        shaft.position.set(sx, 1.1, 2.6); c.add(shaft);
+      }
+      // the horse
+      const horse = new THREE.Group();
+      const hm = new THREE.MeshStandardMaterial({ color: i === 1 ? 0x5a463a : 0x3a3230, roughness: 0.95, flatShading: true });
+      const hbody = new THREE.Mesh(new THREE.BoxGeometry(0.95, 1.15, 2.4), hm);
+      hbody.position.y = 1.6; horse.add(hbody);
+      const neck = new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.0, 0.7), hm);
+      neck.position.set(0, 2.2, 1.1); neck.rotation.x = -0.4; horse.add(neck);
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 1.0), hm);
+      head.position.set(0, 2.6, 1.7); horse.add(head);
+      const legs = [];
+      for (const sx of [-0.34, 0.34]) for (const sz of [-0.8, 0.85]) {
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.24, 1.15, 0.26), hm);
+        leg.position.set(sx, 0.55, sz);
+        horse.add(leg); legs.push(leg);
+      }
+      horse.position.z = 4.2;
+      c.add(horse);
+      g.add(c);
+
+      /* A route, not a circle. Each cart comes down one street, crosses the
+         place along its edge, goes up another, and turns round at the far end
+         to come back — which is what a cart in a town actually does, and it
+         means they are on the roads instead of driving through the houses.
+         Waypoints are offset to the right of the centre line so two carts on
+         the same street pass each other rather than colliding. */
+      const A_IN = STREET_A[i % NSTREET], A_OUT = STREET_A[(i + 2) % NSTREET];
+      const LANE = STREET_W * 0.28;
+      const onStreet = (deg, dist, side) => {
+        const rad = RAD(deg);
+        return new THREE.Vector2(
+          Math.sin(rad) * dist + Math.cos(rad) * LANE * side,
+          Math.cos(rad) * dist - Math.sin(rad) * LANE * side,
+        );
+      };
+      const path = [onStreet(A_IN, 150, 1), onStreet(A_IN, 60, 1), onStreet(A_IN, PLACE_R - 2, 1)];
+      // round the edge of the place from one street to the next
+      const sweep = ((A_OUT - A_IN + 720) % 360);
+      for (let k2 = 1; k2 <= 6; k2++) {
+        const aa = RAD(A_IN + (sweep * k2) / 6);
+        path.push(new THREE.Vector2(Math.sin(aa) * (PLACE_R - 5), Math.cos(aa) * (PLACE_R - 5)));
+      }
+      path.push(onStreet(A_OUT, PLACE_R - 2, -1), onStreet(A_OUT, 60, -1), onStreet(A_OUT, 150, -1));
+      carts.push({
+        c, legs, path,
+        at: rnd(path.length - 1),        // somewhere along it to start
+        dir: Math.random() < 0.5 ? 1 : -1,
+        sp: 3.2 + rnd(1.6),              // metres a second, i.e. a walk
+        yaw: 0,
+      });
+    }
+
+    /* ------------------------------- the rain -------------------------------
+       Shells of streaks that ride with the camera and wrap in a column: rain
+       is only ever visible near the eye, so a volume filling the town would
+       cost millions of verts to say the same thing. */
+    function rainShell(count, radius, height, len, wide, alpha, speed) {
       const geo = new THREE.InstancedBufferGeometry();
       const q = new THREE.PlaneGeometry(wide, len);
       geo.setIndex(q.index);
@@ -2460,17 +2753,14 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
       geo.instanceCount = count;
       const mat = new THREE.ShaderMaterial({
         transparent: true, depthWrite: false, fog: false, side: THREE.DoubleSide,
-        blending: THREE.NormalBlending,
         uniforms: { uT, uAlpha: { value: alpha }, uTint: { value: new THREE.Color(0xbcc8d8) } },
         vertexShader: `
           attribute vec3 aOff; uniform float uT; varying vec2 vUv;
           void main(){
             vUv = uv;
-            // fall, and wrap in a column that rides with the camera
             vec3 c = aOff;
             c.y = mod(c.y - uT * ${speed.toFixed(1)}, ${height.toFixed(1)});
             c += vec3(cameraPosition.x, 0.0, cameraPosition.z);
-            // billboard on Y only: a streak stays vertical however you look
             vec3 toEye = normalize(vec3(cameraPosition.x - c.x, 0.0, cameraPosition.z - c.z));
             vec3 right = normalize(cross(vec3(0.0,1.0,0.0), toEye));
             vec3 wp = c + right * position.x + vec3(0.0, position.y, 0.0);
@@ -2479,7 +2769,6 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
         fragmentShader: `
           uniform float uAlpha; uniform vec3 uTint; varying vec2 vUv;
           void main(){
-            // taper both ends so a streak has no hard start or stop
             float a = smoothstep(0.0, 0.22, vUv.y) * smoothstep(1.0, 0.72, vUv.y);
             a *= smoothstep(0.0, 0.5, vUv.x) * smoothstep(1.0, 0.5, vUv.x);
             gl_FragColor = vec4(uTint, a * uAlpha);
@@ -2487,72 +2776,115 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
       });
       const m = new THREE.Mesh(geo, mat);
       m.frustumCulled = false;
-      m.renderOrder = 5;
+      m.renderOrder = 6;
       g.add(m);
       return m;
-    };
-    // near: few, long, and clearly readable. far: many, short, a grey veil.
-    const rainNear = rainMat(900, 34, 46, 2.6, 0.045, 0.5, 34);
-    const rainFar = rainMat(2600, 130, 90, 1.5, 0.05, 0.22, 26);
+    }
+    const rainNear = rainShell(1000, 30, 42, 2.4, 0.04, 0.42, 36);
+    const rainFar = rainShell(2600, 120, 84, 1.4, 0.05, 0.2, 27);
 
-    /* splashes: a ring of short-lived vertical ticks on the ground plane, so
-       the rain visibly *lands* instead of passing through */
+    // splashes where it lands, and mist lying in the streets
     const splash = pointCloud(g, 900, () => {
       const a = rnd(6.28), d = rnd(70, 2);
       return { x: Math.cos(a) * d, y: 0.06, z: Math.sin(a) * d, v: rnd(6.28) };
-    }, { color: 0xc8d4e4, size: 0.34, opacity: 0.5 });
+    }, { color: 0xc8d4e4, size: 0.3, opacity: 0.45 });
+    const mist = pointCloud(g, 380, () => ({
+      x: rnd(220, -220), y: rnd(6, 0.4), z: rnd(220, -220), v: rnd(0.5, 0.08),
+    }), { color: 0x9fb0c0, size: 6.0, opacity: 0.05, additive: false });
 
-    // mist lying in the hollows, and the drifting curtain of heavier rain
-    const mist = pointCloud(g, 420, () => ({
-      x: rnd(230, -230), y: rnd(7, 0.4), z: rnd(230, -230), v: rnd(0.5, 0.08),
-    }), { color: 0x9fb0c0, size: 5.5, opacity: 0.055, additive: false });
-
-    // lightning, seen rather than heard: the whole sky lifts for a few frames
+    // lightning, seen rather than heard
     const flash = { t: -1, next: rnd(26, 9), power: 0 };
     const bolt = new THREE.PointLight(0xcfe0ff, 0, 900, 1.4);
     bolt.position.set(120, 190, -160);
     g.add(bolt);
 
-    const fog = new THREE.FogExp2(0x424b57, 0.0075);
+    const fog = new THREE.FogExp2(0x39424f, 0.0068);
     let dayK = 1;
+    const _lampV = new THREE.Vector3();
     return {
       group: g,
       fog,
-      css: '#2b303a',
+      css: '#232a34',
       glass: { color: 0xffe9c0, emissive: 0xffc47a, intensity: 2.2 },
       fade: { on: 1, radius: 13, amount: 1.0 },
       light: {
-        // overcast: the sky *is* the light source, so the hemisphere carries
-        // it and the key is barely a key at all
-        hemi: { i: 1.15, sky: 0x9fb0c4, gnd: 0x2a2a24 },
-        key: { mul: 0.35, c: 0xc8d4e4, p: [-20, 60, 24] },
-        fill: { mul: 0.45, c: 0x6f7f96 },
+        hemi: { i: 1.0, sky: 0x9fb0c4, gnd: 0x2e2a26 },
+        key: { mul: 0.32, c: 0xc8d4e4, p: [-30, 70, 30] },
+        fill: { mul: 0.42, c: 0x6f7f96 },
       },
       lightNight: {
-        hemi: { i: 0.42, sky: 0x3f4a60, gnd: 0x0e0f12 },
-        key: { mul: 0.12, c: 0x7f92b8, p: [-20, 60, 24] },
-        fill: { mul: 0.18, c: 0x2a3346 },
+        hemi: { i: 0.34, sky: 0x38445c, gnd: 0x0e0f12 },
+        key: { mul: 0.1, c: 0x7f92b8, p: [-30, 70, 30] },
+        fill: { mul: 0.16, c: 0x28314a },
       },
       night(n) {
         dayK = 1 - n * 0.72;
-        dome.setSky(mixC(0x39414f, 0x0a0d14, n), mixC(0x4a5462, 0x11151e, n), mixC(0x2b303a, 0x090b10, n));
-        fog.color.set(mixC(0x424b57, 0x0e1219, n));
-        fog.density = mixN(0.0075, 0.0098, n);
-        rainNear.material.uniforms.uTint.value.set(mixC(0xbcc8d8, 0x6f7f98, n));
-        rainFar.material.uniforms.uTint.value.set(mixC(0xbcc8d8, 0x6f7f98, n));
-        splash.m.material.color.set(mixC(0xc8d4e4, 0x7f8ea8, n));
-        this.css = n > 0.5 ? '#0b0e14' : '#2b303a';
+        dome.setSky(mixC(0x2b3340, 0x080b12, n), mixC(0x39424f, 0x10151d, n), mixC(0x232a34, 0x090b10, n));
+        fog.color.set(mixC(0x39424f, 0x0d1119, n));
+        fog.density = mixN(0.0068, 0.0092, n);
+        rainNear.material.uniforms.uTint.value.set(mixC(0xbcc8d8, 0x7183a0, n));
+        rainFar.material.uniforms.uTint.value.set(mixC(0xbcc8d8, 0x7183a0, n));
+        // the town lights up as it gets dark, which is most of the atmosphere
+        MW.lit.color.set(mixC(0xd8a860, 0xffc266, n));
+        uWet.value = 1;
+        this.css = n > 0.5 ? '#0a0d14' : '#232a34';
       },
       tick(t, dt) {
-        // splashes: each tick pops on its own phase and dies immediately
+        /* Hand the paving the lamps that matter. Only the nearest handful,
+           because the shader loops over every one of them per fragment and the
+           far ones contribute nothing anyway. */
+        if (uRT.value > 0.5) {
+          const near = lamps
+            .map((l) => ({ l, d: l.light.position.distanceToSquared(camera.position) }))
+            .sort((a, b) => a.d - b.d)
+            .slice(0, 10);
+          near.forEach((e, i) => {
+            uLampPos.value[i].copy(e.l.light.position);
+            uLampCol.value[i].copy(e.l.light.color).multiplyScalar(e.l.light.intensity / 26);
+          });
+          uLampN.value = near.length;
+        } else uLampN.value = 0;
+
+        // the lamps gutter in the wet
+        for (const l of lamps) {
+          const k = 0.82 + 0.18 * Math.sin(t * 7 + l.ph) + 0.06 * Math.sin(t * 17 + l.ph * 2);
+          l.light.intensity = 26 * k;
+          l.box.material = lampMat;
+        }
+
+        /* Carts, following their routes. `at` is a position along the path in
+           leg units; the cart is placed by interpolating between waypoints and
+           turned to face the direction it is actually travelling, so it corners
+           rather than sliding sideways. At either end it turns round. */
+        for (const cc of carts) {
+          const legN = cc.path.length - 1;
+          const legLen = cc.path[Math.min(legN - 1, Math.floor(cc.at))]
+            .distanceTo(cc.path[Math.min(legN, Math.floor(cc.at) + 1)]) || 1;
+          cc.at += (cc.dir * cc.sp * dt) / legLen;
+          if (cc.at >= legN) { cc.at = legN - 0.001; cc.dir = -1; }
+          if (cc.at <= 0) { cc.at = 0.001; cc.dir = 1; }
+          const i0 = Math.floor(cc.at), f = cc.at - i0;
+          const p0 = cc.path[i0], p1 = cc.path[Math.min(legN, i0 + 1)];
+          const px = p0.x + (p1.x - p0.x) * f, pz = p0.y + (p1.y - p0.y) * f;
+          cc.c.position.set(px, groundH(px, pz) + Math.abs(Math.sin(t * 3.4)) * 0.04, pz);
+          // steer toward where it is going, easing so corners are not snapped
+          const wantYaw = Math.atan2((p1.x - p0.x) * cc.dir, (p1.y - p0.y) * cc.dir);
+          let dd = wantYaw - cc.yaw;
+          while (dd > Math.PI) dd -= Math.PI * 2;
+          while (dd < -Math.PI) dd += Math.PI * 2;
+          cc.yaw += dd * Math.min(1, dt * 2.4);
+          cc.c.rotation.y = cc.yaw;
+          cc.legs.forEach((lg, i) => { lg.rotation.x = Math.sin(t * 3.4 + i * 1.6) * 0.42; });
+        }
+
         const sp2 = splash.pos;
         for (let i = 0; i < sp2.length; i += 3) {
           const ph = splash.vel[i / 3];
           const u = (t * 2.4 + ph) % 1;
-          sp2[i + 1] = u < 0.3 ? 0.06 + u * 0.9 : -50;   // parked below the bed between hits
+          sp2[i + 1] = u < 0.3 ? 0.06 + u * 0.9 : -50;
         }
         splash.m.geometry.attributes.position.needsUpdate = true;
-        splash.m.material.opacity = 0.5 * dayK;
+        splash.m.material.opacity = 0.45 * dayK;
 
         const mp = mist.pos;
         for (let i = 0; i < mp.length; i += 3) {
@@ -2561,9 +2893,6 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
         }
         mist.m.geometry.attributes.position.needsUpdate = true;
 
-        /* lightning: a fast double-strike, then a long wait. The light does
-           the work; there is no bolt geometry, because at this distance you
-           would only ever see the sky change. */
         flash.next -= dt;
         if (flash.t < 0 && flash.next <= 0) {
           flash.t = 0;
@@ -2573,7 +2902,6 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
         if (flash.t >= 0) {
           flash.t += dt;
           const u = flash.t;
-          // strike, a dip, then the second stroke — the shape is most of it
           const env = Math.exp(-u * 7.0) + 0.65 * Math.exp(-Math.abs(u - 0.16) * 26.0);
           flash.power = Math.max(0, env);
           if (u > 1.2) { flash.t = -1; flash.power = 0; }
@@ -2581,6 +2909,8 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
         bolt.intensity = flash.power * 2600;
         bolt.visible = flash.power > 0.004;
       },
+      /* the wet-reflection pass, which the console can switch on */
+      rt(on) { uRT.value = on ? 1 : 0; },
     };
   }
 
@@ -3079,6 +3409,7 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
     uFadeOn.value = w.fade ? w.fade.on : 0;
     if (w.fade) { uFadeRad.value = w.fade.radius; uFadeAmt.value = w.fade.amount; }
     applyGlass(w.glass);
+    if (w.rt) w.rt(rtOn);
     refreshFog();
     return current;
   }
@@ -3116,6 +3447,12 @@ export function installWorlds({ THREE, scene, camera, model, fx, dims, nightFor 
     shellFocus(hidden) { shellHidden = !!hidden; if (shell) setShell(); },
     cssFor: (kind) => (built[kind] ? built[kind].css : null),
     wind: (v) => { uWind.value = v; },
+    /* Wet-surface reflections. Off by default: the paving shader loops over
+       every nearby lamp for each fragment, which is the sort of thing you opt
+       into rather than pay for by default. Worlds that do not implement it
+       simply ignore the call. */
+    reflections: (on) => { rtOn = !!on; const w = current && built[current]; if (w && w.rt) w.rt(rtOn); return rtOn; },
+    reflectionsOn: () => rtOn,
     /* sink a shaft through the world so the cellar can be seen; 0 fills it in */
     cutaway: (r) => { uCutR.value = r || 0; },
     current: () => current,

@@ -82,9 +82,18 @@ mat('tile_pale', '#cdd8d2', { roughness: 0.35 });
 mat('tile_deep', '#4a7f7a', { roughness: 0.35 });
 mat('tile_warm', '#c8a882', { roughness: 0.4 });
 mat('grout', '#8f9a92', { roughness: 0.95 });
-mat('bathwater', '#7fc8d8', {
-  transparent: true, opacity: 0.66, roughness: 0.12,
-  emissive: '#2f6f8f', emissiveIntensity: 0.3,
+/* Hot water in a deep wooden tub is not a pane of tinted glass — you cannot
+   see the bottom through it. Nearly opaque, with the tint doing the work and
+   a low roughness so the lamps sit on the surface. */
+mat('bathwater', '#2f7f96', {
+  transparent: true, opacity: 0.94, roughness: 0.08, metalness: 0.15,
+  emissive: '#123f52', emissiveIntensity: 0.5,
+});
+/* The surface itself: a separate skin sitting a hair above the body of the
+   water, bright and moving, which is what actually reads as "water". */
+mat('bathwater_top', '#8fd8e8', {
+  transparent: true, opacity: 0.9, roughness: 0.05, metalness: 0.35,
+  emissive: '#3f9fb8', emissiveIntensity: 0.85,
 });
 mat('copper', '#b87333', { metalness: 0.5, roughness: 0.35 });
 

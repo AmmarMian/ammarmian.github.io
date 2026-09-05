@@ -251,7 +251,7 @@ for (const f of FLOORS_BY_LEVEL) {
   const a = document.createElement('a');
   a.className = 'nav-item';
   a.href = BASE + '/' + f.slug;
-  a.innerHTML = `<span class="nav-num">${String(f.index + 1).padStart(2, '0')}</span><span class="nav-label">${f.label}</span>`;
+  a.innerHTML = `<span class="nav-num">${String(f.index).padStart(2, '0')}</span><span class="nav-label">${f.label}</span>`;
   a.addEventListener('click', (e) => { e.preventDefault(); navigate(f.slug); });
   navRail.appendChild(a);
   links.push(a);

@@ -13,6 +13,8 @@ import { WORLD_BLURBS } from '../data/worlds';
 export interface WorldsApi {
   kinds: string[];
   current: () => string | null;
+  reflections: (on: boolean) => boolean;
+  reflectionsOn: () => boolean;
   teleport: (kind: string | null, onSwap?: () => void) => boolean;
 }
 
@@ -612,6 +614,23 @@ export const COMMANDS: Record<string, Command> = {
       const applied = ctx.scene.simSet(key, v);
       if (applied === null) { ctx.print(`sim: no parameter "${key}". Try "sim" for the list.`, 'err'); return; }
       ctx.print(`sim: ${key} = ${applied}${applied !== v ? ' (clamped)' : ''}.`, 'ok');
+    },
+  },
+
+  reflect: {
+    args: '<on|off>',
+    help: 'wet-surface reflections',
+    detail: 'Where a world supports it, every wet surface works out per fragment where each nearby lamp\'s reflected image would fall and burns it in — a real mirror image stretched by the roughness of the stone, not a blurred copy of the scene. It is off by default because it loops over the lamps for every ground fragment. The rainy city is the world built around it.',
+    examples: ['reflect on', 'reflect off'],
+    complete: () => ['on', 'off'],
+    run(args, ctx) {
+      const v = args[0];
+      if (v !== 'on' && v !== 'off') { ctx.print('reflect: try on, off', 'err'); return; }
+      const now = ctx.worlds.reflections(v === 'on');
+      ctx.print(`reflect: wet reflections ${now ? 'on' : 'off'}.`, 'ok');
+      if (now && ctx.worlds.current() !== 'rain') {
+        ctx.print('(nothing here uses them yet — try the rainy city.)', 'dim');
+      }
     },
   },
 

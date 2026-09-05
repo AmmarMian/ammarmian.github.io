@@ -32,7 +32,7 @@ export interface Anim {
   fire?: THREE.Mesh[];
   /** the bathhouse: rocking water, a running tap, and the view out */
   bath?: {
-    water: THREE.Mesh; stream: THREE.Mesh; tap: THREE.Group; lever: THREE.Mesh;
+    water: THREE.Mesh; surface: THREE.Mesh; stream: THREE.Mesh; tap: THREE.Group; lever: THREE.Mesh;
     tray: THREE.Group; petals: THREE.Mesh[];
     steam: { m: THREE.Points; pos: Float32Array; vel: Float32Array };
     uVista: { value: number }; uT: { value: number }; vistaLight: THREE.PointLight;
