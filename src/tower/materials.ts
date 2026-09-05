@@ -69,6 +69,12 @@ for (let i = 0; i < SPINE_STEPS; i++) {
   mat('spine_' + i, '#' + c.getHexString(), { roughness: 0.82 });
 }
 
+/* A bound project's specimen: lit from within and never quite still. Kept in
+   M so the pixel-mode sweep finds it, and so the ambience wash can drive its
+   emissive along with every other glowing thing in the tower. */
+mat('specimen', '#7fe8c0', { emissive: '#2fc08f', emissiveIntensity: 1.6, roughness: 0.28 });
+mat('specimen_tag', '#e8dcb8', { roughness: 0.95 });
+
 mat('fox_fur', '#c8622c');
 mat('fox_fur_dark', '#9c4720');
 mat('fox_cream', '#e8d7bd');

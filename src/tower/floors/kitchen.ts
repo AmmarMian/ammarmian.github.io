@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { addBox, addCyl, arcBox, polar, RAD, rnd, pick, slab, wall, railing, roundWindow, windowGlow } from '../util';
 import type { Anim } from '../anim';
+import { makePoints } from '../fx';
 
 /* ===== kitchen: hearth spirit, floating chores, a laden table ===== */
 export function buildKitchen(g: THREE.Group, fg: THREE.Group, anim: Anim) {
@@ -93,6 +94,7 @@ export function buildKitchen(g: THREE.Group, fg: THREE.Group, anim: Anim) {
   hearth.add(spirit);
   anim.spirit = { g: spirit, tongues, core, mouth };
   const fire1 = new THREE.PointLight(0xff9a40, 14, 9, 2);
+  fire1.name = 'hearth_fire_light';
   fire1.position.set(hp.x, 1.0, hp.z); fg.add(fire1);
   anim.fireLight = fire1;
   addBox('kettle_arm', 'iron', 1.1, 0.08, 0.08, -0.4, 1.5, 0.2, 0, hearth);
@@ -100,6 +102,16 @@ export function buildKitchen(g: THREE.Group, fg: THREE.Group, anim: Anim) {
   const kettle = addCyl('kettle', 'iron', 0.28, 0.34, 0.42, 12, 0.1, 0.9, 0.2, hearth);
   addCyl('kettle_lid', 'iron', 0.22, 0.3, 0.08, 12, 0.1, 1.14, 0.2, hearth);
   addBox('kettle_spout', 'iron', 0.24, 0.09, 0.09, 0.38, 1.0, 0.2, 0.3, hearth);
+  /* Steam off the spout. It is a handful of points, and it is the difference
+     between a kettle and a model of a kettle. Parented to the hearth so it
+     rides along with it, wherever the hearth ends up facing. */
+  anim.steam = makePoints(hearth, 34, 0xdfe6ee, 0.075, () => ({
+    x: 0.5 + (Math.random() - 0.5) * 0.1,
+    y: 1.1 + Math.random() * 1.1,
+    z: 0.2 + (Math.random() - 0.5) * 0.1,
+    v: 0.22 + Math.random() * 0.3,
+  }));
+  (anim.steam.m.material as THREE.PointsMaterial).opacity = 0.16;
   g.add(hearth);
 
   const tb = new THREE.Group(); tb.name = 'dining_table';

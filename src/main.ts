@@ -2,6 +2,7 @@ import './style.css';
 import { createTowerScene } from './tower/scene';
 import { SidePanel } from './ui/SidePanel';
 import { fetchHalPublications, shelfFor } from './data/hal';
+import projects from './data/projects.json';
 import { createHelpButton } from './ui/HelpModal';
 import { createTerminal } from './ui/Terminal';
 import { createDestinationModal } from './ui/DestinationModal';
@@ -403,6 +404,10 @@ const panel = new SidePanel(app, tower);
 void fetchHalPublications()
   .then((docs) => tower.bindPublications(docs, shelfFor, (id) => void panel.openDoc(id)))
   .catch(() => {});
+
+/* And the same for the laboratory: each project becomes a lit specimen on the
+   alchemy shelves. This list is local, so it can be bound immediately. */
+tower.bindProjects(projects as { name: string; status?: string }[], () => navigate('projects'));
 
 let navGen = 0;
 let appliedSlug: string | null | undefined;

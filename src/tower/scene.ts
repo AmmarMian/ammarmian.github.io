@@ -22,7 +22,8 @@ import { buildFoxMesh, createFoxState, foxDecide } from './fox';
 import { makePoints, setBackdrop as setBackdropFx, suppressBackdrop } from './fx';
 import { createFocusController } from './focus';
 import { createInteractionSystem } from './interactions';
-import { addFloorFill, registerInteriorLights, applyAmbience, addFlameLights, interiorGain, registerShellPane, setOccupiedFloor, NO_DAYNIGHT, clampNight } from './ambience';
+import { addFloorFill, registerInteriorLights, applyAmbience, addFlameLights, interiorGain, registerShellPane,
+         registerLamp, setOccupiedFloor, tickLamps, NO_DAYNIGHT, clampNight } from './ambience';
 
 export type TowerScene = ReturnType<typeof createTowerScene>;
 
@@ -84,7 +85,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
 
   buildQuarters(floors[F.quarters].g, floors[F.quarters].fg, anim);
   const library = buildLibrary(floors[F.library].g, floors[F.library].fg, anim);
-  buildLaboratory(floors[F.lab].g, floors[F.lab].fg, anim);
+  const laboratory = buildLaboratory(floors[F.lab].g, floors[F.lab].fg, anim);
   buildObservatory(floors[F.observatory].g, floors[F.observatory].fg, anim);
   buildSanctum(floors[F.sanctum].g, floors[F.sanctum].fg, anim);
   buildKitchen(floors[F.kitchen].g, floors[F.kitchen].fg, anim);
@@ -92,6 +93,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
   const { wizard, handL, staffOrb } = buildWizardMesh();
   model.add(wizard);
   const wizardLight = new THREE.PointLight(0x8fd8ff, 6, 4.5, 2);
+  wizardLight.name = 'wizard_light';
   fx.add(wizardLight);
   const wiz = createWizardController(NF);
   // Where he is depends on the hour, like anyone with a routine — placed
@@ -143,6 +145,25 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     z: cauldronWorld.z + (Math.random() - 0.5) * 0.7,
     v: 0.4 + Math.random() * 0.5,
   }));
+
+  /* Wisps. Small, slow, warm lights that drift up through the tower after
+     dark and are gone by morning — the one piece of this place that is purely
+     atmosphere and answers to nothing. They rise on a lazy helix rather than
+     straight up, because straight up reads as an effect and a helix reads as
+     something alive. Faded right out in daylight, so they cost nothing to
+     look at when they would only be clutter. */
+  const WISPS = 40;
+  const wisps = makePoints(fx, WISPS, 0xffd08a, 0.13, () => {
+    const a = Math.random() * Math.PI * 2, r = 0.6 + Math.random() * (R - 1.4);
+    return { x: Math.sin(a) * r, y: Math.random() * TOP, z: Math.cos(a) * r, v: 0.12 + Math.random() * 0.3 };
+  });
+  wisps.m.material.opacity = 0;
+  const wispPhase = new Float32Array(WISPS);
+  const wispRad = new Float32Array(WISPS);
+  for (let i = 0; i < WISPS; i++) {
+    wispPhase[i] = Math.random() * 6.283;
+    wispRad[i] = Math.hypot(wisps.pos[i * 3], wisps.pos[i * 3 + 2]);
+  }
 
   const interactions = createInteractionSystem(model, floors);
   wireInteractables();
@@ -307,6 +328,11 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
       else if (dp[i + 1] < dustLo) dp[i + 1] = dustLo;
     }
     dust.m.geometry.attributes.position.needsUpdate = true;
+    /* Dust only shows where there is light to show it. In daylight the shafts
+       through the windows are full of it; at night there is almost nothing to
+       catch, and a room full of glittering motes under a dead sky is the sort
+       of detail that quietly makes a scene look wrong. */
+    dust.m.material.opacity = 0.12 + (1 - nightNow) * 0.34;
 
     const bp = bubbles.pos;
     for (let i = 0; i < bp.length; i += 3) {
@@ -333,9 +359,19 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
         void wiz.sendWizard({ to: want, hold: 1200 }).finally(() => { wizBusy = false; });
       }
     }
-    wiz.update(dt, () => {});
+    const wstep = wiz.update(dt, () => {});
     const p = wiz.pathPoint(wiz.wizAt, _wp, _wt);
-    wizard.position.set(p.x, p.y + (Math.abs(Math.sin(t * 6)) * 0.045), p.z);
+    /* Walking, he bobs on the step; standing, he breathes. The bob used to run
+       whether or not he was going anywhere, which is the uncanny thing about a
+       figure that is perfectly still except for a twitch. */
+    const bob = wstep.moving
+      ? Math.abs(Math.sin(t * 6)) * 0.045
+      : Math.sin(t * 1.15) * 0.016;
+    wizard.position.set(p.x, p.y + bob, p.z);
+    if (!wstep.moving) {
+      // a slow shift of weight, so he is never quite at rest
+      wizard.rotation.z = Math.sin(t * 0.62) * 0.012;
+    } else wizard.rotation.z = 0;
     if (_wt.lengthSq() > 1e-6) {
       const want = Math.atan2(_wt.x, _wt.z);
       let dd = want - wizard.rotation.y;
@@ -352,6 +388,8 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
        so it warms right down to candle colour. */
     wizardLight.color.copy(WIZ_LIGHT_DAY).lerp(WIZ_LIGHT_NIGHT, nightNow);
     setOccupiedFloor(wizFloor);
+    // the staff's orb answers to him: brighter and larger while he walks
+    staffOrb.scale.setScalar(1 + Math.sin(t * 1.9) * 0.07 + (wstep.moving ? 0.1 : 0));
 
     for (const it of anim.books) {
       const a = it.a0 + t * it.sp;
@@ -391,6 +429,53 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
         if (rim) rim.material.emissiveIntensity = 1.1 + p2.flash * 4;
         if (halo2) halo2.material.opacity = 0.13 + p2.flash * 0.4;
       }
+    }
+
+    /* wisps: a slow rise on a drifting helix, wrapping at the roof */
+    {
+      const lit = Math.max(0, nightNow - 0.28) / 0.72;
+      wisps.m.material.opacity = lit * 0.85;
+      wisps.m.visible = lit > 0.01;
+      if (wisps.m.visible) {
+        const wp2 = wisps.pos;
+        for (let i = 0; i < WISPS; i++) {
+          const j = i * 3;
+          wp2[j + 1] += wisps.vel[i] * dt;
+          // the same band the dust is held to, so focusing a storey does not
+          // leave lights drifting through the floors above and below it
+          if (wp2[j + 1] > dustHi) wp2[j + 1] = dustLo + 0.2;
+          else if (wp2[j + 1] < dustLo) wp2[j + 1] = dustLo + 0.2;
+          const a = wispPhase[i] + t * (0.25 + wisps.vel[i]);
+          const r = wispRad[i] + Math.sin(t * 0.7 + wispPhase[i]) * 0.35;
+          wp2[j] = Math.sin(a) * r;
+          wp2[j + 2] = Math.cos(a) * r;
+        }
+        wisps.m.geometry.attributes.position.needsUpdate = true;
+      }
+    }
+
+    if (anim.steam) {
+      const sp3 = anim.steam.pos;
+      for (let i = 0; i < sp3.length; i += 3) {
+        sp3[i + 1] += anim.steam.vel[i / 3] * dt;
+        sp3[i] += Math.sin(t * 1.4 + i) * dt * 0.09;      // it wanders as it cools
+        sp3[i + 2] += Math.cos(t * 1.1 + i) * dt * 0.07;
+        if (sp3[i + 1] > 2.4) {
+          sp3[i + 1] = 1.1;
+          sp3[i] = 0.5 + (Math.random() - 0.5) * 0.1;
+          sp3[i + 2] = 0.2 + (Math.random() - 0.5) * 0.1;
+        }
+      }
+      anim.steam.m.geometry.attributes.position.needsUpdate = true;
+    }
+
+    tickLamps(t);
+    for (const sp of anim.specimens) {
+      // the brew turns over slowly and the jar breathes with it
+      const k = 0.72 + 0.28 * Math.sin(t * 1.3 + sp.phase) + 0.1 * Math.sin(t * 3.7 + sp.phase);
+      sp.light.intensity = 3.4 * interiorGain() * k;
+      sp.body.rotation.y = Math.sin(t * 0.4 + sp.phase) * 0.12;
+      sp.body.scale.setScalar(1.15 + Math.sin(t * 2.1 + sp.phase) * 0.03);
     }
 
     if (anim.fire) {
@@ -722,6 +807,46 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     return `scan: world is "${worlds.current() || 'none'}", backdrop "${document.body.dataset.backdrop}".`;
   }
 
+  /* ---------------- and the shelves hold the actual projects --------------
+     The same idea as the library, in the room where the work happens: each
+     project becomes a lit specimen on the alchemy shelves, with a tag on the
+     jar. There are far fewer of these than there are publications, which
+     suits them — one glowing jar among forty dull ones reads as *the* thing
+     being worked on, which is exactly what a current project is. */
+  let boundProjects = 0;
+  function bindProjects(list: { name: string; status?: string }[], onOpen: (name: string) => void) {
+    if (boundProjects || !list.length) return boundProjects;
+    const slots = laboratory.slots;
+    // spread them along the shelves rather than clumping at one end
+    const free = slots.filter((sl) => !sl.taken);
+    const stride = Math.max(1, Math.floor(free.length / Math.max(1, list.length)));
+    list.forEach((proj, i) => {
+      const sl = free[Math.min(free.length - 1, i * stride + (stride >> 1))];
+      if (!sl || sl.taken) return;
+      sl.taken = true;
+      sl.body.material = M.specimen;
+      sl.body.scale.set(1.15, 1.15, 1.15);
+      // a paper tag tied round the neck, angled to face the room
+      const tag = new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.11, 0.02), M.specimen_tag);
+      tag.name = 'specimen_tag';
+      tag.position.copy(polar(sl.angle, R - 0.78, sl.y - 0.02));
+      tag.rotation.y = RAD(sl.angle);
+      tag.rotation.z = 0.22;
+      floors[F.lab].g.add(tag);
+      // its own light, so a bound jar actually lifts the shelf around it
+      const jl = new THREE.PointLight(0x5fe0b0, 0, 2.6, 2);
+      jl.name = 'specimen_light';
+      jl.position.copy(polar(sl.angle, R - 1.0, sl.y + 0.1));
+      floors[F.lab].fg.add(jl);
+      registerLamp(jl, 3.4, true);   // the specimen loop drives this one itself
+      anim.specimens.push({ body: sl.body, light: jl, phase: i * 1.9 });
+      const label = proj.status === 'current' ? `${proj.name} — in progress` : proj.name;
+      interactions.interact(sl.group, label, () => onOpen(proj.name), undefined, { marker: false });
+      boundProjects++;
+    });
+    return boundProjects;
+  }
+
   /** Whether the current world answers to the clock at all — the console
    *  uses this to say so rather than silently doing nothing. */
   function lightModeAvailable() {
@@ -925,6 +1050,7 @@ export function createTowerScene(container: HTMLElement, opts: { onNavigateFloor
     pluckBook,
     focusShelf,
     bindPublications,
+    bindProjects,
     playIntro,
     F, NF,
     start, stop,

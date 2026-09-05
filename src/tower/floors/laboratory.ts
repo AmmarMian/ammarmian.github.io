@@ -3,6 +3,16 @@ import { addBox, addCyl, arcBox, polar, RAD, rnd, pick, slab, wall, railing, rou
 import { M } from '../materials';
 import type { Anim } from '../anim';
 
+/** One specimen jar on the alchemy shelves, and whether a project has
+ *  claimed it. */
+export interface JarSlot {
+  group: THREE.Group;
+  body: THREE.Mesh;
+  angle: number;
+  y: number;
+  taken: boolean;
+}
+
 export const CAULDRON_LOCAL = new THREE.Vector3(0.3, 0, -0.5);
 
 /* ===== laboratory: stone, glass, cauldron light ===== */
@@ -13,15 +23,23 @@ export function buildLaboratory(g: THREE.Group, fg: THREE.Group, anim: Anim) {
   roundWindow(g, 178, 3.5, 0.88);
   windowGlow(fg, 178, 3.5, 0.72);
 
+  /* The specimen shelves. Every jar here is a slot a real project can take —
+     see bindProjects in scene.ts. The bottle is built as a group so a bound
+     one can be lit, labelled and made to bubble as a single thing. */
+  const slots: JarSlot[] = [];
   for (const [a0, a1] of [[112, 150], [206, 244]] as const) {
     for (const sy of [1.05, 1.78, 2.51, 3.24, 3.97]) {
       for (let a = a0; a <= a1; a += 4.4) arcBox('alchemy_board', 'wood_dark', 0.4, 0.12, 0.72, a, 5.4 - 0.56, sy, g);
       for (let a = a0 + 1; a <= a1 - 1; a += 3.2) {
         if (rnd() < 0.3) continue;
         const gl = pick(['glass_blue', 'glass_green', 'glass_violet', 'glass_amber']);
-        arcBox('bottle_body', gl, 0.2, 0.28, 0.2, a, 5.4 - 0.62, sy + 0.2, g);
-        arcBox('bottle_neck', gl, 0.09, 0.14, 0.09, a, 5.4 - 0.62, sy + 0.4, g);
-        if (rnd() < 0.4) arcBox('bottle_stopper', 'wood_deep', 0.12, 0.07, 0.12, a, 5.4 - 0.62, sy + 0.5, g);
+        const jar = new THREE.Group();
+        jar.name = 'jar';
+        const body = arcBox('bottle_body', gl, 0.2, 0.28, 0.2, a, 5.4 - 0.62, sy + 0.2, jar);
+        arcBox('bottle_neck', gl, 0.09, 0.14, 0.09, a, 5.4 - 0.62, sy + 0.4, jar);
+        if (rnd() < 0.4) arcBox('bottle_stopper', 'wood_deep', 0.12, 0.07, 0.12, a, 5.4 - 0.62, sy + 0.5, jar);
+        g.add(jar);
+        slots.push({ group: jar, body, angle: a, y: sy + 0.2, taken: false });
       }
     }
     for (const a of [a0 - 1, a1 + 1]) arcBox('alchemy_post', 'wood_ebony', 0.24, 4.4, 0.74, a, 5.4 - 0.56, 2.4, g);
@@ -165,5 +183,5 @@ export function buildLaboratory(g: THREE.Group, fg: THREE.Group, anim: Anim) {
     anim.books.push({ o: rg, r: 1.05, a0: (i / 5) * Math.PI * 2, y: 2.9, sp: -0.55, c: new THREE.Vector3(0.3, 0, -0.5), tilt: true });
   }
 
-  return { cauldronBelly, still, spell, hgUpper };
+  return { cauldronBelly, still, spell, hgUpper, slots };
 }

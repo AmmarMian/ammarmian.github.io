@@ -18,9 +18,13 @@ export interface Anim {
   fireLight?: THREE.PointLight;
   /** flame tongues that lick: scaled and swayed on their own phase */
   fire?: THREE.Mesh[];
+  /** the kettle's steam, parented to the hearth */
+  steam?: { m: THREE.Points; pos: Float32Array; vel: Float32Array };
+  /** bound project jars: the brew turns over and the glass breathes */
+  specimens: { body: THREE.Mesh; light: THREE.PointLight; phase: number }[];
   chores?: any[];
 }
 
 export function createAnim(): Anim {
-  return { books: [], rings: [], candles: [], portal: null };
+  return { books: [], rings: [], candles: [], specimens: [], portal: null };
 }

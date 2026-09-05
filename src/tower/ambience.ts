@@ -114,7 +114,7 @@ function applyFills() {
 }
 
 const windows: WindowRig[] = [];
-const lamps: { light: THREE.Light; base: number }[] = [];
+const lamps: { light: THREE.Light; base: number; phase: number; steady?: boolean }[] = [];
 const fills: THREE.PointLight[] = [];
 /* The outer shell's window panes. Same idea as the interior oculi — glass,
    not lamps — but the shell lives in worlds.js, which hands its material over
@@ -125,13 +125,19 @@ export function registerShellPane(m: THREE.MeshStandardMaterial) { shellPane = m
 /* Flames, runes and brews are emissive rather than lit, so they need their own
    handle: a candle that reads well at noon is invisible at midnight unless it
    is allowed to burn harder. */
-const GLOWS = ['flame', 'candle', 'brew', 'glow_pane', 'rune_glow', 'rune_violet', 'orb', 'marker', 'portal_rim'];
+const GLOWS = ['flame', 'candle', 'brew', 'glow_pane', 'rune_glow', 'rune_violet', 'orb', 'marker', 'portal_rim', 'specimen'];
 const glowBase: Record<string, number> = {};
 
 /** The multiplier lamps are currently running at. Anything animating a light's
  *  intensity per frame must fold this in, or it will simply undo the wash. */
 let gain = 1;
 export const interiorGain = () => gain;
+
+/** Add a single light to the wash after the initial sweep — anything built
+ *  later than scene construction, such as a project's specimen jar. */
+export function registerLamp(light: THREE.Light, base: number, steady = false) {
+  lamps.push({ light, base, phase: Math.random() * 6.283, steady });
+}
 
 export function registerWindow(rig: Omit<WindowRig, 'baseHalo' | 'baseSpot'>) {
   windows.push({ ...rig, baseHalo: rig.halo.intensity, baseSpot: rig.spot.intensity });
@@ -144,7 +150,13 @@ export function registerInteriorLights(root: THREE.Object3D) {
   root.traverse((o) => {
     if (!(o as any).isPointLight) return;
     if (o.name === 'window_halo' || o.name === 'floor_fill') return;   // both driven separately, below
-    lamps.push({ light: o as THREE.Light, base: (o as THREE.PointLight).intensity });
+    lamps.push({
+      light: o as THREE.Light,
+      base: (o as THREE.PointLight).intensity,
+      phase: Math.random() * 6.283,
+      // these two are already animated by hand every frame
+      steady: o.name === 'wizard_light' || o.name === 'hearth_fire_light',
+    });
   });
 }
 
@@ -198,11 +210,25 @@ export function addFlameLights(
       l.name = 'flame_light';
       l.position.copy(p).setY(p.y + 0.3);
       f.fg.add(l);
-      lamps.push({ light: l, base: power });
+      lamps.push({ light: l, base: power, phase: Math.random() * 6.283 });
       added++;
     }
   }
   return added;
+}
+
+/* A candle is never steady. Every lamp gets its own phase and two
+   incommensurate wobbles, so a room full of them shimmers rather than
+   pulsing in unison — this is most of what separates a lit room from a room
+   with lights in it. Called every frame; it is a handful of sines over a few
+   dozen lights, and it is the cheapest life in the building. */
+let flickerGain = 1;
+export function tickLamps(t: number) {
+  for (const l of lamps) {
+    if (l.steady) continue;
+    const f = 0.86 + 0.1 * Math.sin(t * 6.1 + l.phase) + 0.06 * Math.sin(t * 13.7 + l.phase * 2.3);
+    l.light.intensity = l.base * flickerGain * f;
+  }
 }
 
 /* ---------------- application ---------------- */
@@ -258,6 +284,7 @@ export function applyAmbience(world: string | null, night: number) {
     shellPane.opacity = 0.12 + a.pane * 0.2;
   }
 
+  flickerGain = a.interior;
   for (const l of lamps) {
     l.light.intensity = l.base * a.interior;
     l.light.visible = a.interior > 0.05;
