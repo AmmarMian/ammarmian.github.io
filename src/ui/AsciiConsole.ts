@@ -21,7 +21,7 @@ export function renderAsciiConsole(root: HTMLElement) {
       <div class="ascii-name">${PROFILE.name}</div>
       <div class="ascii-role">${PROFILE.role} — LISTIC, Université Savoie Mont-Blanc</div>
       <nav class="ascii-modes" aria-label="Other views">
-        <a href="/">3D tower</a><span aria-hidden="true">·</span><a href="/text">Text version</a>
+        <a href="/?view=3d">3D tower</a><span aria-hidden="true">·</span><a href="/text">Text version</a>
       </nav>
       <button class="ascii-tower-toggle" type="button" aria-controls="ascii-tower" aria-expanded="false">
         <span aria-hidden="true">⌂</span> Tower

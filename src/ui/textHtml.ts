@@ -53,7 +53,7 @@ export function textPageHtml(base = ''): string {
   const colophonNote = COLOPHON_NOTE.map((p) => `<p>${esc(p)}</p>`).join('');
 
   return `<main class="text-page">
-    <p><a class="text-page-back" href="${esc(base)}/">&larr; view the interactive tower</a></p>
+    <p><a class="text-page-back" href="${esc(base)}/?view=3d">&larr; view the interactive tower</a></p>
     <h1>${esc(PROFILE.name)}</h1>
     <p class="text-lede">${esc(PROFILE.role)} — ${esc(PROFILE.affiliation)}</p>
     <p>${esc(PROFILE.bio)}</p>

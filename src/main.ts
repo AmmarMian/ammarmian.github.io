@@ -7,6 +7,8 @@ import { createHelpButton } from './ui/HelpModal';
 import { createTerminal } from './ui/Terminal';
 import { createDestinationModal } from './ui/DestinationModal';
 import { renderTextPage } from './ui/TextPage';
+import { offerLighter, preferredView, honourViewOverride } from './ui/lighter';
+import { gpuInfo, guessTier } from './tower/quality';
 import { renderAsciiConsole } from './ui/AsciiConsole';
 import { createViewMenu } from './ui/ViewMenu';
 import { createSettingsButton } from './ui/SettingsPanel';
@@ -25,9 +27,24 @@ const app = document.getElementById('app')!;
 //   /console  — an ASCII tower driven by typing or tapping, good on a phone
 //   /         — the 3D tower
 const entry = currentSlug();
+/* `?view=3d` on the way in means a visitor has come back for the tower; it
+   clears any standing preference before the preference is read. */
+honourViewOverride();
+
+/* Two reasons to never reach the tower at all. One is a choice already made
+   on this device; the other is a machine that cannot draw it — asking a
+   browser with no WebGL context to spend 250KB finding that out for itself
+   is the one case where guessing is better than measuring. */
+const stuck = !gpuInfo().ok;
+const chosen = preferredView();
+
 if (entry === 'text') {
   renderTextPage(app);
 } else if (entry === 'console') {
+  renderAsciiConsole(app);
+} else if (stuck || chosen === 'text') {
+  renderTextPage(app);
+} else if (chosen === 'console') {
   renderAsciiConsole(app);
 } else {
   void bootTower();
@@ -343,32 +360,41 @@ dotRow.addEventListener('pointercancel', () => { clearPreview(); dragging = fals
    even at fifteen frames a second — this is an offer, not an eviction. */
 window.addEventListener('lair-struggling', (e: any) => {
   const fps = Math.round(e.detail?.fps ?? 0);
-  const offer = document.createElement('div');
-  offer.className = 'perf-offer';
-  offer.setAttribute('role', 'status');
-  offer.innerHTML = `
-    <div class="kicker">slow going</div>
-    <p>The tower is drawing at about ${fps} frames a second here, and it is already as simple as it goes. The same content reads well without the 3D.</p>
-    <div class="perf-offer-actions">
-      <button type="button" class="mode-btn mode-btn-primary" data-go="console">Text console</button>
-      <button type="button" class="mode-btn" data-go="text">Plain text</button>
-      <button type="button" class="mode-btn perf-offer-stay" data-go="stay">Stay here</button>
-    </div>
-  `;
-  document.body.appendChild(offer);
-  requestAnimationFrame(() => offer.classList.add('perf-offer-in'));
-  const dismiss = () => {
-    offer.classList.remove('perf-offer-in');
-    setTimeout(() => offer.remove(), 400);
-  };
-  offer.querySelectorAll<HTMLButtonElement>('.mode-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const go = btn.dataset.go;
-      if (go === 'stay') { dismiss(); return; }
-      window.location.href = BASE + '/' + go;
-    });
-  });
-  announce(`This device is drawing about ${fps} frames a second. A lighter text version is available.`);
+  offerLighter(
+    `The tower is drawing at about ${fps} frames a second here, and it is already as simple as it goes. `
+    + 'The same content reads well without the 3D.',
+    `This device is drawing about ${fps} frames a second. A lighter text version is available.`,
+  );
+});
+
+/* The first sign, rather than the last. By the time `lair-struggling` fires
+   the governor has already spent its whole scale and several more seconds
+   measuring — on the machines this matters for, that is half a minute of a
+   slide show before anyone mentions there is another way to read the page. */
+const g = gpuInfo();
+if (g.software) {
+  // Not a prediction: the browser has named a CPU rasteriser as the renderer.
+  offerLighter(
+    'This browser is drawing the tower on the processor rather than a graphics card, '
+    + 'which it will do slowly however much detail is turned off. Everything here is also one plain page.',
+    'No GPU is in use on this device. A lighter text version is available.',
+  );
+} else if (guessTier() === 'low') {
+  // Deliberately after the opening, so the tower gets to make its case first.
+  setTimeout(() => offerLighter(
+    'This looks like a modest machine for a scene this size, so the tower is running at its lowest detail. '
+    + 'If it feels heavy, the same content is one plain page.',
+    'The tower is running at its lowest detail. A lighter text version is available.',
+  ), 9000);
+}
+window.addEventListener('lair-quality', (e: any) => {
+  if (e.detail?.reason === 'demoted' && e.detail?.tier === 'low') {
+    offerLighter(
+      'The tower has turned itself down as far as it goes to keep moving. '
+      + 'If it still feels heavy, the same content reads well as one plain page.',
+      'The tower is now at its lowest detail. A lighter text version is available.',
+    );
+  }
 });
 
 /* ---------- when the tower quietly turns itself down ----------
@@ -382,6 +408,10 @@ window.addEventListener('lair-struggling', (e: any) => {
 window.addEventListener('lair-quality', (e: any) => {
   const { tier, reason, blurb } = e.detail || {};
   if (reason !== 'demoted' && reason !== 'promoted') return;
+  /* The same demotion may have just raised the offer of a lighter version,
+     which says all of this and then some. Two floating notes explaining one
+     event is one too many. */
+  if (document.querySelector('.perf-offer')) return;
   const note = document.createElement('div');
   note.className = 'quality-note';
   note.setAttribute('role', 'status');

@@ -1,5 +1,6 @@
 import { BASE } from '../router';
 import { textPageHtml, TEXT_TITLE, TEXT_DESCRIPTION } from './textHtml';
+import { mountPreferenceNote } from './lighter';
 
 function setMeta(name: string, content: string) {
   let el = document.querySelector(`meta[name="${name}"]`);
@@ -19,4 +20,8 @@ export function renderTextPage(root: HTMLElement) {
   document.title = TEXT_TITLE;
   setMeta('description', TEXT_DESCRIPTION);
   root.insertAdjacentHTML('beforeend', textPageHtml(BASE));
+  /* Only ever reached through the SPA, which is exactly the case where this
+     page may be standing in for the tower by an earlier request. */
+  const main = root.querySelector('main');
+  if (main) mountPreferenceNote(main as HTMLElement);
 }

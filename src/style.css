@@ -830,3 +830,19 @@ body[data-gl-lost="1"] #tower-host::after {
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 }
+
+/* ---------- the lighter way in ----------
+   The note at the top of the plain page when the plain page is where this
+   browser now lands, and the one line under the offer that says choosing is
+   not a one-way door. Both exist so a remembered preference can never read
+   as the site having broken. */
+.view-pref-note {
+  margin: 0 0 20px; padding: 10px 14px;
+  border-left: 2px solid var(--accent);
+  font-size: 12.5px; line-height: 1.6; color: var(--ink-dim);
+}
+.view-pref-note a { color: var(--accent-bright); }
+.perf-offer-fine {
+  margin: 12px 0 0 !important;
+  font-size: 11px !important; line-height: 1.5 !important; color: var(--ink-faint) !important;
+}
