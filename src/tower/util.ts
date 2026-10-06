@@ -15,13 +15,48 @@ export const rnd = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x
 export const pick = <T,>(a: T[]): T => a[Math.floor(rnd() * a.length) % a.length];
 export const RAD = (a: number) => (a * Math.PI) / 180;
 
+/* ---------------------------- shared shapes ----------------------------
+ * The tower is built out of several thousand boxes and cylinders, and a
+ * great many of them are the same box: every tread of every stair, every
+ * wall panel, every railing post, every book on every shelf. Each one used
+ * to carry its own BufferGeometry — its own vertex buffers, its own upload,
+ * its own vertex array object for the renderer to bind before drawing it.
+ *
+ * Nothing in the tower ever mutates a geometry after it is made (no
+ * translate, no scale, nothing reads `.parameters`), so two props of exactly
+ * the same size can hold the same one. Identical meshes drawn back to back
+ * then also skip the VAO rebind between them, which was the single hottest
+ * GL call in the frame.
+ *
+ * Rounded into the cache key: these sizes come out of trigonometry and a
+ * seeded random, and two planks that differ in the twelfth decimal are the
+ * same plank. A thousandth of a unit is a hundredth of a pixel here.
+ */
+const shapes = new Map<string, THREE.BufferGeometry>();
+const q = (n: number) => Math.round(n * 1000) / 1000;
+
+export function boxGeo(w: number, h: number, d: number) {
+  const k = `b${q(w)},${q(h)},${q(d)}`;
+  let g = shapes.get(k);
+  if (!g) { g = new THREE.BoxGeometry(q(w), q(h), q(d)); shapes.set(k, g); }
+  return g;
+}
+export function cylGeo(rt: number, rb: number, h: number, seg: number) {
+  const k = `c${q(rt)},${q(rb)},${q(h)},${seg}`;
+  let g = shapes.get(k);
+  if (!g) { g = new THREE.CylinderGeometry(q(rt), q(rb), q(h), seg); shapes.set(k, g); }
+  return g;
+}
+/** How many distinct shapes the tower turned out to need, for `perf`. */
+export const shapeCount = () => shapes.size;
+
 export function addBox(name: string, m: string, w: number, h: number, d: number, x: number, y: number, z: number, ry = 0, parent: THREE.Object3D) {
-  const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), M[m]);
+  const mesh = new THREE.Mesh(boxGeo(w, h, d), M[m]);
   mesh.name = name; mesh.position.set(x, y, z); mesh.rotation.y = ry;
   parent.add(mesh); return mesh;
 }
 export function addCyl(name: string, m: string, rt: number, rb: number, h: number, seg: number, x: number, y: number, z: number, parent: THREE.Object3D) {
-  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), M[m]);
+  const mesh = new THREE.Mesh(cylGeo(rt, rb, h, seg), M[m]);
   mesh.name = name; mesh.position.set(x, y, z);
   parent.add(mesh); return mesh;
 }

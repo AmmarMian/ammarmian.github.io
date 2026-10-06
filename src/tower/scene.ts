@@ -9,7 +9,7 @@ import anime from 'animejs';
 import { installWorlds } from '../worlds.js';
 import { createStage } from './stage';
 import { M, SPINE_STEPS } from './materials';
-import { R, FH, WH, ROT, RAD, polar, landing, spiralStair, addBox } from './util';
+import { R, FH, WH, ROT, RAD, polar, landing, spiralStair, addBox, shapeCount } from './util';
 import { F, NF, GROUND, NF_ABOVE, floorY, FLOOR_IDS, FLOOR_NAMES } from './scene-constants';
 import { createAnim } from './anim';
 import { buildQuarters } from './floors/quarters';
@@ -27,7 +27,8 @@ import { createQuality, gpuInfo, gpuSummary, type Tier, type Profile } from './q
 import { createInteractionSystem } from './interactions';
 import { addFloorFill, registerInteriorLights, applyAmbience, addFlameLights, interiorGain, registerShellPane,
          registerLamp, setOccupiedFloor, tickLamps, NO_DAYNIGHT, clampNight,
-         cullLights, setLightTarget, lightBudget, setLightBudget } from './ambience';
+         cullLights, syncLights, setLightTarget, lightBudget, setLightBudget,
+         setSpotBudget, installLightRig, registerDirectionals, lightStats } from './ambience';
 
 export type TowerScene = ReturnType<typeof createTowerScene>;
 
@@ -61,6 +62,12 @@ export function createTowerScene(container: HTMLElement, opts: {
   const model = new THREE.Group();
   const fx = new THREE.Group();
   const anim = createAnim();
+
+  /* The pool every interior light is actually drawn through. Installed before
+     a single candle is registered, because registering one parks it off-stage
+     and hands its job to a slot in here. See ambience.ts — this is what stops
+     walking into a room from relinking every shader in the scene. */
+  installLightRig(scene);
 
   // one pair per flight, so NF - 1 of them
   const STAIR_MATS = [
@@ -142,7 +149,13 @@ export function createTowerScene(container: HTMLElement, opts: {
   // and patches every existing mesh's material for the teleport clip effect,
   // so meshes added afterward wouldn't get patched.
   // the shell is built from the storeys above ground only
-  const worlds = installWorlds({ scene, camera, model, fx, dims: { R, FH, NF: NF_ABOVE, WH, ROT, GROUND }, nightFor: clampNight });
+  const worlds = installWorlds({
+    scene, camera, model, fx,
+    dims: { R, FH, NF: NF_ABOVE, WH, ROT, GROUND },
+    nightFor: clampNight,
+    // named rather than discovered — see the note at the rig in worlds.js
+    rig: { hemi, key, fill },
+  });
 
   // Every candle, brazier and hearth the floor builders placed, so the
   // day/night wash can bring them up as the outside goes dark...
@@ -150,6 +163,9 @@ export function createTowerScene(container: HTMLElement, opts: {
   // ...and a light for every flame that had none. Done after the sweep above
   // so it can see which ones were already spoken for.
   addFlameLights(floors, [M.flame]);
+  // ...and the observatory's pair of moons, which are directional rather than
+  // local and so get a permanent slot each rather than a place in the queue.
+  registerDirectionals(fx);
   // the shell's own window panes answer to the same sky as the interior ones
   registerShellPane(worlds.shellPaneMaterial());
 
@@ -791,6 +807,9 @@ export function createTowerScene(container: HTMLElement, opts: {
        opening reveal, a teleport — and a sort of forty-odd numbers four times
        a second is not worth being clever about. */
     if (cullTimer <= 0) { cullTimer = 0.25; setLightTarget(controls.target); cullLights(); }
+    /* The shortlist moves four times a second; what it is pointing at moves
+       every frame — a candle's wobble, the wizard's lamp on the stairs. */
+    else syncLights();
     if (!contextLost) renderer.render(scene, camera);
     /* Wall time across the whole frame — update, culling, draw submission and
        whatever the browser did in between — because that is what the visitor
@@ -935,6 +954,7 @@ export function createTowerScene(container: HTMLElement, opts: {
     setMaxPixelRatio(p.maxPixelRatio);
     if (pixelOverride === null) setPixel(autoScale());
     if (!simPinned.has('lights')) { sim.lights = p.lights; setLightBudget(p.lights); }
+    setSpotBudget(p.spots);
     dust.setDensity(p.particles);
     bubbles.setDensity(p.particles);
     wisps.setDensity(p.particles);
@@ -1131,21 +1151,14 @@ export function createTowerScene(container: HTMLElement, opts: {
   }
   function perf(report: (line: string) => void) {
     const info = renderer.info;
-    let point = 0, spot = 0, dir = 0, hidden = 0;
-    scene.traverse((o: any) => {
-      if (!o.isLight) return;
-      // a light under a hidden parent is never uploaded, so it costs nothing
-      let vis = true;
-      for (let p: any = o; p; p = p.parent) if (!p.visible) { vis = false; break; }
-      if (!vis) { hidden++; return; }
-      if (o.isPointLight) point++;
-      else if (o.isSpotLight) spot++;
-      else if (o.isDirectionalLight) dir++;
-    });
+    const L = lightStats();
     report(`  frame     ${frameMs.toFixed(1)} ms  (${frameFps.toFixed(0)} fps, worst ${frameWorst.toFixed(0)} ms)`);
     report(`  draws     ${info.render.calls} calls, ${(info.render.triangles / 1000).toFixed(0)}k triangles`);
-    report(`  lights    ${point} point, ${spot} spot, ${dir} directional  (${hidden} switched off)`);
-    report(`  memory    ${info.memory.geometries} geometries, ${info.memory.textures} textures, ${info.programs?.length ?? 0} shaders`);
+    /* The pool sizes, because those are the numbers compiled into every lit
+       material and therefore the ones that cost anything. How many are
+       carrying a light at this instant is the second figure. */
+    report(`  lights    ${L.point} point, ${L.spot} spot, ${L.dir + 2} directional  (${L.live} lit, from ${L.sources} in the tower)`);
+    report(`  memory    ${info.memory.geometries} geometries (${shapeCount()} shared shapes), ${info.memory.textures} textures, ${info.programs?.length ?? 0} shaders`);
     report(`  pixels    1/${pixelOverride ?? autoScale()} resolution, budget ${lightBudget()} lights`);
     const g = gpuInfo();
     const p = quality.profile();

@@ -86,7 +86,60 @@ export function clampNight(world: string | null, night: number): number {
   return fixed === undefined ? night : fixed;
 }
 
-/* ---------------- registries ---------------- */
+/* ---------------- the rig ----------------
+ * Every light in this file is authored where it belongs — a candle inside its
+ * own storey's group, a window's spot beside its window — and none of them is
+ * ever drawn. What is drawn is a fixed pool of anonymous lights sitting at the
+ * scene root, which copy whichever authored lights currently matter.
+ *
+ * The reason is the one thing about three.js that makes a scene stutter in a
+ * way no amount of culling fixes: the light *counts* are compiled into every
+ * lit material. Change the number of point, spot or directional lights the
+ * renderer can see and every program in the scene is rebuilt — which is
+ * exactly what hiding a storey used to do, because hiding a storey hides the
+ * lights inside it. Walking into a room therefore relinked forty-odd shaders
+ * and dropped several hundred milliseconds on the floor, once per room, and
+ * again whenever the shortlist happened to land on a count never seen before.
+ *
+ * With the pool the count is a constant: it is the size of the pool. A storey
+ * going dark means some slots carry nothing (intensity 0) and no program is
+ * touched. The pool is resized only when the quality tier moves, which is a
+ * rare, announced event.
+ *
+ * The authored lights are parked on a layer the camera does not look at, so
+ * `visible` stays free to mean what the rest of the scene already uses it for
+ * — the wizard's lamp going out with the wizard, a window going dark with its
+ * storey — and this file reads it as intent rather than as instruction.
+ */
+const OFFSTAGE = 31;
+
+const rig = new THREE.Group();
+rig.name = 'light_rig';
+/** Hang the rig at the scene root. Called once, before anything registers. */
+export function installLightRig(scene: THREE.Scene) {
+  scene.add(rig);
+  resizePools();
+}
+
+type Emitter = {
+  src: THREE.Light;
+  base: number;
+  phase: number;
+  steady?: boolean;
+  /** what the wash wants of it — the budget below has the final say */
+  want?: boolean;
+  /** never a candidate for being culled */
+  pin?: boolean;
+  /** driven by the sky rather than by the interior wash — a window halo */
+  sky?: boolean;
+  score: number;
+};
+
+/** Park an authored light off-stage and return it as an emitter. */
+function emitter(src: THREE.Light, base: number, steady = false): Emitter {
+  src.layers.set(OFFSTAGE);
+  return { src, base, phase: Math.random() * 6.283, steady, score: -1 };
+}
 
 type WindowRig = {
   halo: THREE.PointLight;
@@ -94,6 +147,8 @@ type WindowRig = {
   shaft: THREE.Mesh;
   baseHalo: number;
   baseSpot: number;
+  haloEm: Emitter;
+  spotEm: Emitter;
 };
 /* Which storey the wizard is on. The room he is in is brighter than the rest
    — from outside, the lit window moves up and down the tower as his day goes
@@ -108,27 +163,28 @@ export function setOccupiedFloor(i: number) {
 function applyFills() {
   const lit = lastFill > 0.04;
   fills.forEach((f, i) => {
-    f.intensity = 2.6 * lastFill * (i === occupied ? 2.0 : 0.7);
-    f.userData.want = lit;
+    f.src.intensity = 2.6 * lastFill * (i === occupied ? 2.0 : 0.7);
+    f.want = lit;
     // whichever storey he is on is never a candidate for being culled
-    f.userData.pin = lit && i === occupied;
+    f.pin = lit && i === occupied;
   });
   cullLights();
 }
 
-type Lamp = {
-  light: THREE.Light;
-  base: number;
-  phase: number;
-  steady?: boolean;
-  /** what the wash wants of it — the budget below has the final say */
-  want?: boolean;
-  /** on this frame's shortlist */
-  lit?: boolean;
-};
 const windows: WindowRig[] = [];
-const lamps: Lamp[] = [];
-const fills: THREE.PointLight[] = [];
+/** Candles, braziers, hearths, the wizard's lamp — everything that competes
+ *  for a point slot. The window halos are in here too, so the budget covers
+ *  the whole room rather than the half of it that is not daylight. */
+const lamps: Emitter[] = [];
+const fills: Emitter[] = [];
+/** The window spots, which have a pool of their own: a spot is the most
+ *  expensive light there is, and there are exactly four of them. */
+const spots: Emitter[] = [];
+/** Directional lights authored inside a storey — the observatory's moons.
+ *  There is no shortlist for these: they are few, they are cheap, and they
+ *  light the whole scene rather than a room, so each one keeps a slot of its
+ *  own and simply goes to zero when its storey is out of view. */
+const dirs: { pool: THREE.DirectionalLight; src: THREE.DirectionalLight; base: number }[] = [];
 /* The outer shell's window panes. Same idea as the interior oculi — glass,
    not lamps — but the shell lives in worlds.js, which hands its material over
    once it has been built. */
@@ -149,11 +205,43 @@ export const interiorGain = () => gain;
 /** Add a single light to the wash after the initial sweep — anything built
  *  later than scene construction, such as a project's specimen jar. */
 export function registerLamp(light: THREE.Light, base: number, steady = false) {
-  lamps.push({ light, base, phase: Math.random() * 6.283, steady });
+  lamps.push(emitter(light, base, steady));
 }
 
-export function registerWindow(rig: Omit<WindowRig, 'baseHalo' | 'baseSpot'>) {
-  windows.push({ ...rig, baseHalo: rig.halo.intensity, baseSpot: rig.spot.intensity });
+export function registerWindow(w: Omit<WindowRig, 'baseHalo' | 'baseSpot' | 'haloEm' | 'spotEm'>) {
+  const haloEm = emitter(w.halo, w.halo.intensity);
+  const spotEm = emitter(w.spot, w.spot.intensity);
+  haloEm.sky = true;
+  spotEm.sky = true;
+  lamps.push(haloEm);
+  spots.push(spotEm);
+  windows.push({
+    ...w, baseHalo: w.halo.intensity, baseSpot: w.spot.intensity, haloEm, spotEm,
+  });
+}
+
+/** The directional lights a floor builder placed — the observatory's moons.
+ *  Swept up like the point lights, but each keeps a permanent slot: a mirror
+ *  at the scene root pointed the same way, so the count never moves while the
+ *  storey comes and goes. */
+export function registerDirectionals(root: THREE.Object3D) {
+  const _w = new THREE.Vector3();
+  root.updateMatrixWorld(true);
+  root.traverse((o) => {
+    if (!(o as any).isDirectionalLight) return;
+    const src = o as THREE.DirectionalLight;
+    src.layers.set(OFFSTAGE);
+    const pool = new THREE.DirectionalLight(src.color.getHex(), 0);
+    /* A directional light is a direction, not a place, and the direction is
+       the one from its position to its target. Baked once from the authored
+       layout: a storey rising an inch during the opening does not change
+       where the moon is. */
+    pool.position.copy(src.getWorldPosition(_w));
+    pool.name = 'dir_slot';
+    rig.add(pool);
+    dirs.push({ pool, src, base: src.intensity });
+  });
+  return dirs.length;
 }
 
 /** Every point light already placed by a floor builder — candles, braziers,
@@ -163,13 +251,12 @@ export function registerInteriorLights(root: THREE.Object3D) {
   root.traverse((o) => {
     if (!(o as any).isPointLight) return;
     if (o.name === 'window_halo' || o.name === 'floor_fill') return;   // both driven separately, below
-    lamps.push({
-      light: o as THREE.Light,
-      base: (o as THREE.PointLight).intensity,
-      phase: Math.random() * 6.283,
+    lamps.push(emitter(
+      o as THREE.Light,
+      (o as THREE.PointLight).intensity,
       // these two are already animated by hand every frame
-      steady: o.name === 'wizard_light' || o.name === 'hearth_fire_light',
-    });
+      o.name === 'wizard_light' || o.name === 'hearth_fire_light',
+    ));
   });
 }
 
@@ -181,7 +268,7 @@ export function addFloorFill(fg: THREE.Object3D, y = 2.4) {
   l.name = 'floor_fill';
   l.position.set(0, y, 0);
   fg.add(l);
-  fills.push(l);
+  fills.push(emitter(l, 0));
   return l;
 }
 
@@ -223,7 +310,7 @@ export function addFlameLights(
       l.name = 'flame_light';
       l.position.copy(p).setY(p.y + 0.3);
       f.fg.add(l);
-      lamps.push({ light: l, base: power, phase: Math.random() * 6.283 });
+      lamps.push(emitter(l, power));
       added++;
     }
   }
@@ -239,27 +326,73 @@ export function addFlameLights(
  * fills came to well over forty, which the town's paving shader was paying for
  * on every pixel of every frame.
  *
- * So only the ones that are actually doing something get to be on. The score
- * is a light's own falloff evaluated at the point the camera is looking at:
- * a light contributes what it contributes there, and the brightest handful
- * win. Nothing here changes what a lit room looks like when you are in it —
- * the storey you are looking at keeps its lights, because they are the ones
- * nearest the target.
+ * So only the ones that are actually doing something get a slot in the pool.
+ * The score is a light's own falloff evaluated at the point the camera is
+ * looking at: a light contributes what it contributes there, and the brightest
+ * handful win. Nothing here changes what a lit room looks like when you are in
+ * it — the storey you are looking at keeps its lights, because they are the
+ * ones nearest the target.
  *
- * The count is what must stay stable, not the membership: three only rebuilds
- * the lighting uniforms (and re-keys the programs) when the *number* of lights
- * changes, so swapping which ten are on is free, while going from ten to nine
- * is not. Hence the shortlist is always filled right up to the budget, even
- * with lights that are contributing almost nothing, and it is only rebuilt
- * when the camera target actually moves.
+ * What the pool adds is that losing is now free. Membership changes as often
+ * as it likes; the count the shaders were compiled against is the pool's size
+ * and nothing else.
  */
-let BUDGET = 10;
-export function setLightBudget(n: number) {
-  BUDGET = Math.max(0, Math.round(n));
+let BUDGET = 12;
+let SPOT_BUDGET = 2;
+
+const pointPool: THREE.PointLight[] = [];
+const spotPool: THREE.SpotLight[] = [];
+const pointAt: (Emitter | null)[] = [];
+const spotAt: (Emitter | null)[] = [];
+
+/* Resizing the pool is the one thing here that does relink the shaders, so it
+   happens only where a visitor is already being told the scene is changing:
+   a quality tier moving, or `sim lights` typed into the console. */
+function resizePools() {
+  while (pointPool.length > BUDGET) rig.remove(pointPool.pop()!);
+  while (pointPool.length < BUDGET) {
+    const l = new THREE.PointLight(0xffffff, 0, 8, 2);
+    l.name = 'point_slot';
+    rig.add(l);
+    pointPool.push(l);
+  }
+  while (spotPool.length > SPOT_BUDGET) {
+    const l = spotPool.pop()!;
+    rig.remove(l.target);
+    rig.remove(l);
+  }
+  while (spotPool.length < SPOT_BUDGET) {
+    const l = new THREE.SpotLight(0xffffff, 0, 18, 0.6, 0.7, 2);
+    l.name = 'spot_slot';
+    rig.add(l, l.target);
+    spotPool.push(l);
+  }
+  pointAt.length = pointPool.length;
+  spotAt.length = spotPool.length;
+  pointAt.fill(null);
+  spotAt.fill(null);
   cullLights();
+}
+
+export function setLightBudget(n: number) {
+  const want = Math.max(0, Math.round(n));
+  if (want === BUDGET) return BUDGET;
+  BUDGET = want;
+  resizePools();
   return BUDGET;
 }
 export const lightBudget = () => BUDGET;
+
+/** How many window spots may be cast at once. A spot is the dearest light
+ *  there is, and on a weak machine one is plenty. */
+export function setSpotBudget(n: number) {
+  const want = Math.max(0, Math.round(n));
+  if (want === SPOT_BUDGET) return SPOT_BUDGET;
+  SPOT_BUDGET = want;
+  resizePools();
+  return SPOT_BUDGET;
+}
+export const spotBudget = () => SPOT_BUDGET;
 
 const _target = new THREE.Vector3();
 const _lp = new THREE.Vector3();
@@ -267,31 +400,108 @@ const _lp = new THREE.Vector3();
  *  camera, so an orbit does not reshuffle the shortlist under you. */
 export function setLightTarget(v: THREE.Vector3) { _target.copy(v); }
 
-function ancestorsVisible(o: THREE.Object3D) {
-  for (let p: THREE.Object3D | null = o; p; p = p.parent) if (!p.visible) return false;
+/** A light wants to burn if the wash says so and nothing it hangs from has
+ *  been put away — a candle under a hidden storey, the wizard's lamp with the
+ *  wizard off-screen, the whole fx group during a teleport. `visible` is read
+ *  rather than written: these lights are never drawn, so it is the scene
+ *  telling us what it means, not us telling the renderer what to do. */
+function wanted(e: Emitter) {
+  if (e.want === false) return false;
+  for (let p: THREE.Object3D | null = e.src; p; p = p.parent) if (!p.visible) return false;
   return true;
 }
 
-type Cand = { light: THREE.Light; score: number };
-const _cands: Cand[] = [];
-export function cullLights() {
-  _cands.length = 0;
-  const consider = (light: THREE.Light, base: number, want: boolean, pin = false) => {
-    if (!want) { light.visible = false; return; }
-    /* A light under a hidden storey is never uploaded at all, so it neither
-       costs anything nor deserves a place on the shortlist. Its own `visible`
-       is left alone — putting it back is the storey's business, not ours. */
-    if (!ancestorsVisible(light.parent!)) { light.visible = true; return; }
-    light.getWorldPosition(_lp);
+/** Fill `slots` with the best-scoring emitters from `pool`. */
+function shortlist(cands: Emitter[], slots: (Emitter | null)[]) {
+  if (!slots.length) return;
+  _ranked.length = 0;
+  for (const e of cands) {
+    if (!wanted(e)) { e.score = -1; continue; }
+    e.src.getWorldPosition(_lp);
     const d2 = _lp.distanceToSquared(_target);
-    const r = (light as THREE.PointLight).distance || 8;
+    const r = (e.src as THREE.PointLight).distance || 8;
     // the light's own inverse-square falloff, evaluated where we are looking
-    _cands.push({ light, score: pin ? Infinity : base * (r * r) / (r * r + d2 * 4) });
+    e.score = e.pin ? Infinity : e.base * (r * r) / (r * r + d2 * 4);
+    _ranked.push(e);
+  }
+  _ranked.sort((a, b) => b.score - a.score);
+  for (let i = 0; i < slots.length; i++) slots[i] = _ranked[i] ?? null;
+}
+const _ranked: Emitter[] = [];
+const _pointCands: Emitter[] = [];
+
+export function cullLights() {
+  _pointCands.length = 0;
+  for (const e of lamps) _pointCands.push(e);
+  for (const e of fills) _pointCands.push(e);
+  shortlist(_pointCands, pointAt);
+  shortlist(spots, spotAt);
+  syncLights();
+}
+
+/* ---------------------------- the copy ----------------------------
+ * Every frame, because what a slot is copying moves and flickers: the
+ * shortlist is re-scored a few times a second, but a candle's wobble and the
+ * wizard's lamp walking up the stairs are per-frame facts. It is a couple of
+ * dozen field copies over at most fourteen lights, and it is what keeps the
+ * authored lights authoritative — intensity written anywhere else in the
+ * scene arrives here without that code knowing the pool exists.
+ */
+const _v = new THREE.Vector3();
+export function syncLights() {
+  for (let i = 0; i < pointPool.length; i++) {
+    const slot = pointPool[i];
+    const e = pointAt[i];
+    if (!e) { slot.intensity = 0; continue; }
+    const src = e.src as THREE.PointLight;
+    src.updateWorldMatrix(true, false);
+    slot.position.setFromMatrixPosition(src.matrixWorld);
+    slot.color.copy(src.color);
+    slot.intensity = src.intensity;
+    slot.distance = src.distance;
+    slot.decay = src.decay;
+  }
+  for (let i = 0; i < spotPool.length; i++) {
+    const slot = spotPool[i];
+    const e = spotAt[i];
+    if (!e) { slot.intensity = 0; continue; }
+    const src = e.src as THREE.SpotLight;
+    src.updateWorldMatrix(true, false);
+    slot.position.setFromMatrixPosition(src.matrixWorld);
+    src.target.updateWorldMatrix(true, false);
+    slot.target.position.setFromMatrixPosition(src.target.matrixWorld);
+    slot.color.copy(src.color);
+    slot.intensity = src.intensity;
+    slot.distance = src.distance;
+    slot.decay = src.decay;
+    slot.angle = src.angle;
+    slot.penumbra = src.penumbra;
+  }
+  for (const d of dirs) {
+    d.pool.color.copy(d.src.color);
+    // no shortlist, just presence: lit when its storey is in view
+    let vis = true;
+    for (let p: THREE.Object3D | null = d.src; p; p = p.parent) if (!p.visible) { vis = false; break; }
+    d.pool.intensity = vis ? d.src.intensity : 0;
+  }
+  void _v;
+}
+
+/** What the renderer is actually carrying, for `perf`. The pool sizes are the
+ *  numbers compiled into every shader; `live` is how many are doing anything.
+ */
+export function lightStats() {
+  let live = 0;
+  for (const l of pointPool) if (l.intensity > 0) live++;
+  for (const l of spotPool) if (l.intensity > 0) live++;
+  for (const d of dirs) if (d.pool.intensity > 0) live++;
+  return {
+    point: pointPool.length,
+    spot: spotPool.length,
+    dir: dirs.length,
+    live,
+    sources: lamps.length + fills.length + spots.length + dirs.length,
   };
-  for (const l of lamps) consider(l.light, l.base, l.want !== false);
-  for (const f of fills) consider(f, f.intensity, !!f.userData.want, !!f.userData.pin);
-  _cands.sort((a, b) => b.score - a.score);
-  for (let i = 0; i < _cands.length; i++) _cands[i].light.visible = i < BUDGET;
 }
 
 /* A candle is never steady. Every lamp gets its own phase and two
@@ -304,7 +514,7 @@ export function tickLamps(t: number) {
   for (const l of lamps) {
     if (l.steady) continue;
     const f = 0.86 + 0.1 * Math.sin(t * 6.1 + l.phase) + 0.06 * Math.sin(t * 13.7 + l.phase * 2.3);
-    l.light.intensity = l.base * flickerGain * f;
+    l.src.intensity = l.base * flickerGain * f;
   }
 }
 
@@ -338,20 +548,18 @@ export function applyAmbience(world: string | null, night: number, lampGain = 1)
   shaftMat.color.copy(sky);
   shaftMat.opacity = 0.035 + a.through * 0.14;
 
-  /* Lights that contribute nothing are switched off rather than left at a
-     token intensity: three only uploads and loops over *visible* lights, and
-     with six storeys of candles, four window rigs and a fill per floor this
-     scene carries enough of them for that to matter in every lit fragment.
-     The count only changes when the sky crosses a threshold — once at dusk,
-     once at dawn, on a teleport — so the recompile it costs is rare. */
+  /* Lights that contribute nothing lose their slot rather than being left at
+     a token intensity, and a slot with nothing in it costs one multiply by
+     zero. Crossing dusk therefore reshuffles the pool and recompiles nothing,
+     which is the whole point of it. */
   const skyLit = a.through > 0.06;
   for (const w of windows) {
     w.halo.color.copy(sky);
     w.halo.intensity = w.baseHalo * a.through;
     w.spot.color.copy(sky);
     w.spot.intensity = w.baseSpot * a.through;
-    w.halo.visible = skyLit;
-    w.spot.visible = skyLit;
+    w.haloEm.want = skyLit;
+    w.spotEm.want = skyLit;
     w.shaft.visible = skyLit;
   }
   if (shellPane) {
@@ -363,7 +571,10 @@ export function applyAmbience(world: string | null, night: number, lampGain = 1)
 
   flickerGain = a.interior;
   for (const l of lamps) {
-    l.light.intensity = l.base * a.interior;
+    // the window halos are in this list for the budget's sake only — what
+    // they carry is the sky, set in the window loop above
+    if (l.sky) continue;
+    l.src.intensity = l.base * a.interior;
     l.want = a.interior > 0.05;
   }
   lastFill = a.fill;

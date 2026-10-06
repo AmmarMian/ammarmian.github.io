@@ -24,7 +24,7 @@
    couple of hundred kilobytes to the entry chunk with nothing to show for it. */
 import * as THREE from 'three';
 
-export function installWorlds({ scene, camera, model, fx, dims, nightFor }) {
+export function installWorlds({ scene, camera, model, fx, dims, nightFor, rig: hostRig }) {
   /* NF here is the number of storeys *above ground*: the shell is masonry the
      world can see, and the tower's cellar is not one of those. GROUND is how
      many storeys sit below it, which the interior floor groups have been
@@ -339,11 +339,12 @@ export function installWorlds({ scene, camera, model, fx, dims, nightFor }) {
 
   /* ============================ scene lighting =========================== */
 
-  const rig = { hemi: null, keys: [] };
-  scene.traverse((o) => {
-    if (o.isHemisphereLight) rig.hemi = o;
-    else if (o.isDirectionalLight) rig.keys.push(o);
-  });
+  /* The host hands these over rather than letting us go looking: a traverse
+     of the scene also finds the observatory's two moons, which belong to that
+     storey and are driven by ambience.ts. Multiplying them by a world's sky
+     factors moved moonlight that was never ours to move — and the comments
+     below have always said "these three lights", which is what this is. */
+  const rig = { hemi: hostRig.hemi, keys: [hostRig.key, hostRig.fill].filter(Boolean) };
   const rigDefaults = {
     hemi: rig.hemi && { i: rig.hemi.intensity, sky: rig.hemi.color.clone(), gnd: rig.hemi.groundColor.clone() },
     keys: rig.keys.map((l) => ({ i: l.intensity, c: l.color.clone(), p: l.position.clone() })),

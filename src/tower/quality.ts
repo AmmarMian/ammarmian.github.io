@@ -35,6 +35,9 @@ export interface Profile {
   antialias: boolean;
   /** How many interior lights may burn at once — see ambience.ts. */
   lights: number;
+  /** How many window spots may be cast at once. A spot is the dearest light
+   *  in the scene, and the window shaft still draws without one. */
+  spots: number;
   /** Fraction of the motes, bubbles and wisps that actually draw. */
   particles: number;
   /** Fraction of a world's scattered instances — grass, trees, rubble, cars. */
@@ -48,19 +51,19 @@ export const PROFILES: Record<Tier, Profile> = {
   high: {
     tier: 'high', label: 'high', blurb: 'everything, at full resolution',
     maxPixelRatio: 2, antialias: true,
-    lights: 10, particles: 1, detail: 1,
+    lights: 12, spots: 2, particles: 1, detail: 1,
     pixelNear: 4, pixelFar: 2,
   },
   medium: {
     tier: 'medium', label: 'medium', blurb: 'fewer lights, coarser pixels, a thinner world',
     maxPixelRatio: 1.5, antialias: true,
-    lights: 6, particles: 0.6, detail: 0.7,
+    lights: 8, spots: 1, particles: 0.6, detail: 0.7,
     pixelNear: 5, pixelFar: 3,
   },
   low: {
     tier: 'low', label: 'low', blurb: 'chunky pixels, a handful of lights, half the scenery',
     maxPixelRatio: 1, antialias: false,
-    lights: 4, particles: 0.3, detail: 0.45,
+    lights: 5, spots: 0, particles: 0.3, detail: 0.45,
     pixelNear: 6, pixelFar: 4,
   },
 };
