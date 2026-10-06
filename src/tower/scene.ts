@@ -150,7 +150,7 @@ export function createTowerScene(container: HTMLElement, opts: {
   // so meshes added afterward wouldn't get patched.
   // the shell is built from the storeys above ground only
   const worlds = installWorlds({
-    scene, camera, model, fx,
+    scene, camera, renderer, model, fx,
     dims: { R, FH, NF: NF_ABOVE, WH, ROT, GROUND },
     nightFor: clampNight,
     // named rather than discovered — see the note at the rig in worlds.js

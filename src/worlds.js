@@ -24,7 +24,7 @@
    couple of hundred kilobytes to the entry chunk with nothing to show for it. */
 import * as THREE from 'three';
 
-export function installWorlds({ scene, camera, model, fx, dims, nightFor, rig: hostRig }) {
+export function installWorlds({ scene, camera, renderer, model, fx, dims, nightFor, rig: hostRig }) {
   /* NF here is the number of storeys *above ground*: the shell is masonry the
      world can see, and the tower's cellar is not one of those. GROUND is how
      many storeys sit below it, which the interior floor groups have been
@@ -3638,7 +3638,15 @@ export function installWorlds({ scene, camera, model, fx, dims, nightFor, rig: h
 
   const built = {};
   const BUILDERS = { seafloor: buildSeafloor, moon: buildMoon, forest: buildForest, beach: buildBeach, city: buildCity, space: buildSpace, rain: buildRain };
-  const savedFog = scene.fog;
+  /* The tower at home has no fog, and "no fog" is a different shader from
+     "fog" — three compiles USE_FOG into every material, so leaving a world
+     rebuilt every program in the scene on the way out as well as on the way
+     in. A FogExp2 of density zero is the same arithmetic as no fog at all
+     (1 - exp(-(0 * depth)^2) is exactly 0) and the same shader as the five
+     worlds that use exp2 fog, so going home is now a swap of two numbers
+     rather than a recompile. */
+  const savedFog = scene.fog || new THREE.FogExp2(0x000000, 0);
+  scene.fog = savedFog;
   let current = null;
 
   /* Worlds are expensive to build and expensive to keep: a couple of
@@ -3675,6 +3683,11 @@ export function installWorlds({ scene, camera, model, fx, dims, nightFor, rig: h
   function ensureBuilt(kind) {
     if (!kind || built[kind] || !BUILDERS[kind]) return;
     built[kind] = BUILDERS[kind]();
+    /* Compile the new world's shaders while the flash is still covering the
+       screen, rather than on the first frame it is actually drawn. three does
+       this off the main thread where the driver supports parallel compile, so
+       it costs nothing here and the swap arrives with its programs ready. */
+    renderer?.compileAsync?.(built[kind].group, camera, scene).catch(() => {});
     // Built, but deliberately NOT added to the scene: set() owns membership.
     // A world that is not in the graph cannot render, cannot be raycast and
     // cannot be half-hidden by a missed transition.
@@ -3756,8 +3769,19 @@ export function installWorlds({ scene, camera, model, fx, dims, nightFor, rig: h
     refreshFog();
     return current;
   }
-  // switching between no fog / Fog / FogExp2 changes the shader defines
+  /* Which of three's three fog shaders the scene is currently compiled for:
+     none, linear, or exponential. Only the *kind* is a shader define — the
+     colour, the density and the near/far planes are uniforms, so swapping one
+     exp2 fog for another is free and needs none of this.
+     It is worth being careful about, because the alternative is marking every
+     material in the scene for a rebuild on every single jump, which is a
+     visible hitch in the middle of the rise. */
+  let fogKind = () => (scene.fog ? (scene.fog.isFogExp2 ? 2 : 1) : 0);
+  let compiledFog = fogKind();
   function refreshFog() {
+    const k = fogKind();
+    if (k === compiledFog) return;
+    compiledFog = k;
     scene.traverse((o) => {
       if (!o.isMesh && !o.isInstancedMesh && !o.isPoints) return;
       (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => { if (m && m.fog) m.needsUpdate = true; });
