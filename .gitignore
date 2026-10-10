@@ -4,3 +4,5 @@ dist-ssr
 *.local
 .DS_Store
 tsconfig.tsbuildinfo
+dist-spike
+spike/out

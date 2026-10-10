@@ -1,0 +1,33 @@
+// Wall-clock frame cost of the library scene on the real GPU, headless.
+//   node spike/tools/bench.mjs [--size 1920x1080] [--pixel 3] [--frames 300]
+import { readFileSync } from 'node:fs';
+import { init, frame, target } from 'vgpu/node';
+import { LibraryScene } from '../src/library.ts';
+
+const args = process.argv.slice(2);
+const opt = (n, d) => { const i = args.indexOf(`--${n}`); return i >= 0 ? args[i + 1] : d; };
+const [W, H] = opt('size', '1920x1080').split('x').map(Number);
+const pixel = Number(opt('pixel', '3'));
+const N = Number(opt('frames', '300'));
+const manifest = JSON.parse(readFileSync('spike/public/library.json', 'utf8'));
+const bin = readFileSync('spike/public/library.bin');
+const ab = bin.buffer.slice(bin.byteOffset, bin.byteOffset + bin.byteLength);
+const src = { library: readFileSync('spike/src/shaders/library.wgsl', 'utf8'), post: readFileSync('spike/src/shaders/post.wgsl', 'utf8') };
+const gpu = await init();
+const output = target(gpu, { size: [W, H], format: 'rgba8unorm' });
+const lib = new LibraryScene(gpu, manifest, ab, src, [W, H], pixel);
+const view = { pos: manifest.camera.pos, target: manifest.camera.target };
+const q = gpu.device.gpu.queue;
+for (let i = 0; i < 20; i++) frame(gpu, (f) => lib.render(f, output, view, i / 60));
+await q.onSubmittedWorkDone();
+const times = [];
+for (let i = 0; i < N; i++) {
+  const t0 = performance.now();
+  frame(gpu, (f) => lib.render(f, output, view, i / 60));
+  await q.onSubmittedWorkDone();
+  times.push(performance.now() - t0);
+}
+times.sort((a, b) => a - b);
+const pct = (p) => times[Math.min(N - 1, Math.floor(N * p))].toFixed(2);
+console.log(`${W}x${H}, scene ${Math.ceil(W / pixel)}x${Math.ceil(H / pixel)}: median ${pct(0.5)} ms, p95 ${pct(0.95)} ms, max ${times[N - 1].toFixed(2)} ms (submit -> GPU idle, ${N} frames)`);
+gpu.dispose();
