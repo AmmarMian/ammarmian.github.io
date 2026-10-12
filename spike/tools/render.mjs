@@ -5,6 +5,7 @@
 // the same file the page imports.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { PNG } from 'pngjs';
+import sharp from 'sharp';
 import { init, frame, target } from 'vgpu/node';
 import { LibraryScene } from '../src/library.ts';
 
@@ -12,21 +13,25 @@ const args = process.argv.slice(2);
 const opt = (n, d) => { const i = args.indexOf(`--${n}`); return i >= 0 ? args[i + 1] : d; };
 const out = args[0] ?? 'spike/out/shot.png';
 const [W, H] = opt('size', '1280x720').split('x').map(Number);
-const pixel = Number(opt('pixel', '3'));
+const pixel = Number(opt('pixel', '1'));
 const time = Number(opt('time', '4'));
 const v3 = (s) => s.split(',').map(Number);
 
 const manifest = JSON.parse(readFileSync('spike/public/library.json', 'utf8'));
 const bin = readFileSync('spike/public/library.bin');
 const ab = bin.buffer.slice(bin.byteOffset, bin.byteOffset + bin.byteLength);
-const src = {
-  library: readFileSync('spike/src/shaders/library.wgsl', 'utf8'),
-  post: readFileSync('spike/src/shaders/post.wgsl', 'utf8'),
+const sh = (n) => readFileSync(`spike/src/shaders/${n}.wgsl`, 'utf8');
+const src = { pbr: sh('pbr'), godrays: sh('godrays'), composite: sh('composite'), down: sh('bloom-down'), up: sh('bloom-up') };
+const loadImage = async (url) => {
+  const { data, info } = await sharp(`spike/public/${url}`).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  return { width: info.width, height: info.height, data: new Uint8Array(data) };
 };
+const bytes = async (url) => { const b = readFileSync(`spike/public/${url}`); return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength); };
+const load = { image: loadImage, bytes };
 
 const gpu = await init();
 const output = target(gpu, { size: [W, H], format: 'rgba8unorm' });
-const lib = new LibraryScene(gpu, manifest, ab, src, [W, H], pixel);
+const lib = await LibraryScene.create(gpu, manifest, ab, src, load, output, { debug: Number(opt('debug', '0')), scale: 1 / pixel, rays: Number(opt('rays', '1')), bloom: Number(opt('bloom', '0.12')), exposure: Number(opt('exposure', '1')) });
 const view = {
   pos: opt('cam') ? v3(opt('cam')) : manifest.camera.pos,
   target: opt('look') ? v3(opt('look')) : manifest.camera.target,

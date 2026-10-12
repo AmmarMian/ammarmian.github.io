@@ -1,45 +1,66 @@
 # vgpu spike: the library floor
 
-One floor of the tower, rebuilt on vgpu with a Blender-baked mesh, to find out what the rewrite
-would cost and what it would buy. It builds beside the site (`vite.spike.config.ts`) and nothing in
-the real build imports it.
+One floor of the tower rebuilt on vgpu with Blender-built assets, to find out what a rewrite costs and what it
+buys. It builds beside the site (`vite.spike.config.ts`); nothing in the real build imports it.
 
-    npm run spike:model     # Blender -> spike/public/library.{bin,json}  (about 7 s)
-    npm run spike:render -- spike/out/shot.png [--cam x,y,z --look x,y,z --time t]
+    npm run spike:fetch     # CC0 Poly Haven scans + PBR sets -> spike/assets-src   (not committed, ~70 MB)
+    npm run spike:model     # Blender assembles the room -> spike/public, then pack-assets.py writes the WebP
+    npm run spike:render -- spike/out/shot.png [--cam x,y,z --look x,y,z --fov 62 --exposure 1.4]
     node spike/tools/bench.mjs
-    npm run spike:build     # typecheck + bundle into dist-spike/
+    npm run spike:build && npm run spike:browser   # build, then load it in the cached Chrome and screenshot
 
-`spike:render` and `bench.mjs` drive vgpu's Node adapter straight onto the GPU: no browser, no dev
-server. They import the same `src/library.ts` the page does.
+The generated files in `spike/public` are gitignored; the three commands above recreate them.
+`spike:render` and `bench.mjs` drive vgpu's Node adapter straight onto the GPU, with no browser and no dev server,
+through the same `src/library.ts` the page imports. `spike:browser` serves the build from a throwaway static
+server and loads it in real Chrome with WebGPU, to check the browser path itself.
 
-## What is here
+## What is in the room
 
-- `blender/model_library.py` reads like `src/tower/floors/library.ts` (same polar layout, same
-  seeded choices) but builds bevelled solids, a real window opening in the wall, books with gilt
-  bands and labels, and bakes ambient occlusion into the vertices by ray casting.
-- `src/shaders/library.wgsl`: four point lamps, hemisphere ambient times baked AO, and the sun
-  through the round window as an analytic test (ray from the fragment toward the sun, does it
-  cross the window plane inside the glass and clear of the mullions?). That gives the crossed
-  pool of light on the floor with no shadow map. Also the orbiting books (hinged leaves),
-  the spinning globe, the sunbeam and the sky.
-- `src/shaders/post.wgsl` and `LibraryScene`: scene drawn at 1/N resolution in HDR, nearest
-  upscale, ACES. This is the site's pixel-art look.
+`blender/model_library.py` builds it, in the site's own coordinates (x = r sin a, z = r cos a):
+
+- **Architecture from swept mouldings**: skirting, chair rail, frieze and crown running round the wall; fluted
+  pilasters; raised wainscot panels; a deep stone window reveal with an outer moulding, keystone, casement and lead
+  lattice; bookcases with rounded nosings, dividers, cabinet doors with brass knobs, plinth and cornice; a
+  rolling library ladder on a brass rail; a rolled stone platform edge; turned balusters and newels.
+- **Furniture modelled by hand**: a writing desk (rolled-edge top, leather inlay with gilt border, two drawer
+  pedestals, hutch of pigeonholes, turned feet), a turned lectern with a clasped grimoire, a globe on three
+  cabriole legs with horizon ring and tilted brass meridian, an armillary, an open tome with curved page stacks and
+  leaves mid-turn, wall sconces with candles.
+- **Poly Haven scans** decimated to a triangle budget: armchair, gothic chair, console, drawers, stool, clock,
+  bust, vases, oil lamp, candelabra, lantern, chest, encyclopedia set, two plants.
+- **Books**: four unit meshes (folio, quarto, thick, slim), each with a rounded leather spine, boards, a chamfered
+  page block, headbands, raised hubs, gilt tooling and a label. The ~600 on the shelves are instances in a 28 KB
+  buffer (position, lean, scale, cover colour, baked AO), so each can be addressed, tinted or opened.
+- **Baked ambient occlusion** on every static vertex by ray casting, and per instance for the books.
+
+## How it is lit and drawn (`src/library.ts`, `src/shaders/`)
+
+- PBR (GGX, Smith, Schlick), tangent-space normal maps, ARM maps; cotangent frame from screen derivatives.
+- A shadow-mapped sun (2048², 5x5 PCF) that comes through the real window opening, so the pool of light on the
+  floor, the mullion shadows and the beam are physical, not painted.
+- The candelabra casts a six-face cube shadow, drawn once because nothing near it moves.
+- A volumetric pass marches the sun's shadow map for the beam (64 steps, forward-scattering phase), boosted where
+  the ray passes through the glass; dust motes shine only where the sun reaches them.
+- 4x MSAA in HDR, a five-level bloom, ACES, grade, vignette and grain. Full resolution; `?scale=0.5` on the page
+  trades sharpness for speed.
 
 ## Numbers (M4 Pro, headless, submit to GPU idle)
 
 | | |
 |---|---|
-| 1920x1080 canvas, scene at 640x360 | 0.43 ms median, 0.58 ms p95 |
-| 1920x1080, scene at full resolution | 0.68 ms median |
-| room mesh | 90k vertices, 53k triangles |
-| mesh file | 2.5 MB raw, 0.87 MB gzip (20-byte vertices) |
-| JS for the page | 228 KB, 73 KB gzip (vgpu included); the tower ships three 552 KB + scene 211 KB |
+| 1920x1080, 4x MSAA, shadows, beam, bloom | 4.3 ms median, 4.9 ms p95 |
+| room mesh | 422k vertices, 412k triangles, 41 materials |
+| mesh file | 10 MB raw, 6.5 MB gzip |
+| textures | 8.1 MB WebP (1k for hero pieces, 512 for small props) |
+| page JS | 254 KB, 80 KB gzip, vgpu included (the tower ships three 552 KB + scene 211 KB) |
 
-## What it does not have yet
+One floor at this fidelity is about 15 MB over the wire, so seven would be too many as-is. The levers, in order of
+effect: meshopt-compress the vertex stream (typically 3-5x over gzip), KTX2/Basis textures instead of WebP, 512 px
+for everything that is not a hero, lower decimation budgets on the scans, and streaming floors on demand.
 
-- Shadows from the room's own objects. The sun and the lamps ignore the desk and shelves; the AO
-  covers contact darkening only. A single shadow map for the sun is the next thing to add.
-- Picking. Hover and click on books, globe and lectern need either a CPU ray against the bounding
-  boxes the manifest could carry, or an ID buffer.
-- Bloom, glass pane, other floors, worlds, teleport, quality tiers, the wizard and fox.
-- WebGPU only: no `navigator.gpu` shows the link to `/text`.
+## Not done yet
+
+- Picking (a CPU ray against per-book boxes, or an ID buffer) for hover and click on books, globe and lectern.
+- Lamp shadows beyond the candelabra; screen-space AO for contact detail on the scans.
+- Glass in the window, other floors, the worlds and teleport, quality tiers, wizard and fox.
+- WebGPU only: without `navigator.gpu` the page shows a link to `/text`.

@@ -1,7 +1,10 @@
 import { clock, frameLoop, init, surface } from 'vgpu';
-import { LibraryScene, type Manifest, type View } from './library';
-import libraryShader from './shaders/library.wgsl';
-import postShader from './shaders/post.wgsl';
+import { LibraryScene, type Loaders, type Manifest, type View } from './library';
+import pbr from './shaders/pbr.wgsl';
+import godrays from './shaders/godrays.wgsl';
+import composite from './shaders/composite.wgsl';
+import down from './shaders/bloom-down.wgsl';
+import up from './shaders/bloom-up.wgsl';
 
 const canvas = document.getElementById('c') as HTMLCanvasElement;
 
@@ -23,11 +26,28 @@ async function main() {
     fetch('library.bin').then((r) => r.arrayBuffer()),
   ]);
 
-  // Pixels are as wide as the screen is big: about 3 CSS pixels on a laptop, finer on a phone.
-  const pixelFor = () => Math.max(2, Math.round(Math.min(innerWidth, innerHeight) / 240));
+  // Decode on the main thread to RGBA bytes; vgpu textures are built from those, mips and all, so the page and the
+  // headless renderer share one path from pixels to texels.
+  const load: Loaders = {
+    bytes: (url) => fetch(url).then((r) => r.arrayBuffer()),
+    image: async (url) => {
+      const bmp = await createImageBitmap(await (await fetch(url)).blob(), { colorSpaceConversion: 'none', premultiplyAlpha: 'none' });
+      const cv = new OffscreenCanvas(bmp.width, bmp.height);
+      const cx = cv.getContext('2d', { willReadFrequently: true })!;
+      cx.drawImage(bmp, 0, 0);
+      const px = cx.getImageData(0, 0, bmp.width, bmp.height);
+      bmp.close();
+      return { width: px.width, height: px.height, data: px.data };
+    },
+  };
+
+  // Full resolution up to what an ordinary GPU can carry with 4x MSAA; ?scale=0.5 trades sharpness for speed.
+  const q = new URLSearchParams(location.search);
   const out = surface(gpu, canvas, { dpr: [1, 2] });
-  const lib = new LibraryScene(gpu, manifest, bin, { library: libraryShader, post: postShader }, out.size, pixelFor() * (out.size[0] / innerWidth));
-  out.onResize(() => lib.resize(out.size, pixelFor() * (out.size[0] / innerWidth)));
+  const autoScale = () => Math.min(1, 2400 / out.size[0]);
+  const scaleOf = () => Number(q.get('scale')) || autoScale();
+  const lib = await LibraryScene.create(gpu, manifest, bin, { pbr, godrays, composite, down, up }, load, out, { scale: scaleOf() });
+  out.onResize(() => lib.resize(out, scaleOf()));
 
   // A camera that stands where the old tower's visitor would, and turns on a drag.
   const home = manifest.camera;
