@@ -41,7 +41,7 @@ struct Mat {
 @group(0) @binding(7) var<uniform> books: array<vec4f, 24>;
 @group(0) @binding(8) var<uniform> globeModel: mat4x4f;
 
-// Shelf books, three vec4 each: [pos.xyz, yaw], [sx, sy, lean, ao at the foot], [tint.rgb, ao at the head]
+// Shelf books, four vec4 each: [pos.xyz, yaw], [sx, sy, lean, ao at the foot], [tint.rgb, ao at the head], [label cell, 0, 0, 0]
 @group(0) @binding(9) var<storage, read> shelf: array<vec4f>;
 
 // The candelabra's shadow cube: one depth map per face. casterVP is what a shadow pass projects with.
@@ -53,7 +53,7 @@ struct Mat {
 @group(0) @binding(15) var cf5: texture_depth_2d;
 @group(0) @binding(16) var<uniform> casterVP: mat4x4f;
 
-// Which slice of the shelf-book buffer a draw covers: x = first instance.
+// Which slice of the shelf-book buffer a draw covers: x = first instance; yzw = the spine-label atlas (columns, cell width, cell height as fractions).
 @group(0) @binding(17) var<uniform> inst: vec4f;
 
 struct VOut {
@@ -111,8 +111,8 @@ fn bookWorld(i: u32, p: vec3f, n: vec3f, side: f32) -> array<vec3f, 2> {
 
 fn shelfWorld(ii: u32, p: vec3f, n: vec3f) -> array<vec3f, 2> {
   let i = ii + u32(inst.x);
-  let a = shelf[i * 3u];
-  let b = shelf[i * 3u + 1u];
+  let a = shelf[i * 4u];
+  let b = shelf[i * 4u + 1u];
   let m = rotY(a.w) * rotZ(b.z);
   return array<vec3f, 2>(m * (p * vec3f(b.x, b.y, select(0.0, 1.0, b.x > 0.0))) + a.xyz, normalize(m * n));
 }
@@ -120,11 +120,18 @@ fn shelfWorld(ii: u32, p: vec3f, n: vec3f) -> array<vec3f, 2> {
 @vertex fn vs_shelf(@builtin(instance_index) i: u32, @location(0) pq: vec4f, @location(1) nq: vec4f, @location(2) uv: vec2f, @location(3) c: vec4f, @location(4) d: vec4f) -> VOut {
   let p = decode(pq);
   let w = shelfWorld(i, p, nq.xyz);
-  let t = shelf[(i + u32(inst.x)) * 3u + 2u];
-  let b = shelf[(i + u32(inst.x)) * 3u + 1u];
+  let ix = i + u32(inst.x);
+  let t = shelf[ix * 4u + 2u];
+  let b = shelf[ix * 4u + 1u];
+  let cell = u32(shelf[ix * 4u + 3u].x);
   var o: VOut;
   o.pos = G.viewProj * vec4f(w[0], 1.0);
   o.wp = w[0]; o.n = w[1]; o.uv = uv * vec2f(b.x, b.y);
+  if (d.z > 0.5) {
+    // a spine label: its quad addresses one cell of the typeset atlas
+    let cols = u32(inst.y);
+    o.uv = (vec2f(f32(cell % cols), f32(cell / cols)) + uv) * vec2f(inst.z, inst.w);
+  }
   o.col = vec4f(select(c.rgb, t.rgb, d.w > 0.5), c.a);
   // occlusion: the shelf above darkens the head, the board below the foot
   let ao = mix(b.w, t.w, clamp(p.y / 0.34 + 0.5, 0.0, 1.0));

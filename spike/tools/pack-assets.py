@@ -6,9 +6,12 @@ Poly Haven sets are resized to the material's size cap; maps that are a single r
 become an ARM image (ambient occlusion, roughness, metalness in R, G, B); the three painted
 materials (paper, rug, globe) are generated here. The manifest gains a `textures` entry per material.
 """
-import json, os
+import json, os, sys
 import numpy as np
 from PIL import Image
+
+sys.path.insert(0, os.path.dirname(__file__))
+import typeset as T
 
 PUB = "spike/public"
 SRC = "spike/assets-src"
@@ -140,11 +143,71 @@ def flat_arm(shape, ao=255, rough=200, metal=0):
 
 m = json.load(open(os.path.join(PUB, "library.json")))
 total = 0
+
+
+def spine_entries(slots):
+    """One label per shelf slot: the site's real publications first (oldest on the lowest shelves), then bound
+    volumes from a small library of classics. Returns the atlas entries and writes `label` onto each slot."""
+    pubs = json.load(open("src/data/hal-snapshot.json"))
+    pubs = sorted(pubs, key=lambda p: (p.get("year") or 0, p.get("title") or ""))
+
+    def short(names):
+        who = [n.split()[-1] if i else f"{n.split()[0][0]}. {n.split()[-1]}" for i, n in enumerate(names)]
+        return who[0] if len(who) == 1 else (f"{who[0]} & {who[1]}" if len(who) == 2 else f"{who[0]} et al.")
+    order = sorted(range(len(slots)), key=lambda i: (slots[i]["row"], slots[i]["band"], slots[i]["angle"]))
+    entries = [None] * len(slots)
+    for rank, i in enumerate(order):
+        if rank < len(pubs):
+            p = pubs[rank]
+            title, author, year, pub = p["title"], short(p.get("authorList") or [p.get("authors", "")]), p.get("year") or 0, True
+            hal = p.get("id", "")
+        else:
+            title, author, year = T.FILLERS[(rank - len(pubs)) % len(T.FILLERS)]
+            pub, hal = False, ""
+        entries[i] = (title, author, year, rank + 1)
+        slots[i]["label"] = {"title": title, "author": author, "year": year, "publication": pub, "id": hal, "number": rank + 1}
+    return entries
+
+
+def save_img(name, arr, q=88):
+    path = os.path.join(OUT, name + ".webp")
+    Image.fromarray(arr).save(path, "WEBP", quality=q, method=5)
+    return name + ".webp"
+
+
+def gen_typeset(name):
+    """Textures that carry type. Returns {diff, nor, arm} file names."""
+    t = {"diff": None, "nor": None, "arm": None}
+    if name == "spinelabel":
+        entries = spine_entries(m["slots"])
+        atlas, cols, rows = T.spine_atlas(entries)
+        t["diff"] = save_img("spinelabel_diff", atlas, 90)
+        m["spineAtlas"] = {"cols": cols, "rows": rows, "cell": [56, 288], "size": 4096}
+    elif name == "pages":
+        left = T.page_image("prose", folio="8", seed=1)
+        right = T.page_image("algorithm", folio="9", seed=2)
+        t["diff"] = save_img("pages_diff", np.concatenate([left, right], axis=1), 90)
+    elif name == "letter":
+        t["diff"] = save_img("letter_diff", T.page_image("letter", folio="", running="Annecy, le 12 octobre", seed=5), 88)
+    elif name == "plaque":
+        a, n, r = T.brass_plaque([("sc", 74, "Bibliotheca Mian"), ("mono", 24, "LISTIC · ANNECY · MMXXVI")])
+        t["diff"], t["nor"], t["arm"] = save_img("plaque_diff", a), save_img("plaque_nor", n, 92), save_img("plaque_arm", r, 92)
+    elif name == "cards":
+        labels = [("I.1", "Riemannian geometry"), ("I.2", "Covariance estimation"), ("I.3", "Radar polarimetry"), ("I.4", "Robust statistics"),
+                  ("II.1", "Machine learning"), ("II.2", "Signal processing"), ("II.3", "Hyperspectral imaging"), ("II.4", "Algorithms and code")]
+        t["diff"] = save_img("cards_diff", T.shelf_cards(labels), 90)
+    elif name == "grimoire":
+        a, n, r = T.grimoire_cover()
+        t["diff"], t["nor"], t["arm"] = save_img("grimoire_diff", a, 90), save_img("grimoire_nor", n, 92), save_img("grimoire_arm", r, 92)
+    return t
+
 for mat in m["materials"]:
     t = {"diff": None, "nor": None, "arm": None}
     size = mat["size"]
     name = mat["name"]
-    if mat.get("gen"):
+    if mat.get("gen") in ("spinelabel", "pages", "letter", "plaque", "cards", "grimoire"):
+        t = gen_typeset(mat["gen"])
+    elif mat.get("gen"):
         g = mat["gen"]
         img = {"paper": gen_paper, "rug": gen_rug, "globe": gen_globe}[g](size)
         if isinstance(img, tuple):

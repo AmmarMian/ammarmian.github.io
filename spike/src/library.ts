@@ -31,6 +31,7 @@ export interface Manifest {
   flyingCount: number;
   flyingBooks: { r: number; a0: number; y: number; sp: number; spread: number; tint: V3 }[];
   flyingCenter: V3;
+  spineAtlas: { cols: number; rows: number; cell: [number, number]; size: number };
   shelfBooks: { file: string; count: number; variants: { group: string; first: number; count: number }[] };
   slots: { band: number; angle: number; row: number; height: number; pos: V3; yaw: number; tint: V3; depth: number; inst: number }[];
   camera: { pos: V3; target: V3 };
@@ -192,7 +193,7 @@ export class LibraryScene {
       const spec = specs.get(m.material)!;
       this.opaque.push(draw(gpu, {
         label: m.material, shader: src.pbr, entry: { vertex: 'vs_static', fragment: 'fs_pbr' }, geometry: range(m),
-        cull: /leaves|paper|rug/.test(m.material) ? 'none' : 'back', depth: { compare: 'less', write: true },
+        cull: /leaves|paper|rug|spinelabel|pages|letter|plaque|cards|grimoire/.test(m.material) ? 'none' : 'back', depth: { compare: 'less', write: true },
         set: { ...base, ...matBindings(spec) },
       }));
     }
@@ -211,12 +212,13 @@ export class LibraryScene {
       this.bookDraws.push(d); this.opaque.push(d);
     }
     this.shelfVariants = manifest.shelfBooks.variants.filter((v) => v.count > 0);
+    const atlas = manifest.spineAtlas;
     for (const v of this.shelfVariants) {
       for (const m of manifest.meshes.filter((x) => x.group === v.group)) {
         this.opaque.push(draw(gpu, {
           label: `${v.group}-${m.material}`, shader: src.pbr, entry: { vertex: 'vs_shelf', fragment: 'fs_pbr' }, geometry: range(m),
-          cull: m.material === 'paper' || m.material === 'gilt' ? 'none' : 'back', instances: v.count, depth: { compare: 'less', write: true },
-          set: { ...base, shelf: shelfBuf, inst: [v.first, 0, 0, 0], ...matBindings(specs.get(m.material)!) },
+          cull: ['paper', 'gilt', 'spinelabel'].includes(m.material) ? 'none' : 'back', instances: v.count, depth: { compare: 'less', write: true },
+          set: { ...base, shelf: shelfBuf, inst: [v.first, atlas.cols, atlas.cell[0] / atlas.size, atlas.cell[1] / atlas.size], ...matBindings(specs.get(m.material)!) },
         }));
       }
     }
@@ -302,7 +304,7 @@ export class LibraryScene {
 
   private setShelfVisible(inst: number, visible: boolean): void {
     if (visible !== this.hidden.has(inst)) return;
-    const o = inst * 12;
+    const o = inst * 16;
     if (visible) { this.hidden.delete(inst); this.shelfLive[o + 4] = this.shelfData[o + 4]; this.shelfLive[o + 5] = this.shelfData[o + 5]; }
     else { this.hidden.add(inst); this.shelfLive[o + 4] = 0; this.shelfLive[o + 5] = 0; }
     this.shelfBuf.write(this.shelfLive);            // 28 KB, and only when a book leaves or returns

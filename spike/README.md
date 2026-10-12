@@ -39,6 +39,24 @@ server and loads it in real Chrome with WebGPU, to check the browser path itself
   slot can be the one that flies.
 - **Baked ambient occlusion** on every static vertex by ray casting, and per instance for the books.
 
+## Typography (the Paper & Night system)
+
+The room carries type set in the "Paper & Night" design system (Cormorant Garamond for display, Cormorant SC for small
+caps, Newsreader for text, JetBrains Mono for tracked capitals, Pirata One for the single blackletter signature; paper
+`#efece4`, ink `#1f1e1b`, one vermilion accent `#b03915`). `tools/typeset.py` sets it with PIL from the fonts in
+`assets-src/fonts` (Google Fonts, OFL; fetched with the other sources) and `pack-assets.py` bakes it into textures:
+
+- **Spines**: every shelf book has a paper label from a 4096x4096 atlas (one 56x288 cell each): accent index, hairline,
+  title in small caps, author in italic, year in mono. The first 37 are the site's real publications from
+  `src/data/hal-snapshot.json`, oldest on the lowest shelves; the rest are bound classics. The manifest's `slots`
+  carry each book's `label` (title, author, year, HAL id), so a click can open the right record. The atlas cell
+  comes from the instance buffer, so the four book meshes serve all 585 labels.
+- **Pages**: the open tome on the desk and the flying books carry a typeset spread (running head, kicker with accent
+  index, display title with the short vermilion bar, drop cap, ruled algorithm plate, folio). A typed letter lies on
+  the desk.
+- **Plaque, cards, cover**: an engraved brass plate under the window, a brass card holder on each bay with its
+  category in tracked mono capitals, and the lectern grimoire in gilt on violet cloth, signed in blackletter.
+
 ## How it is lit and drawn (`src/library.ts`, `src/shaders/`)
 
 - PBR (GGX, Smith, Schlick), tangent-space normal maps, ARM maps; cotangent frame from screen derivatives.

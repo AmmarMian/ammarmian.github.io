@@ -73,6 +73,12 @@ material("stonewall", "old_stone_wall", tile=1.4, tint=(0.85, 0.82, 0.78))
 material("leather", "brown_leather", tile=0.5, rough=None, size=512)
 material("velvet", "velour_velvet", tile=0.6, tint=(0.9, 0.9, 0.9), size=512)
 material("paper", gen="paper", tile=0.3, rough=0.85, metal=0.0, size=512)
+material("spinelabel", gen="spinelabel", rough=0.8, metal=0.0, size=4096, tint=(0.66, 0.61, 0.52))
+material("pages", gen="pages", rough=0.85, metal=0.0, size=2048)
+material("letter", gen="letter", rough=0.88, metal=0.0, size=1024)
+material("plaque", gen="plaque", size=1024)
+material("cards", gen="cards", rough=0.7, metal=0.0, size=1024, tint=(0.9, 0.87, 0.8))
+material("grimoire", gen="grimoire", size=1024)
 material("rug", gen="rug", tile=5.0, rough=0.95, metal=0.0, size=1024)["centered"] = True
 material("globe", gen="globe", tile=1.0, rough=0.35, metal=0.0, size=1024)
 material("gilt", None, tint=(0.78, 0.58, 0.24), rough=0.42, metal=1.0)
@@ -170,7 +176,7 @@ def box_uv(co, n, ext, spec, off):
 
 
 def emit(bm, M, mat, emissive=0.0, tint=None, tint_mode=0, side=0, scale_uv=True, smooth=None, faces=None, uvlayer=None,
-         matof=None):
+         matof=None, flag=0):
     """Triangulate and append a primitive. `tint` (rgb 0..1) multiplies the texture, or replaces its colour
     in proportion to `tint_mode`. Imported scans pass `uvlayer` and `matof` (face -> material name)."""
     bmesh.ops.triangulate(bm, faces=bm.faces[:])
@@ -222,7 +228,7 @@ def emit(bm, M, mat, emissive=0.0, tint=None, tint_mode=0, side=0, scale_uv=True
         tnt = tint if tint is not None else (1, 1, 1)
         em = emissive if emissive else spec["emissive"]
         C = np.tile(np.array([int(min(1, tnt[0]) * 255), int(min(1, tnt[1]) * 255), int(min(1, tnt[2]) * 255), int(min(1, em) * 255)], np.uint8), (len(P), 1))
-        D = np.tile(np.array([255, 127 + int(side * 127), 0, int(tint_mode * 255)], np.uint8), (len(P), 1))
+        D = np.tile(np.array([255, 127 + int(side * 127), flag, int(tint_mode * 255)], np.uint8), (len(P), 1))
         b.P.append(np.array(P, np.float32)); b.N.append(np.array(N, np.float32)); b.T.append(np.array(T, np.float32))
         b.C.append(C); b.D.append(D); b.I.append(I)
         b.n += len(P)
@@ -252,6 +258,26 @@ def box(w, h, d, pos=(0, 0, 0), ry=0.0, mat="shelf", bevel=0.012, segs=1, rx=0.0
 def arcbox(w, h, d, ang, rad, y, ry_extra=0.0, **kw):
     a = RAD(ang)
     box(w, h, d, (rad * math.sin(a), y, rad * math.cos(a)), a + ry_extra, **kw)
+
+
+def quad_uv(w, h, pos, mat, uv=(0.0, 0.0, 1.0, 1.0), up=False, flag=0, ry=0.0, **kw):
+    """A flat sheet that carries type. Standing (default) it faces local -z, as a spine or a plaque does toward the room;
+    `up` lays it facing +y, as a letter on a desk does. `uv` is the rectangle of the texture it shows, in image
+    coordinates, laid out for a reader looking at it: u runs to the reader's right, v down the page."""
+    bm = bmesh.new()
+    pts = ([(-w / 2, 0, -h / 2), (w / 2, 0, -h / 2), (w / 2, 0, h / 2), (-w / 2, 0, h / 2)] if up
+           else [(-w / 2, -h / 2, 0), (w / 2, -h / 2, 0), (w / 2, h / 2, 0), (-w / 2, h / 2, 0)])
+    f = bm.faces.new([bm.verts.new(p) for p in pts])
+    if (up and f.normal.y < 0) or (not up and f.normal.z > 0):
+        bmesh.ops.reverse_faces(bm, faces=bm.faces[:])
+    uvl = bm.loops.layers.uv.verify()
+    u0, v0, u1, v1 = uv
+    for lp in f.loops:
+        c = lp.vert.co
+        u = u0 + (0.5 - c.x / w) * (u1 - u0)
+        v = v0 + (0.5 - (c.z if up else c.y) / h) * (v1 - v0)
+        lp[uvl].uv = (u, 1.0 - v)
+    emit(bm, STACK[-1] @ frame(pos, ry), mat, uvlayer=uvl, flag=flag, smooth=89.0, **kw)
 
 
 def lathe(profile, seg, pos=(0, 0, 0), ry=0.0, rx=0.0, rz=0.0, mat="shelf", bevel=0.0, segs=1, L=0.5, **kw):
@@ -541,9 +567,10 @@ def subsurf_box(w, h, d, pos, mat, levels=2, ry=0.0, rx=0.0, rz=0.0, bevel=0.03,
     emit(bm2, STACK[-1] @ frame(pos, ry, rx, rz), mat, smooth=60.0, **kw)
 
 
-def page_stack(width, depth, t_edge, t_spine, side, mat="paper", nx=14, nz=6, **kw):
-    """The pages of one half of an open book: a block whose top surface dips toward the spine and rounds over
-    toward the fore-edge. `side` -1 / +1 puts it left / right of the spine at x = 0."""
+def page_stack(width, depth, t_edge, t_spine, side, mat="pages", nx=14, nz=6, **kw):
+    """The pages of one half of an open book: a block whose top dips toward the spine and rounds over toward the
+    fore-edge, carrying a typeset page. `side` -1 / +1 puts it left / right of the spine at x = 0 (model space);
+    a reader standing on the -z side sees +x on their left, so the +x half shows the left page of the spread."""
     bm = bmesh.new()
     top = [[None] * (nz + 1) for _ in range(nx + 1)]
     bot = [[None] * (nz + 1) for _ in range(nx + 1)]
@@ -566,27 +593,41 @@ def page_stack(width, depth, t_edge, t_spine, side, mat="paper", nx=14, nz=6, **
         bm.faces.new((top[nx][k], bot[nx][k], bot[nx][k + 1], top[nx][k + 1]))
         bm.faces.new((top[0][k + 1], bot[0][k + 1], bot[0][k], top[0][k]))
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    emit(bm, STACK[-1], mat, smooth=50.0, **kw)
+    uvl = bm.loops.layers.uv.verify()
+    for f in bm.faces:
+        for lp in f.loops:
+            c = lp.vert.co
+            us = abs(c.x) / width
+            u = 0.5 - 0.5 * us if side > 0 else 0.5 + 0.5 * us
+            lp[uvl].uv = (u, 1.0 - (0.5 - c.z / depth))
+    emit(bm, STACK[-1], mat, uvlayer=uvl, smooth=50.0, **kw)
 
 
-def leaf(width, depth, lift, mat="paper", nx=10, nz=3, **kw):
-    """One turning page, curling up and over: a thin curved sheet standing from the spine."""
+def leaf(width, depth, lift, side=1, mat="pages", nx=10, nz=3, **kw):
+    """One turning page, curling up and over from the spine, carrying the same typeset sheet."""
     bm = bmesh.new()
     g = [[None] * (nz + 1) for _ in range(nx + 1)]
+    uvs = {}
     for i in range(nx + 1):
         u = i / nx
         ang = lift * (1 - 0.5 * u)
-        x = width * u * math.cos(ang) * (1 - 0.25 * u)
+        x = side * width * u * math.cos(ang) * (1 - 0.25 * u)
         y = width * u * math.sin(ang) + 0.012 * math.sin(u * math.pi)
         for k in range(nz + 1):
             g[i][k] = bm.verts.new((x, y, (k / nz - 0.5) * depth))
+            uvs[g[i][k]] = ((0.5 - 0.5 * u) if side > 0 else (0.5 + 0.5 * u), 0.5 - ((k / nz - 0.5) * depth) / depth)
     for i in range(nx):
         for k in range(nz):
             bm.faces.new((g[i][k], g[i + 1][k], g[i + 1][k + 1], g[i][k + 1]))
     bm.faces.ensure_lookup_table()
     if bm.faces[0].normal.y < 0:
         bmesh.ops.reverse_faces(bm, faces=bm.faces[:])
-    emit(bm, STACK[-1], mat, smooth=60.0, **kw)
+    uvl = bm.loops.layers.uv.verify()
+    for f in bm.faces:
+        for lp in f.loops:
+            u, v = uvs[lp.vert]
+            lp[uvl].uv = (u, 1.0 - v)
+    emit(bm, STACK[-1], mat, uvlayer=uvl, smooth=60.0, **kw)
 
 
 def open_book(pos, ry, w, d, tint):
@@ -597,8 +638,8 @@ def open_book(pos, ry, w, d, tint):
             page_stack(w, d - 0.02, 0.014, 0.034, -1)
             page_stack(w, d - 0.02, 0.014, 0.034, 1)
             for lift, s_ in ((0.5, 1), (0.95, 1), (0.35, -1)):
-                with at((0, 0.032, 0), ry=0 if s_ > 0 else math.pi):
-                    leaf(w * 0.96, d - 0.03, lift)
+                with at((0, 0.032, 0)):
+                    leaf(w * 0.96, d - 0.03, lift, side=s_)
             box(0.006, 0.002, 0.18, (0.02, 0.036, d / 2 + 0.07), mat="paper", tint=(0.7, 0.1, 0.12), bevel=0.0, rx=0.0)
 
 
@@ -665,7 +706,8 @@ def wall():
     # wainscot: raised panels between pilasters
     k = WALL_A[0]
     while k < WALL_A[1] - 1:
-        pilaster(k, 0.0, WH - 0.55)
+        if abs(k - WIN_ANG) > 10.6:                     # none across the window
+            pilaster(k, 0.0, WH - 0.55)
         nxt = min(k + 11.0, WALL_A[1])
         mid = (k + nxt) / 2
         if nxt - k > 6:
@@ -782,18 +824,14 @@ def book_units():
             for yy in (-1, 1):                                                              # headbands
                 cyl(0.0045, 0.0045, w - 0.018, 6, (0, yy * (h / 2 - 0.007), -d / 2 + 0.014), mat="paper", bevel=0.0, rz=math.pi / 2, tint=(0.75, 0.18, 0.15))
             nb = v["bands"]
-            hubs = [(i + 1) / (nb + 1) for i in range(nb)]
-            for fy in hubs:                                                                # raised hubs, tooled in gilt
+            ends = [0.08, 0.17, 0.83, 0.92] if nb >= 4 else ([0.1, 0.9] if nb >= 2 else [])
+            for fy in ends:                                                                # raised hubs, tooled in gilt
                 box(w * 0.98, 0.011, 0.014, (0, (fy - 0.5) * h, -d / 2 - 0.004), mat="leather", bevel=0.003, **cover)
                 quad(w * 0.96, 0.003, (0, (fy - 0.5) * h + 0.007, -d / 2 - 0.0125), "gilt")
                 quad(w * 0.96, 0.003, (0, (fy - 0.5) * h - 0.007, -d / 2 - 0.0125), "gilt")
-            if v["label"] and nb >= 3:
-                fy = (hubs[0] + hubs[1]) / 2
-                quad(w * 0.6, h * 0.14, (0, (fy - 0.5) * h, -d / 2 - 0.0135), "paper", tint=(0.7, 0.6, 0.45))
-                fy = (hubs[1] + hubs[2]) / 2
-                quad(w * 0.5, h * 0.05, (0, (fy - 0.5) * h, -d / 2 - 0.0135), "gilt")
-            elif nb == 0:                                                                   # a plain cloth book: title in gilt
-                quad(w * 0.5, h * 0.4, (0, h * 0.1, -d / 2 - 0.0095), "gilt")
+            # the label is a cell of the typeset atlas: the renderer picks it per book from the instance buffer
+            lo, hi = (0.24, 0.76) if nb >= 4 else ((0.2, 0.8) if nb >= 2 else (0.1, 0.9))
+            quad_uv(w * 0.76, h * (hi - lo), (0, ((lo + hi) / 2 - 0.5) * h, -d / 2 - 0.0135), "spinelabel", flag=255)
 
 
 def shelf_rows(bi, a0, a1):
@@ -856,6 +894,33 @@ def shelves():
             pilaster(a, 0.0, 5.1, rad=R - 0.5, w=0.2)
 
 
+def plaque():
+    """An engraved brass plate on the wall under the window: kicker and title in the system's type."""
+    with at(polar(WIN_ANG, R - 0.355, 1.82), ry=RAD(WIN_ANG)):
+        box(0.72, 0.2, 0.014, (0, 0, 0.0), mat="brass", bevel=0.006)
+        quad_uv(0.68, 0.17, (0, 0, -0.0085), "plaque")
+        for sx in (-1, 1):
+            for sy in (-1, 1):
+                cyl(0.006, 0.006, 0.008, 8, (sx * 0.35, sy * 0.085, -0.004), mat="brass", bevel=0.001, rx=math.pi / 2)
+
+
+CARD_LABELS = 8
+
+
+def shelf_cards():
+    """A brass card holder on the nosing of each bay's first shelf, carrying its category in tracked mono capitals."""
+    rad = R - 0.54 - 0.34 - 0.03
+    k = 0
+    for bi, (a0, a1) in enumerate(BAND):
+        for bay in range(4):
+            ang = a0 + (a1 - a0) * (bay + 0.5) / 4
+            x, z = rad * math.sin(RAD(ang)), rad * math.cos(RAD(ang))
+            with at((x, ROWS[0], z), ry=RAD(ang)):
+                box(0.23, 0.058, 0.01, (0, 0, 0.0), mat="brass", bevel=0.004)
+                quad_uv(0.21, 0.046, (0, 0, -0.0065), "cards", uv=(0.0, k / CARD_LABELS, 1.0, (k + 1) / CARD_LABELS))
+            k += 1
+
+
 def tome(pos, ry, tint):
     open_book(pos, ry, 0.23, 0.32, tint)
 
@@ -908,8 +973,8 @@ def desk():
         with at((0.1, top_y + 0.0775 + 0.012, 0.15), ry=0.7):                            # a magnifier
             torus(0.045, 0.004, (0, 0.0, 0), rx=math.pi / 2, mat="brass", seg=24, tseg=6)
             tube([(0, 0, 0.045), (0, 0, 0.09), (0, 0, 0.18)], [0.006, 0.008, 0.009], 8, "ebony")
-        for k in range(3):                                                                # loose letters and a seal
-            box(0.21, 0.002, 0.15, (-0.78 + k * 0.03, top_y + 0.0775 + 0.002 + k * 0.002, -0.2 + k * 0.02), 0.2 * k, mat="paper", bevel=0.0)
+        for k in range(3):                                                                # typed letters, one on top of another
+            quad_uv(0.21, 0.297, (-0.80 + k * 0.035, top_y + 0.0775 + 0.002 + k * 0.0016, -0.22 + k * 0.02), "letter", up=True, ry=0.25 * (k - 1))
         cyl(0.018, 0.018, 0.004, 14, (-0.74, top_y + 0.0775 + 0.009, -0.19), mat="wax", bevel=0.001)
 
 
@@ -984,15 +1049,14 @@ def lectern():
             box(0.86, 0.03, 0.04, (0, -0.005, 0.33), mat="brass", bevel=0.008)
             box(0.84, 0.05, 0.05, (0, 0.035, -0.31), mat="shelf", bevel=0.01)
         with at((0, 1.27, 0.03), rx=-0.5):                                                # the grimoire
-            box(0.7, 0.11, 0.5, mat="leather", tint=(0.22, 0.1, 0.4), tint_mode=0.92, bevel=0.016, segs=2)
-            box(0.64, 0.085, 0.455, (0.012, 0, 0.012), mat="paper", bevel=0.0)
-            for (cx, cz) in ((-0.345, -0.245), (0.345, -0.245), (-0.345, 0.245), (0.345, 0.245)):
-                box(0.06, 0.12, 0.06, (cx, 0, cz), mat="gilt", bevel=0.008)
-            box(0.04, 0.115, 0.5, (-0.34, 0, 0), mat="gilt", bevel=0.006)
-            box(0.7, 0.115, 0.03, (0, 0, 0.0), mat="leather", tint=(0.22, 0.1, 0.4), tint_mode=0.9, bevel=0.01)
-            torus(0.085, 0.009, (0.0, 0.0615, 0.0), rx=math.pi / 2, mat="gilt", seg=32, tseg=6)
-            cyl(0.06, 0.06, 0.012, 18, (0.0, 0.06, 0.0), mat="rune", bevel=0.0, emissive=1.0)
-            box(0.05, 0.003, 0.18, (0.35, 0.056, 0.0), mat="gilt", bevel=0.0)                 # clasp strap
+            box(0.38, 0.11, 0.52, (0, 0, 0), mat="leather", tint=(0.22, 0.1, 0.4), tint_mode=0.92, bevel=0.016, segs=2)
+            box(0.345, 0.085, 0.485, (0.012, -0.002, 0.012), mat="paper", bevel=0.0)
+            quad_uv(0.355, 0.49, (0, 0.0572, 0), "grimoire", up=True)                          # the typeset cover
+            for (cx, cz) in ((-0.185, -0.255), (0.185, -0.255), (-0.185, 0.255), (0.185, 0.255)):
+                box(0.05, 0.116, 0.05, (cx, 0, cz), mat="gilt", bevel=0.008)
+            box(0.03, 0.118, 0.52, (0.18, 0, 0), mat="gilt", bevel=0.006)
+            cyl(0.03, 0.03, 0.014, 18, (0.0, 0.06, 0.0), mat="rune", bevel=0.0, emissive=0.3)  # a gem in the cover
+            box(0.05, 0.003, 0.2, (-0.02, 0.058, 0.0), mat="gilt", bevel=0.0)                  # clasp strap
 
 
 GLOBE_TILT = RAD(23.5)
@@ -1157,7 +1221,7 @@ def flying_book_model():
         for side in (-1, 1):
             box(0.23, 0.014, 0.35, (side * 0.145, -0.016, 0), mat="leather", tint_mode=1.0, tint=(1, 1, 1), bevel=0.006, side=side)
             box(0.21, 0.03, 0.32, (side * 0.14, 0.008, 0), mat="paper", bevel=0.004, side=side)
-            box(0.205, 0.004, 0.31, (side * 0.14, 0.028, 0), mat="paper", bevel=0.0, side=side)
+            quad_uv(0.205, 0.31, (side * 0.14, 0.0305, 0), "pages", up=True, uv=((0.0, 0.0, 0.5, 1.0) if side > 0 else (0.5, 0.0, 1.0, 1.0)), side=side)
 
 
 def globe_model():
@@ -1211,7 +1275,7 @@ def build():
         fn(*a)
         print(f"[library]   {fn.__name__}: {sum(b.n for b in BATCHES.values()) - t0} corners", flush=True)
 
-    for fn in (floor_and_platform, wall, railing, window, shelves, ladder_rail, desk, rug, ladder, floor_litter, lectern, globe_stand,
+    for fn in (floor_and_platform, wall, railing, window, plaque, shelves, shelf_cards, ladder_rail, desk, rug, ladder, floor_litter, lectern, globe_stand,
                catalogue, console_set, armchair, stool, plants, chest, candelabra, shelf_scans):
         stage(fn)
     SCONCE_LIGHTS.extend(sconces())
@@ -1319,11 +1383,11 @@ def finish():
             pts.append(tuple(m @ Vector((0, fy * it["h"], -it["d"] / 2 - 0.02))))
             nrm.append(tuple((m.to_3x3() @ Vector((0, 0, -1))).normalized()))
     aoI = ao_bake(np.array(pts, np.float32), np.array(nrm, np.float32), tree, nrays=48) if pts else np.array([])
-    inst = np.zeros((len(BOOK_INST), 12), np.float32)
+    inst = np.zeros((len(BOOK_INST), 16), np.float32)
     variants = []
     for i, it in enumerate(BOOK_INST):
         a0, a1 = float(np.clip(aoI[2 * i], 0, 1) ** 1.2), float(np.clip(aoI[2 * i + 1], 0, 1) ** 1.2)
-        inst[i] = [*it["pos"], it["yaw"], it["sx"], it["sy"], it["tilt"], a0, *it["tint"], a1]
+        inst[i] = [*it["pos"], it["yaw"], it["sx"], it["sy"], it["tilt"], a0, *it["tint"], a1, float(it["slot"]), 0, 0, 0]
     for vi in range(len(VARIANTS)):
         idx = [i for i, it in enumerate(BOOK_INST) if it["variant"] == vi]
         variants.append({"group": f"shelfbook{vi}", "first": idx[0] if idx else 0, "count": len(idx)})
