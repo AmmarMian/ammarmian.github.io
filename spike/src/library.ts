@@ -17,7 +17,7 @@ import { CYCLE, flightPose, type Orbit, type Slot } from './flights.ts';
 type V3 = [number, number, number];
 export interface MeshRange { group: string; material: string; firstIndex: number; indexCount: number; triangles: number; vertices: number }
 export interface MaterialSpec {
-  name: string; tint: V3; rough: number | null; metal: number | null; nscale: number; emissive: number; alpha: number; blend?: 'alpha' | 'additive' | null;
+  name: string; tint: V3; rough: number | null; metal: number | null; nscale: number; emissive: number; alpha: number; blend?: 'alpha' | 'additive' | 'portal' | 'fire' | 'water' | 'steam' | null;
   textures: { diff: string | null; nor: string | null; arm: string | null };
 }
 export interface Manifest {
@@ -159,7 +159,7 @@ export class LibraryScene {
     const lin8 = (img: Img) => img;
     void lin8;
     const matBindings = (spec: MaterialSpec) => ({
-      M: { tint: [...spec.tint, spec.blend === 'additive' ? -1 : (spec.alpha > 0 ? spec.alpha : 0)], p: [spec.rough ?? -1, spec.metal ?? -1, spec.nscale, spec.emissive] },
+      M: { tint: [...spec.tint, spec.blend === 'portal' ? -2 : spec.blend === 'fire' ? -3 : spec.blend === 'water' ? -4 : spec.blend === 'steam' ? -5 : spec.blend === 'additive' ? -1 : (spec.alpha > 0 ? spec.alpha : 0)], p: [spec.rough ?? -1, spec.metal ?? -1, spec.nscale, spec.emissive] },
       diffTex: tex(spec.textures.diff, true, solid(255, 255, 255)),
       norTex: tex(spec.textures.nor, false, solid(128, 128, 255)),
       armTex: tex(spec.textures.arm, false, solid(255, 255, 0)),
@@ -201,12 +201,12 @@ export class LibraryScene {
 
     const statics = manifest.meshes.filter((m) => m.group === 'static');
     const specs = new Map(manifest.materials.map((m) => [m.name, m]));
-    const blendOf = (spec: MaterialSpec) => spec.blend === 'additive'
+    const blendOf = (spec: MaterialSpec) => spec.blend === 'portal' ? undefined : (spec.blend === 'additive' || spec.blend === 'fire' || spec.blend === 'steam')
       ? { color: { src: 'one' as const, dst: 'one' as const }, alpha: { src: 'zero' as const, dst: 'one' as const } }
-      : (spec.blend === 'alpha' || spec.alpha > 0)
+      : (spec.blend === 'alpha' || spec.blend === 'water' || spec.alpha > 0)
         ? { color: { src: 'src-alpha' as const, dst: 'one-minus-src-alpha' as const }, alpha: { src: 'zero' as const, dst: 'one' as const } }
         : undefined;
-    const cullOf = (spec: MaterialSpec) => (blendOf(spec) || /leaves|paper|rug|spinelabel|pages|letter|plaque|cards|grimoire/.test(spec.name)) ? 'none' as const : 'back' as const;
+    const cullOf = (spec: MaterialSpec) => (blendOf(spec) || /leaves|paper|rug|spinelabel|pages|letter|plaque|cards|grimoire|portalview|chalk|fire|steam|water/.test(spec.name)) ? 'none' as const : 'back' as const;
     /** One draw of a mesh range in its material: opaque ones into the opaque list, blended ones into the transparent list. */
     const meshDraw = (m: MeshRange, vertex: string, extra: Record<string, unknown> = {}, set: Record<string, unknown> = {}): Draw => {
       const spec = specs.get(m.material)!;

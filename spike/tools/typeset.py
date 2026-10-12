@@ -563,3 +563,329 @@ def star_chart(size=1024):
     d.text((c, W - 18 * S), "Epoch MMXXVI", font=font("text-i", 28 * S), fill=INK3 + (255,), anchor="mm")
     im = im.resize((size, size), Image.LANCZOS)
     return np.asarray(im.convert("RGBA"))
+
+
+# ------------------------------------------------------------------------ the sanctum: the gate's seven worlds
+def portal_atlas(cell=512):
+    """Seven paintings, one per destination the gate can show (seafloor, moon, forest, beach, city, space, rain), in a 4x2 atlas:
+    soft gradients, silhouettes and a few lights, painted to be seen through a ring of stone and a ripple."""
+    from PIL import ImageChops
+    S = 2
+    n = cell * S
+    rng = np.random.default_rng(31)
+
+    def canvas(top, bottom):
+        a = np.linspace(0, 1, n)[:, None, None]
+        top_, bot_ = np.array(top, np.float32), np.array(bottom, np.float32)
+        arr = (top_ * (1 - a) + bot_ * a) * np.ones((1, n, 1), np.float32)
+        return Image.fromarray(arr.astype(np.uint8)).convert("RGBA")
+
+    def blur(im, r):
+        return im.filter(ImageFilter.GaussianBlur(r * S))
+
+    def glow(im, xy, r, color, alpha=200):
+        layer = Image.new("RGBA", im.size, (0, 0, 0, 0))
+        ImageDraw.Draw(layer).ellipse([xy[0] - r * S, xy[1] - r * S, xy[0] + r * S, xy[1] + r * S], fill=color + (alpha,))
+        return Image.alpha_composite(im, blur(layer, r * 0.5))
+
+    def draw(im):
+        return ImageDraw.Draw(im, "RGBA")
+
+    worlds = []
+    # 0 seafloor: teal depths, light shafts, kelp, fish, bubbles
+    im = canvas((12, 90, 130), (4, 38, 66))
+    sh = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    d = draw(sh)
+    for x0, w in ((0.25, 0.1), (0.62, 0.08), (0.8, 0.05)):
+        d.polygon([(x0 * n, 0), ((x0 + w) * n, 0), ((x0 + w - 0.12) * n, n), ((x0 - 0.12) * n, n)], fill=(190, 240, 255, 70))
+    im = Image.alpha_composite(im, blur(sh, 14))
+    d = draw(im)
+    d.polygon([(0, n * 0.82)] + [(x, n * (0.84 + 0.03 * math.sin(x / n * 12))) for x in range(0, n + 1, 16)] + [(n, n), (0, n)], fill=(196, 170, 108, 255))
+    for k in range(11):
+        x = (0.05 + k * 0.09 + rng.random() * 0.03) * n
+        hgt = (0.2 + rng.random() * 0.25) * n
+        pts = [(x + math.sin(t / 6 + k) * 18 * S, n * 0.86 - t) for t in range(0, int(hgt), 8)]
+        d.line(pts, fill=(34, 150, 112, 255), width=int(10 * S), joint="curve")
+    for k in range(7):
+        x, y = (0.1 + rng.random() * 0.8) * n, (0.25 + rng.random() * 0.4) * n
+        d.polygon([(x, y), (x + 30 * S, y - 10 * S), (x + 50 * S, y), (x + 30 * S, y + 10 * S)], fill=(255, 190, 90, 255))
+        d.polygon([(x + 48 * S, y), (x + 64 * S, y - 12 * S), (x + 64 * S, y + 12 * S)], fill=(255, 190, 90, 255))
+    for k in range(40):
+        x, y = rng.random() * n, rng.random() * n * 0.8
+        r_ = (2 + rng.random() * 6) * S
+        d.ellipse([x - r_, y - r_, x + r_, y + r_], outline=(220, 250, 255, 150), width=S)
+    worlds.append(im)
+    # 1 moon: a violet dusk, a huge ringed planet, green hills, strange trees
+    im = canvas((34, 28, 70), (96, 62, 110))
+    d = draw(im)
+    for k in range(80):
+        x, y = rng.random() * n, rng.random() * n * 0.6
+        d.ellipse([x - S, y - S, x + S, y + S], fill=(255, 250, 235, 220))
+    im = glow(im, (n * 0.32, n * 0.34), 150, (190, 140, 100), 90)
+    d = draw(im)
+    d.ellipse([n * 0.12, n * 0.14, n * 0.52, n * 0.54], fill=(176, 130, 92, 255))
+    for k in range(6):
+        d.arc([n * 0.12, n * (0.14 + k * 0.06), n * 0.52, n * (0.2 + k * 0.06)], 0, 180, fill=(210, 170, 130, 180), width=3 * S)
+    d.ellipse([n * -0.02, n * 0.3, n * 0.66, n * 0.4], outline=(226, 204, 170, 230), width=5 * S)
+    d.ellipse([n * 0.7, n * 0.12, n * 0.76, n * 0.18], fill=(236, 232, 220, 255))
+    d.polygon([(0, n * 0.78)] + [(x, n * (0.74 + 0.04 * math.sin(x / n * 5))) for x in range(0, n + 1, 16)] + [(n, n), (0, n)], fill=(60, 94, 62, 255))
+    for k in range(7):
+        x = (0.08 + k * 0.14) * n
+        hgt = (0.1 + rng.random() * 0.12) * n
+        d.rectangle([x - 4 * S, n * 0.8 - hgt, x + 4 * S, n * 0.82], fill=(70, 48, 36, 255))
+        d.ellipse([x - 28 * S, n * 0.8 - hgt - 20 * S, x + 28 * S, n * 0.8 - hgt + 14 * S], fill=(54, 116, 74, 255))
+    worlds.append(im)
+    # 2 forest: green mist, trunks, rays
+    im = canvas((120, 170, 120), (28, 60, 40))
+    for k in range(3):
+        im = Image.alpha_composite(im, blur(Image.new("RGBA", im.size, (0, 0, 0, 0)), 1))
+    sh = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    d = draw(sh)
+    for x0 in (0.3, 0.52, 0.7):
+        d.polygon([(x0 * n, 0), ((x0 + 0.06) * n, 0), ((x0 + 0.02) * n, n), ((x0 - 0.18) * n, n)], fill=(255, 250, 200, 80))
+    im = Image.alpha_composite(im, blur(sh, 16))
+    d = draw(im)
+    for k, x in enumerate(np.linspace(0.04, 0.96, 9)):
+        w = (0.035 + 0.03 * rng.random()) * n
+        d.rectangle([x * n - w / 2, 0, x * n + w / 2, n], fill=(36 + 14 * (k % 2), 28, 20, 255))
+        d.ellipse([x * n - w * 3, n * (0.0 + 0.1 * rng.random()) - w * 2, x * n + w * 3, n * 0.25], fill=(40, 104 + 20 * (k % 3), 60, 235))
+    d.polygon([(0, n * 0.84)] + [(x, n * (0.86 + 0.02 * math.sin(x / 18))) for x in range(0, n + 1, 16)] + [(n, n), (0, n)], fill=(80, 130, 70, 255))
+    worlds.append(blur(im, 1.2))
+    # 3 beach: low sun, sea, surf, sand
+    im = canvas((70, 150, 220), (255, 190, 130))
+    im = glow(im, (n * 0.66, n * 0.46), 110, (255, 220, 140), 170)
+    d = draw(im)
+    d.ellipse([n * 0.62, n * 0.42, n * 0.7, n * 0.5], fill=(255, 238, 190, 255))
+    d.rectangle([0, n * 0.5, n, n * 0.74], fill=(30, 125, 160, 255))
+    d.rectangle([0, n * 0.62, n, n * 0.7], fill=(50, 175, 175, 255))
+    d.polygon([(n * 0.6, n * 0.5), (n * 0.72, n * 0.5), (n * 0.9, n * 0.74), (n * 0.42, n * 0.74)], fill=(255, 205, 140, 120))
+    d.rectangle([0, n * 0.72, n, n * 0.75], fill=(245, 250, 252, 255))
+    d.polygon([(0, n * 0.75), (n, n * 0.75), (n, n), (0, n)], fill=(216, 186, 120, 255))
+    for k in range(5):
+        x = (0.1 + 0.2 * k) * n
+        d.arc([x, n * 0.78, x + 60 * S, n * 0.82], 0, 180, fill=(190, 160, 100, 255), width=S * 2)
+    worlds.append(im)
+    # 4 city: night skyline, lit windows, the eye
+    im = canvas((10, 14, 26), (30, 24, 36))
+    d = draw(im)
+    for k in range(7):
+        w = (0.1 + 0.07 * rng.random()) * n
+        x = (0.04 + k * 0.14) * n
+        top = (0.34 + 0.34 * rng.random()) * n
+        d.rectangle([x, top, x + w, n * 0.86], fill=(34 + 8 * (k % 2), 32, 44, 255))
+        for wy in np.arange(top + 14 * S, n * 0.84, 22 * S):
+            for wx in np.arange(x + 10 * S, x + w - 10 * S, 20 * S):
+                if rng.random() < 0.4:
+                    d.rectangle([wx, wy, wx + 8 * S, wy + 10 * S], fill=(255, 180, 100, 255))
+    im = glow(im, (n * 0.6, n * 0.24), 60, (255, 130, 50), 150)
+    d = draw(im)
+    d.ellipse([n * 0.54, n * 0.18, n * 0.66, n * 0.3], fill=(255, 140, 60, 255))
+    d.ellipse([n * 0.58, n * 0.22, n * 0.62, n * 0.26], fill=(26, 22, 20, 255))
+    d.rectangle([0, n * 0.86, n, n], fill=(20, 20, 22, 255))
+    for k in range(6):
+        x = (0.1 + 0.15 * k) * n
+        d.rectangle([x, n * 0.88, x + 8 * S, n * 0.98], fill=(255, 170, 90, 120))
+    worlds.append(im)
+    # 5 space: a nebula, a red dwarf, an ocean world
+    im = canvas((4, 5, 14), (8, 8, 22))
+    nb = (np.stack([_noise(n, n, 5, 3, 51) * 120, _noise(n, n, 5, 3, 52) * 50, _noise(n, n, 5, 3, 53) * 190], -1)).astype(np.uint8)
+    nb_im = Image.fromarray(nb).convert("RGBA")
+    mask = Image.fromarray((np.clip((_noise(n, n, 4, 2, 54) - 0.45) * 3, 0, 1) * 190).astype(np.uint8))
+    im = Image.composite(nb_im, im, mask)
+    d = draw(im)
+    for k in range(220):
+        x, y = rng.random() * n, rng.random() * n
+        r_ = (0.8 + rng.random() * 1.6) * S
+        d.ellipse([x - r_, y - r_, x + r_, y + r_], fill=(236, 242, 255, int(120 + rng.random() * 135)))
+    im = glow(im, (n * 0.8, n * 0.22), 70, (255, 100, 50), 150)
+    d = draw(im)
+    d.ellipse([n * 0.76, n * 0.18, n * 0.84, n * 0.26], fill=(255, 126, 70, 255))
+    d.ellipse([n * 0.22, n * 0.5, n * 0.7, n * 0.98], fill=(40, 100, 150, 255))
+    for k in range(6):
+        d.ellipse([n * (0.3 + 0.05 * k), n * (0.6 + 0.04 * k), n * (0.46 + 0.05 * k), n * (0.66 + 0.04 * k)], fill=(72, 150, 120, 255))
+    d.arc([n * 0.2, n * 0.48, n * 0.72, n * 1.0], 200, 340, fill=(180, 220, 255, 200), width=5 * S)
+    worlds.append(im)
+    # 6 rain: a grey street, a castle, wet cobbles with lamplight
+    im = canvas((70, 80, 96), (34, 38, 46))
+    d = draw(im)
+    d.polygon([(n * 0.1, n * 0.5), (n * 0.62, n * 0.5), (n * 0.62, n * 0.36), (n * 0.56, n * 0.36), (n * 0.56, n * 0.3), (n * 0.1, n * 0.3)], fill=(40, 46, 56, 255))
+    for x in (0.12, 0.3, 0.5):
+        d.rectangle([x * n, n * 0.12, (x + 0.06) * n, n * 0.5], fill=(40, 46, 56, 255))
+        d.polygon([(x * n - 6 * S, n * 0.12), ((x + 0.03) * n, n * 0.04), ((x + 0.06) * n + 6 * S, n * 0.12)], fill=(34, 38, 48, 255))
+        d.rectangle([(x + 0.02) * n, n * 0.22, (x + 0.035) * n, n * 0.26], fill=(255, 196, 110, 255))
+    for side, xs in ((0, (0.0, 0.2)), (1, (0.78, 1.0))):
+        for k in range(2):
+            x0 = xs[0] + 0.1 * k * (1 if side == 0 else -1)
+            h = 0.4 + 0.16 * k
+            d.rectangle([x0 * n, (0.86 - h) * n, (x0 + 0.2) * n, 0.86 * n], fill=(62 - 6 * k, 58, 52, 255))
+            d.polygon([(x0 * n - 8 * S, (0.86 - h) * n), ((x0 + 0.1) * n, (0.86 - h - 0.08) * n), ((x0 + 0.2) * n + 8 * S, (0.86 - h) * n)], fill=(46, 42, 44, 255))
+            d.rectangle([(x0 + 0.06) * n, (0.86 - h * 0.6) * n, (x0 + 0.1) * n, (0.86 - h * 0.6 + 0.05) * n], fill=(255, 196, 110, 255))
+    d.rectangle([0, n * 0.86, n, n], fill=(32, 36, 42, 255))
+    for x in (0.34, 0.66):
+        d.rectangle([x * n, n * 0.88, (x + 0.012) * n, n * 0.99], fill=(255, 180, 100, 140))
+    streaks = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    ds = draw(streaks)
+    for k in range(120):
+        x, y = rng.random() * n, rng.random() * n
+        ds.line([x, y, x - 6 * S, y + 36 * S], fill=(200, 215, 235, 90), width=S)
+    im = Image.alpha_composite(im, streaks)
+    worlds.append(im)
+    atlas = Image.new("RGB", (cell * 4, cell * 2), (0, 0, 0))
+    for i, w in enumerate(worlds):
+        atlas.paste(w.convert("RGB").resize((cell, cell), Image.LANCZOS), ((i % 4) * cell, (i // 4) * cell))
+    return np.asarray(atlas)
+
+
+# ------------------------------------------------------------------------ the quarters: cloth
+def tapestry(w=768, h=1152):
+    """A woven hanging: madder-red ground, a gold border of lozenges, and in the field a tower under a moon and seven stars."""
+    S = 2
+    W, H = w * S, h * S
+    rng = np.random.default_rng(21)
+    base = np.zeros((H, W, 3), np.float32)
+    base[:] = np.array((112, 28, 36), np.float32) / 255
+    weave = (np.sin(np.arange(W)[None, :] * 1.1) * np.sin(np.arange(H)[:, None] * 1.1)) * 0.5 + 0.5
+    grain = _noise(H, W, 5, 24, 8)
+    base *= (0.78 + 0.14 * weave + 0.16 * grain)[..., None]
+    im = Image.fromarray((np.clip(base, 0, 1) * 255).astype(np.uint8)).convert("RGBA")
+    d = ImageDraw.Draw(im, "RGBA")
+    gold, deep, teal, cream = (186, 142, 66, 255), (52, 14, 22, 255), (30, 112, 108, 255), (214, 196, 160, 255)
+    m = 46 * S
+    d.rectangle([m, m, W - m, H - m], outline=gold, width=6 * S)
+    d.rectangle([m + 24 * S, m + 24 * S, W - m - 24 * S, H - m - 24 * S], outline=gold, width=2 * S)
+    for k in range(20):                                    # a border of lozenges
+        x = m + 40 * S + k * (W - 2 * m - 80 * S) / 19
+        for y in (m + 12 * S, H - m - 12 * S):
+            d.polygon([(x, y - 9 * S), (x + 9 * S, y), (x, y + 9 * S), (x - 9 * S, y)], fill=gold)
+    for k in range(30):
+        y = m + 40 * S + k * (H - 2 * m - 80 * S) / 29
+        for x in (m + 12 * S, W - m - 12 * S):
+            d.polygon([(x, y - 9 * S), (x + 9 * S, y), (x, y + 9 * S), (x - 9 * S, y)], fill=gold)
+    cx = W / 2
+    d.ellipse([cx - 70 * S, 190 * S, cx + 70 * S, 330 * S], fill=cream)                        # the moon, bitten by a second disc
+    d.ellipse([cx - 40 * S, 175 * S, cx + 100 * S, 315 * S], fill=(112, 28, 36, 255))
+    for k in range(7):
+        a = k / 7 * math.tau
+        x, y = cx + math.cos(a) * 250 * S, 330 * S + math.sin(a) * 120 * S - 30 * S
+        d.polygon([(x + math.cos(t * math.pi / 4) * (14 if t % 2 == 0 else 5) * S, y + math.sin(t * math.pi / 4) * (14 if t % 2 == 0 else 5) * S) for t in range(8)], fill=gold)
+    base_y = H - 150 * S                                                                         # the tower
+    d.polygon([(cx - 120 * S, base_y), (cx - 80 * S, 560 * S), (cx + 80 * S, 560 * S), (cx + 120 * S, base_y)], fill=deep)
+    d.polygon([(cx - 80 * S, 560 * S), (cx, 430 * S), (cx + 80 * S, 560 * S)], fill=teal)
+    for k, wy in enumerate((640, 760, 880)):
+        d.rectangle([cx - 10 * S, wy * S, cx + 10 * S, (wy + 40) * S], fill=gold)
+    d.rectangle([cx - 140 * S, base_y, cx + 140 * S, base_y + 18 * S], fill=gold)
+    for k in range(9):                                                                           # hills in the foreground
+        x = k / 8 * W
+        d.ellipse([x - 140 * S, base_y + 6 * S, x + 140 * S, base_y + 200 * S], fill=(46, 100, 70, 255) if k % 2 else (36, 82, 58, 255))
+    im = im.filter(ImageFilter.GaussianBlur(0.8))
+    return np.asarray(im.resize((w, h), Image.LANCZOS).convert("RGBA"))
+
+
+def quilt(size=1024):
+    """A patchwork quilt: 6x6 squares in four warm tones, a diagonal stitch across each, puffy between the seams.
+    Returns (albedo, normal) -- the normal map is the puff."""
+    n = 6
+    cell = size // n
+    rng = np.random.default_rng(14)
+    tones = [(150, 40, 40), (200, 150, 90), (70, 90, 120), (210, 200, 175), (120, 70, 50)]
+    img = np.zeros((size, size, 3), np.float32)
+    for r in range(n):
+        for c in range(n):
+            t = np.array(tones[(r * 2 + c * 3 + (r * c) % 2) % len(tones)], np.float32) / 255
+            img[r * cell:(r + 1) * cell, c * cell:(c + 1) * cell] = t * (0.9 + 0.15 * rng.random())
+    y, x = np.mgrid[0:size, 0:size].astype(np.float32)
+    fx, fy = (x % cell) / cell, (y % cell) / cell
+    puff = np.sin(np.pi * fx) * np.sin(np.pi * fy)
+    stitch = (np.abs(((fx + fy) % 1.0) - 0.5) < 0.012).astype(np.float32) * 0.5
+    seam = (np.minimum(np.minimum(fx, 1 - fx), np.minimum(fy, 1 - fy)) < 0.012).astype(np.float32)
+    weave = (np.sin(x * 1.3) * np.sin(y * 1.3)) * 0.5 + 0.5
+    img *= (0.84 + 0.16 * puff + 0.08 * weave)[..., None]
+    img = img * (1 - 0.5 * seam[..., None]) + stitch[..., None] * np.array((0.9, 0.85, 0.7))
+    gx, gy = np.gradient(puff * 1.0, axis=1) * 20, np.gradient(puff * 1.0, axis=0) * 20
+    nrm = np.stack([-gx, -gy, np.ones_like(gx)], -1)
+    nrm /= np.linalg.norm(nrm, axis=-1, keepdims=True)
+    return (np.clip(img, 0, 1) * 255).astype(np.uint8), ((nrm * 0.5 + 0.5) * 255).astype(np.uint8)
+
+
+def linen(size=512):
+    """Plain linen: a cream plain weave with slubs."""
+    y, x = np.mgrid[0:size, 0:size].astype(np.float32)
+    weave = (np.sin(x * 2.1) * np.sin(y * 2.1)) * 0.5 + 0.5
+    slub = _noise(size, size, 3, 40, 5)
+    v = 0.82 + 0.08 * weave + 0.1 * slub
+    rgb = np.stack([v * 0.96, v * 0.92, v * 0.82], -1)
+    return (np.clip(rgb, 0, 1) * 255).astype(np.uint8)
+
+
+# ------------------------------------------------------------------------ the kitchen
+PANTRY_NAMES = [
+    ("Sel gris", "grey sea salt"), ("Poivre noir", "black pepper"), ("Safran", "saffron, by the pinch"), ("Cannelle", "cinnamon bark"),
+    ("Muscade", "nutmeg"), ("Girofle", "cloves"), ("Thym", "thyme, dried"), ("Romarin", "rosemary"), ("Laurier", "bay leaf"),
+    ("Sarriette", "savory"), ("Paprika", "sweet paprika"), ("Cumin", "cumin seed"), ("Curcuma", "turmeric"), ("Farine", "flour, T65"),
+    ("Sucre", "cane sugar"), ("Miel", "honey of the high pasture"), ("Lentilles", "green lentils"), ("Haricots", "white beans"),
+    ("Orge", "pearl barley"), ("Avoine", "rolled oats"), ("Noix", "walnuts"), ("Amandes", "almonds"), ("Raisins", "dried grapes"),
+    ("Figues", "dried figs"), ("Thé", "smoked black tea"), ("Café", "roasted, ground"), ("Moutarde", "grain mustard"), ("Vinaigre", "cider vinegar"),
+]
+
+
+def slate(w=1024, h=768):
+    """The kitchen slate, chalked in the system's voice: a mono kicker with an accent index, then what the keeper is doing this month."""
+    S = 2
+    W, H = w * S, h * S
+    rng = np.random.default_rng(15)
+    n = _noise(H, W, 5, 12, 2)
+    base = np.zeros((H, W, 3), np.float32)
+    base[:] = np.array((38, 44, 46), np.float32) / 255
+    base *= (0.8 + 0.3 * n)[..., None]
+    smear = np.asarray(Image.fromarray((_noise(H, W, 3, 5, 9) * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(14)), np.float32) / 255
+    base += (smear[..., None] * 0.05)
+    im = Image.fromarray((np.clip(base, 0, 1) * 255).astype(np.uint8)).convert("RGBA")
+    d = ImageDraw.Draw(im, "RGBA")
+    chalk = (236, 232, 218, 235)
+    tracked(d, (70 * S, 110 * S), "NOW", font("mono", 30 * S), (236, 140, 100, 240), 0.2)
+    d.line([70 * S, 130 * S, 330 * S, 130 * S], fill=chalk, width=2 * S)
+    lines = ["Writing the habilitation manuscript", "Reviewing for EUSIPCO, three papers", "Teaching the geometry of covariance", "Mending Qanat, one experiment at a time",
+             "Learning to bake a better loaf"]
+    y = 240 * S
+    for i, t in enumerate(lines):
+        f = font("display-i" if i % 2 else "display", 58 * S)
+        d.text((70 * S + (i % 2) * 14 * S, y), t, font=f, fill=chalk, anchor="ls")
+        y += 100 * S
+    d.rectangle([70 * S, (H // S - 90) * S, 150 * S, (H // S - 86) * S], fill=(236, 140, 100, 240))
+    im = im.filter(ImageFilter.GaussianBlur(0.9))
+    out = np.asarray(im.resize((w, h), Image.LANCZOS).convert("RGBA")).copy()
+    noise = (np.random.default_rng(3).random((h, w)) * 18).astype(np.uint8)
+    out[..., :3] = np.clip(out[..., :3].astype(np.int16) + noise[..., None] - 9, 0, 255).astype(np.uint8)
+    return out
+
+
+# ------------------------------------------------------------------------ the bath
+def glaze(size=512):
+    """One glazed ceramic tile: soft pooling of glaze, hairline crazing, a bevelled edge that catches the light.
+    Returns (albedo, normal, arm)."""
+    y, x = np.mgrid[0:size, 0:size].astype(np.float32) / size
+    pool = _noise(size, size, 4, 3, 41)
+    base = np.array((218, 226, 220), np.float32) / 255
+    col = base[None, None, :] * (0.9 + 0.12 * pool[..., None])
+    edge = np.minimum(np.minimum(x, 1 - x), np.minimum(y, 1 - y))
+    bevel = np.clip(1 - edge / 0.035, 0, 1)
+    col = col * (1 - 0.35 * bevel[..., None])
+    rng = np.random.default_rng(5)
+    img = Image.fromarray((np.clip(col, 0, 1) * 255).astype(np.uint8))
+    d = ImageDraw.Draw(img, "RGBA")
+    for _ in range(26):                                                    # crazing: a few hairlines
+        x0, y0 = rng.random() * size, rng.random() * size
+        pts = [(x0, y0)]
+        for k in range(8):
+            x0 += (rng.random() - 0.5) * 60
+            y0 += (rng.random() - 0.3) * 60
+            pts.append((x0, y0))
+        d.line(pts, fill=(120, 130, 125, 40), width=1)
+    height = 1 - bevel * 0.9 + 0.05 * pool
+    gx, gy = np.gradient(height, axis=1) * 30, np.gradient(height, axis=0) * 30
+    nrm = np.stack([-gx, -gy, np.ones_like(gx)], -1)
+    nrm /= np.linalg.norm(nrm, axis=-1, keepdims=True)
+    arm = np.zeros((size, size, 3), np.float32)
+    arm[..., 0] = 1.0
+    arm[..., 1] = 0.22 + 0.4 * bevel + 0.08 * pool
+    return np.asarray(img), ((nrm * 0.5 + 0.5) * 255).astype(np.uint8), (np.clip(arm, 0, 1) * 255).astype(np.uint8)

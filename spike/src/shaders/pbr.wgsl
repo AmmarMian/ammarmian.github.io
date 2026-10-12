@@ -388,6 +388,65 @@ fn shade(wp: vec3f, s: Surf, V: vec3f) -> vec3f {
   let V = normalize(G.cam.xyz - in.wp);
   if (G.shadow.w > 0.5) { return vec4f(vec3f(sunVisibility(in.wp, Ng)), length(G.cam.xyz - in.wp)); }
   let kind = M.tint.w;                      // 0 opaque, > 0 glass of that opacity, < 0 additive glow
+  if (kind < -1.5 && kind > -2.5) {
+    // the gate: a disc that looks onto a different world every few seconds, rippling as one gives way to the next
+    let q = in.uv * 2.0 - 1.0;
+    let r = length(q);
+    let tt = G.cam.w / 5.0;
+    let first = u32(max(M.p.x, 0.0));
+    let count = max(u32(max(M.p.y, 1.0)), 1u);
+    let i0 = first + u32(floor(tt)) % count;
+    let i1 = first + (u32(floor(tt)) + 1u) % count;
+    let f = fract(tt);
+    let swap = smoothstep(0.84, 1.0, f);
+    let ang = atan2(q.y, q.x);
+    let ripple = sin(r * 14.0 - G.cam.w * 4.0) * 0.02 * (swap + 0.15) * (1.0 - r * 0.6);
+    let w = q * (1.0 + ripple) * (1.0 + swap * 0.25 * (1.0 - r));
+    let cell = vec2f(4.0, 2.0);
+    let c0 = (vec2f(f32(i0 % 4u), f32(i0 / 4u)) + (w * 0.5 + 0.5)) / cell;
+    let c1 = (vec2f(f32(i1 % 4u), f32(i1 / 4u)) + (w * 0.5 + 0.5)) / cell;
+    var col = mix(textureSample(diffTex, samp, c0).rgb, textureSample(diffTex, samp, c1).rgb, swap);
+    let rim = smoothstep(0.78, 1.0, r) * M.p.z;                // only a round gate has a rim; a window (nscale 0) does not
+    col = col * (1.0 - rim * 0.6) + vec3f(0.35, 0.8, 1.0) * rim * (0.8 + 0.4 * sin(ang * 6.0 + G.cam.w * 2.0));
+    return vec4f(col * 1.5, 1.0);
+  }
+  if (kind < -2.5 && kind > -3.5) {
+    // fire: a flame drawn in the fragment, rising and licking, hot white at the heart and red at the edge
+    let q = vec2f(in.uv.x * 2.0 - 1.0, 1.0 - in.uv.y);       // image v runs down the sheet; flames rise from its foot
+    let t = G.cam.w;
+    let seed = in.wp.x * 3.1 + in.wp.z * 2.3;
+    let n1 = vnoise(vec2f(q.x * 2.5 + seed, q.y * 2.0 - t * 2.4));
+    let n2 = vnoise(vec2f(q.x * 5.5 - seed, q.y * 4.0 - t * 4.0));
+    let width = (1.0 - q.y) * (0.7 + 0.5 * n1);
+    let sway = (n1 - 0.5) * 0.7 * q.y;
+    let dd = abs(q.x + sway) / max(width, 0.001);
+    let body = (1.0 - smoothstep(0.35, 1.0, dd)) * (1.0 - smoothstep(0.5, 1.0, q.y + n2 * 0.4 * q.y)) * smoothstep(0.0, 0.08, q.y);
+    let heat = clamp(body * (1.15 - q.y * 0.6), 0.0, 1.0);
+    var fc = mix(vec3f(0.9, 0.12, 0.02), vec3f(1.0, 0.55, 0.1), smoothstep(0.1, 0.5, heat));
+    fc = mix(fc, vec3f(1.0, 0.92, 0.6), smoothstep(0.55, 0.95, heat));
+    return vec4f(fc * body * max(M.p.w, 1.0) * 2.2, 1.0);
+  }
+  if (kind < -4.5) {
+    // steam: slow wisps that thin out as they rise
+    let q = vec2f(in.uv.x * 2.0 - 1.0, 1.0 - in.uv.y);
+    let n = fbm(vec2f(q.x * 1.8 + in.wp.x * 3.0, q.y * 2.2 - G.cam.w * 0.35 + in.wp.z * 3.0));
+    let a = smoothstep(0.32, 0.8, n) * (1.0 - q.y) * smoothstep(0.0, 0.15, q.y) * (1.0 - q.x * q.x);
+    return vec4f(vec3f(0.78, 0.84, 0.9) * a * max(M.p.w, 0.2) * 0.7, 1.0);
+  }
+  if (kind < -3.5) {
+    // water: a rippling normal, Fresnel reflection of the room, a deep tint beneath
+    let t = G.cam.w;
+    let wn = normalize(vec3f(sin(in.wp.x * 4.0 + t * 1.3) * 0.04 + sin(in.wp.z * 7.0 - t * 1.7) * 0.03, 1.0,
+                             cos(in.wp.z * 5.0 + t * 1.1) * 0.04 + cos(in.wp.x * 8.0 + t * 1.9) * 0.03));
+    let wv = normalize(G.cam.xyz - in.wp);
+    let fres = pow(1.0 - max(dot(wn, wv), 0.0), 4.0);
+    var W: Surf;
+    let deep = M.tint.rgb * M.tint.rgb;
+    W.albedo = deep; W.rough = 0.06; W.metal = 0.0; W.ao = 1.0; W.N = wn;
+    var wc = shade(in.wp, W, wv) + envColor(reflect(-wv, wn), 0.05) * (0.12 + 0.85 * fres) * G.ambient.w;
+    wc += deep * max(M.p.w, 0.0) * 1.5;
+    return vec4f(wc, clamp(0.86 + fres * 0.14, 0.0, 1.0));
+  }
   if (kind < 0.0) {
     return vec4f(albedo * max(M.p.w, 1.0) * 2.0 * tex.a, 1.0);
   }

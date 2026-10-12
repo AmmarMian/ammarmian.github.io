@@ -11,6 +11,10 @@ const FLOORS = [
   { id: 'library', name: 'Library' },
   { id: 'lab', name: 'Laboratory' },
   { id: 'obs', name: 'Observatory' },
+  { id: 'sanctum', name: 'Portal sanctum' },
+  { id: 'quarters', name: 'Sleeping quarters' },
+  { id: 'kitchen', name: 'Kitchen' },
+  { id: 'bath', name: 'Bath cellar' },
 ];
 const floor = new URLSearchParams(location.search).get('floor') ?? 'library';
 

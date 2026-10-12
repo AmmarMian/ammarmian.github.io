@@ -1,7 +1,7 @@
 {
- "vertexBytes": 6907880,
+ "vertexBytes": 6927396,
  "stride": 28,
- "indexCount": 637914,
+ "indexCount": 639255,
  "quant": {
   "min": [
    -5.486661911010742,
@@ -99,14 +99,14 @@
    "group": "static",
    "material": "cork",
    "firstIndex": 130125,
-   "indexCount": 6696,
-   "triangles": 2232,
-   "vertices": 2504
+   "indexCount": 6996,
+   "triangles": 2332,
+   "vertices": 2664
   },
   {
    "group": "static",
    "material": "desk",
-   "firstIndex": 136821,
+   "firstIndex": 137121,
    "indexCount": 2712,
    "triangles": 904,
    "vertices": 1076
@@ -114,7 +114,7 @@
   {
    "group": "static",
    "material": "ebony",
-   "firstIndex": 139533,
+   "firstIndex": 139833,
    "indexCount": 30390,
    "triangles": 10130,
    "vertices": 13584
@@ -122,7 +122,7 @@
   {
    "group": "static",
    "material": "ember",
-   "firstIndex": 169923,
+   "firstIndex": 170223,
    "indexCount": 2916,
    "triangles": 972,
    "vertices": 864
@@ -130,7 +130,7 @@
   {
    "group": "static",
    "material": "flame",
-   "firstIndex": 172839,
+   "firstIndex": 173139,
    "indexCount": 792,
    "triangles": 264,
    "vertices": 407
@@ -138,15 +138,15 @@
   {
    "group": "static",
    "material": "herb",
-   "firstIndex": 173631,
-   "indexCount": 7434,
-   "triangles": 2478,
-   "vertices": 3630
+   "firstIndex": 173931,
+   "indexCount": 8379,
+   "triangles": 2793,
+   "vertices": 4135
   },
   {
    "group": "static",
    "material": "iron",
-   "firstIndex": 181065,
+   "firstIndex": 182310,
    "indexCount": 12936,
    "triangles": 4312,
    "vertices": 7048
@@ -154,7 +154,7 @@
   {
    "group": "static",
    "material": "labcards",
-   "firstIndex": 194001,
+   "firstIndex": 195246,
    "indexCount": 36,
    "triangles": 12,
    "vertices": 24
@@ -162,7 +162,7 @@
   {
    "group": "static",
    "material": "labfloor",
-   "firstIndex": 194037,
+   "firstIndex": 195282,
    "indexCount": 53736,
    "triangles": 17912,
    "vertices": 29404
@@ -170,15 +170,15 @@
   {
    "group": "static",
    "material": "labplaque",
-   "firstIndex": 247773,
-   "indexCount": 6,
-   "triangles": 2,
-   "vertices": 4
+   "firstIndex": 249018,
+   "indexCount": 18,
+   "triangles": 6,
+   "vertices": 8
   },
   {
    "group": "static",
    "material": "labstone",
-   "firstIndex": 247779,
+   "firstIndex": 249036,
    "indexCount": 37044,
    "triangles": 12348,
    "vertices": 10268
@@ -186,7 +186,7 @@
   {
    "group": "static",
    "material": "labwall",
-   "firstIndex": 284823,
+   "firstIndex": 286080,
    "indexCount": 115152,
    "triangles": 38384,
    "vertices": 40162
@@ -194,7 +194,7 @@
   {
    "group": "static",
    "material": "leather",
-   "firstIndex": 399975,
+   "firstIndex": 401232,
    "indexCount": 1692,
    "triangles": 564,
    "vertices": 406
@@ -202,15 +202,15 @@
   {
    "group": "static",
    "material": "letter",
-   "firstIndex": 401667,
-   "indexCount": 84,
-   "triangles": 28,
-   "vertices": 56
+   "firstIndex": 402924,
+   "indexCount": 168,
+   "triangles": 56,
+   "vertices": 84
   },
   {
    "group": "static",
    "material": "liquid",
-   "firstIndex": 401751,
+   "firstIndex": 403092,
    "indexCount": 12180,
    "triangles": 4060,
    "vertices": 3596
@@ -218,7 +218,7 @@
   {
    "group": "static",
    "material": "potted_plant_01_leaves",
-   "firstIndex": 413931,
+   "firstIndex": 415272,
    "indexCount": 42990,
    "triangles": 14330,
    "vertices": 20062
@@ -226,7 +226,7 @@
   {
    "group": "static",
    "material": "potted_plant_01_pot",
-   "firstIndex": 456921,
+   "firstIndex": 458262,
    "indexCount": 5004,
    "triangles": 1668,
    "vertices": 2549
@@ -234,7 +234,7 @@
   {
    "group": "static",
    "material": "potted_plant_02_leaves",
-   "firstIndex": 461925,
+   "firstIndex": 463266,
    "indexCount": 12864,
    "triangles": 4288,
    "vertices": 6496
@@ -242,7 +242,7 @@
   {
    "group": "static",
    "material": "potted_plant_02_pot",
-   "firstIndex": 474789,
+   "firstIndex": 476130,
    "indexCount": 71121,
    "triangles": 23707,
    "vertices": 38804
@@ -250,7 +250,7 @@
   {
    "group": "static",
    "material": "sand",
-   "firstIndex": 545910,
+   "firstIndex": 547251,
    "indexCount": 360,
    "triangles": 120,
    "vertices": 134
@@ -258,7 +258,7 @@
   {
    "group": "static",
    "material": "shelf",
-   "firstIndex": 546270,
+   "firstIndex": 547611,
    "indexCount": 10872,
    "triangles": 3624,
    "vertices": 3646
@@ -266,7 +266,7 @@
   {
    "group": "static",
    "material": "slab",
-   "firstIndex": 557142,
+   "firstIndex": 558483,
    "indexCount": 7332,
    "triangles": 2444,
    "vertices": 1702
@@ -274,7 +274,7 @@
   {
    "group": "static",
    "material": "treasure_chest",
-   "firstIndex": 564474,
+   "firstIndex": 565815,
    "indexCount": 29988,
    "triangles": 9996,
    "vertices": 16496
@@ -282,7 +282,7 @@
   {
    "group": "static",
    "material": "glass",
-   "firstIndex": 594462,
+   "firstIndex": 595803,
    "indexCount": 24366,
    "triangles": 8122,
    "vertices": 6395
@@ -290,7 +290,7 @@
   {
    "group": "orbit",
    "material": "cork",
-   "firstIndex": 618828,
+   "firstIndex": 620169,
    "indexCount": 1164,
    "triangles": 388,
    "vertices": 340
@@ -298,7 +298,7 @@
   {
    "group": "orbit",
    "material": "liquid",
-   "firstIndex": 619992,
+   "firstIndex": 621333,
    "indexCount": 672,
    "triangles": 224,
    "vertices": 226
@@ -306,7 +306,7 @@
   {
    "group": "orbit",
    "material": "glass",
-   "firstIndex": 620664,
+   "firstIndex": 622005,
    "indexCount": 1002,
    "triangles": 334,
    "vertices": 293
@@ -314,7 +314,7 @@
   {
    "group": "shaft",
    "material": "shaft",
-   "firstIndex": 621666,
+   "firstIndex": 623007,
    "indexCount": 96,
    "triangles": 32,
    "vertices": 32
@@ -322,7 +322,7 @@
   {
    "group": "shelfbook0",
    "material": "cork",
-   "firstIndex": 621762,
+   "firstIndex": 623103,
    "indexCount": 1164,
    "triangles": 388,
    "vertices": 364
@@ -330,7 +330,7 @@
   {
    "group": "shelfbook0",
    "material": "liquid",
-   "firstIndex": 622926,
+   "firstIndex": 624267,
    "indexCount": 840,
    "triangles": 280,
    "vertices": 218
@@ -338,7 +338,7 @@
   {
    "group": "shelfbook0",
    "material": "spinelabel",
-   "firstIndex": 623766,
+   "firstIndex": 625107,
    "indexCount": 6,
    "triangles": 2,
    "vertices": 4
@@ -346,7 +346,7 @@
   {
    "group": "shelfbook0",
    "material": "glass",
-   "firstIndex": 623772,
+   "firstIndex": 625113,
    "indexCount": 1338,
    "triangles": 446,
    "vertices": 411
@@ -354,7 +354,7 @@
   {
    "group": "shelfbook1",
    "material": "cork",
-   "firstIndex": 625110,
+   "firstIndex": 626451,
    "indexCount": 1164,
    "triangles": 388,
    "vertices": 376
@@ -362,7 +362,7 @@
   {
    "group": "shelfbook1",
    "material": "liquid",
-   "firstIndex": 626274,
+   "firstIndex": 627615,
    "indexCount": 1176,
    "triangles": 392,
    "vertices": 282
@@ -370,7 +370,7 @@
   {
    "group": "shelfbook1",
    "material": "spinelabel",
-   "firstIndex": 627450,
+   "firstIndex": 628791,
    "indexCount": 6,
    "triangles": 2,
    "vertices": 4
@@ -378,7 +378,7 @@
   {
    "group": "shelfbook1",
    "material": "glass",
-   "firstIndex": 627456,
+   "firstIndex": 628797,
    "indexCount": 1674,
    "triangles": 558,
    "vertices": 441
@@ -386,7 +386,7 @@
   {
    "group": "shelfbook2",
    "material": "brass",
-   "firstIndex": 629130,
+   "firstIndex": 630471,
    "indexCount": 2592,
    "triangles": 864,
    "vertices": 738
@@ -394,7 +394,7 @@
   {
    "group": "shelfbook2",
    "material": "liquid",
-   "firstIndex": 631722,
+   "firstIndex": 633063,
    "indexCount": 1008,
    "triangles": 336,
    "vertices": 246
@@ -402,7 +402,7 @@
   {
    "group": "shelfbook2",
    "material": "spinelabel",
-   "firstIndex": 632730,
+   "firstIndex": 634071,
    "indexCount": 6,
    "triangles": 2,
    "vertices": 4
@@ -410,7 +410,7 @@
   {
    "group": "shelfbook2",
    "material": "glass",
-   "firstIndex": 632736,
+   "firstIndex": 634077,
    "indexCount": 1338,
    "triangles": 446,
    "vertices": 349
@@ -418,7 +418,7 @@
   {
    "group": "spin0",
    "material": "spell1",
-   "firstIndex": 634074,
+   "firstIndex": 635415,
    "indexCount": 1536,
    "triangles": 512,
    "vertices": 390
@@ -426,7 +426,7 @@
   {
    "group": "spin1",
    "material": "spell2",
-   "firstIndex": 635610,
+   "firstIndex": 636951,
    "indexCount": 1536,
    "triangles": 512,
    "vertices": 390
@@ -434,7 +434,7 @@
   {
    "group": "spin2",
    "material": "spell3",
-   "firstIndex": 637146,
+   "firstIndex": 638487,
    "indexCount": 768,
    "triangles": 256,
    "vertices": 262
@@ -599,6 +599,87 @@
    "files": {},
    "textures": {
     "diff": "letter_diff.webp",
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "glass",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    0.8,
+    0.92,
+    0.95
+   ],
+   "rough": 0.05,
+   "metal": 0.0,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.16,
+   "smooth": 40.0,
+   "blend": "alpha",
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": null,
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "liquid",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    1,
+    1,
+    1
+   ],
+   "rough": 0.25,
+   "metal": 0.0,
+   "nscale": 1.0,
+   "emissive": 0.32,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": null,
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "cork",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    0.5,
+    0.36,
+    0.22
+   ],
+   "rough": 0.92,
+   "metal": 0.0,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": null,
     "nor": null,
     "arm": null
    }
@@ -871,87 +952,6 @@
     "diff": "castiron_diff.webp",
     "nor": "castiron_nor.webp",
     "arm": "castiron_arm.webp"
-   }
-  },
-  {
-   "name": "glass",
-   "tex": null,
-   "tile": 1.5,
-   "rot": false,
-   "tint": [
-    0.8,
-    0.92,
-    0.95
-   ],
-   "rough": 0.05,
-   "metal": 0.0,
-   "nscale": 1.0,
-   "emissive": 0.0,
-   "size": 1024,
-   "gen": null,
-   "alpha": 0.16,
-   "smooth": 40.0,
-   "blend": "alpha",
-   "centered": false,
-   "files": {},
-   "textures": {
-    "diff": null,
-    "nor": null,
-    "arm": null
-   }
-  },
-  {
-   "name": "liquid",
-   "tex": null,
-   "tile": 1.5,
-   "rot": false,
-   "tint": [
-    1,
-    1,
-    1
-   ],
-   "rough": 0.25,
-   "metal": 0.0,
-   "nscale": 1.0,
-   "emissive": 0.32,
-   "size": 1024,
-   "gen": null,
-   "alpha": 0.0,
-   "smooth": 40.0,
-   "blend": null,
-   "centered": false,
-   "files": {},
-   "textures": {
-    "diff": null,
-    "nor": null,
-    "arm": null
-   }
-  },
-  {
-   "name": "cork",
-   "tex": null,
-   "tile": 1.5,
-   "rot": false,
-   "tint": [
-    0.5,
-    0.36,
-    0.22
-   ],
-   "rough": 0.92,
-   "metal": 0.0,
-   "nscale": 1.0,
-   "emissive": 0.0,
-   "size": 1024,
-   "gen": null,
-   "alpha": 0.0,
-   "smooth": 40.0,
-   "blend": null,
-   "centered": false,
-   "files": {},
-   "textures": {
-    "diff": null,
-    "nor": null,
-    "arm": null
    }
   },
   {
@@ -1714,22 +1714,22 @@
  },
  "shelfBooks": {
   "file": "lab.books.bin",
-  "count": 114,
+  "count": 106,
   "variants": [
    {
     "group": "shelfbook0",
     "first": 0,
-    "count": 34
+    "count": 27
    },
    {
     "group": "shelfbook1",
-    "first": 34,
-    "count": 39
+    "first": 27,
+    "count": 42
    },
    {
     "group": "shelfbook2",
-    "first": 73,
-    "count": 41
+    "first": 69,
+    "count": 37
    }
   ]
  },
@@ -1753,7 +1753,7 @@
     0.72
    ],
    "depth": 0.22,
-   "inst": 73,
+   "inst": 69,
    "label": {
     "title": "Qanat",
     "gloss": "a command-line tool for managing and reproducing numerical experiments",
@@ -1780,7 +1780,7 @@
     0.2
    ],
    "depth": 0.22,
-   "inst": 74,
+   "inst": 70,
    "label": {
     "title": "Aqua regia",
     "gloss": "royal water",
@@ -1807,7 +1807,7 @@
     0.72
    ],
    "depth": 0.12,
-   "inst": 34,
+   "inst": 27,
    "label": {
     "title": "Sal ammoniacum",
     "gloss": "sel ammoniac",
@@ -1861,7 +1861,7 @@
     0.38
    ],
    "depth": 0.12,
-   "inst": 35,
+   "inst": 28,
    "label": {
     "title": "Spiritus vini",
     "gloss": "spirit of wine",
@@ -1888,7 +1888,7 @@
     0.15
    ],
    "depth": 0.22,
-   "inst": 75,
+   "inst": 71,
    "label": {
     "title": "Oleum vitrioli",
     "gloss": "oil of vitriol",
@@ -1915,7 +1915,7 @@
     0.15
    ],
    "depth": 0.12,
-   "inst": 36,
+   "inst": 29,
    "label": {
     "title": "Cinnabaris",
     "gloss": "vermilion",
@@ -1969,7 +1969,7 @@
     0.2
    ],
    "depth": 0.12,
-   "inst": 37,
+   "inst": 30,
    "label": {
     "title": "Tinctura solis",
     "gloss": "tincture of the sun",
@@ -1996,7 +1996,7 @@
     0.15
    ],
    "depth": 0.22,
-   "inst": 76,
+   "inst": 72,
    "label": {
     "title": "Elixir vitae",
     "gloss": "elixir of life",
@@ -2006,51 +2006,78 @@
   },
   {
    "band": 0,
-   "angle": 147.03694130266072,
-   "row": 0,
-   "height": 0.2709971995482181,
-   "width": 0.23229287096553086,
-   "variant": 2,
+   "angle": 114.37575326910958,
+   "row": 1,
+   "height": 0.36161410527951093,
+   "width": 0.11348902943738012,
+   "variant": 1,
    "pos": [
-    2.611671317825899,
-    1.245498599774109,
-    -4.027303431285696
+    4.3721203150673205,
+    2.0208070526397557,
+    -1.981051223612263
    ],
-   "yaw": 2.5662787477930697,
+   "yaw": 1.99623347899463,
    "tint": [
     0.25,
     0.5,
     0.9
    ],
-   "depth": 0.22,
-   "inst": 77,
+   "depth": 0.12,
+   "inst": 31,
    "label": {
-    "title": "Aqua fortis",
-    "gloss": "strong water",
+    "title": "Aurum potabile",
+    "gloss": "potable gold",
     "project": false,
-    "number": 11
+    "number": 20
    }
   },
   {
    "band": 0,
-   "angle": 123.16862484305477,
+   "angle": 117.07775879859554,
    "row": 1,
-   "height": 0.27206091214032424,
-   "width": 0.2167623049264633,
+   "height": 0.26537990790133986,
+   "width": 0.23923634237019656,
    "variant": 2,
    "pos": [
-    4.017907360765901,
-    1.9760304560701623,
-    -2.6261036613780506
+    4.273869945394788,
+    1.97268995395067,
+    -2.1849566791703596
    ],
-   "yaw": 2.1496980386649898,
+   "yaw": 2.043392371891253,
    "tint": [
-    0.2,
-    0.75,
-    0.38
+    0.85,
+    0.22,
+    0.2
    ],
    "depth": 0.22,
-   "inst": 78,
+   "inst": 73,
+   "label": {
+    "title": "Terra sigillata",
+    "gloss": "sealed earth",
+    "project": false,
+    "number": 21
+   }
+  },
+  {
+   "band": 0,
+   "angle": 122.75257500551866,
+   "row": 1,
+   "height": 0.3502440675168262,
+   "width": 0.12356744004141029,
+   "variant": 1,
+   "pos": [
+    4.03687055743085,
+    2.0151220337584133,
+    -2.5968588915356836
+   ],
+   "yaw": 2.1424365991475973,
+   "tint": [
+    0.85,
+    0.22,
+    0.2
+   ],
+   "depth": 0.12,
+   "inst": 32,
    "label": {
     "title": "Cremor tartari",
     "gloss": "cream of tartar",
@@ -2060,24 +2087,24 @@
   },
   {
    "band": 0,
-   "angle": 125.83020074699105,
+   "angle": 125.3108043144013,
    "row": 1,
-   "height": 0.33204653475516405,
-   "width": 0.12918901810168756,
-   "variant": 1,
+   "height": 0.24369326583990517,
+   "width": 0.2050679947843915,
+   "variant": 2,
    "pos": [
-    3.8916257937388337,
-    2.006023267377582,
-    -2.8098485157578508
+    3.9169373206141094,
+    1.9618466329199526,
+    -2.774455266602864
    ],
-   "yaw": 2.1961513014804224,
+   "yaw": 2.1870861236086183,
    "tint": [
-    0.85,
-    0.22,
-    0.2
+    0.62,
+    0.32,
+    0.85
    ],
-   "depth": 0.12,
-   "inst": 38,
+   "depth": 0.22,
+   "inst": 74,
    "label": {
     "title": "Alumen",
     "gloss": "alum",
@@ -2087,21 +2114,21 @@
   },
   {
    "band": 0,
-   "angle": 128.22550567922175,
+   "angle": 128.24011373252262,
    "row": 1,
-   "height": 0.18699155013847207,
-   "width": 0.17214817540249008,
+   "height": 0.21269289318030704,
+   "width": 0.1857425091122157,
    "variant": 0,
    "pos": [
-    3.770791323961833,
-    1.933495775069236,
-    -2.9700391901680647
+    3.770033964296694,
+    1.9463464465901537,
+    -2.9710004894057764
    ],
-   "yaw": 2.2379572591371075,
+   "yaw": 2.2382122177645143,
    "tint": [
-    0.9,
-    0.62,
-    0.15
+    0.2,
+    0.75,
+    0.38
    ],
    "depth": 0.18,
    "inst": 2,
@@ -2114,24 +2141,24 @@
   },
   {
    "band": 0,
-   "angle": 131.239788188797,
+   "angle": 131.20040946922484,
    "row": 1,
-   "height": 0.27367911719675725,
-   "width": 0.23289970662022433,
+   "height": 0.2807460705491876,
+   "width": 0.21025980229455377,
    "variant": 2,
    "pos": [
-    3.6093950906989636,
-    1.9768395585983787,
-    -3.164216661235167
+    3.611568967178551,
+    1.9803730352745939,
+    -3.1617352190392
    ],
-   "yaw": 2.2905664135144734,
+   "yaw": 2.2898791252027193,
    "tint": [
-    0.9,
-    0.62,
-    0.15
+    0.85,
+    0.22,
+    0.2
    ],
    "depth": 0.22,
-   "inst": 79,
+   "inst": 75,
    "label": {
     "title": "Camphora",
     "gloss": "camphor",
@@ -2141,24 +2168,24 @@
   },
   {
    "band": 0,
-   "angle": 134.5686118772082,
+   "angle": 133.80770919846006,
    "row": 1,
-   "height": 0.2633711675307762,
-   "width": 0.22485005575888434,
-   "variant": 2,
+   "height": 0.3139697366197596,
+   "width": 0.12659746037595326,
+   "variant": 1,
    "pos": [
-    3.4195708650633083,
-    1.9716855837653882,
-    -3.368461829798608
+    3.4640020467898163,
+    1.9969848683098799,
+    -3.3227533492325265
    ],
-   "yaw": 2.3486653470956305,
+   "yaw": 2.335385090064231,
    "tint": [
     0.9,
     0.62,
     0.15
    ],
-   "depth": 0.22,
-   "inst": 80,
+   "depth": 0.12,
+   "inst": 33,
    "label": {
     "title": "Balsamum",
     "gloss": "balsam",
@@ -2168,24 +2195,24 @@
   },
   {
    "band": 0,
-   "angle": 140.54897362924117,
+   "angle": 140.53832702008614,
    "row": 1,
-   "height": 0.26159079863096796,
-   "width": 0.20321717501044628,
-   "variant": 2,
+   "height": 0.328677062945484,
+   "width": 0.11148397548148542,
+   "variant": 1,
    "pos": [
-    3.0500085170653644,
-    1.970795399315484,
-    -3.7064063519572086
+    3.050697182843837,
+    2.004338531472742,
+    -3.705839540318588
    ],
-   "yaw": 2.4530423501289427,
+   "yaw": 2.4528565317450144,
    "tint": [
-    0.15,
-    0.7,
-    0.72
+    0.62,
+    0.32,
+    0.85
    ],
-   "depth": 0.22,
-   "inst": 81,
+   "depth": 0.12,
+   "inst": 34,
    "label": {
     "title": "Succinum",
     "gloss": "amber",
@@ -2195,24 +2222,24 @@
   },
   {
    "band": 0,
-   "angle": 143.46362913396194,
+   "angle": 145.1732170545955,
    "row": 1,
-   "height": 0.1987976635982041,
-   "width": 0.1851380421296006,
-   "variant": 0,
+   "height": 0.24429362282345204,
+   "width": 0.23472177212342046,
+   "variant": 2,
    "pos": [
-    2.8575981516734523,
-    1.9393988317991022,
-    -3.8566997295035135
+    2.74126728956051,
+    1.9621468114117262,
+    -3.9402352273925962
    ],
-   "yaw": 2.503912685247697,
+   "yaw": 2.5337506233150764,
    "tint": [
     0.25,
     0.5,
     0.9
    ],
-   "depth": 0.18,
-   "inst": 3,
+   "depth": 0.22,
+   "inst": 76,
    "label": {
     "title": "Galbanum",
     "gloss": "resin",
@@ -2222,78 +2249,78 @@
   },
   {
    "band": 0,
-   "angle": 146.31974164290315,
-   "row": 1,
-   "height": 0.19775381388156024,
-   "width": 0.19340820191923438,
-   "variant": 0,
-   "pos": [
-    2.661877148052996,
-    1.9388769069407803,
-    -3.994297190830103
-   ],
-   "yaw": 2.553761252336117,
-   "tint": [
-    0.15,
-    0.7,
-    0.72
-   ],
-   "depth": 0.18,
-   "inst": 4,
-   "label": {
-    "title": "Opopanax",
-    "gloss": "gum",
-    "project": false,
-    "number": 29
-   }
-  },
-  {
-   "band": 0,
-   "angle": 149.06406710602738,
-   "row": 1,
-   "height": 0.21227591111229166,
-   "width": 0.16640794282798732,
-   "variant": 0,
-   "pos": [
-    2.46758056381709,
-    1.946137955556146,
-    -4.117164820731876
-   ],
-   "yaw": 2.6016587674139533,
-   "tint": [
-    0.2,
-    0.75,
-    0.38
-   ],
-   "depth": 0.18,
-   "inst": 5,
-   "label": {
-    "title": "Myrrha",
-    "gloss": "myrrh",
-    "project": false,
-    "number": 30
-   }
-  },
-  {
-   "band": 0,
-   "angle": 114.91872085979233,
+   "angle": 115.10788782126161,
    "row": 2,
-   "height": 0.26277226706755913,
-   "width": 0.20446412245211495,
+   "height": 0.2673080936669201,
+   "width": 0.23615935106298458,
    "variant": 2,
    "pos": [
-    4.3531507025477465,
-    2.7013861335337794,
-    -2.0223943633495582
+    4.34644987945002,
+    2.70365404683346,
+    -2.036755617502727
    ],
-   "yaw": 2.005710051183665,
+   "yaw": 2.0090116374972973,
    "tint": [
     0.85,
     0.22,
     0.2
    ],
    "depth": 0.22,
-   "inst": 82,
+   "inst": 77,
+   "label": {
+    "title": "Tinctura solis",
+    "gloss": "tincture of the sun",
+    "project": false,
+    "number": 39
+   }
+  },
+  {
+   "band": 0,
+   "angle": 117.88899768538452,
+   "row": 2,
+   "height": 0.3509197746398856,
+   "width": 0.12982007922792732,
+   "variant": 1,
+   "pos": [
+    4.24250625010812,
+    2.7454598873199427,
+    -2.2452484757357145
+   ],
+   "yaw": 2.057551161485934,
+   "tint": [
+    0.25,
+    0.5,
+    0.9
+   ],
+   "depth": 0.12,
+   "inst": 35,
+   "label": {
+    "title": "Elixir vitae",
+    "gloss": "elixir of life",
+    "project": false,
+    "number": 40
+   }
+  },
+  {
+   "band": 0,
+   "angle": 120.55522116322568,
+   "row": 2,
+   "height": 0.2513060514272232,
+   "width": 0.21690995228217677,
+   "variant": 2,
+   "pos": [
+    4.133470076984282,
+    2.6956530257136113,
+    -2.4401690766575097
+   ],
+   "yaw": 2.1040855397682363,
+   "tint": [
+    0.9,
+    0.62,
+    0.15
+   ],
+   "depth": 0.22,
+   "inst": 78,
    "label": {
     "title": "Aqua fortis",
     "gloss": "strong water",
@@ -2303,24 +2330,24 @@
   },
   {
    "band": 0,
-   "angle": 117.96211557855995,
+   "angle": 123.51045589305667,
    "row": 2,
-   "height": 0.2791123985846522,
-   "width": 0.20546155703878088,
-   "variant": 2,
+   "height": 0.21024363164966953,
+   "width": 0.17824437928424608,
+   "variant": 0,
    "pos": [
-    4.23963752700926,
-    2.709556199292326,
-    -2.2506607117855
+    4.002168409605382,
+    2.6751218158248347,
+    -2.6500279283729693
    ],
-   "yaw": 2.058827309463967,
+   "yaw": 2.1556641159730723,
    "tint": [
-    0.85,
-    0.22,
-    0.2
+    0.2,
+    0.75,
+    0.38
    ],
-   "depth": 0.22,
-   "inst": 83,
+   "depth": 0.18,
+   "inst": 3,
    "label": {
     "title": "Sulphur",
     "gloss": "brimstone",
@@ -2330,24 +2357,24 @@
   },
   {
    "band": 0,
-   "angle": 120.51987847525315,
+   "angle": 126.39807864795354,
    "row": 2,
-   "height": 0.3171230538489704,
-   "width": 0.12309572967459921,
-   "variant": 1,
+   "height": 0.25996330591466243,
+   "width": 0.20558145714896517,
+   "variant": 2,
    "pos": [
-    4.134974499694641,
-    2.728561526924485,
-    -2.4376188969720136
+    3.8635857435091405,
+    2.699981652957331,
+    -2.848281096126738
    ],
-   "yaw": 2.1034686934966107,
+   "yaw": 2.206062640601532,
    "tint": [
-    0.25,
-    0.5,
-    0.9
+    0.85,
+    0.22,
+    0.2
    ],
-   "depth": 0.12,
-   "inst": 39,
+   "depth": 0.22,
+   "inst": 79,
    "label": {
     "title": "Nitrum",
     "gloss": "saltpetre",
@@ -2357,24 +2384,24 @@
   },
   {
    "band": 0,
-   "angle": 122.55063302645786,
+   "angle": 128.91767921288744,
    "row": 2,
-   "height": 0.36196616645655,
-   "width": 0.11716046122186911,
+   "height": 0.31359676675620013,
+   "width": 0.11658166950581082,
    "variant": 1,
    "pos": [
-    4.045998229878726,
-    2.7509830832282747,
-    -2.5826146293665695
+    3.7346368651307893,
+    2.7267983833781,
+    -3.0153751815663132
    ],
-   "yaw": 2.1389120467149927,
+   "yaw": 2.2500379662947374,
    "tint": [
-    0.85,
-    0.22,
-    0.2
+    0.25,
+    0.5,
+    0.9
    ],
    "depth": 0.12,
-   "inst": 40,
+   "inst": 36,
    "label": {
     "title": "Lapis lunaris",
     "gloss": "moonstone",
@@ -2384,24 +2411,24 @@
   },
   {
    "band": 0,
-   "angle": 124.95682095037965,
+   "angle": 131.5995052999023,
    "row": 2,
-   "height": 0.19868143899765892,
-   "width": 0.18600019504208756,
-   "variant": 0,
+   "height": 0.246690346630749,
+   "width": 0.23276260426332782,
+   "variant": 2,
    "pos": [
-    3.9340035280742645,
-    2.6693407194988295,
-    -2.750202945438618
+    3.5894583499497097,
+    2.6933451733153744,
+    -3.1868148289438336
    ],
-   "yaw": 2.1809079484091547,
+   "yaw": 2.2968446614790228,
    "tint": [
-    0.62,
-    0.32,
-    0.85
+    0.85,
+    0.22,
+    0.2
    ],
-   "depth": 0.18,
-   "inst": 6,
+   "depth": 0.22,
+   "inst": 80,
    "label": {
     "title": "Argentum vivum",
     "gloss": "living silver",
@@ -2411,24 +2438,24 @@
   },
   {
    "band": 0,
-   "angle": 127.32883010692038,
+   "angle": 137.51113659262347,
    "row": 2,
-   "height": 0.3532270870813624,
-   "width": 0.11143375378116964,
+   "height": 0.35574690818235555,
+   "width": 0.12261992970212406,
    "variant": 1,
    "pos": [
-    3.8168086019807177,
-    2.746613543540681,
-    -2.910665232527782
+    3.2421450725034666,
+    2.747873454091178,
+    -3.539561459961036
    ],
-   "yaw": 2.222307318078244,
+   "yaw": 2.400022091700936,
    "tint": [
-    0.2,
-    0.75,
-    0.38
+    0.62,
+    0.32,
+    0.85
    ],
    "depth": 0.12,
-   "inst": 41,
+   "inst": 37,
    "label": {
     "title": "Essentia rosae",
     "gloss": "attar of rose",
@@ -2438,24 +2465,24 @@
   },
   {
    "band": 0,
-   "angle": 132.67844648744904,
+   "angle": 139.49103167711726,
    "row": 2,
-   "height": 0.19908118210955586,
-   "width": 0.18876599594071045,
-   "variant": 0,
+   "height": 0.35981698786082117,
+   "width": 0.10911467575517023,
+   "variant": 1,
    "pos": [
-    3.528814334813047,
-    2.6695405910547776,
-    -3.2538391770980257
+    3.1179219084378125,
+    2.7499084939304104,
+    -3.649460641366545
    ],
-   "yaw": 2.315675737637091,
+   "yaw": 2.434577779769404,
    "tint": [
-    0.15,
-    0.7,
-    0.72
+    0.25,
+    0.5,
+    0.9
    ],
-   "depth": 0.18,
-   "inst": 7,
+   "depth": 0.12,
+   "inst": 38,
    "label": {
     "title": "Vitriolum",
     "gloss": "green vitriol",
@@ -2465,24 +2492,24 @@
   },
   {
    "band": 0,
-   "angle": 135.11950580275197,
+   "angle": 141.50904957043284,
    "row": 2,
-   "height": 0.3367430402791571,
-   "width": 0.12023741802902878,
+   "height": 0.3174365530632012,
+   "width": 0.12900746762898438,
    "variant": 1,
    "pos": [
-    3.387025834670042,
-    2.7383715201395784,
-    -3.401184498858848
+    2.987476895925915,
+    2.7287182765316005,
+    -3.756991056192291
    ],
-   "yaw": 2.3582802599256056,
+   "yaw": 2.4697988363719205,
    "tint": [
-    0.85,
-    0.22,
-    0.2
+    0.62,
+    0.32,
+    0.85
    ],
    "depth": 0.12,
-   "inst": 42,
+   "inst": 39,
    "label": {
     "title": "Cuprum",
     "gloss": "copper",
@@ -2492,24 +2519,24 @@
   },
   {
    "band": 0,
-   "angle": 137.56642163876592,
+   "angle": 144.2453384539436,
    "row": 2,
-   "height": 0.2049623515159198,
-   "width": 0.18974726540424874,
-   "variant": 0,
+   "height": 0.24892913986044962,
+   "width": 0.2294621352796444,
+   "variant": 2,
    "pos": [
-    3.238728219362706,
-    2.6724811757579596,
-    -3.542688177232606
+    2.804715325519702,
+    2.6944645699302248,
+    -3.895326936573478
    ],
-   "yaw": 2.4009869977832388,
+   "yaw": 2.5175560866749027,
    "tint": [
     0.15,
     0.7,
     0.72
    ],
-   "depth": 0.18,
-   "inst": 8,
+   "depth": 0.22,
+   "inst": 81,
    "label": {
     "title": "Plumbum",
     "gloss": "lead",
@@ -2519,105 +2546,159 @@
   },
   {
    "band": 0,
-   "angle": 140.62218880749955,
-   "row": 2,
-   "height": 0.2698116564818536,
-   "width": 0.22225143797572813,
+   "angle": 114.9824073135277,
+   "row": 3,
+   "height": 0.24641817288714138,
+   "width": 0.21513489019548634,
    "variant": 2,
    "pos": [
-    3.0452698119441535,
-    2.7049058282409266,
-    -3.710300765768407
+    4.350900045008273,
+    3.423209086443571,
+    -2.027231806761876
    ],
-   "yaw": 2.454320196051986,
+   "yaw": 2.0068215894902663,
+   "tint": [
+    0.25,
+    0.5,
+    0.9
+   ],
+   "depth": 0.22,
+   "inst": 82,
+   "label": {
+    "title": "Myrrha",
+    "gloss": "myrrh",
+    "project": false,
+    "number": 60
+   }
+  },
+  {
+   "band": 0,
+   "angle": 117.9059286728934,
+   "row": 3,
+   "height": 0.20894999026488323,
+   "width": 0.17470581514830627,
+   "variant": 0,
+   "pos": [
+    4.241842590645313,
+    3.404474995132442,
+    -2.2465020445544805
+   ],
+   "yaw": 2.057846662963578,
+   "tint": [
+    0.25,
+    0.5,
+    0.9
+   ],
+   "depth": 0.18,
+   "inst": 4,
+   "label": {
+    "title": "Olibanum",
+    "gloss": "frankincense",
+    "project": false,
+    "number": 61
+   }
+  },
+  {
+   "band": 0,
+   "angle": 120.27336545360646,
+   "row": 3,
+   "height": 0.32503321275282826,
+   "width": 0.12196202475177141,
+   "variant": 1,
+   "pos": [
+    4.145423962985931,
+    3.4625166063764143,
+    -2.419805811858055
+   ],
+   "yaw": 2.099166229619836,
+   "tint": [
+    0.2,
+    0.75,
+    0.38
+   ],
+   "depth": 0.12,
+   "inst": 40,
+   "label": {
+    "title": "Aqua regia",
+    "gloss": "royal water",
+    "project": false,
+    "number": 62
+   }
+  },
+  {
+   "band": 0,
+   "angle": 122.84749386549888,
+   "row": 3,
+   "height": 0.24342993437246985,
+   "width": 0.20933733035211863,
+   "variant": 2,
+   "pos": [
+    4.032562942320244,
+    3.4217149671862352,
+    -2.603542992966605
+   ],
+   "yaw": 2.1440932457764914,
    "tint": [
     0.2,
     0.75,
     0.38
    ],
    "depth": 0.22,
-   "inst": 84,
+   "inst": 83,
    "label": {
-    "title": "Aurum potabile",
-    "gloss": "potable gold",
+    "title": "Sal ammoniacum",
+    "gloss": "sel ammoniac",
     "project": false,
-    "number": 50
+    "number": 63
    }
   },
   {
    "band": 0,
-   "angle": 145.52447730639574,
-   "row": 2,
-   "height": 0.19646173832399008,
-   "width": 0.16599930872098942,
-   "variant": 0,
+   "angle": 125.93297651356326,
+   "row": 3,
+   "height": 0.2534973656726745,
+   "width": 0.20764024937790246,
+   "variant": 2,
    "pos": [
-    2.717059731065678,
-    2.6682308691619947,
-    -3.956966820409455
+    3.88657929805961,
+    3.4267486828363376,
+    -2.816824694562031
    ],
-   "yaw": 2.5398812712403744,
+   "yaw": 2.1979450769983684,
    "tint": [
     0.15,
     0.7,
     0.72
    ],
-   "depth": 0.18,
-   "inst": 9,
+   "depth": 0.22,
+   "inst": 84,
    "label": {
-    "title": "Terra sigillata",
-    "gloss": "sealed earth",
+    "title": "Mercurius vivus",
+    "gloss": "quicksilver",
     "project": false,
-    "number": 51
+    "number": 64
    }
   },
   {
    "band": 0,
-   "angle": 148.1225079493631,
-   "row": 2,
-   "height": 0.1952940579096056,
-   "width": 0.16930490363887313,
-   "variant": 0,
+   "angle": 130.63031583836633,
+   "row": 3,
+   "height": 0.3448110772762564,
+   "width": 0.12176701994643009,
+   "variant": 1,
    "pos": [
-    2.534902971674821,
-    2.6676470289548027,
-    -4.076060220874339
+    3.642848971895485,
+    3.4724055386381285,
+    -3.1256441524844147
    ],
-   "yaw": 2.58522546002786,
+   "yaw": 2.2799291142995894,
    "tint": [
     0.2,
     0.75,
     0.38
    ],
-   "depth": 0.18,
-   "inst": 10,
-   "label": {
-    "title": "Cremor tartari",
-    "gloss": "cream of tartar",
-    "project": false,
-    "number": 52
-   }
-  },
-  {
-   "band": 0,
-   "angle": 114.71142780214157,
-   "row": 3,
-   "height": 0.20261603300236192,
-   "width": 0.1697318372758052,
-   "variant": 0,
-   "pos": [
-    4.360439110605724,
-    3.401308016501181,
-    -2.006631695827605
-   ],
-   "yaw": 2.002092104811133,
-   "tint": [
-    0.9,
-    0.62,
-    0.15
-   ],
-   "depth": 0.18,
-   "inst": 11,
+   "depth": 0.12,
+   "inst": 41,
    "label": {
     "title": "Spiritus vini",
     "gloss": "spirit of wine",
@@ -2627,24 +2708,24 @@
   },
   {
    "band": 0,
-   "angle": 116.97586851123405,
+   "angle": 133.32871924451817,
    "row": 3,
-   "height": 0.32681706298080127,
-   "width": 0.10967884518684096,
-   "variant": 1,
+   "height": 0.27586406626162996,
+   "width": 0.23035481030361218,
+   "variant": 2,
    "pos": [
-    4.277748739776241,
-    3.463408531490401,
-    -2.1773529156622247
+    3.4916587342483996,
+    3.4379320331308154,
+    -3.293678685534895
    ],
-   "yaw": 2.041614050900992,
+   "yaw": 2.3270251382839686,
    "tint": [
     0.15,
     0.7,
     0.72
    ],
-   "depth": 0.12,
-   "inst": 43,
+   "depth": 0.22,
+   "inst": 85,
    "label": {
     "title": "Oleum vitrioli",
     "gloss": "oil of vitriol",
@@ -2654,24 +2735,24 @@
   },
   {
    "band": 0,
-   "angle": 118.87460622915464,
+   "angle": 136.67794230171884,
    "row": 3,
-   "height": 0.3247188537763158,
-   "width": 0.10845771298452651,
-   "variant": 1,
+   "height": 0.2752345587484233,
+   "width": 0.23081289912226347,
+   "variant": 2,
    "pos": [
-    4.203257443845772,
-    3.4623594268881583,
-    -2.317892762997269
+    3.2932727023762376,
+    3.437617279374212,
+    -3.4920416532142795
    ],
-   "yaw": 2.0747532757105094,
+   "yaw": 2.3854801080158308,
    "tint": [
-    0.15,
-    0.7,
-    0.72
+    0.25,
+    0.5,
+    0.9
    ],
-   "depth": 0.12,
-   "inst": 44,
+   "depth": 0.22,
+   "inst": 86,
    "label": {
     "title": "Cinnabaris",
     "gloss": "vermilion",
@@ -2681,24 +2762,24 @@
   },
   {
    "band": 0,
-   "angle": 120.90475619154836,
+   "angle": 139.40433310176303,
    "row": 3,
-   "height": 0.3599914206030413,
-   "width": 0.13169717808436243,
+   "height": 0.3302837174834444,
+   "width": 0.12599826398352523,
    "variant": 1,
    "pos": [
-    4.1185069108343475,
-    3.479995710301521,
-    -2.4653399005836354
+    3.123440611561308,
+    3.4651418587417226,
+    -3.6447385017377485
    ],
-   "yaw": 2.110186076863519,
+   "yaw": 2.433064604172684,
    "tint": [
     0.62,
     0.32,
     0.85
    ],
    "depth": 0.12,
-   "inst": 45,
+   "inst": 42,
    "label": {
     "title": "Antimonium",
     "gloss": "stibnite",
@@ -2708,24 +2789,24 @@
   },
   {
    "band": 0,
-   "angle": 123.62536251515711,
+   "angle": 141.3999999745041,
    "row": 3,
-   "height": 0.24591548860335977,
-   "width": 0.2241447866921289,
-   "variant": 2,
+   "height": 0.36315738421732924,
+   "width": 0.10837892995865411,
+   "variant": 1,
    "pos": [
-    3.9968457366948806,
-    3.42295774430168,
-    -2.6580489380491032
+    2.994622065874333,
+    3.481578692108665,
+    -3.7512982662777623
    ],
-   "yaw": 2.15766961486107,
+   "yaw": 2.467895561874995,
    "tint": [
-    0.62,
-    0.32,
-    0.85
+    0.25,
+    0.5,
+    0.9
    ],
-   "depth": 0.22,
-   "inst": 85,
+   "depth": 0.12,
+   "inst": 43,
    "label": {
     "title": "Tinctura solis",
     "gloss": "tincture of the sun",
@@ -2735,24 +2816,24 @@
   },
   {
    "band": 0,
-   "angle": 126.33977417995796,
+   "angle": 143.71489389368287,
    "row": 3,
-   "height": 0.35968739610812267,
-   "width": 0.1306592530388994,
-   "variant": 1,
+   "height": 0.20440918764436344,
+   "width": 0.17948526899237366,
+   "variant": 0,
    "pos": [
-    3.866482167499412,
-    3.4798436980540615,
-    -2.844348018159708
+    2.8406575669007994,
+    3.402204593822182,
+    -3.8691943072956727
    ],
-   "yaw": 2.205045035666385,
+   "yaw": 2.5082980825990595,
    "tint": [
-    0.25,
-    0.5,
-    0.9
+    0.15,
+    0.7,
+    0.72
    ],
-   "depth": 0.12,
-   "inst": 46,
+   "depth": 0.18,
+   "inst": 5,
    "label": {
     "title": "Elixir vitae",
     "gloss": "elixir of life",
@@ -2762,24 +2843,24 @@
   },
   {
    "band": 0,
-   "angle": 129.10535466710834,
+   "angle": 146.5636045566639,
    "row": 3,
-   "height": 0.24939286882409775,
-   "width": 0.23271820516606082,
-   "variant": 2,
+   "height": 0.2045388467035707,
+   "width": 0.19782078386224258,
+   "variant": 0,
    "pos": [
-    3.724739821819037,
-    3.424696434412049,
-    -3.027591990304423
+    2.64485251830949,
+    3.4022694233517856,
+    -4.005590487854688
    ],
-   "yaw": 2.2533135208960684,
+   "yaw": 2.558017463104749,
    "tint": [
     0.85,
     0.22,
     0.2
    ],
-   "depth": 0.22,
-   "inst": 86,
+   "depth": 0.18,
+   "inst": 6,
    "label": {
     "title": "Aqua fortis",
     "gloss": "strong water",
@@ -2789,183 +2870,237 @@
   },
   {
    "band": 0,
-   "angle": 132.41286621803934,
-   "row": 3,
-   "height": 0.25905443099663494,
-   "width": 0.22146067430424005,
-   "variant": 2,
-   "pos": [
-    3.5438587300919133,
-    3.4295272154983176,
-    -3.2374473433789372
-   ],
-   "yaw": 2.311040487507558,
-   "tint": [
-    0.9,
-    0.62,
-    0.15
-   ],
-   "depth": 0.22,
-   "inst": 87,
-   "label": {
-    "title": "Sulphur",
-    "gloss": "brimstone",
-    "project": false,
-    "number": 72
-   }
-  },
-  {
-   "band": 0,
-   "angle": 135.4027375712727,
-   "row": 3,
-   "height": 0.19018068829606366,
-   "width": 0.179497079215573,
-   "variant": 0,
-   "pos": [
-    3.370171352885277,
-    3.395090344148032,
-    -3.417886050205804
-   ],
-   "yaw": 2.3632235868325386,
-   "tint": [
-    0.62,
-    0.32,
-    0.85
-   ],
-   "depth": 0.18,
-   "inst": 12,
-   "label": {
-    "title": "Nitrum",
-    "gloss": "saltpetre",
-    "project": false,
-    "number": 73
-   }
-  },
-  {
-   "band": 0,
-   "angle": 138.2771041849291,
-   "row": 3,
-   "height": 0.27719032469481797,
-   "width": 0.202107669434386,
-   "variant": 2,
-   "pos": [
-    3.194537585490057,
-    3.438595162347409,
-    -3.5825870003241187
-   ],
-   "yaw": 2.413390748150243,
-   "tint": [
-    0.62,
-    0.32,
-    0.85
-   ],
-   "depth": 0.22,
-   "inst": 88,
-   "label": {
-    "title": "Lapis lunaris",
-    "gloss": "moonstone",
-    "project": false,
-    "number": 74
-   }
-  },
-  {
-   "band": 0,
-   "angle": 143.11884106085975,
-   "row": 3,
-   "height": 0.19123372137384254,
-   "width": 0.1875318609231335,
-   "variant": 0,
-   "pos": [
-    2.8807546834879396,
-    3.3956168606869217,
-    -3.839433871492295
-   ],
-   "yaw": 2.497894998150457,
-   "tint": [
-    0.62,
-    0.32,
-    0.85
-   ],
-   "depth": 0.18,
-   "inst": 13,
-   "label": {
-    "title": "Argentum vivum",
-    "gloss": "living silver",
-    "project": false,
-    "number": 75
-   }
-  },
-  {
-   "band": 0,
-   "angle": 146.17008134921673,
-   "row": 3,
+   "angle": 115.03357642056697,
+   "row": 4,
    "height": 0.2452495663348569,
    "width": 0.22370835636963737,
    "variant": 2,
    "pos": [
-    2.6723014187855196,
-    3.4226247831674286,
-    -3.987330576608479
+    4.349087851489558,
+    4.152624783167429,
+    -2.0311166534756078
    ],
-   "yaw": 2.5511491874517875,
+   "yaw": 2.007714658883407,
    "tint": [
     0.62,
     0.32,
     0.85
    ],
    "depth": 0.22,
-   "inst": 89,
+   "inst": 87,
    "label": {
-    "title": "Essentia rosae",
-    "gloss": "attar of rose",
+    "title": "Cremor tartari",
+    "gloss": "cream of tartar",
     "project": false,
-    "number": 76
+    "number": 82
    }
   },
   {
    "band": 0,
-   "angle": 148.75896988917705,
-   "row": 3,
+   "angle": 117.62246496052731,
+   "row": 4,
    "height": 0.3316204319088777,
    "width": 0.11006408192914661,
    "variant": 1,
    "pos": [
-    2.4894691768583774,
-    3.465810215954439,
-    -4.103966766126656
+    4.252904920894758,
+    4.195810215954439,
+    -2.2254886505729834
    ],
-   "yaw": 2.596333816441244,
+   "yaw": 2.052899287872864,
    "tint": [
     0.9,
     0.62,
     0.15
    ],
    "depth": 0.12,
-   "inst": 47,
+   "inst": 44,
    "label": {
-    "title": "Vitriolum",
-    "gloss": "green vitriol",
+    "title": "Alumen",
+    "gloss": "alum",
     "project": false,
-    "number": 77
+    "number": 83
    }
   },
   {
    "band": 0,
-   "angle": 114.43321760231576,
+   "angle": 119.61099468223644,
    "row": 4,
    "height": 0.31608802447968476,
    "width": 0.1231172708797253,
    "variant": 1,
    "pos": [
-    4.370131237345944,
+    4.1731206206894065,
     4.188044012239843,
-    -1.9854352088076834
+    -2.3717217975928095
    ],
-   "yaw": 1.9972364208115412,
+   "yaw": 2.0876056787904544,
    "tint": [
     0.2,
     0.75,
     0.38
+   ],
+   "depth": 0.12,
+   "inst": 45,
+   "label": {
+    "title": "Borax",
+    "gloss": "tincal",
+    "project": false,
+    "number": 84
+   }
+  },
+  {
+   "band": 0,
+   "angle": 123.75718931613325,
+   "row": 4,
+   "height": 0.32839446190075555,
+   "width": 0.11153501001010997,
+   "variant": 1,
+   "pos": [
+    3.9907194928277,
+    4.194197230950378,
+    -2.6672378839475557
+   ],
+   "yaw": 2.159970426580475,
+   "tint": [
+    0.62,
+    0.32,
+    0.85
+   ],
+   "depth": 0.12,
+   "inst": 46,
+   "label": {
+    "title": "Camphora",
+    "gloss": "camphor",
+    "project": false,
+    "number": 85
+   }
+  },
+  {
+   "band": 0,
+   "angle": 126.15304196060922,
+   "row": 4,
+   "height": 0.19864971828382216,
+   "width": 0.18989395356158933,
+   "variant": 0,
+   "pos": [
+    3.875731608842509,
+    4.129324859141911,
+    -2.8317317133194426
+   ],
+   "yaw": 2.2017859436191936,
+   "tint": [
+    0.62,
+    0.32,
+    0.85
+   ],
+   "depth": 0.18,
+   "inst": 7,
+   "label": {
+    "title": "Balsamum",
+    "gloss": "balsam",
+    "project": false,
+    "number": 86
+   }
+  },
+  {
+   "band": 0,
+   "angle": 129.13069914967664,
+   "row": 4,
+   "height": 0.26220502875027923,
+   "width": 0.20901729710950556,
+   "variant": 2,
+   "pos": [
+    3.723400218281137,
+    4.1611025143751394,
+    -3.029239312848027
+   ],
+   "yaw": 2.2537558655640995,
+   "tint": [
+    0.25,
+    0.5,
+    0.9
+   ],
+   "depth": 0.22,
+   "inst": 88,
+   "label": {
+    "title": "Succinum",
+    "gloss": "amber",
+    "project": false,
+    "number": 87
+   }
+  },
+  {
+   "band": 0,
+   "angle": 131.6906447590445,
+   "row": 4,
+   "height": 0.3515988243173584,
+   "width": 0.1199057066227335,
+   "variant": 1,
+   "pos": [
+    3.58438459671729,
+    4.2057994121586795,
+    -3.192520487454362
+   ],
+   "yaw": 2.298435345119541,
+   "tint": [
+    0.62,
+    0.32,
+    0.85
+   ],
+   "depth": 0.12,
+   "inst": 47,
+   "label": {
+    "title": "Galbanum",
+    "gloss": "resin",
+    "project": false,
+    "number": 88
+   }
+  },
+  {
+   "band": 0,
+   "angle": 134.22621806320646,
+   "row": 4,
+   "height": 0.2642662921370214,
+   "width": 0.20493367817692712,
+   "variant": 2,
+   "pos": [
+    3.4396392756530765,
+    4.162133146068511,
+    -3.3479667939489466
+   ],
+   "yaw": 2.342689447702839,
+   "tint": [
+    0.9,
+    0.62,
+    0.15
+   ],
+   "depth": 0.22,
+   "inst": 89,
+   "label": {
+    "title": "Opopanax",
+    "gloss": "gum",
+    "project": false,
+    "number": 89
+   }
+  },
+  {
+   "band": 0,
+   "angle": 136.6985629150425,
+   "row": 4,
+   "height": 0.3243289063035283,
+   "width": 0.10931167775206391,
+   "variant": 1,
+   "pos": [
+    3.292015711723595,
+    4.192164453151764,
+    -3.493226667962587
+   ],
+   "yaw": 2.385840005612109,
+   "tint": [
+    0.15,
+    0.7,
+    0.72
    ],
    "depth": 0.12,
    "inst": 48,
@@ -2978,21 +3113,21 @@
   },
   {
    "band": 0,
-   "angle": 118.57941223621258,
+   "angle": 138.636902466287,
    "row": 4,
-   "height": 0.32839446190075555,
-   "width": 0.11153501001010997,
+   "height": 0.31554357630532776,
+   "width": 0.11546023128005836,
    "variant": 1,
    "pos": [
-    4.215143636850073,
-    4.194197230950378,
-    -2.2962064629998635
+    3.171977301608861,
+    4.187771788152664,
+    -3.6025768552632123
    ],
-   "yaw": 2.0696011686015616,
+   "yaw": 2.4196704128029554,
    "tint": [
-    0.62,
-    0.32,
-    0.85
+    0.25,
+    0.5,
+    0.9
    ],
    "depth": 0.12,
    "inst": 49,
@@ -3005,24 +3140,24 @@
   },
   {
    "band": 0,
-   "angle": 120.97526488068854,
+   "angle": 140.61063058176038,
    "row": 4,
-   "height": 0.19864971828382216,
-   "width": 0.18989395356158933,
-   "variant": 0,
+   "height": 0.3498612516586939,
+   "width": 0.11524108860019726,
+   "variant": 1,
    "pos": [
-    4.115469924151895,
-    4.129324859141911,
-    -2.470406303303407
+    3.04601822559107,
+    4.2049306258293475,
+    -3.70968637075522
    ],
-   "yaw": 2.1114166856402803,
+   "yaw": 2.4541184669571483,
    "tint": [
     0.62,
     0.32,
     0.85
    ],
-   "depth": 0.18,
-   "inst": 14,
+   "depth": 0.12,
+   "inst": 50,
    "label": {
     "title": "Aqua regia",
     "gloss": "royal water",
@@ -3032,24 +3167,24 @@
   },
   {
    "band": 0,
-   "angle": 123.95292206975596,
+   "angle": 143.0246039784091,
    "row": 4,
-   "height": 0.26220502875027923,
-   "width": 0.20901729710950556,
-   "variant": 2,
+   "height": 0.20702843306937802,
+   "width": 0.18922403613968738,
+   "variant": 0,
    "pos": [
-    3.9815844567467846,
-    4.1611025143751394,
-    -2.6808553138489994
+    2.8870656828896304,
+    4.13351421653469,
+    -3.8346905667447326
    ],
-   "yaw": 2.1633866075851858,
+   "yaw": 2.4962502507842195,
    "tint": [
-    0.25,
-    0.5,
-    0.9
+    0.62,
+    0.32,
+    0.85
    ],
-   "depth": 0.22,
-   "inst": 90,
+   "depth": 0.18,
+   "inst": 8,
    "label": {
     "title": "Sal ammoniacum",
     "gloss": "sel ammoniac",
@@ -3059,71 +3194,17 @@
   },
   {
    "band": 0,
-   "angle": 126.5128676791238,
+   "angle": 145.45374471872546,
    "row": 4,
-   "height": 0.3515988243173584,
-   "width": 0.1199057066227335,
+   "height": 0.33333813052967254,
+   "width": 0.11778240142370316,
    "variant": 1,
    "pos": [
-    3.8578716145982703,
-    4.2057994121586795,
-    -2.856015862224323
+    2.721942600384472,
+    4.196669065264836,
+    -3.9536095508044573
    ],
-   "yaw": 2.2080660871406272,
-   "tint": [
-    0.62,
-    0.32,
-    0.85
-   ],
-   "depth": 0.12,
-   "inst": 50,
-   "label": {
-    "title": "Mercurius vivus",
-    "gloss": "quicksilver",
-    "project": false,
-    "number": 94
-   }
-  },
-  {
-   "band": 0,
-   "angle": 129.04844098328576,
-   "row": 4,
-   "height": 0.2642662921370214,
-   "width": 0.20493367817692712,
-   "variant": 2,
-   "pos": [
-    3.72774538521203,
-    4.162133146068511,
-    -3.0238905970670333
-   ],
-   "yaw": 2.252320189723925,
-   "tint": [
-    0.9,
-    0.62,
-    0.15
-   ],
-   "depth": 0.22,
-   "inst": 91,
-   "label": {
-    "title": "Spiritus vini",
-    "gloss": "spirit of wine",
-    "project": false,
-    "number": 95
-   }
-  },
-  {
-   "band": 0,
-   "angle": 131.52078583512179,
-   "row": 4,
-   "height": 0.3243289063035283,
-   "width": 0.10931167775206391,
-   "variant": 1,
-   "pos": [
-    3.5938333697890967,
-    4.192164453151764,
-    -3.1818802161914186
-   ],
-   "yaw": 2.2954707476331953,
+   "yaw": 2.538646754697073,
    "tint": [
     0.15,
     0.7,
@@ -3132,194 +3213,59 @@
    "depth": 0.12,
    "inst": 51,
    "label": {
-    "title": "Oleum vitrioli",
-    "gloss": "oil of vitriol",
+    "title": "Mercurius vivus",
+    "gloss": "quicksilver",
     "project": false,
-    "number": 96
-   }
-  },
-  {
-   "band": 0,
-   "angle": 133.4591253863663,
-   "row": 4,
-   "height": 0.31554357630532776,
-   "width": 0.11546023128005836,
-   "variant": 1,
-   "pos": [
-    3.4841532297237703,
-    4.187771788152664,
-    -3.3016172206670826
-   ],
-   "yaw": 2.3293011548240417,
-   "tint": [
-    0.25,
-    0.5,
-    0.9
-   ],
-   "depth": 0.12,
-   "inst": 52,
-   "label": {
-    "title": "Cinnabaris",
-    "gloss": "vermilion",
-    "project": false,
-    "number": 97
-   }
-  },
-  {
-   "band": 0,
-   "angle": 135.43285350183967,
-   "row": 4,
-   "height": 0.3498612516586939,
-   "width": 0.11524108860019726,
-   "variant": 1,
-   "pos": [
-    3.3683743708153777,
-    4.2049306258293475,
-    -3.419657014677658
-   ],
-   "yaw": 2.3637492089782346,
-   "tint": [
-    0.62,
-    0.32,
-    0.85
-   ],
-   "depth": 0.12,
-   "inst": 53,
-   "label": {
-    "title": "Antimonium",
-    "gloss": "stibnite",
-    "project": false,
-    "number": 98
-   }
-  },
-  {
-   "band": 0,
-   "angle": 137.8468268984884,
-   "row": 4,
-   "height": 0.20702843306937802,
-   "width": 0.18922403613968738,
-   "variant": 0,
-   "pos": [
-    3.221351604653407,
-    4.13351421653469,
-    -3.5584960080344232
-   ],
-   "yaw": 2.4058809928053058,
-   "tint": [
-    0.62,
-    0.32,
-    0.85
-   ],
-   "depth": 0.18,
-   "inst": 15,
-   "label": {
-    "title": "Tinctura solis",
-    "gloss": "tincture of the sun",
-    "project": false,
-    "number": 99
-   }
-  },
-  {
-   "band": 0,
-   "angle": 140.27596763880476,
-   "row": 4,
-   "height": 0.33333813052967254,
-   "width": 0.11778240142370316,
-   "variant": 1,
-   "pos": [
-    3.0676343098176337,
-    4.196669065264836,
-    -3.6918314887369514
-   ],
-   "yaw": 2.448277496718159,
-   "tint": [
-    0.15,
-    0.7,
-    0.72
-   ],
-   "depth": 0.12,
-   "inst": 54,
-   "label": {
-    "title": "Elixir vitae",
-    "gloss": "elixir of life",
-    "project": false,
-    "number": 100
-   }
-  },
-  {
-   "band": 0,
-   "angle": 142.77374034029077,
-   "row": 4,
-   "height": 0.2770779005823428,
-   "width": 0.20072343160699366,
-   "variant": 2,
-   "pos": [
-    2.903827751849311,
-    4.168538950291172,
-    -3.822013132838476
-   ],
-   "yaw": 2.4918718543255234,
-   "tint": [
-    0.85,
-    0.22,
-    0.2
-   ],
-   "depth": 0.22,
-   "inst": 92,
-   "label": {
-    "title": "Aqua fortis",
-    "gloss": "strong water",
-    "project": false,
-    "number": 101
-   }
-  },
-  {
-   "band": 0,
-   "angle": 147.7833657815202,
-   "row": 4,
-   "height": 0.2678660694885959,
-   "width": 0.21249720023920898,
-   "variant": 2,
-   "pos": [
-    2.558985225608235,
-    4.163933034744298,
-    -4.060984439162353
-   ],
-   "yaw": 2.57930631256665,
-   "tint": [
-    0.85,
-    0.22,
-    0.2
-   ],
-   "depth": 0.22,
-   "inst": 93,
-   "label": {
-    "title": "Sulphur",
-    "gloss": "brimstone",
-    "project": false,
-    "number": 102
+    "number": 94
    }
   },
   {
    "band": 1,
-   "angle": 208.89821431165447,
+   "angle": 208.98595856886996,
    "row": 0,
-   "height": 0.2537893020650734,
-   "width": 0.2010282173331582,
+   "height": 0.270850308744083,
+   "width": 0.21572990873918182,
    "variant": 2,
    "pos": [
-    -2.3196244712129594,
-    1.2368946510325367,
-    -4.202302025384421
+    -2.326057264001685,
+    1.2454251543720416,
+    -4.1987447653536885
    ],
-   "yaw": 3.6459616412751106,
+   "yaw": 3.6474930674632375,
    "tint": [
-    0.25,
-    0.5,
-    0.9
+    0.62,
+    0.32,
+    0.85
    ],
    "depth": 0.22,
-   "inst": 94,
+   "inst": 90,
+   "label": {
+    "title": "Aqua fortis",
+    "gloss": "strong water",
+    "project": false,
+    "number": 11
+   }
+  },
+  {
+   "band": 1,
+   "angle": 218.10159358960217,
+   "row": 0,
+   "height": 0.36564362192460936,
+   "width": 0.12766547238369913,
+   "variant": 1,
+   "pos": [
+    -2.961877258700148,
+    1.2928218109623049,
+    -3.777205727041473
+   ],
+   "yaw": 3.8065909119851162,
+   "tint": [
+    0.62,
+    0.32,
+    0.85
+   ],
+   "depth": 0.12,
+   "inst": 52,
    "label": {
     "title": "Sulphur",
     "gloss": "brimstone",
@@ -3329,24 +3275,24 @@
   },
   {
    "band": 1,
-   "angle": 211.76495924672264,
+   "angle": 220.51506824578607,
    "row": 0,
-   "height": 0.1860894984805992,
-   "width": 0.17929950681222753,
+   "height": 0.19881024435232586,
+   "width": 0.17671608758922994,
    "variant": 0,
    "pos": [
-    -2.5268924283287135,
-    1.2030447492402998,
-    -4.081031077516443
+    -3.1183104259914067,
+    1.209405122176163,
+    -3.6491286750611165
    ],
-   "yaw": 3.695995779206921,
+   "yaw": 3.8487139911489634,
    "tint": [
-    0.62,
-    0.32,
-    0.85
+    0.85,
+    0.22,
+    0.2
    ],
    "depth": 0.18,
-   "inst": 16,
+   "inst": 9,
    "label": {
     "title": "Nitrum",
     "gloss": "saltpetre",
@@ -3356,24 +3302,24 @@
   },
   {
    "band": 1,
-   "angle": 216.86476094603586,
+   "angle": 223.5317894588591,
    "row": 0,
-   "height": 0.3348199780544811,
-   "width": 0.11291050076306779,
-   "variant": 1,
+   "height": 0.27005147586673744,
+   "width": 0.22874040312643862,
+   "variant": 2,
    "pos": [
-    -2.8796557235009423,
-    1.2774099890272406,
-    -3.8402581832616765
+    -3.3060332626097977,
+    1.245025737933369,
+    -3.4799632277536534
    ],
-   "yaw": 3.7850041100587384,
+   "yaw": 3.901365708931845,
    "tint": [
-    0.15,
-    0.7,
-    0.72
+    0.25,
+    0.5,
+    0.9
    ],
-   "depth": 0.12,
-   "inst": 55,
+   "depth": 0.22,
+   "inst": 91,
    "label": {
     "title": "Lapis lunaris",
     "gloss": "moonstone",
@@ -3383,24 +3329,24 @@
   },
   {
    "band": 1,
-   "angle": 218.78190992695298,
+   "angle": 226.70116506673082,
    "row": 0,
-   "height": 0.36027774505643245,
-   "width": 0.10831089413220919,
-   "variant": 1,
+   "height": 0.2747253329247717,
+   "width": 0.2022935769352447,
+   "variant": 2,
    "pos": [
-    -3.0065170498527363,
-    1.2901388725282164,
-    -3.741771669803598
+    -3.4933761749227514,
+    1.247362666462386,
+    -3.2918570595458867
    ],
-   "yaw": 3.8184646720269964,
+   "yaw": 3.9566817485216035,
    "tint": [
-    0.9,
-    0.62,
-    0.15
+    0.85,
+    0.22,
+    0.2
    ],
-   "depth": 0.12,
-   "inst": 56,
+   "depth": 0.22,
+   "inst": 92,
    "label": {
     "title": "Argentum vivum",
     "gloss": "living silver",
@@ -3410,24 +3356,24 @@
   },
   {
    "band": 1,
-   "angle": 220.6713693651043,
+   "angle": 231.7087889197002,
    "row": 0,
-   "height": 0.35112942647991513,
-   "width": 0.10827107334256925,
-   "variant": 1,
+   "height": 0.18550678350306546,
+   "width": 0.17737117459862586,
+   "variant": 0,
    "pos": [
-    -3.128253521180216,
-    1.2855647132399577,
-    -3.6406084528858074
+    -3.7673828768054136,
+    1.2027533917515327,
+    -2.9743614877067945
    ],
-   "yaw": 3.8514419603056194,
+   "yaw": 4.044081272457324,
    "tint": [
     0.15,
     0.7,
     0.72
    ],
-   "depth": 0.12,
-   "inst": 57,
+   "depth": 0.18,
+   "inst": 10,
    "label": {
     "title": "Essentia rosae",
     "gloss": "attar of rose",
@@ -3437,24 +3383,24 @@
   },
   {
    "band": 1,
-   "angle": 225.81095116984287,
+   "angle": 234.0589057165593,
    "row": 0,
-   "height": 0.270850308744083,
-   "width": 0.21572990873918182,
-   "variant": 2,
+   "height": 0.3454944597580643,
+   "width": 0.11639467415287232,
+   "variant": 1,
    "pos": [
-    -3.441810463146512,
-    1.2454251543720416,
-    -3.3457347079192035
+    -3.8861801662242588,
+    1.2827472298790323,
+    -2.817375323886613
    ],
-   "yaw": 3.941144584973899,
+   "yaw": 4.085098548368937,
    "tint": [
-    0.62,
-    0.32,
-    0.85
+    0.25,
+    0.5,
+    0.9
    ],
-   "depth": 0.22,
-   "inst": 95,
+   "depth": 0.12,
+   "inst": 53,
    "label": {
     "title": "Vitriolum",
     "gloss": "green vitriol",
@@ -3464,24 +3410,24 @@
   },
   {
    "band": 1,
-   "angle": 234.92658619057508,
+   "angle": 236.13542313824817,
    "row": 0,
-   "height": 0.36564362192460936,
-   "width": 0.12766547238369913,
+   "height": 0.3146069558068908,
+   "width": 0.13152915928866957,
    "variant": 1,
    "pos": [
-    -3.928398918223916,
-    1.2928218109623049,
-    -2.758202664652685
+    -3.9857133723715785,
+    1.2673034779034456,
+    -2.6747128655798527
    ],
-   "yaw": 4.100242429495778,
+   "yaw": 4.121340614352432,
    "tint": [
-    0.62,
-    0.32,
-    0.85
+    0.85,
+    0.22,
+    0.2
    ],
    "depth": 0.12,
-   "inst": 58,
+   "inst": 54,
    "label": {
     "title": "Cuprum",
     "gloss": "copper",
@@ -3491,24 +3437,24 @@
   },
   {
    "band": 1,
-   "angle": 237.34006084675897,
+   "angle": 238.57056801602334,
    "row": 0,
-   "height": 0.19881024435232586,
-   "width": 0.17671608758922994,
+   "height": 0.1852643757064489,
+   "width": 0.17648328116174244,
    "variant": 0,
    "pos": [
-    -4.041063882409322,
-    1.209405122176163,
-    -2.5903286853769942
+    -4.095758639168278,
+    1.2026321878532245,
+    -2.502950492854068
    ],
-   "yaw": 4.142365508659625,
+   "yaw": 4.163841910232684,
    "tint": [
-    0.85,
-    0.22,
-    0.2
+    0.62,
+    0.32,
+    0.85
    ],
    "depth": 0.18,
-   "inst": 17,
+   "inst": 11,
    "label": {
     "title": "Plumbum",
     "gloss": "lead",
@@ -3518,78 +3464,78 @@
   },
   {
    "band": 1,
-   "angle": 240.356782059832,
-   "row": 0,
-   "height": 0.27005147586673744,
-   "width": 0.22874040312643862,
-   "variant": 2,
-   "pos": [
-    -4.171786099833344,
-    1.245025737933369,
-    -2.3740683935466764
-   ],
-   "yaw": 4.1950172264425065,
-   "tint": [
-    0.25,
-    0.5,
-    0.9
-   ],
-   "depth": 0.22,
-   "inst": 96,
-   "label": {
-    "title": "Aurum potabile",
-    "gloss": "potable gold",
-    "project": false,
-    "number": 20
-   }
-  },
-  {
-   "band": 1,
-   "angle": 243.52615766770373,
-   "row": 0,
-   "height": 0.2747253329247717,
-   "width": 0.2022935769352447,
-   "variant": 2,
-   "pos": [
-    -4.2966622767940015,
-    1.247362666462386,
-    -2.1397881388528615
-   ],
-   "yaw": 4.250333266032265,
-   "tint": [
-    0.85,
-    0.22,
-    0.2
-   ],
-   "depth": 0.22,
-   "inst": 97,
-   "label": {
-    "title": "Terra sigillata",
-    "gloss": "sealed earth",
-    "project": false,
-    "number": 21
-   }
-  },
-  {
-   "band": 1,
-   "angle": 210.90185748248513,
+   "angle": 208.6922343984825,
    "row": 1,
-   "height": 0.18550678350306546,
-   "width": 0.17737117459862586,
+   "height": 0.20893319716264225,
+   "width": 0.16651595162605942,
    "variant": 0,
    "pos": [
-    -2.465131533856125,
-    1.9327533917515327,
-    -4.1186316320822085
+    -2.3045021220060047,
+    1.9444665985813212,
+    -4.210613965880728
    ],
-   "yaw": 3.6809318116412046,
+   "yaw": 3.6423666135972876,
    "tint": [
     0.15,
     0.7,
     0.72
    ],
    "depth": 0.18,
-   "inst": 18,
+   "inst": 12,
+   "label": {
+    "title": "Opopanax",
+    "gloss": "gum",
+    "project": false,
+    "number": 29
+   }
+  },
+  {
+   "band": 1,
+   "angle": 211.47099602747406,
+   "row": 1,
+   "height": 0.24738352569271416,
+   "width": 0.19907002809218574,
+   "variant": 2,
+   "pos": [
+    -2.505921017778321,
+    1.963691762846357,
+    -4.0939418477375655
+   ],
+   "yaw": 3.6908651531512713,
+   "tint": [
+    0.9,
+    0.62,
+    0.15
+   ],
+   "depth": 0.22,
+   "inst": 93,
+   "label": {
+    "title": "Myrrha",
+    "gloss": "myrrh",
+    "project": false,
+    "number": 30
+   }
+  },
+  {
+   "band": 1,
+   "angle": 214.5135296360369,
+   "row": 1,
+   "height": 0.26410026696836497,
+   "width": 0.21071137099907447,
+   "variant": 2,
+   "pos": [
+    -2.719683972318111,
+    1.9720501334841827,
+    -3.9551635984768048
+   ],
+   "yaw": 3.7439673822232775,
+   "tint": [
+    0.15,
+    0.7,
+    0.72
+   ],
+   "depth": 0.22,
+   "inst": 94,
    "label": {
     "title": "Olibanum",
     "gloss": "frankincense",
@@ -3599,24 +3545,24 @@
   },
   {
    "band": 1,
-   "angle": 213.25197427934424,
+   "angle": 222.23017968338425,
    "row": 1,
-   "height": 0.3454944597580643,
-   "width": 0.11639467415287232,
-   "variant": 1,
+   "height": 0.19550947412965966,
+   "width": 0.18325467269078904,
+   "variant": 0,
    "pos": [
-    -2.631945819220301,
-    2.0127472298790323,
-    -4.014082859718866
+    -3.2261313778215364,
+    1.9377547370648298,
+    -3.5541632395031213
    ],
-   "yaw": 3.7219490875528187,
+   "yaw": 3.8786483327736647,
    "tint": [
-    0.25,
-    0.5,
-    0.9
+    0.2,
+    0.75,
+    0.38
    ],
-   "depth": 0.12,
-   "inst": 59,
+   "depth": 0.18,
+   "inst": 13,
    "label": {
     "title": "Aqua regia",
     "gloss": "royal water",
@@ -3626,24 +3572,24 @@
   },
   {
    "band": 1,
-   "angle": 215.3284917010331,
+   "angle": 225.0660444248211,
    "row": 1,
-   "height": 0.3146069558068908,
-   "width": 0.13152915928866957,
-   "variant": 1,
+   "height": 0.2080910670201983,
+   "width": 0.19189902535039682,
+   "variant": 0,
    "pos": [
-    -2.7756643052060093,
-    1.9973034779034455,
-    -3.9160806509576958
+    -3.398022662592605,
+    1.9440455335100992,
+    -3.3901979270401115
    ],
-   "yaw": 3.758191153536313,
+   "yaw": 3.9281435096529553,
    "tint": [
     0.85,
     0.22,
     0.2
    ],
-   "depth": 0.12,
-   "inst": 60,
+   "depth": 0.18,
+   "inst": 14,
    "label": {
     "title": "Sal ammoniacum",
     "gloss": "sel ammoniac",
@@ -3653,24 +3599,24 @@
   },
   {
    "band": 1,
-   "angle": 217.76363657880827,
+   "angle": 228.1301970511704,
    "row": 1,
-   "height": 0.1852643757064489,
-   "width": 0.17648328116174244,
-   "variant": 0,
+   "height": 0.2769096103939085,
+   "width": 0.22150467493850579,
+   "variant": 2,
    "pos": [
-    -2.9395461568362538,
-    1.9326321878532244,
-    -3.7946104400622227
+    -3.5743843965794935,
+    1.9784548051969544,
+    -3.2037128750075365
    ],
-   "yaw": 3.8006924494165646,
+   "yaw": 3.981623061766382,
    "tint": [
-    0.62,
-    0.32,
-    0.85
+    0.85,
+    0.22,
+    0.2
    ],
-   "depth": 0.18,
-   "inst": 19,
+   "depth": 0.22,
+   "inst": 95,
    "label": {
     "title": "Mercurius vivus",
     "gloss": "quicksilver",
@@ -3680,24 +3626,24 @@
   },
   {
    "band": 1,
-   "angle": 220.42619176813247,
+   "angle": 231.29397780391508,
    "row": 1,
-   "height": 0.20866283738521055,
-   "width": 0.16963212270803166,
-   "variant": 0,
+   "height": 0.26694556907193995,
+   "width": 0.20859187814904107,
+   "variant": 2,
    "pos": [
-    -3.112646195096036,
-    1.9443314186926053,
-    -3.653961365990913
+    -3.745750490658965,
+    1.97347278453597,
+    -3.0015584721487816
    ],
-   "yaw": 3.847162803986333,
+   "yaw": 4.036841452713002,
    "tint": [
-    0.2,
-    0.75,
-    0.38
+    0.85,
+    0.22,
+    0.2
    ],
-   "depth": 0.18,
-   "inst": 20,
+   "depth": 0.22,
+   "inst": 96,
    "label": {
     "title": "Spiritus vini",
     "gloss": "spirit of wine",
@@ -3707,24 +3653,24 @@
   },
   {
    "band": 1,
-   "angle": 226.52569378211226,
+   "angle": 234.1230455571792,
    "row": 1,
-   "height": 0.2090746409013666,
-   "width": 0.18778295670403544,
+   "height": 0.19289139302383057,
+   "width": 0.1654229735929506,
    "variant": 0,
    "pos": [
-    -3.4832783258185755,
-    1.9445373204506833,
-    -3.3025402503046877
+    -3.889331645292909,
+    1.9364456965119154,
+    -2.813023169638523
    ],
-   "yaw": 3.9536191968623053,
+   "yaw": 4.08621799976946,
    "tint": [
-    0.25,
-    0.5,
-    0.9
+    0.15,
+    0.7,
+    0.72
    ],
    "depth": 0.18,
-   "inst": 21,
+   "inst": 15,
    "label": {
     "title": "Oleum vitrioli",
     "gloss": "oil of vitriol",
@@ -3734,24 +3680,24 @@
   },
   {
    "band": 1,
-   "angle": 231.74045380340624,
+   "angle": 236.90662620104564,
    "row": 1,
-   "height": 0.3323324727564592,
-   "width": 0.11034692495151824,
-   "variant": 1,
+   "height": 0.245032600554726,
+   "width": 0.20097043981747878,
+   "variant": 2,
    "pos": [
-    -3.7690261015313054,
-    2.0061662363782298,
-    -2.9722789650326797
+    -4.021352962452491,
+    1.9625163002773631,
+    -2.6208243648467904
    ],
-   "yaw": 4.044633928935255,
+   "yaw": 4.134800646999712,
    "tint": [
     0.85,
     0.22,
     0.2
    ],
-   "depth": 0.12,
-   "inst": 61,
+   "depth": 0.22,
+   "inst": 97,
    "label": {
     "title": "Cinnabaris",
     "gloss": "vermilion",
@@ -3761,24 +3707,24 @@
   },
   {
    "band": 1,
-   "angle": 234.1651594972511,
+   "angle": 239.4093561338497,
    "row": 1,
-   "height": 0.18562153793169783,
-   "width": 0.1959164134431665,
-   "variant": 0,
+   "height": 0.33744679010353285,
+   "width": 0.1183659852927415,
+   "variant": 1,
    "pos": [
-    -3.8913982422156215,
-    1.932810768965849,
-    -2.8101636465660107
+    -4.131960670171717,
+    2.0087233950517667,
+    -2.4427240982464857
    ],
-   "yaw": 4.086953026684701,
+   "yaw": 4.17848152461536,
    "tint": [
-    0.9,
-    0.62,
-    0.15
+    0.85,
+    0.22,
+    0.2
    ],
-   "depth": 0.18,
-   "inst": 22,
+   "depth": 0.12,
+   "inst": 55,
    "label": {
     "title": "Antimonium",
     "gloss": "stibnite",
@@ -3788,78 +3734,105 @@
   },
   {
    "band": 1,
-   "angle": 236.97542540231476,
-   "row": 1,
-   "height": 0.19070010630823586,
-   "width": 0.17494815839586708,
+   "angle": 208.91919381991508,
+   "row": 2,
+   "height": 0.24263009267554572,
+   "width": 0.20454336768129236,
+   "variant": 2,
+   "pos": [
+    -2.321163036867995,
+    2.6913150463377726,
+    -4.201452386529896
+   ],
+   "yaw": 3.6463278027697075,
+   "tint": [
+    0.62,
+    0.32,
+    0.85
+   ],
+   "depth": 0.22,
+   "inst": 98,
+   "label": {
+    "title": "Aurum potabile",
+    "gloss": "potable gold",
+    "project": false,
+    "number": 50
+   }
+  },
+  {
+   "band": 1,
+   "angle": 211.7281971520166,
+   "row": 2,
+   "height": 0.19662329972555082,
+   "width": 0.16610965802747552,
    "variant": 0,
    "pos": [
-    -4.024497076640161,
-    1.9353500531541181,
-    -2.6159937461918368
+    -2.5242734388811425,
+    2.6683116498627752,
+    -4.082651541064848
    ],
-   "yaw": 4.1360014195846,
+   "yaw": 3.6953541596143706,
    "tint": [
-    0.85,
-    0.22,
-    0.2
+    0.62,
+    0.32,
+    0.85
    ],
    "depth": 0.18,
-   "inst": 23,
+   "inst": 16,
    "label": {
-    "title": "Tinctura solis",
-    "gloss": "tincture of the sun",
+    "title": "Terra sigillata",
+    "gloss": "sealed earth",
     "project": false,
-    "number": 39
+    "number": 51
    }
   },
   {
    "band": 1,
-   "angle": 242.64139893289072,
-   "row": 1,
-   "height": 0.36501021452601146,
-   "width": 0.11214438431680505,
-   "variant": 1,
-   "pos": [
-    -4.263108814290145,
-    2.022505107263006,
-    -2.2058792436399766
-   ],
-   "yaw": 4.234891313023999,
-   "tint": [
-    0.15,
-    0.7,
-    0.72
-   ],
-   "depth": 0.12,
-   "inst": 62,
-   "label": {
-    "title": "Elixir vitae",
-    "gloss": "elixir of life",
-    "project": false,
-    "number": 40
-   }
-  },
-  {
-   "band": 1,
-   "angle": 211.00992842845628,
+   "angle": 214.6149240271024,
    "row": 2,
-   "height": 0.35960128887823467,
-   "width": 0.10855325331553516,
-   "variant": 1,
+   "height": 0.24184364470656833,
+   "width": 0.21756607230264657,
+   "variant": 2,
    "pos": [
-    -2.4728956817029033,
-    2.749800644439117,
-    -4.11397459246106
+    -2.7266790284395044,
+    2.690921822353284,
+    -3.9503444755955406
    ],
-   "yaw": 3.682818005474146,
+   "yaw": 3.745737048190425,
    "tint": [
-    0.9,
-    0.62,
-    0.15
+    0.25,
+    0.5,
+    0.9
    ],
-   "depth": 0.12,
-   "inst": 63,
+   "depth": 0.22,
+   "inst": 99,
+   "label": {
+    "title": "Cremor tartari",
+    "gloss": "cream of tartar",
+    "project": false,
+    "number": 52
+   }
+  },
+  {
+   "band": 1,
+   "angle": 217.72071537314523,
+   "row": 2,
+   "height": 0.26958314131621647,
+   "width": 0.20281426243393422,
+   "variant": 2,
+   "pos": [
+    -2.936702727549861,
+    2.704791570658108,
+    -3.796811437245892
+   ],
+   "yaw": 3.7999433330588186,
+   "tint": [
+    0.25,
+    0.5,
+    0.9
+   ],
+   "depth": 0.22,
+   "inst": 100,
    "label": {
     "title": "Alumen",
     "gloss": "alum",
@@ -3869,24 +3842,24 @@
   },
   {
    "band": 1,
-   "angle": 213.4016135110035,
+   "angle": 220.27067308987665,
    "row": 2,
-   "height": 0.20920487043196823,
-   "width": 0.1921774285527688,
-   "variant": 0,
+   "height": 0.32744143700054695,
+   "width": 0.12443525382463369,
+   "variant": 1,
    "pos": [
-    -2.6424204004021687,
-    2.674602435215984,
-    -4.007195331842266
+    -3.1027167463005045,
+    2.7337207185002734,
+    -3.662396591335572
    ],
-   "yaw": 3.724560784835427,
+   "yaw": 3.844448491002419,
    "tint": [
-    0.85,
-    0.22,
-    0.2
+    0.62,
+    0.32,
+    0.85
    ],
-   "depth": 0.18,
-   "inst": 24,
+   "depth": 0.12,
+   "inst": 56,
    "label": {
     "title": "Borax",
     "gloss": "tincal",
@@ -3896,24 +3869,24 @@
   },
   {
    "band": 1,
-   "angle": 216.25461386696307,
+   "angle": 224.98786266518715,
    "row": 2,
-   "height": 0.2054565355860108,
-   "width": 0.18584736925905215,
-   "variant": 0,
+   "height": 0.2396940227667096,
+   "width": 0.23066528138831108,
+   "variant": 2,
    "pos": [
-    -2.8385980183096664,
-    2.6727282677930053,
-    -3.8707055287697156
+    -3.3933934767758798,
+    2.6898470113833546,
+    -3.3948314703052516
    ],
-   "yaw": 3.7743550346074923,
+   "yaw": 3.9267789805323403,
    "tint": [
     0.9,
     0.62,
     0.15
    ],
-   "depth": 0.18,
-   "inst": 25,
+   "depth": 0.22,
+   "inst": 101,
    "label": {
     "title": "Camphora",
     "gloss": "camphor",
@@ -3923,24 +3896,24 @@
   },
   {
    "band": 1,
-   "angle": 218.71108044400563,
+   "angle": 227.74058183098774,
    "row": 2,
-   "height": 0.32088998186050693,
-   "width": 0.12573755619299254,
+   "height": 0.3486730372359792,
+   "width": 0.13055724174101976,
    "variant": 1,
    "pos": [
-    -3.0018891468438955,
-    2.7304449909302533,
-    -3.7454854892337837
+    -3.5525164566544274,
+    2.7443365186179896,
+    -3.227944675052451
    ],
-   "yaw": 3.81722846434208,
+   "yaw": 3.974822993358312,
    "tint": [
-    0.85,
-    0.22,
-    0.2
+    0.9,
+    0.62,
+    0.15
    ],
    "depth": 0.12,
-   "inst": 64,
+   "inst": 57,
    "label": {
     "title": "Balsamum",
     "gloss": "balsam",
@@ -3950,24 +3923,24 @@
   },
   {
    "band": 1,
-   "angle": 220.75968099983692,
+   "angle": 233.45245690236723,
    "row": 2,
-   "height": 0.31901014990818527,
-   "width": 0.11750876147844799,
-   "variant": 1,
+   "height": 0.21478526448562885,
+   "width": 0.1753953894456665,
+   "variant": 0,
    "pos": [
-    -3.1338611777076246,
-    2.7295050749540923,
-    -3.635782463082326
+    -3.856142446762428,
+    2.6773926322428143,
+    -2.858350123808677
    ],
-   "yaw": 3.8529832890995217,
+   "yaw": 4.074514019816471,
    "tint": [
-    0.2,
-    0.75,
-    0.38
+    0.9,
+    0.62,
+    0.15
    ],
-   "depth": 0.12,
-   "inst": 65,
+   "depth": 0.18,
+   "inst": 17,
    "label": {
     "title": "Succinum",
     "gloss": "amber",
@@ -3977,24 +3950,24 @@
   },
   {
    "band": 1,
-   "angle": 223.35555471508582,
+   "angle": 236.36568751268538,
    "row": 2,
-   "height": 0.25769883199522947,
-   "width": 0.21743405417343167,
+   "height": 0.24675384326873806,
+   "width": 0.21272108434571557,
    "variant": 2,
    "pos": [
-    -3.295313703047128,
-    2.6988494159976146,
-    -3.4901156998744085
+    -3.996430483460232,
+    2.693376921634369,
+    -2.658673238829816
    ],
-   "yaw": 3.8982898323965927,
+   "yaw": 4.125359485836406,
    "tint": [
-    0.15,
-    0.7,
-    0.72
+    0.62,
+    0.32,
+    0.85
    ],
    "depth": 0.22,
-   "inst": 98,
+   "inst": 102,
    "label": {
     "title": "Galbanum",
     "gloss": "resin",
@@ -4004,24 +3977,24 @@
   },
   {
    "band": 1,
-   "angle": 225.92881200322933,
+   "angle": 238.92780583766253,
    "row": 2,
-   "height": 0.3187521790092278,
-   "width": 0.11371934274539958,
+   "height": 0.32567754389532055,
+   "width": 0.11656596138100511,
    "variant": 1,
    "pos": [
-    -3.4486855520005717,
-    2.7293760895046137,
-    -3.338647624925775
+    -4.111284763905566,
+    2.73283877194766,
+    -2.4773650498216764
    ],
-   "yaw": 3.9432016445756375,
+   "yaw": 4.170076886432939,
    "tint": [
-    0.15,
-    0.7,
-    0.72
+    0.85,
+    0.22,
+    0.2
    ],
    "depth": 0.12,
-   "inst": 66,
+   "inst": 58,
    "label": {
     "title": "Opopanax",
     "gloss": "gum",
@@ -4031,159 +4004,186 @@
   },
   {
    "band": 1,
-   "angle": 228.2272380170338,
-   "row": 2,
-   "height": 0.2059136717661783,
-   "width": 0.1713856321766209,
+   "angle": 208.7979379366705,
+   "row": 3,
+   "height": 0.2134936270176716,
+   "width": 0.18422674944098552,
    "variant": 0,
    "pos": [
-    -3.579805345708441,
-    2.672956835883089,
-    -3.1976544039087895
+    -2.3122662513235324,
+    3.406746813508836,
+    -4.20635528492188
    ],
-   "yaw": 3.9833167461300145,
+   "yaw": 3.6442114883696757,
    "tint": [
-    0.9,
-    0.62,
-    0.15
+    0.15,
+    0.7,
+    0.72
    ],
    "depth": 0.18,
-   "inst": 26,
+   "inst": 18,
    "label": {
-    "title": "Myrrha",
-    "gloss": "myrrh",
+    "title": "Sulphur",
+    "gloss": "brimstone",
     "project": false,
-    "number": 60
+    "number": 72
    }
   },
   {
    "band": 1,
-   "angle": 230.5463151859174,
-   "row": 2,
-   "height": 0.3346417861775366,
-   "width": 0.1171794769899108,
-   "variant": 1,
-   "pos": [
-    -3.7062648318760667,
-    2.7373208930887682,
-    -3.0501804858071395
-   ],
-   "yaw": 4.023792278334861,
-   "tint": [
-    0.62,
-    0.32,
-    0.85
-   ],
-   "depth": 0.12,
-   "inst": 67,
-   "label": {
-    "title": "Olibanum",
-    "gloss": "frankincense",
-    "project": false,
-    "number": 61
-   }
-  },
-  {
-   "band": 1,
-   "angle": 233.2297788984765,
-   "row": 2,
-   "height": 0.2628277035315714,
-   "width": 0.23243918357277848,
+   "angle": 211.87000905282449,
+   "row": 3,
+   "height": 0.27960047092056883,
+   "width": 0.23050370654913838,
    "variant": 2,
    "pos": [
-    -3.845004476184113,
-    2.7014138517657855,
-    -2.873315259090819
+    -2.534370604569059,
+    3.4398002354602846,
+    -4.076391251915874
    ],
-   "yaw": 4.0706275554768085,
+   "yaw": 3.69782924420198,
+   "tint": [
+    0.15,
+    0.7,
+    0.72
+   ],
+   "depth": 0.22,
+   "inst": 103,
+   "label": {
+    "title": "Nitrum",
+    "gloss": "saltpetre",
+    "project": false,
+    "number": 73
+   }
+  },
+  {
+   "band": 1,
+   "angle": 216.90973815934726,
+   "row": 3,
+   "height": 0.207394430686375,
+   "width": 0.1821479270209946,
+   "variant": 0,
+   "pos": [
+    -2.882669440375308,
+    3.403697215343188,
+    -3.837996469191486
+   ],
+   "yaw": 3.7857891105193944,
    "tint": [
     0.2,
     0.75,
     0.38
    ],
-   "depth": 0.22,
-   "inst": 99,
+   "depth": 0.18,
+   "inst": 19,
    "label": {
-    "title": "Aqua regia",
-    "gloss": "royal water",
+    "title": "Lapis lunaris",
+    "gloss": "moonstone",
     "project": false,
-    "number": 62
+    "number": 74
    }
   },
   {
    "band": 1,
-   "angle": 239.00430426076406,
-   "row": 2,
-   "height": 0.20402953556786693,
-   "width": 0.18429799011490638,
+   "angle": 219.30645705394863,
+   "row": 3,
+   "height": 0.31981866019860533,
+   "width": 0.11942617815231228,
+   "variant": 1,
+   "pos": [
+    -3.040646774209548,
+    3.459909330099303,
+    -3.714090358955888
+   ],
+   "yaw": 3.827619746474947,
+   "tint": [
+    0.15,
+    0.7,
+    0.72
+   ],
+   "depth": 0.12,
+   "inst": 59,
+   "label": {
+    "title": "Argentum vivum",
+    "gloss": "living silver",
+    "project": false,
+    "number": 75
+   }
+  },
+  {
+   "band": 1,
+   "angle": 221.33367323475693,
+   "row": 3,
+   "height": 0.3568880705019968,
+   "width": 0.12023715309386057,
+   "variant": 1,
+   "pos": [
+    -3.170126776835153,
+    3.4784440352509987,
+    -3.60420535191778
+   ],
+   "yaw": 3.8630013434797568,
+   "tint": [
+    0.85,
+    0.22,
+    0.2
+   ],
+   "depth": 0.12,
+   "inst": 60,
+   "label": {
+    "title": "Essentia rosae",
+    "gloss": "attar of rose",
+    "project": false,
+    "number": 76
+   }
+  },
+  {
+   "band": 1,
+   "angle": 223.6680835378299,
+   "row": 3,
+   "height": 0.21516526176517725,
+   "width": 0.1708970473647163,
    "variant": 0,
    "pos": [
-    -4.114588750836473,
-    2.672014767783933,
-    -2.4718736641442582
+    -3.314301969473194,
+    3.407582630882589,
+    -3.4720890620987985
    ],
-   "yaw": 4.171412035788645,
+   "yaw": 3.9037444893608586,
    "tint": [
     0.85,
     0.22,
     0.2
    ],
    "depth": 0.18,
-   "inst": 27,
+   "inst": 20,
    "label": {
-    "title": "Sal ammoniacum",
-    "gloss": "sel ammoniac",
+    "title": "Vitriolum",
+    "gloss": "green vitriol",
     "project": false,
-    "number": 63
+    "number": 77
    }
   },
   {
    "band": 1,
-   "angle": 241.90188174079674,
-   "row": 2,
-   "height": 0.2632378555463398,
-   "width": 0.20119577652390905,
-   "variant": 2,
-   "pos": [
-    -4.234283206962288,
-    2.7016189277731697,
-    -2.260717966318923
-   ],
-   "yaw": 4.221984303146855,
-   "tint": [
-    0.2,
-    0.75,
-    0.38
-   ],
-   "depth": 0.22,
-   "inst": 100,
-   "label": {
-    "title": "Mercurius vivus",
-    "gloss": "quicksilver",
-    "project": false,
-    "number": 64
-   }
-  },
-  {
-   "band": 1,
-   "angle": 209.08834457329232,
+   "angle": 226.32216632617826,
    "row": 3,
-   "height": 0.25802716068723114,
-   "width": 0.23288484843644242,
-   "variant": 2,
+   "height": 0.19268462522394633,
+   "width": 0.17379879209631569,
+   "variant": 0,
    "pos": [
-    -2.333556589189867,
-    3.4290135803436157,
-    -4.194581462440389
+    -3.4715250105144753,
+    3.3963423126119734,
+    -3.314892773736804
    ],
-   "yaw": 3.649280040348369,
+   "yaw": 3.9500669726380493,
    "tint": [
     0.62,
     0.32,
     0.85
    ],
-   "depth": 0.22,
-   "inst": 101,
+   "depth": 0.18,
+   "inst": 21,
    "label": {
     "title": "Cuprum",
     "gloss": "copper",
@@ -4193,24 +4193,24 @@
   },
   {
    "band": 1,
-   "angle": 212.1540048996358,
+   "angle": 231.18742076124934,
    "row": 3,
-   "height": 0.20878892876556043,
-   "width": 0.18077146941115355,
-   "variant": 0,
+   "height": 0.2621626572521472,
+   "width": 0.20058890589776288,
+   "variant": 2,
    "pos": [
-    -2.554544685065933,
-    3.4043944643827806,
-    -4.063779208077304
+    -3.7401618039644777,
+    3.4310813286260737,
+    -3.0085195163344363
    ],
-   "yaw": 3.702785906790827,
+   "yaw": 4.034981681477296,
    "tint": [
-    0.62,
-    0.32,
-    0.85
+    0.25,
+    0.5,
+    0.9
    ],
-   "depth": 0.18,
-   "inst": 28,
+   "depth": 0.22,
+   "inst": 104,
    "label": {
     "title": "Plumbum",
     "gloss": "lead",
@@ -4220,24 +4220,24 @@
   },
   {
    "band": 1,
-   "angle": 214.89543349791367,
+   "angle": 233.73951663584543,
    "row": 3,
-   "height": 0.2112861123809304,
-   "width": 0.1785593009723533,
-   "variant": 0,
+   "height": 0.3563815363839106,
+   "width": 0.12701886214958977,
+   "variant": 1,
    "pos": [
-    -2.7459864245592986,
-    3.4056430561904656,
-    -3.936947873179939
+    -3.8704147166557323,
+    3.4781907681919555,
+    -2.83899452642916
    ],
-   "yaw": 3.7506328620391085,
+   "yaw": 4.0795241573155625,
    "tint": [
-    0.15,
-    0.7,
-    0.72
+    0.62,
+    0.32,
+    0.85
    ],
-   "depth": 0.18,
-   "inst": 29,
+   "depth": 0.12,
+   "inst": 61,
    "label": {
     "title": "Aurum potabile",
     "gloss": "potable gold",
@@ -4247,24 +4247,24 @@
   },
   {
    "band": 1,
-   "angle": 217.81365892056274,
+   "angle": 235.8490026432225,
    "row": 3,
-   "height": 0.2775074381360048,
-   "width": 0.21039406165768945,
-   "variant": 2,
+   "height": 0.34791793610225763,
+   "width": 0.12642891084380525,
+   "variant": 1,
    "pos": [
-    -2.9428579380789124,
-    3.4387537190680026,
-    -3.7920426100303697
+    -3.9722927891099764,
+    3.473958968051129,
+    -2.6946038665423333
    ],
-   "yaw": 3.801565503979738,
+   "yaw": 4.116341633669042,
    "tint": [
-    0.62,
-    0.32,
-    0.85
+    0.85,
+    0.22,
+    0.2
    ],
-   "depth": 0.22,
-   "inst": 102,
+   "depth": 0.12,
+   "inst": 62,
    "label": {
     "title": "Terra sigillata",
     "gloss": "sealed earth",
@@ -4274,240 +4274,240 @@
   },
   {
    "band": 1,
-   "angle": 221.07176614113462,
-   "row": 3,
-   "height": 0.2765290528671683,
-   "width": 0.2355070428093207,
-   "variant": 2,
+   "angle": 208.84488796232057,
+   "row": 4,
+   "height": 0.18958940176564287,
+   "width": 0.1920933017432876,
+   "variant": 0,
    "pos": [
-    -3.1536183825626605,
-    3.4382645264335845,
-    -3.618658742844215
+    -2.315712298988972,
+    4.124794700882822,
+    -4.2044591267261975
    ],
-   "yaw": 3.8584302023617183,
-   "tint": [
-    0.9,
-    0.62,
-    0.15
-   ],
-   "depth": 0.22,
-   "inst": 103,
-   "label": {
-    "title": "Cremor tartari",
-    "gloss": "cream of tartar",
-    "project": false,
-    "number": 82
-   }
-  },
-  {
-   "band": 1,
-   "angle": 224.3542997368751,
-   "row": 3,
-   "height": 0.24063920090478147,
-   "width": 0.21448674009947657,
-   "variant": 2,
-   "pos": [
-    -3.355647553294477,
-    3.420319600452391,
-    -3.43214648552022
-   ],
-   "yaw": 3.9157212214147186,
+   "yaw": 3.6450309209011653,
    "tint": [
     0.15,
     0.7,
     0.72
    ],
-   "depth": 0.22,
-   "inst": 104,
+   "depth": 0.18,
+   "inst": 22,
    "label": {
-    "title": "Alumen",
-    "gloss": "alum",
+    "title": "Spiritus vini",
+    "gloss": "spirit of wine",
     "project": false,
-    "number": 83
+    "number": 95
    }
   },
   {
    "band": 1,
-   "angle": 226.9561353259531,
-   "row": 3,
-   "height": 0.34778968078429107,
-   "width": 0.12145499710030742,
-   "variant": 1,
+   "angle": 211.6120913076569,
+   "row": 4,
+   "height": 0.2130570258240292,
+   "width": 0.1715560689605855,
+   "variant": 0,
    "pos": [
-    -3.507990532793916,
-    3.4738948403921457,
-    -3.2762787460514198
+    -2.5159950571261063,
+    4.136528512912015,
+    -4.087758416604021
    ],
-   "yaw": 3.9611318190396956,
+   "yaw": 3.693327730349486,
    "tint": [
     0.85,
     0.22,
     0.2
    ],
-   "depth": 0.12,
-   "inst": 68,
+   "depth": 0.18,
+   "inst": 23,
    "label": {
-    "title": "Borax",
-    "gloss": "tincal",
+    "title": "Oleum vitrioli",
+    "gloss": "oil of vitriol",
     "project": false,
-    "number": 84
+    "number": 96
    }
   },
   {
    "band": 1,
-   "angle": 231.32679054676362,
-   "row": 3,
-   "height": 0.2064145909652022,
-   "width": 0.18091122030007806,
+   "angle": 213.9170173684536,
+   "row": 4,
+   "height": 0.35004410326983465,
+   "width": 0.11463799928830307,
+   "variant": 1,
+   "pos": [
+    -2.6783597068089193,
+    4.205022051634917,
+    -3.983263646928539
+   ],
+   "yaw": 3.7335562791254113,
+   "tint": [
+    0.9,
+    0.62,
+    0.15
+   ],
+   "depth": 0.12,
+   "inst": 63,
+   "label": {
+    "title": "Cinnabaris",
+    "gloss": "vermilion",
+    "project": false,
+    "number": 97
+   }
+  },
+  {
+   "band": 1,
+   "angle": 215.8662876604301,
+   "row": 4,
+   "height": 0.35875752913890074,
+   "width": 0.11196537293218631,
+   "variant": 1,
+   "pos": [
+    -2.8122990421805265,
+    4.2093787645694505,
+    -3.889855279743772
+   ],
+   "yaw": 3.7675774637317123,
+   "tint": [
+    0.2,
+    0.75,
+    0.38
+   ],
+   "depth": 0.12,
+   "inst": 64,
+   "label": {
+    "title": "Antimonium",
+    "gloss": "stibnite",
+    "project": false,
+    "number": 98
+   }
+  },
+  {
+   "band": 1,
+   "angle": 218.26328412183562,
+   "row": 4,
+   "height": 0.20922571155843583,
+   "width": 0.18965523900554102,
    "variant": 0,
    "pos": [
-    -3.7474688400300704,
-    3.403207295482601,
-    -2.9994128247048093
+    -2.9725248465880667,
+    4.134612855779218,
+    -3.7688321846981454
    ],
-   "yaw": 4.0374141431123185,
+   "yaw": 3.809412944141892,
    "tint": [
     0.25,
     0.5,
     0.9
    ],
    "depth": 0.18,
-   "inst": 30,
+   "inst": 24,
    "label": {
-    "title": "Camphora",
-    "gloss": "camphor",
+    "title": "Tinctura solis",
+    "gloss": "tincture of the sun",
     "project": false,
-    "number": 85
+    "number": 99
    }
   },
   {
    "band": 1,
-   "angle": 234.22532083575769,
-   "row": 3,
-   "height": 0.2680769488498764,
-   "width": 0.20474219101252106,
-   "variant": 2,
+   "angle": 223.03117999918612,
+   "row": 4,
+   "height": 0.1995263027487446,
+   "width": 0.18956145382263612,
+   "variant": 0,
    "pos": [
-    -3.8943468060810753,
-    3.4340384744249386,
-    -2.8060760777224365
+    -3.2755020340554286,
+    4.129763151374372,
+    -3.5087157800110793
    ],
-   "yaw": 4.088003040124048,
+   "yaw": 3.892628425593922,
    "tint": [
     0.2,
     0.75,
     0.38
    ],
-   "depth": 0.22,
-   "inst": 105,
+   "depth": 0.18,
+   "inst": 25,
    "label": {
-    "title": "Balsamum",
-    "gloss": "balsam",
+    "title": "Elixir vitae",
+    "gloss": "elixir of life",
     "project": false,
-    "number": 86
+    "number": 100
    }
   },
   {
    "band": 1,
-   "angle": 237.25537419463888,
-   "row": 3,
-   "height": 0.25410031813414224,
-   "width": 0.2029481221739409,
-   "variant": 2,
+   "angle": 225.47030035792116,
+   "row": 4,
+   "height": 0.3299698352846952,
+   "width": 0.11911708485594372,
+   "variant": 1,
    "pos": [
-    -4.037230806041615,
-    3.4270501590670714,
-    -2.5962987922711402
+    -3.421857755739927,
+    4.194984917642348,
+    -3.3661386631394907
    ],
-   "yaw": 4.140887447747638,
+   "yaw": 3.9351991067062735,
+   "tint": [
+    0.25,
+    0.5,
+    0.9
+   ],
+   "depth": 0.12,
+   "inst": 65,
+   "label": {
+    "title": "Aqua fortis",
+    "gloss": "strong water",
+    "project": false,
+    "number": 101
+   }
+  },
+  {
+   "band": 1,
+   "angle": 227.48720036080053,
+   "row": 4,
+   "height": 0.3145476533426204,
+   "width": 0.11881775418784289,
+   "variant": 1,
+   "pos": [
+    -3.538206692963931,
+    4.18727382667131,
+    -3.2436234981676355
+   ],
+   "yaw": 3.9704006524400017,
    "tint": [
     0.62,
     0.32,
     0.85
    ],
-   "depth": 0.22,
-   "inst": 106,
+   "depth": 0.12,
+   "inst": 66,
    "label": {
-    "title": "Succinum",
-    "gloss": "amber",
+    "title": "Sulphur",
+    "gloss": "brimstone",
     "project": false,
-    "number": 87
+    "number": 102
    }
   },
   {
    "band": 1,
-   "angle": 240.12420914155396,
-   "row": 3,
-   "height": 0.20785457216240333,
-   "width": 0.17772978681753074,
-   "variant": 0,
-   "pos": [
-    -4.162115026491983,
-    3.4039272860812018,
-    -2.3909827490489435
-   ],
-   "yaw": 4.190958063267583,
-   "tint": [
-    0.85,
-    0.22,
-    0.2
-   ],
-   "depth": 0.18,
-   "inst": 31,
-   "label": {
-    "title": "Galbanum",
-    "gloss": "resin",
-    "project": false,
-    "number": 88
-   }
-  },
-  {
-   "band": 1,
-   "angle": 242.88872315035033,
-   "row": 3,
-   "height": 0.20427125491158182,
-   "width": 0.18546898122410888,
-   "variant": 0,
-   "pos": [
-    -4.272591013732773,
-    3.4021356274557912,
-    -2.187456520566743
-   ],
-   "yaw": 4.239207934938587,
-   "tint": [
-    0.9,
-    0.62,
-    0.15
-   ],
-   "depth": 0.18,
-   "inst": 32,
-   "label": {
-    "title": "Opopanax",
-    "gloss": "gum",
-    "project": false,
-    "number": 89
-   }
-  },
-  {
-   "band": 1,
-   "angle": 208.92333521102384,
+   "angle": 229.4939783593684,
    "row": 4,
-   "height": 0.2657508132237931,
-   "width": 0.2052372644217123,
-   "variant": 2,
+   "height": 0.3140996650700141,
+   "width": 0.11742112675543925,
+   "variant": 1,
    "pos": [
-    -2.321466715607993,
-    4.162875406611897,
-    -4.201284599777102
+    -3.6496209891040534,
+    4.187049832535007,
+    -3.1177342150817084
    ],
-   "yaw": 3.646400083680168,
+   "yaw": 4.005425535871593,
    "tint": [
-    0.85,
-    0.22,
-    0.2
+    0.2,
+    0.75,
+    0.38
    ],
-   "depth": 0.22,
-   "inst": 107,
+   "depth": 0.12,
+   "inst": 67,
    "label": {
     "title": "Nitrum",
     "gloss": "saltpetre",
@@ -4517,24 +4517,24 @@
   },
   {
    "band": 1,
-   "angle": 212.09797041923662,
+   "angle": 231.87239380281926,
    "row": 4,
-   "height": 0.27079435566334187,
-   "width": 0.22667797013555863,
-   "variant": 2,
+   "height": 0.20865516299405043,
+   "width": 0.18108620574214315,
+   "variant": 0,
    "pos": [
-    -2.55056914414919,
-    4.165397177831672,
-    -4.066275573656325
+    -3.77586062879881,
+    4.1343275814970255,
+    -2.963591826127049
    ],
-   "yaw": 3.701807920613217,
+   "yaw": 4.046936716340092,
    "tint": [
-    0.9,
-    0.62,
-    0.15
+    0.25,
+    0.5,
+    0.9
    ],
-   "depth": 0.22,
-   "inst": 108,
+   "depth": 0.18,
+   "inst": 26,
    "label": {
     "title": "Lapis lunaris",
     "gloss": "moonstone",
@@ -4544,24 +4544,24 @@
   },
   {
    "band": 1,
-   "angle": 215.44041426656946,
+   "angle": 234.3158412337765,
    "row": 4,
-   "height": 0.24283550995283654,
-   "width": 0.2333538717746976,
-   "variant": 2,
+   "height": 0.3458279385596447,
+   "width": 0.12831734084601992,
+   "variant": 1,
    "pos": [
-    -2.78330874419589,
-    4.151417754976419,
-    -3.910651152235738
+    -3.898775204686049,
+    4.202913969279822,
+    -2.799919981593271
    ],
-   "yaw": 3.7601445708122014,
+   "yaw": 4.089582919109692,
    "tint": [
-    0.15,
-    0.7,
-    0.72
+    0.25,
+    0.5,
+    0.9
    ],
-   "depth": 0.22,
-   "inst": 109,
+   "depth": 0.12,
+   "inst": 68,
    "label": {
     "title": "Argentum vivum",
     "gloss": "living silver",
@@ -4571,245 +4571,29 @@
   },
   {
    "band": 1,
-   "angle": 221.77215096571456,
+   "angle": 238.91851607228446,
    "row": 4,
-   "height": 0.20681915658678596,
-   "width": 0.16401433937308676,
-   "variant": 0,
-   "pos": [
-    -3.197616227741884,
-    4.133409578293393,
-    -3.5798394461318748
-   ],
-   "yaw": 3.8706542235816412,
-   "tint": [
-    0.62,
-    0.32,
-    0.85
-   ],
-   "depth": 0.18,
-   "inst": 33,
-   "label": {
-    "title": "Essentia rosae",
-    "gloss": "attar of rose",
-    "project": false,
-    "number": 106
-   }
-  },
-  {
-   "band": 1,
-   "angle": 224.63651673607066,
-   "row": 4,
-   "height": 0.26479976455401943,
-   "width": 0.21591475189863532,
+   "height": 0.2517154580382911,
+   "width": 0.2264706458719833,
    "variant": 2,
    "pos": [
-    -3.3725122132729894,
-    4.16239988227701,
-    -3.415576286854757
+    -4.110883037349055,
+    4.155857729019146,
+    -2.4780316086030485
    ],
-   "yaw": 3.920646837255779,
-   "tint": [
-    0.62,
-    0.32,
-    0.85
-   ],
-   "depth": 0.22,
-   "inst": 110,
-   "label": {
-    "title": "Vitriolum",
-    "gloss": "green vitriol",
-    "project": false,
-    "number": 107
-   }
-  },
-  {
-   "band": 1,
-   "angle": 227.22420025123031,
-   "row": 4,
-   "height": 0.3197247087133162,
-   "width": 0.11765578255688278,
-   "variant": 1,
-   "pos": [
-    -3.523280531666284,
-    4.189862354356658,
-    -3.259830408960158
-   ],
-   "yaw": 3.9658104345948955,
-   "tint": [
-    0.85,
-    0.22,
-    0.2
-   ],
-   "depth": 0.12,
-   "inst": 69,
-   "label": {
-    "title": "Cuprum",
-    "gloss": "copper",
-    "project": false,
-    "number": 108
-   }
-  },
-  {
-   "band": 1,
-   "angle": 229.74874363793106,
-   "row": 4,
-   "height": 0.25045780324090594,
-   "width": 0.20533552183393175,
-   "variant": 2,
-   "pos": [
-    -3.6634478477545036,
-    4.155228901620453,
-    -3.1014754338512662
-   ],
-   "yaw": 4.009872028802272,
-   "tint": [
-    0.9,
-    0.62,
-    0.15
-   ],
-   "depth": 0.22,
-   "inst": 111,
-   "label": {
-    "title": "Plumbum",
-    "gloss": "lead",
-    "project": false,
-    "number": 109
-   }
-  },
-  {
-   "band": 1,
-   "angle": 232.85719415062013,
-   "row": 4,
-   "height": 0.25161305601618983,
-   "width": 0.21549036055067466,
-   "variant": 2,
-   "pos": [
-    -3.8262386293080084,
-    4.155806528008095,
-    -2.89825774416134
-   ],
-   "yaw": 4.064124724884002,
-   "tint": [
-    0.15,
-    0.7,
-    0.72
-   ],
-   "depth": 0.22,
-   "inst": 112,
-   "label": {
-    "title": "Aurum potabile",
-    "gloss": "potable gold",
-    "project": false,
-    "number": 110
-   }
-  },
-  {
-   "band": 1,
-   "angle": 236.06861727866226,
-   "row": 4,
-   "height": 0.26357913101261116,
-   "width": 0.22258874913601884,
-   "variant": 2,
-   "pos": [
-    -3.9825919961444267,
-    4.1617895655063055,
-    -2.679358317255525
-   ],
-   "yaw": 4.120174632143033,
-   "tint": [
-    0.62,
-    0.32,
-    0.85
-   ],
-   "depth": 0.22,
-   "inst": 113,
-   "label": {
-    "title": "Terra sigillata",
-    "gloss": "sealed earth",
-    "project": false,
-    "number": 111
-   }
-  },
-  {
-   "band": 1,
-   "angle": 238.7450242625115,
-   "row": 4,
-   "height": 0.34316118812129004,
-   "width": 0.1258475451827642,
-   "variant": 1,
-   "pos": [
-    -4.103360714986644,
-    4.201580594060645,
-    -2.490467996723569
-   ],
-   "yaw": 4.166886746134573,
+   "yaw": 4.169914749440355,
    "tint": [
     0.25,
     0.5,
     0.9
    ],
-   "depth": 0.12,
-   "inst": 70,
+   "depth": 0.22,
+   "inst": 105,
    "label": {
-    "title": "Cremor tartari",
-    "gloss": "cream of tartar",
+    "title": "Essentia rosae",
+    "gloss": "attar of rose",
     "project": false,
-    "number": 112
-   }
-  },
-  {
-   "band": 1,
-   "angle": 240.7824603598167,
-   "row": 4,
-   "height": 0.335223545123475,
-   "width": 0.11552814950804635,
-   "variant": 1,
-   "pos": [
-    -4.189308914834097,
-    4.1976117725617375,
-    -2.3430089236047658
-   ],
-   "yaw": 4.202446714331532,
-   "tint": [
-    0.2,
-    0.75,
-    0.38
-   ],
-   "depth": 0.12,
-   "inst": 71,
-   "label": {
-    "title": "Alumen",
-    "gloss": "alum",
-    "project": false,
-    "number": 113
-   }
-  },
-  {
-   "band": 1,
-   "angle": 242.75875428955868,
-   "row": 4,
-   "height": 0.32530075156597055,
-   "width": 0.11560307667923621,
-   "variant": 1,
-   "pos": [
-    -4.267618032972069,
-    4.192650375782986,
-    -2.197142763830246
-   ],
-   "yaw": 4.236939550392707,
-   "tint": [
-    0.2,
-    0.75,
-    0.38
-   ],
-   "depth": 0.12,
-   "inst": 72,
-   "label": {
-    "title": "Borax",
-    "gloss": "tincal",
-    "project": false,
-    "number": 114
+    "number": 106
    }
   }
  ],

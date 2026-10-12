@@ -174,9 +174,10 @@ def save_img(name, arr, q=88):
     return name + ".webp"
 
 
-def jar_entries(slots):
-    """One label per jar: the site's project first, then alchemical names in Latin with a gloss."""
-    proj = json.load(open("src/data/projects.json"))
+def jar_entries(slots, names=None, first_project=True):
+    """One label per jar: the site's project first, then names with a gloss (alchemical Latin, or the pantry's spices)."""
+    proj = json.load(open("src/data/projects.json")) if first_project else []
+    names = names or T.JAR_NAMES
     order = sorted(range(len(slots)), key=lambda i: (slots[i]["row"], slots[i]["band"], slots[i]["angle"]))
     entries = [None] * len(slots)
     for rank, i in enumerate(order):
@@ -184,7 +185,7 @@ def jar_entries(slots):
             t, g = proj[rank]["name"], proj[rank]["description"].split(".")[0].lower()
             pub = True
         else:
-            t, g = T.JAR_NAMES[(rank - len(proj)) % len(T.JAR_NAMES)]
+            t, g = names[(rank - len(proj)) % len(names)]
             pub = False
         entries[i] = (t, g, rank + 1)
         slots[i]["label"] = {"title": t, "gloss": g, "project": pub, "number": rank + 1}
@@ -194,8 +195,8 @@ def jar_entries(slots):
 def gen_typeset(name):
     """Textures that carry type. Returns {diff, nor, arm} file names."""
     t = {"diff": None, "nor": None, "arm": None}
-    if name == "spinelabel" and m.get("labelSet") == "jars":
-        atlas, cols, rows = T.jar_atlas(jar_entries(m["slots"]))
+    if name == "spinelabel" and m.get("labelSet") in ("jars", "pantry"):
+        atlas, cols, rows = T.jar_atlas(jar_entries(m["slots"], T.PANTRY_NAMES if m["labelSet"] == "pantry" else None, m["labelSet"] == "jars"))
         t["diff"] = save_img("jarlabel_diff", atlas, 90)
         m["spineAtlas"] = {"cols": cols, "rows": rows, "cell": [256, 176], "size": 4096}
     elif name == "spinelabel":
@@ -229,6 +230,22 @@ def gen_typeset(name):
     elif name == "labcards":
         labels = [("I.1", "Tinctures"), ("I.2", "Elixirs"), ("I.3", "Salts"), ("II.1", "Essences"), ("II.2", "Minerals"), ("II.3", "Projects")]
         t["diff"] = save_img("labcards_diff", T.shelf_cards(labels), 90)
+    elif name == "portalview":
+        t["diff"] = save_img("portalview_diff", T.portal_atlas(512), 90)
+    elif name == "chalk":
+        t["diff"] = save_img("chalk_diff", T.spell_ring(1, 1024), 90)
+    elif name == "tapestry":
+        t["diff"] = save_img("tapestry_diff", T.tapestry(768, 1152), 90)
+    elif name == "quilt":
+        a, n = T.quilt(1024)
+        t["diff"], t["nor"] = save_img("quilt_diff", a, 90), save_img("quilt_nor", n, 92)
+    elif name == "linen":
+        t["diff"] = save_img("linen_diff", T.linen(512), 88)
+    elif name == "slate":
+        t["diff"] = save_img("slate_diff", T.slate(1024, 768), 90)
+    elif name == "glaze":
+        a, n, r = T.glaze(512)
+        t["diff"], t["nor"], t["arm"] = save_img("glaze_diff", a, 90), save_img("glaze_nor", n, 92), save_img("glaze_arm", r, 92)
     elif name == "starchart":
         t["diff"] = save_img("starchart_diff", T.star_chart(1024), 90)
     elif name == "grimoire":
@@ -244,7 +261,7 @@ for path in sorted(glob.glob(os.path.join(PUB, "*.json"))):
         t = {"diff": None, "nor": None, "arm": None}
         size = mat["size"]
         name = mat["name"]
-        if mat.get("gen") in ("spinelabel", "pages", "letter", "plaque", "cards", "grimoire", "brew", "spell1", "spell2", "spell3", "labplaque", "labcards", "starchart", "obsplaque"):
+        if mat.get("gen") in ("spinelabel", "pages", "letter", "plaque", "cards", "grimoire", "brew", "spell1", "spell2", "spell3", "labplaque", "labcards", "starchart", "obsplaque", "portalview", "chalk", "tapestry", "quilt", "linen", "slate", "glaze"):
             t = gen_typeset(mat["gen"])
         elif mat.get("gen"):
             g = mat["gen"]

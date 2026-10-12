@@ -7,7 +7,6 @@ tsconfig.tsbuildinfo
 dist-spike
 spike/out
 spike/assets-src
-spike/public/library.bin
-spike/public/library.books.bin
-spike/public/library.json
 spike/public/tex
+spike/public/*.bin
+spike/public/*.json

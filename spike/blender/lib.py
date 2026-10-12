@@ -81,6 +81,9 @@ material("letter", gen="letter", rough=0.88, metal=0.0, size=1024)
 material("plaque", gen="plaque", size=1024)
 material("cards", gen="cards", rough=0.7, metal=0.0, size=1024, tint=(0.9, 0.87, 0.8))
 material("grimoire", gen="grimoire", size=1024)
+material("glass", None, tint=(0.8, 0.92, 0.95), rough=0.05, metal=0.0, alpha=0.16, blend="alpha")
+material("liquid", None, tint=(1, 1, 1), rough=0.25, metal=0.0, emissive=0.32)
+material("cork", None, tint=(0.5, 0.36, 0.22), rough=0.92, metal=0.0)
 material("rug", gen="rug", tile=5.0, rough=0.95, metal=0.0, size=1024)["centered"] = True
 material("globe", gen="globe", tile=1.0, rough=0.35, metal=0.0, size=1024)
 material("gilt", None, tint=(0.78, 0.58, 0.24), rough=0.42, metal=1.0)
@@ -182,6 +185,7 @@ def emit(bm, M, mat, emissive=0.0, tint=None, tint_mode=0, side=0, scale_uv=True
     """Triangulate and append a primitive. `tint` (rgb 0..1) multiplies the texture, or replaces its colour
     in proportion to `tint_mode`. Imported scans pass `uvlayer` and `matof` (face -> material name)."""
     bmesh.ops.triangulate(bm, faces=bm.faces[:])
+    bm.normal_update()                        # a reversed face keeps its old normal until told otherwise
     bm.faces.ensure_lookup_table()
     bm.verts.index_update()
     spec0 = MATS[mat] if mat else None
@@ -262,23 +266,36 @@ def arcbox(w, h, d, ang, rad, y, ry_extra=0.0, **kw):
     box(w, h, d, (rad * math.sin(a), y, rad * math.cos(a)), a + ry_extra, **kw)
 
 
-def quad_uv(w, h, pos, mat, uv=(0.0, 0.0, 1.0, 1.0), up=False, flag=0, ry=0.0, **kw):
+def quad_uv(w, h, pos, mat, uv=(0.0, 0.0, 1.0, 1.0), up=False, flag=0, ry=0.0, cell=0.25, **kw):
     """A flat sheet that carries type. Standing (default) it faces local -z, as a spine or a plaque does toward the room;
     `up` lays it facing +y, as a letter on a desk does. `uv` is the rectangle of the texture it shows, in image
-    coordinates, laid out for a reader looking at it: u runs to the reader's right, v down the page."""
+    coordinates, laid out for a reader looking at it: u runs to the reader's right, v down the page. Sheets bigger than
+    `cell` are cut into a grid so baked occlusion has vertices to land on."""
     bm = bmesh.new()
-    pts = ([(-w / 2, 0, -h / 2), (w / 2, 0, -h / 2), (w / 2, 0, h / 2), (-w / 2, 0, h / 2)] if up
-           else [(-w / 2, -h / 2, 0), (w / 2, -h / 2, 0), (w / 2, h / 2, 0), (-w / 2, h / 2, 0)])
-    f = bm.faces.new([bm.verts.new(p) for p in pts])
-    if (up and f.normal.y < 0) or (not up and f.normal.z > 0):
+    nx, ny = max(1, math.ceil(w / cell)), max(1, math.ceil(h / cell))
+    verts = []
+    for j in range(ny + 1):
+        row = []
+        for i in range(nx + 1):
+            x, y = -w / 2 + w * i / nx, -h / 2 + h * j / ny
+            row.append(bm.verts.new((x, 0, y) if up else (x, y, 0)))
+        verts.append(row)
+    for j in range(ny):
+        for i in range(nx):
+            f = bm.faces.new((verts[j][i], verts[j][i + 1], verts[j + 1][i + 1], verts[j + 1][i]))
+    bm.normal_update()
+    bm.faces.ensure_lookup_table()
+    f0 = bm.faces[0]
+    if (up and f0.normal.y < 0) or (not up and f0.normal.z > 0):
         bmesh.ops.reverse_faces(bm, faces=bm.faces[:])
     uvl = bm.loops.layers.uv.verify()
     u0, v0, u1, v1 = uv
-    for lp in f.loops:
-        c = lp.vert.co
-        u = u0 + (0.5 - c.x / w) * (u1 - u0)
-        v = v0 + (0.5 - (c.z if up else c.y) / h) * (v1 - v0)
-        lp[uvl].uv = (u, 1.0 - v)
+    for f in bm.faces:
+        for lp in f.loops:
+            c = lp.vert.co
+            u = u0 + (0.5 - c.x / w) * (u1 - u0)
+            v = v0 + (0.5 - (c.z if up else c.y) / h) * (v1 - v0)
+            lp[uvl].uv = (u, 1.0 - v)
     emit(bm, STACK[-1] @ frame(pos, ry), mat, uvlayer=uvl, flag=flag, smooth=89.0, **kw)
 
 
@@ -326,6 +343,7 @@ def quad(w, h, pos, mat, **kw):
     bm = bmesh.new()
     vs = [bm.verts.new(v) for v in ((-w / 2, -h / 2, 0), (-w / 2, h / 2, 0), (w / 2, h / 2, 0), (w / 2, -h / 2, 0))]
     bm.faces.new(vs)
+    bm.normal_update()
     bm.faces.ensure_lookup_table()
     if bm.faces[0].normal.z > 0:
         bmesh.ops.reverse_faces(bm, faces=bm.faces[:])
@@ -384,6 +402,7 @@ def blade(base, direction, length, width, lift, droop, mat, tint, segs=5, **kw):
     for i in range(segs):
         (a0, a1), (b0, b1) = cols[i], cols[i + 1]
         bm.faces.new((a0, a1, b1, b0))
+    bm.normal_update()
     bm.faces.ensure_lookup_table()
     if bm.faces[0].normal.y < 0:
         bmesh.ops.reverse_faces(bm, faces=bm.faces[:])
@@ -621,6 +640,7 @@ def leaf(width, depth, lift, side=1, mat="pages", nx=10, nz=3, **kw):
     for i in range(nx):
         for k in range(nz):
             bm.faces.new((g[i][k], g[i + 1][k], g[i + 1][k + 1], g[i][k + 1]))
+    bm.normal_update()
     bm.faces.ensure_lookup_table()
     if bm.faces[0].normal.y < 0:
         bmesh.ops.reverse_faces(bm, faces=bm.faces[:])

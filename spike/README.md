@@ -5,8 +5,9 @@ buys. It builds beside the site (`vite.spike.config.ts`); nothing in the real bu
 
     npm run spike:fetch     # CC0 Poly Haven scans + PBR sets -> spike/assets-src   (not committed, ~70 MB)
     npm run spike:model     # Blender assembles the room -> spike/public, then pack-assets.py writes the WebP
-    npm run spike:render -- spike/out/shot.png [--cam x,y,z --look x,y,z --fov 62 --exposure 1.4]
-    node spike/tools/bench.mjs
+    npm run spike:dev       # Vite on the spike; open ?floor=library|lab|obs|sanctum|quarters|kitchen|bath, [ ] changes floor
+    npm run spike:render -- spike/out/shot.png --floor lab [--cam x,y,z --look x,y,z --fov 62 --exposure 1.4 --time 4]
+    node spike/tools/bench.mjs --floor kitchen
     npm run spike:build && npm run spike:browser   # build, then load it in the cached Chrome and screenshot
 
 The generated files in `spike/public` are gitignored; the three commands above recreate them.
@@ -14,7 +15,30 @@ The generated files in `spike/public` are gitignored; the three commands above r
 through the same `src/library.ts` the page imports. `spike:browser` serves the build from a throwaway static
 server and loads it in real Chrome with WebGPU, to check the browser path itself.
 
-## What is in the room
+## The floors
+
+Each floor is a module in `blender/` (`floor_<name>.py`) over the shared `lib.py` (materials, primitives, scans, occlusion, writer) and `arch.py` (floor,
+wall, mouldings, window, balustrade); `model.py --floor <name>` builds one. `npm run spike:model` builds all seven.
+
+| floor | what is in it | triangles | mesh MB raw / gzip | textures MB |
+|---|---|---|---|---|
+| library | bookcases with 585 instanced, typeset books that fly out and back; desk, lectern, globe, ladder on a brass rail, sun through the window | 415k | 16.7 / 6.5 | 10.8 |
+| lab | cast-iron cauldron with a real fire, a spell circle of turning runes, flasks orbiting it, a brass still, glassware, 106 labelled apothecary jars | 213k | 9.5 / 3.6 | 6.5 |
+| obs | a battlemented roof under stars and a comet: a brass refractor, an orrery and an armillary that turn, a typeset planisphere, a brazier, the letter rack | 134k | 5.7 / 2.2 | 3.9 |
+| sanctum | a stone vault round the gate, whose disc shows seven painted worlds in turn; chalk circle, offering table, trapdoor, relic crate | 129k | 5.4 / 2.0 | 3.8 |
+| quarters | a turned-post bed under a patchwork quilt, a tapestry of a tower under a moon, a candle, a mirror, a cat, robes on a line | 175k | 7.5 / 2.8 | 5.7 |
+| kitchen | a stone hearth with a flame drawn in the shader and a steaming kettle, a laden table, a spice pantry of labelled jars, dishes that wash themselves in the air, a chalked slate | 171k | 7.2 / 2.7 | 4.0 |
+| bath | a tiled, vaulted cellar round a sunken cedar ofuro with rippling water and steam, a window onto a meadow and a coast, hanging plants | 151k | 6.8 / 2.3 | 2.7 |
+
+Frame cost at 1920x1080 with 4x MSAA, shadows, bloom and the beam: 4.3 ms (library), 3.9 (lab), 3.2 (obs), 2.8 (sanctum), 3.1 (quarters), 3.2 (kitchen),
+2.8 (bath), on an M4 Pro.
+
+New materials the renderer understands, picked by a material's `blend`: `alpha` and glass (a Fresnel skin over a tint), `additive` (the spell rings,
+chalk), `portal` (a disc that crossfades between cells of a painted atlas, with a ripple), `fire` (a flame drawn in the fragment: rising, licking, hot
+at the heart), `water` (a rippling normal, Fresnel reflection of the room, a deep tint) and `steam` (wisps that thin as they rise). Per-floor
+`atmosphere` sets the sun or moon, sky, stars, ambient light and exposure; `spinners` and `orbiters` animate props from the clock.
+
+## The library floor in detail
 
 `blender/model_library.py` builds it, in the site's own coordinates (x = r sin a, z = r cos a):
 
@@ -67,20 +91,6 @@ caps, Newsreader for text, JetBrains Mono for tracked capitals, Pirata One for t
   the ray passes through the glass; dust motes shine only where the sun reaches them.
 - 4x MSAA in HDR, a five-level bloom, ACES, grade, vignette and grain. Full resolution; `?scale=0.5` on the page
   trades sharpness for speed.
-
-## Numbers (M4 Pro, headless, submit to GPU idle)
-
-| | |
-|---|---|
-| 1920x1080, 4x MSAA, shadows, beam, bloom | 4.3 ms median, 4.9 ms p95 |
-| room mesh | 422k vertices, 412k triangles, 41 materials |
-| mesh file | 10 MB raw, 6.5 MB gzip |
-| textures | 8.1 MB WebP (1k for hero pieces, 512 for small props) |
-| page JS | 254 KB, 80 KB gzip, vgpu included (the tower ships three 552 KB + scene 211 KB) |
-
-One floor at this fidelity is about 15 MB over the wire, so seven would be too many as-is. The levers, in order of
-effect: meshopt-compress the vertex stream (typically 3-5x over gzip), KTX2/Basis textures instead of WebP, 512 px
-for everything that is not a hero, lower decimation budgets on the scans, and streaming floors on demand.
 
 ## Not done yet
 
