@@ -3,6 +3,7 @@ import type { Draw, Effect, Frame, Gpu, SharedUniforms, Surface, Target, Texture
 import type { ShaderSource } from '@vgpu/wgsl';
 import { mat4 } from 'wgpu-matrix';
 import { makeTexture, solid, type Img } from './textures.ts';
+import { CYCLE, flightPose, type Orbit, type Slot } from './flights.ts';
 
 /* The library floor, rendered with vgpu from the mesh and textures model_library.py and pack-assets.py made.
  *
@@ -27,17 +28,18 @@ export interface Manifest {
   lights: { name: string; pos: V3; color: V3; intensity: number; range: number; flicker: number; shadow: number }[];
   window: { center: V3; normal: V3; right: V3; radius: number; towardSun: V3 };
   globe: { pos: V3; spin: number; tilt: number };
+  flyingCount: number;
   flyingBooks: { r: number; a0: number; y: number; sp: number; spread: number; tint: V3 }[];
   flyingCenter: V3;
   shelfBooks: { file: string; count: number; variants: { group: string; first: number; count: number }[] };
-  slots: { band: number; angle: number; row: number; height: number }[];
+  slots: { band: number; angle: number; row: number; height: number; pos: V3; yaw: number; tint: V3; depth: number; inst: number }[];
   camera: { pos: V3; target: V3 };
 }
 export interface View { pos: V3; target: V3; fov?: number }
 type Src = string | ShaderSource;
 export interface Sources { pbr: Src; godrays: Src; composite: Src; down: Src; up: Src }
 export interface Loaders { image: (url: string) => Promise<Img>; bytes: (url: string) => Promise<ArrayBuffer> }
-export interface Options { debug?: number; scale?: number; shadowSize?: number; bloom?: number; rays?: number; exposure?: number }
+export interface Options { flights?: boolean; debug?: number; scale?: number; shadowSize?: number; bloom?: number; rays?: number; exposure?: number }
 
 const HDR: GPUTextureFormat = 'rgba16float';
 const BLOOM_LEVELS = 5;
@@ -74,6 +76,14 @@ export class LibraryScene {
   private params: { exposure: number; bloom: number; vignette: number; time: number; rays: number; pad0: number; pad1: number; pad2: number };
   private scale: number;
   private out: Surface | Target;
+  private shelfBuf!: ReturnType<typeof storage>;
+  private shelfData!: Float32Array<ArrayBuffer>;
+  private shelfLive!: Float32Array<ArrayBuffer>;
+  private readonly hidden = new Set<number>();
+  private readonly orbits: Orbit[] = [];
+  private flightsOn = true;
+  private readonly flightSlot: number[] = [];
+  private readonly flightCycle: number[] = [];
 
   static async create(gpu: Gpu, manifest: Manifest, bin: ArrayBuffer, src: Sources, load: Loaders, out: Surface | Target, opts: Options = {}) {
     // textures: each file once; a missing map gets a neutral 1x1
@@ -161,7 +171,16 @@ export class LibraryScene {
     this.scene = target(gpu, { size: sceneSize, format: HDR, depth: 'depth32float', msaa: true, label: 'library-scene' });
 
     const shelfBuf = storage(gpu, Math.max(48, shelfBooks.byteLength), 'read');
-    shelfBuf.write(new Float32Array(shelfBooks));
+    this.shelfData = new Float32Array(shelfBooks.slice(0));
+    this.shelfLive = new Float32Array(shelfBooks.slice(0));
+    shelfBuf.write(this.shelfLive);
+    this.shelfBuf = shelfBuf;
+    this.flightsOn = opts.flights ?? true;
+    const nFly = manifest.flyingCount ?? manifest.flyingBooks.length;
+    for (let i = 0; i < nFly; i++) {
+      this.orbits.push({ r: 1.3 + (i % 3) * 0.45, a0: (i / nFly) * Math.PI * 2, sp: 0.32 + (i % 2) * 0.08, y: 2.3 + (i % 3) * 0.35 });
+      this.flightSlot.push(-1); this.flightCycle.push(-1);
+    }
     const base = { G: this.G, samp: linear, sunShadow: this.shadow, globeModel: this.globeModel, books: this.bookData };
     const globals = { G: this.G };
 
@@ -187,7 +206,7 @@ export class LibraryScene {
     for (const m of manifest.meshes.filter((x) => x.group === 'book')) {
       const d = draw(gpu, {
         label: `books-${m.material}`, shader: src.pbr, entry: { vertex: 'vs_book', fragment: 'fs_pbr' }, geometry: range(m), cull: 'none',
-        instances: manifest.flyingBooks.length, depth: { compare: 'less', write: true }, set: { ...base, ...matBindings(specs.get(m.material)!) },
+        instances: nFly, depth: { compare: 'less', write: true }, set: { ...base, ...matBindings(specs.get(m.material)!) },
       });
       this.bookDraws.push(d); this.opaque.push(d);
     }
@@ -223,7 +242,7 @@ export class LibraryScene {
         for (const m of manifest.meshes.filter((x) => x.group === 'globe'))
           out.push(draw(gpu, { label: 'shadow-globe', ...base, entry: { vertex: 'vs_shadow_globe', fragment: 'fs_shadow' }, geometry: range(m), set: { ...globals, globeModel: this.globeModel, casterVP: vp } }));
         for (const m of manifest.meshes.filter((x) => x.group === 'book'))
-          out.push(draw(gpu, { label: 'shadow-books', ...base, entry: { vertex: 'vs_shadow_book', fragment: 'fs_shadow' }, geometry: range(m), instances: manifest.flyingBooks.length, set: { ...globals, books: this.bookData, casterVP: vp } }));
+          out.push(draw(gpu, { label: 'shadow-books', ...base, entry: { vertex: 'vs_shadow_book', fragment: 'fs_shadow' }, geometry: range(m), instances: nFly, set: { ...globals, books: this.bookData, casterVP: vp } }));
       }
       return out;
     };
@@ -270,6 +289,49 @@ export class LibraryScene {
     return new Float32Array(mat4.multiply(proj, view));
   }
 
+  /** Slot for flight `i` in cycle `k`: a book from somewhere on the shelves, never one already away. */
+  private chooseSlot(i: number, k: number): number {
+    const slots = this.manifest.slots;
+    let idx = Math.floor((Math.sin(i * 91.7 + k * 13.37 + 1.7) * 43758.5453 % 1 + 1) % 1 * slots.length);
+    for (let tries = 0; tries < slots.length; tries++) {
+      if (!this.flightSlot.includes(idx) && slots[idx].row > 0) return idx;
+      idx = (idx + 1) % slots.length;
+    }
+    return idx;
+  }
+
+  private setShelfVisible(inst: number, visible: boolean): void {
+    if (visible !== this.hidden.has(inst)) return;
+    const o = inst * 12;
+    if (visible) { this.hidden.delete(inst); this.shelfLive[o + 4] = this.shelfData[o + 4]; this.shelfLive[o + 5] = this.shelfData[o + 5]; }
+    else { this.hidden.add(inst); this.shelfLive[o + 4] = 0; this.shelfLive[o + 5] = 0; }
+    this.shelfBuf.write(this.shelfLive);            // 28 KB, and only when a book leaves or returns
+  }
+
+  /** Move every flying book along its cycle; hide the shelf copy while it is away and put it back on return. */
+  private updateFlights(time: number): void {
+    const c = this.manifest.flyingCenter;
+    this.orbits.forEach((o, i) => {
+      const start = i * (CYCLE / this.orbits.length) * 0.9;
+      const row = this.bookData;
+      if (!this.flightsOn || time < start) { row[i * 3 + 2] = [0, 0, 0, 0]; return; }
+      const k = Math.floor((time - start) / CYCLE);
+      const u = (time - start) - k * CYCLE;
+      if (this.flightCycle[i] !== k) {
+        if (this.flightSlot[i] >= 0) this.setShelfVisible(this.manifest.slots[this.flightSlot[i]].inst, true);
+        this.flightSlot[i] = -1;
+        this.flightSlot[i] = this.chooseSlot(i, k);
+        this.flightCycle[i] = k;
+      }
+      const slot = this.manifest.slots[this.flightSlot[i]] as Slot;
+      const p = flightPose(slot, o, c, u, time);
+      this.setShelfVisible(slot.inst, !p.away);
+      row[i * 3] = [p.pos[0], p.pos[1], p.pos[2], p.open];
+      row[i * 3 + 1] = [p.yaw, p.pitch, p.roll, p.flap];
+      row[i * 3 + 2] = [slot.tint[0], slot.tint[1], slot.tint[2], p.away ? 1 : 0];
+    });
+  }
+
   /** Re-fit every size-dependent target to a new output, or a new internal scale. */
   resize(out: Surface | Target, scale = this.scale): void {
     this.out = out; this.scale = scale;
@@ -299,13 +361,7 @@ export class LibraryScene {
 
     const g = this.manifest.globe;
     mat4.rotateY(mat4.rotateZ(mat4.translation(g.pos), g.tilt), time * g.spin, this.globeModel);
-    const c = this.manifest.flyingCenter;
-    this.manifest.flyingBooks.forEach((b, i) => {
-      const a = b.a0 + time * b.sp;
-      this.bookData[i * 3] = [c[0] + Math.cos(a) * b.r, b.y + Math.sin(time * 1.3 + b.a0) * 0.22, c[2] + Math.sin(a) * b.r, b.spread];
-      this.bookData[i * 3 + 1] = [-a + Math.PI / 2, Math.sin(time * 0.9 + b.a0) * 0.18, Math.sin(time * 1.4 + b.a0) * 0.12, 1];
-      this.bookData[i * 3 + 2] = [b.tint[0], b.tint[1], b.tint[2], 0];
-    });
+    this.updateFlights(time);
     for (const d of this.globeDraws) d.set({ globeModel: this.globeModel });
     for (const d of this.bookDraws) d.set({ books: this.bookData });
     this.params.time = time;

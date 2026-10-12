@@ -25,12 +25,18 @@ server and loads it in real Chrome with WebGPU, to check the browser path itself
 - **Furniture modelled by hand**: a writing desk (rolled-edge top, leather inlay with gilt border, two drawer
   pedestals, hutch of pigeonholes, turned feet), a turned lectern with a clasped grimoire, a globe on three
   cabriole legs with horizon ring and tilted brass meridian, an armillary, an open tome with curved page stacks and
-  leaves mid-turn, wall sconces with candles.
+  leaves mid-turn, wall sconces with candles on the plain wall either side of the window, clear of the shelves.
 - **Poly Haven scans** decimated to a triangle budget: armchair, gothic chair, console, drawers, stool, clock,
   bust, vases, oil lamp, candelabra, lantern, chest, encyclopedia set, two plants.
 - **Books**: four unit meshes (folio, quarto, thick, slim), each with a rounded leather spine, boards, a chamfered
   page block, headbands, raised hubs, gilt tooling and a label. The ~600 on the shelves are instances in a 28 KB
   buffer (position, lean, scale, cover colour, baked AO), so each can be addressed, tinted or opened.
+- **Books that really leave the shelves** (`src/flights.ts`): four books at a time, staggered, each on an 18 s
+  cycle: it slides out of its slot, lifts off still shut, flies a curve into an orbit round the desk and opens
+  while it goes, hovers turning its pages in the sunbeam, then folds, flies back and slides into the gap it left.
+  The shelf copy is hidden while it is away (one write to the 28 KB instance buffer), and the open-book mesh takes
+  its place, so the same book is never in two spots. The slot comes from the manifest, so a publication bound to a
+  slot can be the one that flies.
 - **Baked ambient occlusion** on every static vertex by ray casting, and per instance for the books.
 
 ## How it is lit and drawn (`src/library.ts`, `src/shaders/`)

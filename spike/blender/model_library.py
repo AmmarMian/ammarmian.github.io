@@ -825,7 +825,10 @@ def shelves():
                 if rnd() < 0.9:
                     lean = rnd() < 0.05
                     h = book(a + step / 2, sy, w, lean, pick(BOOK_TINTS), vi)
-                    slots.append({"band": bi, "angle": float(a + step / 2), "row": ri, "height": h, "width": w, "variant": vi})
+                    BOOK_INST[-1]["slot"] = len(slots)
+                    slots.append({"band": bi, "angle": float(a + step / 2), "row": ri, "height": h, "width": w, "variant": vi,
+                                  "pos": list(BOOK_INST[-1]["pos"]), "yaw": BOOK_INST[-1]["yaw"], "tint": list(BOOK_INST[-1]["tint"]),
+                                  "depth": VARIANTS[vi]["d"]})
                 a += step + gap * deg_per_m
         # vertical dividers every ~13.5 degrees, finished with a moulded edge
         nb = 4
@@ -915,16 +918,25 @@ def rug():
         lathe([(0, 0.0), (2.5, 0.0), (2.5, 0.016), (0, 0.016)], 72, mat="rug", bevel=0.004, L=0.5)
 
 
+LADDER_TILT = 0.2
+LADDER_LEN = 4.72 / math.cos(LADDER_TILT)       # the top ends level with the brass rail
+RAIL_R = R - 0.54 - 0.34                        # the rail runs along the shelf nosings
+
+
 def ladder():
-    """A rolling library ladder: chamfered rails, flat rungs, brass hooks that ride a brass rail along the shelves."""
-    with at(polar(214, 3.85), ry=RAD(214), rx=-0.12):
+    """A rolling library ladder: it leans against the bookcase and hooks over the brass rail at the top."""
+    base_r = RAIL_R - 0.06 - LADDER_LEN * math.sin(LADDER_TILT)
+    with at(polar(214, base_r), ry=RAD(214), rx=LADDER_TILT):
         for dx in (-0.29, 0.29):
-            box(0.055, 4.64, 0.075, (dx, 2.32, 0), mat="shelf", bevel=0.01, segs=2)
-            box(0.07, 0.15, 0.1, (dx, 4.68, 0.02), mat="brass", bevel=0.012)
-            box(0.03, 0.2, 0.05, (dx, 4.78, 0.07), mat="brass", bevel=0.008, rx=0.5)
+            box(0.055, LADDER_LEN, 0.075, (dx, LADDER_LEN / 2, 0), mat="shelf", bevel=0.01, segs=2)
+            box(0.06, 0.1, 0.1, (dx, LADDER_LEN + 0.02, 0.03), mat="brass", bevel=0.012)
+            # the hook: up over the rail and back down on its far side
+            box(0.03, 0.05, 0.18, (dx, LADDER_LEN + 0.07, 0.09), mat="brass", bevel=0.008)
+            box(0.03, 0.14, 0.03, (dx, LADDER_LEN - 0.0, 0.17), mat="brass", bevel=0.008)
             cyl(0.055, 0.055, 0.04, 16, (dx, 0.05, 0.02), mat="iron", bevel=0.005, rz=math.pi / 2)
-        for i in range(11):
-            box(0.6, 0.03, 0.1, (0, 0.4 + i * 0.4, 0.0), mat="shelf", bevel=0.008, segs=2)
+        n = 12
+        for i in range(n):
+            box(0.6, 0.03, 0.1, (0, 0.4 + i * (LADDER_LEN - 0.6) / (n - 1), 0.0), mat="shelf", bevel=0.008, segs=2)
 
 
 def ladder_rail():
@@ -933,9 +945,9 @@ def ladder_rail():
         for i in range(8):
             t = i / 7 * math.tau
             r_.append((0.018 * math.cos(t), 0.018 * math.sin(t)))
-        sweep_arc(r_, a0 - 1, a1 + 1, R - 0.54 - 0.34 + 0.0, 4.72, "brass", step=3.0)
+        sweep_arc(r_, a0 - 1, a1 + 1, RAIL_R, 4.72, "brass", step=3.0)
         for a in np.arange(a0, a1 + 1e-6, 6.0):
-            arcbox(0.03, 0.03, 0.12, a, R - 0.54 - 0.28, 4.72, mat="brass", bevel=0.005)
+            arcbox(0.03, 0.03, 0.12, a, RAIL_R + 0.06, 4.72, mat="brass", bevel=0.005)
 
 
 def floor_litter():
@@ -1024,10 +1036,10 @@ def armillary(pos, scale=1.0):
 def sconces():
     """Two brass wall sconces on the shelf pilasters, each holding a candle: they are real light sources."""
     out = []
-    for a, side in ((157.2, -1), (194.8, 1)):
+    for a, side in ((162.4, -1), (187.6, 1)):
         a_r = RAD(a)
-        rr = R - 0.52
-        base = Vector((rr * math.sin(a_r), 2.0, rr * math.cos(a_r)))
+        rr = R - 0.36
+        base = Vector((rr * math.sin(a_r), 2.1, rr * math.cos(a_r)))
         inward = -Vector((math.sin(a_r), 0, math.cos(a_r)))
         tang = Vector((math.cos(a_r), 0, -math.sin(a_r))) * side
         plate = base
@@ -1040,7 +1052,7 @@ def sconces():
         lathe([(0, 0), (0.035, 0), (0.05, 0.03), (0.035, 0.04), (0.0, 0.04)], 16, tuple(cup), mat="brass", bevel=0.002)
         cyl(0.017, 0.017, 0.15, 12, tuple(cup + Vector((0, 0.115, 0))), mat="candle", bevel=0.002)
         lathe([(0, 0), (0.014, 0.02), (0.011, 0.06), (0.0, 0.11)], 10, tuple(cup + Vector((0, 0.19, 0))), mat="flame", bevel=0.0)
-        arcbox(0.08, 0.16, 0.025, a, R - 0.5, 2.0, mat="brass", bevel=0.008)
+        arcbox(0.08, 0.16, 0.025, a, R - 0.35, 2.1, mat="brass", bevel=0.008)
         out.append(dict(name=f"sconce{side}", pos=list(cup + Vector((0, 0.22, 0))), color=[1.0, 0.62, 0.3], intensity=1.8, range=4.2, flicker=1, shadow=0))
     return out
 
@@ -1315,6 +1327,8 @@ def finish():
     for vi in range(len(VARIANTS)):
         idx = [i for i, it in enumerate(BOOK_INST) if it["variant"] == vi]
         variants.append({"group": f"shelfbook{vi}", "first": idx[0] if idx else 0, "count": len(idx)})
+    for i, it in enumerate(BOOK_INST):
+        slots[it["slot"]]["inst"] = i
     inst.tofile(os.path.join(OUT, "library.books.bin"))
     print(f"[library] shelf books: {len(BOOK_INST)} instances", [v["count"] for v in variants], flush=True)
 
@@ -1344,6 +1358,7 @@ def finish():
         "window": {"center": polar(WIN_ANG, R - 0.4, WIN_Y), "normal": list(wn), "right": list(wright), "radius": HOLE_R,
                    "towardSun": list((Vector(sun_from) - Vector(sun_to)).normalized()), "shaftFrom": sun_from, "shaftTo": sun_to},
         "globe": {"pos": list(GLOBE_C), "spin": 0.25, "tilt": GLOBE_TILT},
+        "flyingCount": 4,
         "flyingBooks": [{"r": 1.5 + (i % 3) * 0.55, "a0": i / 7 * 2 * math.pi, "y": 2.5 + (i % 4) * 0.4, "sp": 0.35 + (i % 3) * 0.12,
                          "spread": 0.38 + (i * 0.037 % 0.16), "tint": list(BOOK_TINTS[i % len(BOOK_TINTS)])} for i in range(7)],
         "flyingCenter": polar(176, 2.2),

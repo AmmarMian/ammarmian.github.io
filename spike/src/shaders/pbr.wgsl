@@ -93,8 +93,8 @@ fn bookWorld(i: u32, p: vec3f, n: vec3f, side: f32) -> array<vec3f, 2> {
   let open = a.w + b.w * 0.12 * sin(G.cam.w * 2.2 + f32(i));
   let hinge = rotZ(side * open);
   let m = rotY(b.x) * rotX(b.y) * rotZ(b.z);
-  var lp = p; var ln = n;
-  if (abs(side) > 0.5) { lp = hinge * p; ln = hinge * n; }
+  var lp = p * books[i * 3u + 2u].w; var ln = n;       // w scales the whole book; 0 hides it
+  if (abs(side) > 0.5) { lp = hinge * lp; ln = hinge * n; }
   return array<vec3f, 2>(m * lp + a.xyz, normalize(m * ln));
 }
 
@@ -114,7 +114,7 @@ fn shelfWorld(ii: u32, p: vec3f, n: vec3f) -> array<vec3f, 2> {
   let a = shelf[i * 3u];
   let b = shelf[i * 3u + 1u];
   let m = rotY(a.w) * rotZ(b.z);
-  return array<vec3f, 2>(m * (p * vec3f(b.x, b.y, 1.0)) + a.xyz, normalize(m * n));
+  return array<vec3f, 2>(m * (p * vec3f(b.x, b.y, select(0.0, 1.0, b.x > 0.0))) + a.xyz, normalize(m * n));
 }
 
 @vertex fn vs_shelf(@builtin(instance_index) i: u32, @location(0) pq: vec4f, @location(1) nq: vec4f, @location(2) uv: vec2f, @location(3) c: vec4f, @location(4) d: vec4f) -> VOut {
