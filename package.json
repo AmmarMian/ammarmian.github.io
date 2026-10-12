@@ -12,7 +12,7 @@
     "spike:check": "tsc -p spike",
     "spike:build": "tsc -p spike && vite build -c vite.spike.config.ts",
     "spike:fetch": "node spike/tools/fetch-assets.mjs",
-    "spike:model": "/Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup --python spike/blender/model_library.py -- spike/public && python3 spike/tools/pack-assets.py",
+    "spike:model": "for f in library lab obs; do /Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup --python spike/blender/model.py -- spike/public --floor $f; done && python3 spike/tools/pack-assets.py",
     "spike:browser": "node spike/tools/browser-check.mjs",
     "spike:render": "node spike/tools/render.mjs"
   },

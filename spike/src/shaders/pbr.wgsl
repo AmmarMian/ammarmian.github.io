@@ -56,6 +56,9 @@ struct Mat {
 // Which slice of the shelf-book buffer a draw covers: x = first instance; yzw = the spine-label atlas (columns, cell width, cell height as fractions).
 @group(0) @binding(17) var<uniform> inst: vec4f;
 
+// Props that spin and bob on their own, one matrix each (a spell circle, an orrery ring): inst.x picks the matrix.
+@group(0) @binding(18) var<uniform> spinM: array<mat4x4f, 6>;
+
 struct VOut {
   @builtin(position) pos: vec4f,
   @location(0) wp: vec3f,
@@ -109,6 +112,30 @@ fn bookWorld(i: u32, p: vec3f, n: vec3f, side: f32) -> array<vec3f, 2> {
   return o;
 }
 
+@vertex fn vs_orbit(@builtin(instance_index) i: u32, @location(0) pq: vec4f, @location(1) nq: vec4f, @location(2) uv: vec2f, @location(3) c: vec4f, @location(4) d: vec4f) -> VOut {
+  // flasks, orbs and the like circling something: the same per-instance pose the books use, without a hinge
+  let a = books[i * 3u];
+  let b = books[i * 3u + 1u];
+  let t = books[i * 3u + 2u];
+  let m = rotY(b.x) * rotX(b.y) * rotZ(b.z);
+  let w = m * (decode(pq) * t.w) + a.xyz;
+  var o: VOut;
+  o.pos = G.viewProj * vec4f(w, 1.0);
+  o.wp = w; o.n = normalize(m * nq.xyz); o.uv = uv;
+  o.col = vec4f(select(c.rgb, t.rgb, d.w > 0.5), c.a);
+  o.d = d;
+  return o;
+}
+
+@vertex fn vs_spin(@builtin(instance_index) i: u32, @location(0) pq: vec4f, @location(1) nq: vec4f, @location(2) uv: vec2f, @location(3) c: vec4f, @location(4) d: vec4f) -> VOut {
+  let M4 = spinM[u32(inst.x)];
+  let w = M4 * vec4f(decode(pq), 1.0);
+  var o: VOut;
+  o.pos = G.viewProj * w;
+  o.wp = w.xyz; o.n = normalize((M4 * vec4f(nq.xyz, 0.0)).xyz); o.uv = uv; o.col = c; o.d = d;
+  return o;
+}
+
 fn shelfWorld(ii: u32, p: vec3f, n: vec3f) -> array<vec3f, 2> {
   let i = ii + u32(inst.x);
   let a = shelf[i * 4u];
@@ -156,6 +183,15 @@ fn shelfWorld(ii: u32, p: vec3f, n: vec3f) -> array<vec3f, 2> {
   let side = (d.y * 255.0 - 127.0) / 127.0;
   let w = bookWorld(i, decode(pq), nq.xyz, side);
   return casterVP * vec4f(w[0], 1.0);
+}
+@vertex fn vs_shadow_orbit(@builtin(instance_index) i: u32, @location(0) pq: vec4f, @location(1) nq: vec4f, @location(2) uv: vec2f, @location(3) c: vec4f, @location(4) d: vec4f) -> @builtin(position) vec4f {
+  let a = books[i * 3u];
+  let b = books[i * 3u + 1u];
+  let t = books[i * 3u + 2u];
+  return casterVP * vec4f(rotY(b.x) * rotX(b.y) * rotZ(b.z) * (decode(pq) * t.w) + a.xyz, 1.0);
+}
+@vertex fn vs_shadow_spin(@location(0) pq: vec4f, @location(1) nq: vec4f, @location(2) uv: vec2f, @location(3) c: vec4f, @location(4) d: vec4f) -> @builtin(position) vec4f {
+  return casterVP * (spinM[u32(inst.x)] * vec4f(decode(pq), 1.0));
 }
 @fragment fn fs_shadow() -> @location(0) vec4f { return vec4f(0.0); }
 
@@ -351,6 +387,19 @@ fn shade(wp: vec3f, s: Surf, V: vec3f) -> vec3f {
   S.albedo = albedo; S.rough = clamp(rough, 0.04, 1.0); S.metal = metal; S.ao = ao; S.N = N;
   let V = normalize(G.cam.xyz - in.wp);
   if (G.shadow.w > 0.5) { return vec4f(vec3f(sunVisibility(in.wp, Ng)), length(G.cam.xyz - in.wp)); }
+  let kind = M.tint.w;                      // 0 opaque, > 0 glass of that opacity, < 0 additive glow
+  if (kind < 0.0) {
+    return vec4f(albedo * max(M.p.w, 1.0) * 2.0 * tex.a, 1.0);
+  }
+  if (kind > 0.0) {
+    // glass: nearly no diffuse, a clear specular skin, a Fresnel rim, and a faint tint where you look through
+    let gt = select(M.tint.rgb, in.col.rgb, in.d.w > 0.5);        // a jar's own colour, or the material's
+    S.albedo = gt * gt * 0.06; S.rough = clamp(rough, 0.03, 0.2); S.metal = 0.0;
+    let fres = pow(1.0 - max(dot(N, V), 0.0), 3.0);
+    var g = shade(in.wp, S, V) + gt * gt * 0.05 * G.ambient.w;
+    g += S.albedo * max(M.p.w, 0.0) * 40.0;
+    return vec4f(g, clamp(kind + fres * 0.55, 0.0, 0.95));
+  }
   var c = shade(in.wp, S, V);
   let emissive = max(in.col.a, max(M.p.w, 0.0));
   c += albedo * emissive * 6.0;
@@ -399,7 +448,25 @@ fn fbm(p: vec2f) -> f32 {
     let lit = mix(vec3f(0.62, 0.66, 0.74), vec3f(1.15, 1.05, 0.92), clamp(sd * 1.4, 0.0, 1.0));
     sky = mix(sky, lit * 0.9, cl * clamp(dir.y * 3.0, 0.0, 1.0) * 0.85);
   }
-  sky += G.sunCol.rgb * (pow(sd, 2400.0) * 40.0 + pow(sd, 30.0) * 0.5);
+  // stars and a band of galaxy when the sky is dark enough to show them (skyTop.w is how many)
+  let stars = G.skyTop.w;
+  if (stars > 0.0 && dir.y > -0.05) {
+    // points, not squares: a jittered star in each cell of a 3D grid, shining by its distance from the sight line
+    let g = dir * 360.0;
+    let cell = floor(g);
+    let h1 = hash21(cell.xz + cell.y * 17.31);
+    let h2 = hash21(cell.zx * 1.7 + cell.y * 5.13 + 3.1);
+    let h3 = hash21(cell.xy * 2.3 + cell.z * 9.7);
+    let sp = cell + vec3f(0.5) + (vec3f(h1, h2, h3) - 0.5) * 0.7;
+    let ds = length(g - sp);
+    let tw = 0.75 + 0.25 * sin(G.cam.w * (1.0 + h1 * 3.0) + h2 * 40.0);
+    let star = step(0.985, h1) * smoothstep(0.34, 0.0, ds) * (0.3 + 0.7 * h3) * tw;
+    let band = exp(-pow(dot(dir, normalize(vec3f(0.35, 0.8, -0.5))) * 3.2, 2.0));
+    let dust = fbm(dir.xz * 7.0 / (abs(dir.y) + 0.4));
+    sky = sky * (1.0 - 0.9 * stars) + sky * 0.9 * stars * 0.0;
+    sky += vec3f(0.9, 0.95, 1.1) * star * stars * 3.0 + vec3f(0.14, 0.16, 0.28) * band * (0.4 + dust) * stars * 0.5;
+  }
+  sky += G.sunCol.rgb * (pow(sd, 2400.0) * 40.0 + pow(sd, 30.0) * 0.5) * (1.0 - 0.8 * stars);
   sky = mix(sky, G.skyHorizon.rgb * 0.5, smoothstep(0.0, -0.18, dir.y));
   return vec4f(sky, 1.0e4);
 }

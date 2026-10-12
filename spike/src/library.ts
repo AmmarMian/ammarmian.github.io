@@ -17,7 +17,7 @@ import { CYCLE, flightPose, type Orbit, type Slot } from './flights.ts';
 type V3 = [number, number, number];
 export interface MeshRange { group: string; material: string; firstIndex: number; indexCount: number; triangles: number; vertices: number }
 export interface MaterialSpec {
-  name: string; tint: V3; rough: number | null; metal: number | null; nscale: number; emissive: number; alpha: number;
+  name: string; tint: V3; rough: number | null; metal: number | null; nscale: number; emissive: number; alpha: number; blend?: 'alpha' | 'additive' | null;
   textures: { diff: string | null; nor: string | null; arm: string | null };
 }
 export interface Manifest {
@@ -27,13 +27,20 @@ export interface Manifest {
   materials: MaterialSpec[];
   lights: { name: string; pos: V3; color: V3; intensity: number; range: number; flicker: number; shadow: number }[];
   window: { center: V3; normal: V3; right: V3; radius: number; towardSun: V3 };
-  globe: { pos: V3; spin: number; tilt: number };
-  flyingCount: number;
-  flyingBooks: { r: number; a0: number; y: number; sp: number; spread: number; tint: V3 }[];
-  flyingCenter: V3;
-  spineAtlas: { cols: number; rows: number; cell: [number, number]; size: number };
-  shelfBooks: { file: string; count: number; variants: { group: string; first: number; count: number }[] };
-  slots: { band: number; angle: number; row: number; height: number; pos: V3; yaw: number; tint: V3; depth: number; inst: number }[];
+  globe?: { pos: V3; spin: number; tilt: number };
+  flyingCount?: number;
+  flyingBooks?: { r: number; a0: number; y: number; sp: number; spread: number; tint: V3 }[];
+  flyingCenter?: V3;
+  spineAtlas?: { cols: number; rows: number; cell: [number, number]; size: number };
+  shelfBooks?: { file: string; count: number; variants: { group: string; first: number; count: number }[] };
+  title?: string;
+  /** Light and sky for this floor: the library is lit by afternoon sun, the observatory by the moon. All optional. */
+  atmosphere?: { sunColor?: V3; sunStrength?: number; skyTop?: V3; skyHorizon?: V3; ambient?: V3; ambientScale?: number; ground?: V3; stars?: number; exposure?: number; bloom?: number; rays?: number };
+  /** Props that spin and bob on their own: a group of meshes, a pivot, a rate. */
+  spinners?: { group: string; pos: V3; axis: 'x' | 'y' | 'z'; rate: number; bob?: number; phase?: number }[];
+  /** Things circling a point: reagent flasks round a cauldron. */
+  orbiters?: { center: V3; count: number; r: number; y: number; speed: number; scale?: number; tints: V3[] };
+  slots?: { band: number; angle: number; row: number; height: number; pos: V3; yaw: number; tint: V3; depth: number; inst: number }[];
   camera: { pos: V3; target: V3 };
 }
 export interface View { pos: V3; target: V3; fov?: number }
@@ -54,6 +61,10 @@ export class LibraryScene {
   private readonly shadow: Target;
   private readonly sky: Draw;
   private readonly opaque: Draw[] = [];
+  private readonly transparent: Draw[] = [];
+  private readonly spinDraws: Draw[] = [];
+  private readonly spinShadowSet: Draw[] = [];
+  private readonly spinMats: Float32Array[] = Array.from({ length: 6 }, () => new Float32Array(16));
   private readonly motes: Draw;
   private readonly shadowDraws: Draw[] = [];
   private readonly globeDraws: Draw[] = [];
@@ -92,7 +103,7 @@ export class LibraryScene {
     const need = new Set<string>();
     for (const m of manifest.materials) for (const f of Object.values(m.textures)) if (f) need.add(f);
     await Promise.all([...need].map(async (f) => files.set(f, await load.image(`tex/${f}`))));
-    const shelfBooks = await load.bytes(manifest.shelfBooks.file);
+    const shelfBooks = manifest.shelfBooks ? await load.bytes(manifest.shelfBooks.file) : new ArrayBuffer(48);
     return new LibraryScene(gpu, manifest, bin, src, files, shelfBooks, out, opts);
   }
 
@@ -109,6 +120,7 @@ export class LibraryScene {
       lights[i * 2 + 1] = [l.color[0] * l.intensity, l.color[1] * l.intensity, l.color[2] * l.intensity, l.flicker];
     });
     const shadowSize = opts.shadowSize ?? 2048;
+    const at = manifest.atmosphere ?? {};
     this.sunVP = this.makeSunVP(w.towardSun);
     this.candleMatrices = this.makeCandleVPs(manifest.lights[0].pos, manifest.lights[0].range);
     this.G = uniforms(gpu, {
@@ -117,12 +129,12 @@ export class LibraryScene {
       sunVP: this.sunVP,
       cam: [0, 0, 0, 0],
       lights,
-      sun: [...w.towardSun, 9.0],
-      sunCol: [...lin([1.0, 0.82, 0.58]), 0],
-      skyTop: [...lin([0.22, 0.42, 0.78]), 0],
-      skyHorizon: [...lin([0.78, 0.76, 0.72]), 0],
-      ambient: [0.70, 0.82, 1.05, 1.0],
-      ground: [0.34, 0.24, 0.16, 0],
+      sun: [...w.towardSun, at.sunStrength ?? 9.0],
+      sunCol: [...(at.sunColor ?? lin([1.0, 0.82, 0.58])), 0],
+      skyTop: [...(at.skyTop ?? lin([0.22, 0.42, 0.78])), at.stars ?? 0],
+      skyHorizon: [...(at.skyHorizon ?? lin([0.78, 0.76, 0.72])), 0],
+      ambient: [...(at.ambient ?? [0.70, 0.82, 1.05]), at.ambientScale ?? 1.0],
+      ground: [...(at.ground ?? [0.34, 0.24, 0.16]), 0],
       qMin: [...manifest.quant.min, 0],
       qSize: [...manifest.quant.size, 0],
       shadow: [shadowSize, 0.0006, 0.03, opts.debug ?? 0],
@@ -147,7 +159,7 @@ export class LibraryScene {
     const lin8 = (img: Img) => img;
     void lin8;
     const matBindings = (spec: MaterialSpec) => ({
-      M: { tint: [...spec.tint, 0], p: [spec.rough ?? -1, spec.metal ?? -1, spec.nscale, spec.emissive] },
+      M: { tint: [...spec.tint, spec.blend === 'additive' ? -1 : (spec.alpha > 0 ? spec.alpha : 0)], p: [spec.rough ?? -1, spec.metal ?? -1, spec.nscale, spec.emissive] },
       diffTex: tex(spec.textures.diff, true, solid(255, 255, 255)),
       norTex: tex(spec.textures.nor, false, solid(128, 128, 255)),
       armTex: tex(spec.textures.arm, false, solid(255, 255, 0)),
@@ -177,7 +189,7 @@ export class LibraryScene {
     shelfBuf.write(this.shelfLive);
     this.shelfBuf = shelfBuf;
     this.flightsOn = opts.flights ?? true;
-    const nFly = manifest.flyingCount ?? manifest.flyingBooks.length;
+    const nFly = manifest.slots?.length ? (manifest.flyingCount ?? 0) : 0;
     for (let i = 0; i < nFly; i++) {
       this.orbits.push({ r: 1.3 + (i % 3) * 0.45, a0: (i / nFly) * Math.PI * 2, sp: 0.32 + (i % 2) * 0.08, y: 2.3 + (i % 3) * 0.35 });
       this.flightSlot.push(-1); this.flightCycle.push(-1);
@@ -189,14 +201,25 @@ export class LibraryScene {
 
     const statics = manifest.meshes.filter((m) => m.group === 'static');
     const specs = new Map(manifest.materials.map((m) => [m.name, m]));
-    for (const m of statics) {
+    const blendOf = (spec: MaterialSpec) => spec.blend === 'additive'
+      ? { color: { src: 'one' as const, dst: 'one' as const }, alpha: { src: 'zero' as const, dst: 'one' as const } }
+      : (spec.blend === 'alpha' || spec.alpha > 0)
+        ? { color: { src: 'src-alpha' as const, dst: 'one-minus-src-alpha' as const }, alpha: { src: 'zero' as const, dst: 'one' as const } }
+        : undefined;
+    const cullOf = (spec: MaterialSpec) => (blendOf(spec) || /leaves|paper|rug|spinelabel|pages|letter|plaque|cards|grimoire/.test(spec.name)) ? 'none' as const : 'back' as const;
+    /** One draw of a mesh range in its material: opaque ones into the opaque list, blended ones into the transparent list. */
+    const meshDraw = (m: MeshRange, vertex: string, extra: Record<string, unknown> = {}, set: Record<string, unknown> = {}): Draw => {
       const spec = specs.get(m.material)!;
-      this.opaque.push(draw(gpu, {
-        label: m.material, shader: src.pbr, entry: { vertex: 'vs_static', fragment: 'fs_pbr' }, geometry: range(m),
-        cull: /leaves|paper|rug|spinelabel|pages|letter|plaque|cards|grimoire/.test(m.material) ? 'none' : 'back', depth: { compare: 'less', write: true },
-        set: { ...base, ...matBindings(spec) },
-      }));
-    }
+      const bl = blendOf(spec);
+      const d = draw(gpu, {
+        label: `${m.group}-${m.material}`, shader: src.pbr, entry: { vertex, fragment: 'fs_pbr' }, geometry: range(m), cull: cullOf(spec),
+        depth: { compare: 'less', write: !bl }, ...(bl ? { blend: bl } : {}), ...extra,
+        set: { ...base, ...matBindings(spec), ...set },
+      });
+      (bl ? this.transparent : this.opaque).push(d);
+      return d;
+    };
+    for (const m of statics) meshDraw(m, 'vs_static');
     for (const m of manifest.meshes.filter((x) => x.group === 'globe')) {
       const d = draw(gpu, {
         label: 'globe', shader: src.pbr, entry: { vertex: 'vs_globe', fragment: 'fs_pbr' }, geometry: range(m), cull: 'back',
@@ -207,12 +230,17 @@ export class LibraryScene {
     for (const m of manifest.meshes.filter((x) => x.group === 'book')) {
       const d = draw(gpu, {
         label: `books-${m.material}`, shader: src.pbr, entry: { vertex: 'vs_book', fragment: 'fs_pbr' }, geometry: range(m), cull: 'none',
-        instances: nFly, depth: { compare: 'less', write: true }, set: { ...base, ...matBindings(specs.get(m.material)!) },
+        instances: Math.max(1, nFly), depth: { compare: 'less', write: true }, set: { ...base, ...matBindings(specs.get(m.material)!) },
       });
       this.bookDraws.push(d); this.opaque.push(d);
     }
-    this.shelfVariants = manifest.shelfBooks.variants.filter((v) => v.count > 0);
-    const atlas = manifest.spineAtlas;
+    (manifest.spinners ?? []).forEach((sp, k) => {
+      for (const m of manifest.meshes.filter((x) => x.group === sp.group)) this.spinDraws.push(meshDraw(m, 'vs_spin', {}, { inst: [k, 0, 0, 0], spinM: this.spinMats }));
+    });
+    const nOrbit = manifest.orbiters?.count ?? 0;
+    for (const m of manifest.meshes.filter((x) => x.group === 'orbit')) this.bookDraws.push(meshDraw(m, 'vs_orbit', { instances: Math.max(1, nOrbit) }));
+    this.shelfVariants = (manifest.shelfBooks?.variants ?? []).filter((v) => v.count > 0);
+    const atlas = manifest.spineAtlas ?? { cols: 1, rows: 1, cell: [1, 1] as [number, number], size: 1 };
     for (const v of this.shelfVariants) {
       for (const m of manifest.meshes.filter((x) => x.group === v.group)) {
         this.opaque.push(draw(gpu, {
@@ -229,8 +257,9 @@ export class LibraryScene {
 
     // shadow casters: the room in one draw, the shelf books in one, then the animated bits. Built once per
     // light/face, because each carries the matrix it projects with.
-    const sFirst = statics[0].firstIndex;
-    const sCount = statics.reduce((n, m) => n + m.indexCount, 0);
+    const solidMeshes = statics.filter((m) => !blendOf(specs.get(m.material)!));       // the build orders blended materials last
+    const sFirst = solidMeshes[0].firstIndex;
+    const sCount = solidMeshes.reduce((n, m) => n + m.indexCount, 0);
     const casters = (vp: Float32Array, animated: boolean): Draw[] => {
       const out: Draw[] = [];
       const base = { shader: src.pbr, cull: 'none' as const, depth: { compare: 'less' as const, write: true } };
@@ -241,10 +270,16 @@ export class LibraryScene {
         out.push(draw(gpu, { label: `shadow-${v.group}`, ...base, entry: { vertex: 'vs_shadow_shelf', fragment: 'fs_shadow' }, geometry: slice, instances: v.count, set: { ...globals, shelf: shelfBuf, casterVP: vp, inst: [v.first, 0, 0, 0] } }));
       }
       if (animated) {
+        (manifest.spinners ?? []).forEach((sp, k) => {
+          for (const m of manifest.meshes.filter((x) => x.group === sp.group && !blendOf(specs.get(x.material)!)))
+            { const d = draw(gpu, { label: 'shadow-spin', ...base, entry: { vertex: 'vs_shadow_spin', fragment: 'fs_shadow' }, geometry: range(m), set: { ...globals, spinM: this.spinMats, casterVP: vp, inst: [k, 0, 0, 0] } }); out.push(d); this.spinShadowSet.push(d); }
+        });
+        for (const m of manifest.meshes.filter((x) => x.group === 'orbit' && !blendOf(specs.get(x.material)!)))
+          out.push(draw(gpu, { label: 'shadow-orbit', ...base, entry: { vertex: 'vs_shadow_orbit', fragment: 'fs_shadow' }, geometry: range(m), instances: Math.max(1, nOrbit), set: { ...globals, books: this.bookData, casterVP: vp } }));
         for (const m of manifest.meshes.filter((x) => x.group === 'globe'))
           out.push(draw(gpu, { label: 'shadow-globe', ...base, entry: { vertex: 'vs_shadow_globe', fragment: 'fs_shadow' }, geometry: range(m), set: { ...globals, globeModel: this.globeModel, casterVP: vp } }));
         for (const m of manifest.meshes.filter((x) => x.group === 'book'))
-          out.push(draw(gpu, { label: 'shadow-books', ...base, entry: { vertex: 'vs_shadow_book', fragment: 'fs_shadow' }, geometry: range(m), instances: nFly, set: { ...globals, books: this.bookData, casterVP: vp } }));
+          out.push(draw(gpu, { label: 'shadow-books', ...base, entry: { vertex: 'vs_shadow_book', fragment: 'fs_shadow' }, geometry: range(m), instances: Math.max(1, nFly), set: { ...globals, books: this.bookData, casterVP: vp } }));
       }
       return out;
     };
@@ -255,7 +290,7 @@ export class LibraryScene {
     }
     const cubeSet: Record<string, Target> = {};
     this.candle.forEach((t, f) => { cubeSet[`cf${f}`] = t; });
-    for (const d of this.opaque) d.set(cubeSet);
+    for (const d of [...this.opaque, ...this.transparent]) d.set(cubeSet);
     this.cubeSet = cubeSet;
 
     // ---- volumetric beam, bloom, composite
@@ -271,7 +306,7 @@ export class LibraryScene {
       const coarse = i === BLOOM_LEVELS - 2 ? this.down[BLOOM_LEVELS - 1] : this.up[i + 1];
       this.upFx.push(effect(gpu, src.up, { label: `up-${i}`, set: { coarse, fine: this.down[i], samp: clamp, params: { texel: coarse.texelSize, radius: 1.0, pad: 0 } } }));
     }
-    this.params = { exposure: opts.exposure ?? 1.35, bloom: opts.bloom ?? 0.12, vignette: 0.5, time: 0, rays: opts.rays ?? 1.0, pad0: 0, pad1: 0, pad2: 0 };
+    this.params = { exposure: opts.exposure ?? at.exposure ?? 1.35, bloom: opts.bloom ?? at.bloom ?? 0.12, vignette: 0.5, time: 0, rays: opts.rays ?? at.rays ?? 1.0, pad0: 0, pad1: 0, pad2: 0 };
     this.composite = effect(gpu, src.composite, { label: 'composite', set: { scene: this.scene, bloomTex: this.up[0], rays: this.rays, samp: clamp, params: this.params } });
   }
 
@@ -291,9 +326,32 @@ export class LibraryScene {
     return new Float32Array(mat4.multiply(proj, view));
   }
 
+  /** Spinning props and circling flasks: pure functions of the clock. */
+  private updateProps(time: number): void {
+    (this.manifest.spinners ?? []).forEach((sp, k) => {
+      const m = mat4.translation([sp.pos[0], sp.pos[1] + (sp.bob ?? 0) * Math.sin(time * 0.9 + (sp.phase ?? 0)), sp.pos[2]]);
+      const a = time * sp.rate;
+      if (sp.axis === 'y') mat4.rotateY(m, a, m); else if (sp.axis === 'x') mat4.rotateX(m, a, m); else mat4.rotateZ(m, a, m);
+      this.spinMats[k].set(m);
+    });
+    for (const d of this.spinDraws) d.set({ spinM: this.spinMats });
+    for (const d of this.spinShadowSet) d.set({ spinM: this.spinMats });
+    const o = this.manifest.orbiters;
+    if (o) {
+      for (let i = 0; i < o.count; i++) {
+        const a = (i / o.count) * Math.PI * 2 + time * o.speed;
+        const t = o.tints[i % o.tints.length];
+        this.bookData[i * 3] = [o.center[0] + Math.cos(a) * o.r, o.y + Math.sin(time * 1.3 + i) * 0.14, o.center[2] + Math.sin(a) * o.r, 0];
+        this.bookData[i * 3 + 1] = [-a + Math.PI / 2, Math.sin(time * 0.9 + i) * 0.4, Math.cos(time * 0.8 + i) * 0.4, 0];
+        this.bookData[i * 3 + 2] = [t[0], t[1], t[2], o.scale ?? 1];
+      }
+      for (const d of this.bookDraws) d.set({ books: this.bookData });
+    }
+  }
+
   /** Slot for flight `i` in cycle `k`: a book from somewhere on the shelves, never one already away. */
   private chooseSlot(i: number, k: number): number {
-    const slots = this.manifest.slots;
+    const slots = this.manifest.slots!;
     let idx = Math.floor((Math.sin(i * 91.7 + k * 13.37 + 1.7) * 43758.5453 % 1 + 1) % 1 * slots.length);
     for (let tries = 0; tries < slots.length; tries++) {
       if (!this.flightSlot.includes(idx) && slots[idx].row > 0) return idx;
@@ -312,7 +370,8 @@ export class LibraryScene {
 
   /** Move every flying book along its cycle; hide the shelf copy while it is away and put it back on return. */
   private updateFlights(time: number): void {
-    const c = this.manifest.flyingCenter;
+    const c = this.manifest.flyingCenter!;
+    const slots = this.manifest.slots!;
     this.orbits.forEach((o, i) => {
       const start = i * (CYCLE / this.orbits.length) * 0.9;
       const row = this.bookData;
@@ -320,12 +379,12 @@ export class LibraryScene {
       const k = Math.floor((time - start) / CYCLE);
       const u = (time - start) - k * CYCLE;
       if (this.flightCycle[i] !== k) {
-        if (this.flightSlot[i] >= 0) this.setShelfVisible(this.manifest.slots[this.flightSlot[i]].inst, true);
+        if (this.flightSlot[i] >= 0) this.setShelfVisible(slots[this.flightSlot[i]].inst, true);
         this.flightSlot[i] = -1;
         this.flightSlot[i] = this.chooseSlot(i, k);
         this.flightCycle[i] = k;
       }
-      const slot = this.manifest.slots[this.flightSlot[i]] as Slot;
+      const slot = slots[this.flightSlot[i]] as Slot;
       const p = flightPose(slot, o, c, u, time);
       this.setShelfVisible(slot.inst, !p.away);
       row[i * 3] = [p.pos[0], p.pos[1], p.pos[2], p.open];
@@ -362,8 +421,9 @@ export class LibraryScene {
     this.G.set({ viewProj: vp, invViewProj: mat4.invert(vp), cam: [...view.pos, time] });
 
     const g = this.manifest.globe;
-    mat4.rotateY(mat4.rotateZ(mat4.translation(g.pos), g.tilt), time * g.spin, this.globeModel);
+    if (g) mat4.rotateY(mat4.rotateZ(mat4.translation(g.pos), g.tilt), time * g.spin, this.globeModel);
     this.updateFlights(time);
+    this.updateProps(time);
     for (const d of this.globeDraws) d.set({ globeModel: this.globeModel });
     for (const d of this.bookDraws) d.set({ books: this.bookData });
     this.params.time = time;
@@ -378,6 +438,7 @@ export class LibraryScene {
     frame.pass({ target: this.scene, clear: [0, 0, 0, 1], clearDepth: 1 }, (pass) => {
       pass.draw(this.sky);
       for (const d of this.opaque) pass.draw(d);
+      for (const d of this.transparent) pass.draw(d);
       pass.draw(this.motes);
     });
     frame.pass(this.rays, this.raysFx);

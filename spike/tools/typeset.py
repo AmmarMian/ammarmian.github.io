@@ -343,3 +343,223 @@ def grimoire_cover(w=768, h=1024):
     nrm = np.stack([-gx, -gy, np.ones_like(gx)], -1); nrm /= np.linalg.norm(nrm, axis=-1, keepdims=True)
     f_ = lambda a: np.asarray(Image.fromarray((np.clip(a, 0, 1) * 255).astype(np.uint8)).resize((w, h), Image.LANCZOS))
     return f_(albedo), f_(nrm * 0.5 + 0.5), f_(arm)
+
+
+# ------------------------------------------------------------------------ the laboratory
+JAR_NAMES = [
+    ("Aqua regia", "royal water"), ("Sal ammoniacum", "sel ammoniac"), ("Mercurius vivus", "quicksilver"), ("Spiritus vini", "spirit of wine"),
+    ("Oleum vitrioli", "oil of vitriol"), ("Cinnabaris", "vermilion"), ("Antimonium", "stibnite"), ("Tinctura solis", "tincture of the sun"),
+    ("Elixir vitae", "elixir of life"), ("Aqua fortis", "strong water"), ("Sulphur", "brimstone"), ("Nitrum", "saltpetre"),
+    ("Lapis lunaris", "moonstone"), ("Argentum vivum", "living silver"), ("Essentia rosae", "attar of rose"), ("Vitriolum", "green vitriol"),
+    ("Cuprum", "copper"), ("Plumbum", "lead"), ("Aurum potabile", "potable gold"), ("Terra sigillata", "sealed earth"),
+    ("Cremor tartari", "cream of tartar"), ("Alumen", "alum"), ("Borax", "tincal"), ("Camphora", "camphor"), ("Balsamum", "balsam"),
+    ("Succinum", "amber"), ("Galbanum", "resin"), ("Opopanax", "gum"), ("Myrrha", "myrrh"), ("Olibanum", "frankincense"),
+]
+
+
+def jar_label(title, gloss, index, w=256, h=176, seed=0):
+    """A paper label for an apothecary jar, in the system's voice: accent index, small-caps name, italic gloss, a rule."""
+    S = 3
+    im = Image.fromarray(paper_ground(w * S, h * S, seed=seed + 11, tooth=0.05))
+    d = ImageDraw.Draw(im, "RGBA")
+    d.rectangle([8 * S, 8 * S, (w - 8) * S, (h - 8) * S], outline=(31, 30, 27, 120), width=S)
+    d.rectangle([14 * S, 14 * S, (w - 14) * S, (h - 14) * S], outline=(31, 30, 27, 60), width=S)
+    tracked(d, (w * S / 2 - width(d, f"N° {index:02d}", font("mono", 15 * S), 0.14) / 2, 44 * S), f"N° {index:02d}", font("mono", 15 * S), ACCENT + (255,), 0.14)
+    t, ft = fit(d, title.upper(), "sc", 30 * S, (w - 40) * S, 0.05, 16 * S)
+    d.text((w * S / 2, 92 * S), t, font=ft, fill=INK + (255,), anchor="mm")
+    d.rectangle([w * S / 2 - 20 * S, 108 * S, w * S / 2 + 20 * S, 109 * S], fill=ACCENT + (255,))
+    g, fg = fit(d, gloss, "text-i", 18 * S, (w - 40) * S, 0.0, 11 * S)
+    d.text((w * S / 2, 134 * S), g, font=fg, fill=INK2 + (255,), anchor="mm")
+    im = im.resize((w, h), Image.LANCZOS)
+    return np.asarray(im.convert("RGBA"))
+
+
+def jar_atlas(entries, cell=(256, 176), size=4096):
+    cw, ch = cell
+    cols, rows = size // cw, size // ch
+    assert len(entries) <= cols * rows
+    atlas = np.zeros((size, size, 4), np.uint8)
+    atlas[..., :3] = PAPER
+    atlas[..., 3] = 255
+    for i, (t, g, ix) in enumerate(entries):
+        r, c = divmod(i, cols)
+        atlas[r * ch:(r + 1) * ch, c * cw:(c + 1) * cw] = jar_label(t, g, ix, cw, ch, seed=i)
+    return atlas, cols, rows
+
+
+def _noise(h, w, octaves, base, seed):
+    r = np.random.default_rng(seed)
+    out = np.zeros((h, w), np.float32)
+    amp, tot = 1.0, 0.0
+    for o in range(octaves):
+        n = base * 2 ** o
+        g = r.random((n + 1, n + 1)).astype(np.float32)
+        out += amp * np.asarray(Image.fromarray((g * 255).astype(np.uint8)).resize((w, h), Image.BICUBIC), np.float32) / 255
+        tot += amp
+        amp *= 0.5
+    return out / tot
+
+
+def brew_texture(size=512):
+    """The cauldron's surface: a slow green swirl with foam and bright rolling crests."""
+    y, x = np.mgrid[0:size, 0:size].astype(np.float32) / size
+    wx = _noise(size, size, 4, 3, 1) - 0.5
+    wy = _noise(size, size, 4, 3, 2) - 0.5
+    n = _noise(size, size, 5, 4, 3)
+    sw = np.sin((x + wx * 0.8) * 14 + (y + wy * 0.8) * 9) * 0.5 + 0.5
+    v = np.clip(0.45 * n + 0.55 * sw ** 2, 0, 1)
+    dark = np.array((8, 60, 24), np.float32) / 255
+    mid = np.array((40, 170, 80), np.float32) / 255
+    hi = np.array((170, 255, 170), np.float32) / 255
+    col = dark + (mid - dark) * np.clip(v * 1.6, 0, 1)[..., None]
+    col = col + (hi - col) * np.clip((v - 0.62) * 4, 0, 1)[..., None]
+    rng = np.random.default_rng(9)
+    for _ in range(70):                                              # foam rings
+        cx, cy, r = rng.random(), rng.random(), 0.008 + rng.random() * 0.03
+        d = np.abs(np.hypot(x - cx, y - cy) - r)
+        col = col + (hi - col) * np.clip(1 - d / 0.003, 0, 1)[..., None] * 0.7
+    r_ = np.hypot(x - 0.5, y - 0.5)
+    col *= np.clip(1.15 - r_ * 0.8, 0.5, 1)[..., None]
+    return (np.clip(col, 0, 1) * 255).astype(np.uint8)
+
+
+def _rune(d, cx, cy, size, seed, color, wd):
+    r = np.random.default_rng(seed)
+    pts = [(r.integers(0, 3), r.integers(0, 5)) for _ in range(int(r.integers(3, 6)))]
+    P = [(cx + (px - 1) * size * 0.32, cy + (py - 2) * size * 0.25) for px, py in pts]
+    d.line(P, fill=color, width=wd, joint="curve")
+    if r.random() < 0.5:
+        qx, qy = P[-1]
+        d.ellipse([qx - wd * 1.4, qy - wd * 1.4, qx + wd * 1.4, qy + wd * 1.4], outline=color, width=max(1, wd // 2))
+
+
+def spell_ring(kind, size=1024):
+    """A glowing ring of magic on black, to be drawn additively on a flat disc and turned: runes between two circles
+    (kind 1), a hexagram in a double circle (2), an eight-pointed star with spokes (3)."""
+    S = 2
+    im = Image.new("L", (size * S, size * S), 0)
+    d = ImageDraw.Draw(im)
+    c = size * S / 2
+    R_ = size * S * 0.495
+    W = 5 * S
+
+    def circle(r, w=W):
+        d.ellipse([c - r, c - r, c + r, c + r], outline=255, width=w)
+
+    if kind == 1:
+        circle(R_); circle(R_ * 0.955, 2 * S); circle(R_ * 0.72); circle(R_ * 0.68, 2 * S)
+        for k in range(72):
+            a = k / 72 * math.tau
+            r0, r1 = R_ * 0.955, R_ * (0.935 if k % 6 else 0.9)
+            d.line([c + math.cos(a) * r0, c + math.sin(a) * r0, c + math.cos(a) * r1, c + math.sin(a) * r1], fill=255, width=2 * S)
+        for k in range(12):
+            a = (k + 0.5) / 12 * math.tau
+            rr = R_ * 0.835
+            _rune(d, c + math.cos(a) * rr, c + math.sin(a) * rr, R_ * 0.1, k + 3, 255, 4 * S)
+            for b in (k / 12 * math.tau,):
+                d.line([c + math.cos(b) * R_ * 0.72, c + math.sin(b) * R_ * 0.72, c + math.cos(b) * R_ * 0.955, c + math.sin(b) * R_ * 0.955], fill=255, width=2 * S)
+    elif kind == 2:
+        circle(R_); circle(R_ * 0.93, 2 * S); circle(R_ * 0.52); circle(R_ * 0.2, 4 * S)
+        for off in (-math.pi / 2, math.pi / 2):
+            tri = [(c + math.cos(off + k * math.tau / 3) * R_ * 0.93, c + math.sin(off + k * math.tau / 3) * R_ * 0.93) for k in range(3)]
+            d.line(tri + [tri[0]], fill=255, width=W)
+        for k in range(6):
+            a = -math.pi / 2 + k * math.tau / 6
+            x_, y_ = c + math.cos(a) * R_ * 0.93, c + math.sin(a) * R_ * 0.93
+            d.ellipse([x_ - 9 * S, y_ - 9 * S, x_ + 9 * S, y_ + 9 * S], fill=255)
+            _rune(d, c + math.cos(a) * R_ * 0.62, c + math.sin(a) * R_ * 0.62, R_ * 0.12, 40 + k, 255, 4 * S)
+    else:
+        circle(R_ * 0.98, 3 * S); circle(R_ * 0.5, 3 * S); circle(R_ * 0.12, 4 * S)
+        for k in range(8):
+            a = k * math.tau / 8
+            d.line([c + math.cos(a) * R_ * 0.12, c + math.sin(a) * R_ * 0.12, c + math.cos(a) * R_ * 0.98, c + math.sin(a) * R_ * 0.98], fill=255, width=2 * S)
+        star = [(c + math.cos(k * math.tau * 3 / 8) * R_ * 0.9, c + math.sin(k * math.tau * 3 / 8) * R_ * 0.9) for k in range(9)]
+        d.line(star, fill=255, width=W)
+        for k in range(8):
+            a = (k + 0.5) * math.tau / 8
+            _rune(d, c + math.cos(a) * R_ * 0.36, c + math.sin(a) * R_ * 0.36, R_ * 0.09, 70 + k, 255, 3 * S)
+    glow = im.filter(ImageFilter.GaussianBlur(10 * S))
+    a = np.asarray(im, np.float32) / 255
+    g = np.asarray(glow, np.float32) / 255
+    v = np.clip(a + 0.9 * g, 0, 1)
+    v = np.asarray(Image.fromarray((v * 255).astype(np.uint8)).resize((size, size), Image.LANCZOS), np.uint8)
+    return np.stack([v, v, v], -1)
+
+
+import math  # noqa: E402 (used by the generators above)
+
+
+# ------------------------------------------------------------------------ the observatory
+CONSTELLATIONS = [
+    ("LYR", [(0.0, 0.0), (0.12, 0.04), (0.2, 0.2), (0.08, 0.26), (-0.02, 0.15)]),
+    ("CYG", [(0.0, 0.0), (0.0, 0.2), (0.0, 0.4), (-0.15, 0.2), (0.15, 0.2)]),
+    ("UMA", [(0.0, 0.0), (0.1, -0.03), (0.2, 0.02), (0.3, 0.1), (0.32, 0.22), (0.45, 0.24), (0.47, 0.12)]),
+    ("ORI", [(0.0, 0.0), (0.1, 0.02), (0.05, 0.18), (0.04, 0.2), (0.03, 0.22), (-0.05, 0.4), (0.12, 0.38)]),
+    ("CAS", [(0.0, 0.0), (0.08, 0.1), (0.18, 0.04), (0.26, 0.14), (0.36, 0.06)]),
+    ("SCO", [(0.0, 0.0), (0.04, 0.1), (0.1, 0.18), (0.14, 0.3), (0.22, 0.36), (0.3, 0.32), (0.32, 0.24)]),
+]
+
+
+def star_chart(size=1024):
+    """A planisphere on parchment, in the system's type: concentric circles of declination, the ecliptic, the twelve signs round
+    the rim in small caps, constellations as dotted lines with mono names, an accent kicker and a title cartouche."""
+    S = 2
+    W = size * S
+    im = Image.fromarray(paper_ground(W, W, base=(232, 222, 198), seed=77, tooth=0.07))
+    d = ImageDraw.Draw(im, "RGBA")
+    c = W / 2
+    R0 = W * 0.46
+    for r_, wd in ((1.0, 4), (0.97, 2), (0.75, 2), (0.5, 2), (0.25, 2)):
+        d.ellipse([c - R0 * r_, c - R0 * r_, c + R0 * r_, c + R0 * r_], outline=INK + (200,), width=wd * S)
+    for k in range(72):                                                    # degree ticks
+        a = k / 72 * math.tau
+        r0, r1 = R0 * 0.97, R0 * (0.94 if k % 6 else 0.9)
+        d.line([c + math.cos(a) * r0, c + math.sin(a) * r0, c + math.cos(a) * r1, c + math.sin(a) * r1], fill=INK + (190,), width=S)
+    for k in range(12):                                                    # the signs, in small caps
+        a = (k + 0.5) / 12 * math.tau
+        d.line([c + math.cos(k / 12 * math.tau) * R0 * 0.75, c + math.sin(k / 12 * math.tau) * R0 * 0.75,
+                c + math.cos(k / 12 * math.tau) * R0 * 0.9, c + math.sin(k / 12 * math.tau) * R0 * 0.9], fill=INK + (130,), width=S)
+        name = ["ARIES", "TAURUS", "GEMINI", "CANCER", "LEO", "VIRGO", "LIBRA", "SCORPIO", "SAGITTA", "CAPRICORN", "AQUARIUS", "PISCES"][k]
+        f = font("sc", 26 * S)
+        tw = d.textlength(name, font=f)
+        t = Image.new("RGBA", (int(tw) + 8, 40 * S), (0, 0, 0, 0))
+        ImageDraw.Draw(t).text((4, 28 * S), name, font=f, fill=INK2 + (255,), anchor="ls")
+        t = t.rotate(-math.degrees(a) - 90, expand=True, resample=Image.BICUBIC)
+        rr = R0 * 0.835
+        im.alpha_composite(t, (int(c + math.cos(a) * rr - t.width / 2), int(c + math.sin(a) * rr - t.height / 2)))
+    # the ecliptic, tilted
+    e = [(c + R0 * 0.5 * math.cos(t) + R0 * 0.18, c + R0 * 0.5 * math.sin(t)) for t in np.linspace(0, math.tau, 200)]
+    d.line(e + [e[0]], fill=ACCENT + (190,), width=3 * S)
+    rng = np.random.default_rng(12)
+    for name, pts in CONSTELLATIONS:                                       # constellations
+        ox, oy = (rng.random() - 0.5) * 0.9, (rng.random() - 0.5) * 0.9
+        rot = rng.random() * math.tau
+        P = []
+        for px, py in pts:
+            x, y = px * 0.8 * math.cos(rot) - py * 0.8 * math.sin(rot), px * 0.8 * math.sin(rot) + py * 0.8 * math.cos(rot)
+            P.append((c + (ox + x) * R0 * 0.8, c + (oy + y) * R0 * 0.8))
+        for (x0, y0), (x1, y1) in zip(P, P[1:]):
+            for k in range(14):
+                t = k / 14
+                if k % 2 == 0:
+                    d.ellipse([x0 + (x1 - x0) * t - S, y0 + (y1 - y0) * t - S, x0 + (x1 - x0) * t + S, y0 + (y1 - y0) * t + S], fill=INK2 + (200,))
+        for k, (x, y) in enumerate(P):
+            r_ = (7 if k == 0 else 4.5) * S
+            d.ellipse([x - r_, y - r_, x + r_, y + r_], fill=INK + (255,))
+            if k == 0:
+                d.ellipse([x - r_ * 1.9, y - r_ * 1.9, x + r_ * 1.9, y + r_ * 1.9], outline=ACCENT + (255,), width=2 * S)
+        tracked(d, (P[0][0] + 16 * S, P[0][1] - 12 * S), name, font("mono", 17 * S), ACCENT + (255,), 0.14)
+    for _ in range(260):                                                   # field stars
+        x, y = rng.random() * W, rng.random() * W
+        if math.hypot(x - c, y - c) < R0 * 0.96:
+            r_ = (1 + rng.random() * 2) * S
+            d.ellipse([x - r_, y - r_, x + r_, y + r_], fill=INK + (150,))
+    # cartouche
+    d.rectangle([c - 240 * S, 40 * S, c + 240 * S, 130 * S], fill=PAPER + (255,), outline=INK + (200,), width=2 * S)
+    tracked(d, (c - 210 * S, 78 * S), "III.1", font("mono", 20 * S), ACCENT + (255,), 0.14)
+    d.rectangle([c - 140 * S, 56 * S, c - 139 * S, 112 * S], fill=INK + (120,))
+    d.text((c - 120 * S, 82 * S), "Planisphere", font=font("display", 44 * S), fill=INK + (255,), anchor="lm")
+    tracked(d, (c - 120 * S, 114 * S), "LISTIC · 45° 54′ N", font("mono", 15 * S), INK3 + (255,), 0.14)
+    d.text((c, W - 18 * S), "Epoch MMXXVI", font=font("text-i", 28 * S), fill=INK3 + (255,), anchor="mm")
+    im = im.resize((size, size), Image.LANCZOS)
+    return np.asarray(im.convert("RGBA"))

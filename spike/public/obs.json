@@ -1,0 +1,1375 @@
+{
+ "vertexBytes": 4083576,
+ "stride": 28,
+ "indexCount": 402618,
+ "quant": {
+  "min": [
+   -5.486661911010742,
+   -1.5299999713897705,
+   -5.490000247955322
+  ],
+  "size": [
+   10.973323822021484,
+   5.550804138183594,
+   10.980000495910645
+  ]
+ },
+ "meshes": [
+  {
+   "group": "static",
+   "material": "brass",
+   "firstIndex": 0,
+   "indexCount": 41352,
+   "triangles": 13784,
+   "vertices": 11314
+  },
+  {
+   "group": "static",
+   "material": "brass_vase_001",
+   "firstIndex": 41352,
+   "indexCount": 27000,
+   "triangles": 9000,
+   "vertices": 5571
+  },
+  {
+   "group": "static",
+   "material": "candle",
+   "firstIndex": 68352,
+   "indexCount": 588,
+   "triangles": 196,
+   "vertices": 188
+  },
+  {
+   "group": "static",
+   "material": "desk",
+   "firstIndex": 68940,
+   "indexCount": 1836,
+   "triangles": 612,
+   "vertices": 442
+  },
+  {
+   "group": "static",
+   "material": "ebony",
+   "firstIndex": 70776,
+   "indexCount": 22548,
+   "triangles": 7516,
+   "vertices": 6252
+  },
+  {
+   "group": "static",
+   "material": "ember",
+   "firstIndex": 93324,
+   "indexCount": 3240,
+   "triangles": 1080,
+   "vertices": 960
+  },
+  {
+   "group": "static",
+   "material": "flame",
+   "firstIndex": 96564,
+   "indexCount": 768,
+   "triangles": 256,
+   "vertices": 407
+  },
+  {
+   "group": "static",
+   "material": "gilt",
+   "firstIndex": 97332,
+   "indexCount": 5184,
+   "triangles": 1728,
+   "vertices": 1776
+  },
+  {
+   "group": "static",
+   "material": "iron",
+   "firstIndex": 102516,
+   "indexCount": 19080,
+   "triangles": 6360,
+   "vertices": 5592
+  },
+  {
+   "group": "static",
+   "material": "leather",
+   "firstIndex": 121596,
+   "indexCount": 3828,
+   "triangles": 1276,
+   "vertices": 972
+  },
+  {
+   "group": "static",
+   "material": "letter",
+   "firstIndex": 125424,
+   "indexCount": 54,
+   "triangles": 18,
+   "vertices": 36
+  },
+  {
+   "group": "static",
+   "material": "obsfloor",
+   "firstIndex": 125478,
+   "indexCount": 53736,
+   "triangles": 17912,
+   "vertices": 29404
+  },
+  {
+   "group": "static",
+   "material": "obsplaque",
+   "firstIndex": 179214,
+   "indexCount": 6,
+   "triangles": 2,
+   "vertices": 4
+  },
+  {
+   "group": "static",
+   "material": "obsstone",
+   "firstIndex": 179220,
+   "indexCount": 25992,
+   "triangles": 8664,
+   "vertices": 7245
+  },
+  {
+   "group": "static",
+   "material": "obswall",
+   "firstIndex": 205212,
+   "indexCount": 47148,
+   "triangles": 15716,
+   "vertices": 12226
+  },
+  {
+   "group": "static",
+   "material": "paper",
+   "firstIndex": 252360,
+   "indexCount": 4764,
+   "triangles": 1588,
+   "vertices": 1494
+  },
+  {
+   "group": "static",
+   "material": "potted_plant_01_leaves",
+   "firstIndex": 257124,
+   "indexCount": 42990,
+   "triangles": 14330,
+   "vertices": 20062
+  },
+  {
+   "group": "static",
+   "material": "potted_plant_01_pot",
+   "firstIndex": 300114,
+   "indexCount": 5004,
+   "triangles": 1668,
+   "vertices": 2549
+  },
+  {
+   "group": "static",
+   "material": "potted_plant_02_leaves",
+   "firstIndex": 305118,
+   "indexCount": 7350,
+   "triangles": 2450,
+   "vertices": 3613
+  },
+  {
+   "group": "static",
+   "material": "potted_plant_02_pot",
+   "firstIndex": 312468,
+   "indexCount": 40644,
+   "triangles": 13548,
+   "vertices": 21269
+  },
+  {
+   "group": "static",
+   "material": "rune",
+   "firstIndex": 353112,
+   "indexCount": 336,
+   "triangles": 112,
+   "vertices": 122
+  },
+  {
+   "group": "static",
+   "material": "shelf",
+   "firstIndex": 353448,
+   "indexCount": 9120,
+   "triangles": 3040,
+   "vertices": 2974
+  },
+  {
+   "group": "static",
+   "material": "starchart",
+   "firstIndex": 362568,
+   "indexCount": 6,
+   "triangles": 2,
+   "vertices": 4
+  },
+  {
+   "group": "static",
+   "material": "velvet",
+   "firstIndex": 362574,
+   "indexCount": 828,
+   "triangles": 276,
+   "vertices": 276
+  },
+  {
+   "group": "static",
+   "material": "wax",
+   "firstIndex": 363402,
+   "indexCount": 828,
+   "triangles": 276,
+   "vertices": 276
+  },
+  {
+   "group": "static",
+   "material": "glass",
+   "firstIndex": 364230,
+   "indexCount": 384,
+   "triangles": 128,
+   "vertices": 148
+  },
+  {
+   "group": "static",
+   "material": "lens",
+   "firstIndex": 364614,
+   "indexCount": 1536,
+   "triangles": 512,
+   "vertices": 536
+  },
+  {
+   "group": "orbit",
+   "material": "comet",
+   "firstIndex": 366150,
+   "indexCount": 1560,
+   "triangles": 520,
+   "vertices": 284
+  },
+  {
+   "group": "orbit",
+   "material": "cometTail",
+   "firstIndex": 367710,
+   "indexCount": 2940,
+   "triangles": 980,
+   "vertices": 587
+  },
+  {
+   "group": "spin0",
+   "material": "brass",
+   "firstIndex": 370650,
+   "indexCount": 9396,
+   "triangles": 3132,
+   "vertices": 3221
+  },
+  {
+   "group": "spin0",
+   "material": "globe",
+   "firstIndex": 380046,
+   "indexCount": 6480,
+   "triangles": 2160,
+   "vertices": 1167
+  },
+  {
+   "group": "spin0",
+   "material": "sun",
+   "firstIndex": 386526,
+   "indexCount": 2160,
+   "triangles": 720,
+   "vertices": 388
+  },
+  {
+   "group": "spin1",
+   "material": "brass",
+   "firstIndex": 388686,
+   "indexCount": 12372,
+   "triangles": 4124,
+   "vertices": 4196
+  },
+  {
+   "group": "spin1",
+   "material": "rune",
+   "firstIndex": 401058,
+   "indexCount": 1560,
+   "triangles": 520,
+   "vertices": 287
+  }
+ ],
+ "materials": [
+  {
+   "name": "shelf",
+   "tex": "dark_wood",
+   "tile": 1.6,
+   "rot": false,
+   "tint": [
+    0.9,
+    0.8,
+    0.75
+   ],
+   "rough": null,
+   "metal": null,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": "shelf_diff.webp",
+    "nor": "shelf_nor.webp",
+    "arm": "shelf_arm.webp"
+   }
+  },
+  {
+   "name": "ebony",
+   "tex": "lacquered_cherry_wood",
+   "tile": 1.8,
+   "rot": false,
+   "tint": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "rough": null,
+   "metal": null,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": "ebony_diff.webp",
+    "nor": "ebony_nor.webp",
+    "arm": "ebony_arm.webp"
+   }
+  },
+  {
+   "name": "desk",
+   "tex": "wood_table_worn",
+   "tile": 1.6,
+   "rot": false,
+   "tint": [
+    1,
+    1,
+    1
+   ],
+   "rough": null,
+   "metal": null,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": "desk_diff.webp",
+    "nor": "desk_nor.webp",
+    "arm": "desk_arm.webp"
+   }
+  },
+  {
+   "name": "leather",
+   "tex": "brown_leather",
+   "tile": 0.5,
+   "rot": false,
+   "tint": [
+    1,
+    1,
+    1
+   ],
+   "rough": null,
+   "metal": null,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 512,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": "leather_diff.webp",
+    "nor": "leather_nor.webp",
+    "arm": "leather_arm.webp"
+   }
+  },
+  {
+   "name": "velvet",
+   "tex": "velour_velvet",
+   "tile": 0.6,
+   "rot": false,
+   "tint": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "rough": null,
+   "metal": null,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 512,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": "velvet_diff.webp",
+    "nor": "velvet_nor.webp",
+    "arm": "velvet_arm.webp"
+   }
+  },
+  {
+   "name": "paper",
+   "tex": null,
+   "tile": 0.3,
+   "rot": false,
+   "tint": [
+    1,
+    1,
+    1
+   ],
+   "rough": 0.85,
+   "metal": 0.0,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 512,
+   "gen": "paper",
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": "paper_diff.webp",
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "letter",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    1,
+    1,
+    1
+   ],
+   "rough": 0.88,
+   "metal": 0.0,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": "letter",
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": "letter_diff.webp",
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "globe",
+   "tex": null,
+   "tile": 1.0,
+   "rot": false,
+   "tint": [
+    1,
+    1,
+    1
+   ],
+   "rough": 0.35,
+   "metal": 0.0,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": "globe",
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": "globe_diff.webp",
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "gilt",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    0.78,
+    0.58,
+    0.24
+   ],
+   "rough": 0.42,
+   "metal": 1.0,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": null,
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "brass",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    0.82,
+    0.62,
+    0.26
+   ],
+   "rough": 0.38,
+   "metal": 1.0,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": null,
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "iron",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    0.18,
+    0.17,
+    0.17
+   ],
+   "rough": 0.55,
+   "metal": 0.9,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": null,
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "candle",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    0.93,
+    0.88,
+    0.76
+   ],
+   "rough": 0.7,
+   "metal": 0.0,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": null,
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "flame",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    1.0,
+    0.72,
+    0.28
+   ],
+   "rough": 1.0,
+   "metal": 0.0,
+   "nscale": 1.0,
+   "emissive": 1.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": null,
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "wax",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    0.5,
+    0.04,
+    0.05
+   ],
+   "rough": 0.35,
+   "metal": 0.0,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": null,
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "rune",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    0.5,
+    0.9,
+    1.0
+   ],
+   "rough": 1.0,
+   "metal": 0.0,
+   "nscale": 1.0,
+   "emissive": 1.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": null,
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "obsfloor",
+   "tex": "dark_planks",
+   "tile": 1.6,
+   "rot": false,
+   "tint": [
+    0.55,
+    0.57,
+    0.62
+   ],
+   "rough": null,
+   "metal": null,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": "obsfloor_diff.webp",
+    "nor": "obsfloor_nor.webp",
+    "arm": "obsfloor_arm.webp"
+   }
+  },
+  {
+   "name": "obswall",
+   "tex": "old_stone_wall",
+   "tile": 1.2,
+   "rot": true,
+   "tint": [
+    0.62,
+    0.64,
+    0.7
+   ],
+   "rough": null,
+   "metal": null,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": "obswall_diff.webp",
+    "nor": "obswall_nor.webp",
+    "arm": "obswall_arm.webp"
+   }
+  },
+  {
+   "name": "obsstone",
+   "tex": "monastery_stone_floor",
+   "tile": 2.0,
+   "rot": false,
+   "tint": [
+    0.62,
+    0.64,
+    0.7
+   ],
+   "rough": null,
+   "metal": null,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": "obsstone_diff.webp",
+    "nor": "obsstone_nor.webp",
+    "arm": "obsstone_arm.webp"
+   }
+  },
+  {
+   "name": "glass",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    0.8,
+    0.92,
+    0.95
+   ],
+   "rough": 0.05,
+   "metal": 0.0,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.16,
+   "smooth": 40.0,
+   "blend": "alpha",
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": null,
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "ember",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    1.0,
+    0.45,
+    0.12
+   ],
+   "rough": 1.0,
+   "metal": 0.0,
+   "nscale": 1.0,
+   "emissive": 1.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": null,
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "starchart",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    1,
+    1,
+    1
+   ],
+   "rough": 0.9,
+   "metal": 0.0,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": "starchart",
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": "starchart_diff.webp",
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "obsplaque",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    1,
+    1,
+    1
+   ],
+   "rough": null,
+   "metal": null,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": "obsplaque",
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": "obsplaque_diff.webp",
+    "nor": "obsplaque_nor.webp",
+    "arm": "obsplaque_arm.webp"
+   }
+  },
+  {
+   "name": "comet",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    0.6,
+    0.9,
+    1.0
+   ],
+   "rough": 0.3,
+   "metal": 0.0,
+   "nscale": 1.0,
+   "emissive": 0.55,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": null,
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "cometTail",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    0.6,
+    0.45,
+    1.0
+   ],
+   "rough": 0.3,
+   "metal": 0.0,
+   "nscale": 1.0,
+   "emissive": 0.3,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": null,
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "lens",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    0.9,
+    0.95,
+    1.0
+   ],
+   "rough": 0.04,
+   "metal": 0.0,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.25,
+   "smooth": 40.0,
+   "blend": "alpha",
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": null,
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "sun",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    1.0,
+    0.8,
+    0.35
+   ],
+   "rough": 0.4,
+   "metal": 0.0,
+   "nscale": 1.0,
+   "emissive": 0.9,
+   "size": 1024,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 40.0,
+   "blend": null,
+   "centered": false,
+   "files": {},
+   "textures": {
+    "diff": null,
+    "nor": null,
+    "arm": null
+   }
+  },
+  {
+   "name": "potted_plant_02_pot",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    1,
+    1,
+    1
+   ],
+   "rough": null,
+   "metal": null,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 512,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 55.0,
+   "blend": null,
+   "centered": false,
+   "files": {
+    "diff": "models/potted_plant_02/textures/potted_plant_02_pot_diff_1k.jpg",
+    "rough": "models/potted_plant_02/textures/potted_plant_02_pot_rough_1k.jpg",
+    "nor": "models/potted_plant_02/textures/potted_plant_02_pot_nor_gl_1k.jpg"
+   },
+   "textures": {
+    "diff": "potted_plant_02_pot_diff.webp",
+    "nor": "potted_plant_02_pot_nor.webp",
+    "arm": "potted_plant_02_pot_arm.webp"
+   }
+  },
+  {
+   "name": "potted_plant_02_leaves",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    1,
+    1,
+    1
+   ],
+   "rough": null,
+   "metal": null,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 512,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 55.0,
+   "blend": null,
+   "centered": false,
+   "files": {
+    "diff": "models/potted_plant_02/textures/potted_plant_02_leaves_diff_1k.jpg",
+    "rough": "models/potted_plant_02/textures/potted_plant_02_leaves_rough_1k.jpg",
+    "nor": "models/potted_plant_02/textures/potted_plant_02_leaves_nor_gl_1k.jpg"
+   },
+   "textures": {
+    "diff": "potted_plant_02_leaves_diff.webp",
+    "nor": "potted_plant_02_leaves_nor.webp",
+    "arm": "potted_plant_02_leaves_arm.webp"
+   }
+  },
+  {
+   "name": "potted_plant_01_pot",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    1,
+    1,
+    1
+   ],
+   "rough": null,
+   "metal": null,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 512,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 55.0,
+   "blend": null,
+   "centered": false,
+   "files": {
+    "diff": "models/potted_plant_01/textures/potted_plant_01_pot_diff_1k.jpg",
+    "rough": "models/potted_plant_01/textures/potted_plant_01_pot_rough_1k.jpg",
+    "nor": "models/potted_plant_01/textures/potted_plant_01_pot_nor_gl_1k.jpg"
+   },
+   "textures": {
+    "diff": "potted_plant_01_pot_diff.webp",
+    "nor": "potted_plant_01_pot_nor.webp",
+    "arm": "potted_plant_01_pot_arm.webp"
+   }
+  },
+  {
+   "name": "potted_plant_01_leaves",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    1,
+    1,
+    1
+   ],
+   "rough": null,
+   "metal": null,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 512,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 55.0,
+   "blend": null,
+   "centered": false,
+   "files": {
+    "diff": "models/potted_plant_01/textures/potted_plant_01_leaves_diff_1k.jpg",
+    "rough": "models/potted_plant_01/textures/potted_plant_01_leaves_rough_1k.jpg",
+    "nor": "models/potted_plant_01/textures/potted_plant_01_leaves_nor_gl_1k.jpg"
+   },
+   "textures": {
+    "diff": "potted_plant_01_leaves_diff.webp",
+    "nor": "potted_plant_01_leaves_nor.webp",
+    "arm": "potted_plant_01_leaves_arm.webp"
+   }
+  },
+  {
+   "name": "brass_vase_001",
+   "tex": null,
+   "tile": 1.5,
+   "rot": false,
+   "tint": [
+    1,
+    1,
+    1
+   ],
+   "rough": null,
+   "metal": null,
+   "nscale": 1.0,
+   "emissive": 0.0,
+   "size": 512,
+   "gen": null,
+   "alpha": 0.0,
+   "smooth": 55.0,
+   "blend": null,
+   "centered": false,
+   "files": {
+    "diff": "models/brass_vase_01/textures/brass_vase_01_diff_1k.jpg",
+    "arm": "models/brass_vase_01/textures/brass_vase_01_arm_1k.jpg",
+    "nor": "models/brass_vase_01/textures/brass_vase_01_nor_gl_1k.jpg"
+   },
+   "textures": {
+    "diff": "brass_vase_001_diff.webp",
+    "nor": "brass_vase_001_nor.webp",
+    "arm": "brass_vase_001_arm.webp"
+   }
+  }
+ ],
+ "lights": [
+  {
+   "name": "brazier",
+   "pos": [
+    1.3680805733026755,
+    1.5,
+    -3.7587704831436333
+   ],
+   "color": [
+    1.0,
+    0.55,
+    0.25
+   ],
+   "intensity": 9.0,
+   "range": 8.5,
+   "flicker": 1,
+   "shadow": 1
+  },
+  {
+   "name": "lantern",
+   "pos": [
+    1.5499999999999998,
+    1.5,
+    2.68467875173176
+   ],
+   "color": [
+    1.0,
+    0.82,
+    0.58
+   ],
+   "intensity": 3.0,
+   "range": 5.0,
+   "flicker": 1,
+   "shadow": 0
+  },
+  {
+   "name": "rack",
+   "pos": [
+    -2.4574561328669753,
+    1.9,
+    1.7207293090531381
+   ],
+   "color": [
+    1.0,
+    0.82,
+    0.62
+   ],
+   "intensity": 2.2,
+   "range": 3.6,
+   "flicker": 0,
+   "shadow": 0
+  },
+  {
+   "name": "deck",
+   "pos": [
+    0.0,
+    2.6,
+    0.0
+   ],
+   "color": [
+    0.82,
+    0.78,
+    1.0
+   ],
+   "intensity": 1.4,
+   "range": 9.0,
+   "flicker": 0,
+   "shadow": 0
+  },
+  {
+   "name": "orrery",
+   "pos": [
+    -1.3000000000000003,
+    1.5,
+    -2.25166604983954
+   ],
+   "color": [
+    1.0,
+    0.76,
+    0.42
+   ],
+   "intensity": 2.0,
+   "range": 4.0,
+   "flicker": 0,
+   "shadow": 0
+  },
+  {
+   "name": "comet",
+   "pos": [
+    0.0,
+    3.4,
+    0.0
+   ],
+   "color": [
+    0.6,
+    0.85,
+    1.0
+   ],
+   "intensity": 2.2,
+   "range": 5.0,
+   "flicker": 0,
+   "shadow": 0
+  }
+ ],
+ "window": {
+  "center": [
+   0,
+   -50,
+   0
+  ],
+  "normal": [
+   0,
+   0,
+   1
+  ],
+  "right": [
+   1,
+   0,
+   0
+  ],
+  "radius": 0.0,
+  "towardSun": [
+   0.2018018364906311,
+   0.9417418837547302,
+   -0.269069105386734
+  ],
+  "shaftFrom": [
+   0,
+   0,
+   0
+  ],
+  "shaftTo": [
+   0,
+   0,
+   0
+  ]
+ },
+ "atmosphere": {
+  "sunColor": [
+   0.64,
+   0.74,
+   1.0
+  ],
+  "sunStrength": 1.3,
+  "skyTop": [
+   0.004,
+   0.01,
+   0.04
+  ],
+  "skyHorizon": [
+   0.03,
+   0.045,
+   0.1
+  ],
+  "ambient": [
+   0.08,
+   0.11,
+   0.24
+  ],
+  "ambientScale": 1.0,
+  "ground": [
+   0.03,
+   0.035,
+   0.07
+  ],
+  "stars": 1.0,
+  "exposure": 1.9,
+  "bloom": 0.22,
+  "rays": 0.0
+ },
+ "spinners": [
+  {
+   "group": "spin0",
+   "pos": [
+    -1.3000000000000003,
+    0.0,
+    -2.25166604983954
+   ],
+   "axis": "y",
+   "rate": 0.12,
+   "bob": 0.0
+  },
+  {
+   "group": "spin1",
+   "pos": [
+    3.364415935784116,
+    1.1,
+    0.9647307453594971
+   ],
+   "axis": "y",
+   "rate": 0.2,
+   "bob": 0.03
+  }
+ ],
+ "orbiters": {
+  "center": [
+   0,
+   0,
+   0
+  ],
+  "count": 1,
+  "r": 2.2,
+  "y": 3.2,
+  "speed": 0.5,
+  "scale": 1.0,
+  "tints": [
+   [
+    0.6,
+    0.85,
+    1.0
+   ]
+  ]
+ },
+ "camera": {
+  "pos": [
+   -1.9116622224562607,
+   2.0,
+   4.293663650920224
+  ],
+  "target": [
+   0.0,
+   1.5,
+   0.0
+  ]
+ }
+}

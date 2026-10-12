@@ -30,7 +30,7 @@ const logs = [];
 page.on('console', (m) => { if (['error', 'warning'].includes(m.type())) logs.push(`[${m.type()}] ${m.text()}`); });
 page.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}`));
 const t0 = Date.now();
-await page.goto(`http://localhost:${port}/`, { waitUntil: 'domcontentloaded' });
+await page.goto(`http://localhost:${port}/${process.env.QUERY ?? ''}`, { waitUntil: 'domcontentloaded' });
 await new Promise((r) => setTimeout(r, Number(process.env.WAIT ?? 9000)));
 const info = await page.evaluate(() => ({ gpu: 'gpu' in navigator, fail: document.getElementById('fail')?.style.display, why: document.getElementById('why')?.textContent }));
 await page.screenshot({ path: process.argv[2] ?? 'spike/out/browser.png' });

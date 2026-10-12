@@ -12,7 +12,7 @@ const MODELS = [
 ];
 const TEXTURES = [
   'wood_cabinet_worn_long', 'dark_paneled_wood', 'dark_wood', 'lacquered_cherry_wood', 'wood_table_worn',
-  'brown_leather', 'velour_velvet', 'monastery_stone_floor', 'old_stone_wall',
+  'brown_leather', 'velour_velvet', 'monastery_stone_floor', 'old_stone_wall', 'rusty_metal_02', 'marble_01', 'plaster_grey_04', 'dark_planks',
 ];
 const RES = '1k';
 const H = { 'User-Agent': 'Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/120 Safari/537.36' };

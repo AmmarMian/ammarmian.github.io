@@ -141,7 +141,6 @@ def flat_arm(shape, ao=255, rough=200, metal=0):
     return a
 
 
-m = json.load(open(os.path.join(PUB, "library.json")))
 total = 0
 
 
@@ -175,10 +174,31 @@ def save_img(name, arr, q=88):
     return name + ".webp"
 
 
+def jar_entries(slots):
+    """One label per jar: the site's project first, then alchemical names in Latin with a gloss."""
+    proj = json.load(open("src/data/projects.json"))
+    order = sorted(range(len(slots)), key=lambda i: (slots[i]["row"], slots[i]["band"], slots[i]["angle"]))
+    entries = [None] * len(slots)
+    for rank, i in enumerate(order):
+        if rank < len(proj):
+            t, g = proj[rank]["name"], proj[rank]["description"].split(".")[0].lower()
+            pub = True
+        else:
+            t, g = T.JAR_NAMES[(rank - len(proj)) % len(T.JAR_NAMES)]
+            pub = False
+        entries[i] = (t, g, rank + 1)
+        slots[i]["label"] = {"title": t, "gloss": g, "project": pub, "number": rank + 1}
+    return entries
+
+
 def gen_typeset(name):
     """Textures that carry type. Returns {diff, nor, arm} file names."""
     t = {"diff": None, "nor": None, "arm": None}
-    if name == "spinelabel":
+    if name == "spinelabel" and m.get("labelSet") == "jars":
+        atlas, cols, rows = T.jar_atlas(jar_entries(m["slots"]))
+        t["diff"] = save_img("jarlabel_diff", atlas, 90)
+        m["spineAtlas"] = {"cols": cols, "rows": rows, "cell": [256, 176], "size": 4096}
+    elif name == "spinelabel":
         entries = spine_entries(m["slots"])
         atlas, cols, rows = T.spine_atlas(entries)
         t["diff"] = save_img("spinelabel_diff", atlas, 90)
@@ -196,47 +216,66 @@ def gen_typeset(name):
         labels = [("I.1", "Riemannian geometry"), ("I.2", "Covariance estimation"), ("I.3", "Radar polarimetry"), ("I.4", "Robust statistics"),
                   ("II.1", "Machine learning"), ("II.2", "Signal processing"), ("II.3", "Hyperspectral imaging"), ("II.4", "Algorithms and code")]
         t["diff"] = save_img("cards_diff", T.shelf_cards(labels), 90)
+    elif name == "brew":
+        t["diff"] = save_img("brew_diff", T.brew_texture(512), 90)
+    elif name in ("spell1", "spell2", "spell3"):
+        t["diff"] = save_img(f"{name}_diff", T.spell_ring(int(name[-1]), 1024), 90)
+    elif name == "labplaque":
+        a, n, r = T.brass_plaque([("sc", 74, "Laboratorium"), ("mono", 24, "ARS MAGNA · SCIENTIA · MMXXVI")])
+        t["diff"], t["nor"], t["arm"] = save_img("labplaque_diff", a), save_img("labplaque_nor", n, 92), save_img("labplaque_arm", r, 92)
+    elif name == "obsplaque":
+        a, n, r = T.brass_plaque([("sc", 74, "Observatorium"), ("mono", 24, "STELLAE · TEMPUS · SILENTIUM")])
+        t["diff"], t["nor"], t["arm"] = save_img("obsplaque_diff", a), save_img("obsplaque_nor", n, 92), save_img("obsplaque_arm", r, 92)
+    elif name == "labcards":
+        labels = [("I.1", "Tinctures"), ("I.2", "Elixirs"), ("I.3", "Salts"), ("II.1", "Essences"), ("II.2", "Minerals"), ("II.3", "Projects")]
+        t["diff"] = save_img("labcards_diff", T.shelf_cards(labels), 90)
+    elif name == "starchart":
+        t["diff"] = save_img("starchart_diff", T.star_chart(1024), 90)
     elif name == "grimoire":
         a, n, r = T.grimoire_cover()
         t["diff"], t["nor"], t["arm"] = save_img("grimoire_diff", a, 90), save_img("grimoire_nor", n, 92), save_img("grimoire_arm", r, 92)
     return t
 
-for mat in m["materials"]:
-    t = {"diff": None, "nor": None, "arm": None}
-    size = mat["size"]
-    name = mat["name"]
-    if mat.get("gen") in ("spinelabel", "pages", "letter", "plaque", "cards", "grimoire"):
-        t = gen_typeset(mat["gen"])
-    elif mat.get("gen"):
-        g = mat["gen"]
-        img = {"paper": gen_paper, "rug": gen_rug, "globe": gen_globe}[g](size)
-        if isinstance(img, tuple):
-            t["diff"] = save(f"{name}_diff", img[0])
-            t["nor"] = save(f"{name}_nor", img[1], 90)
-        else:
-            t["diff"] = save(f"{name}_diff", img)
-    elif mat.get("tex"):
-        d = os.path.join(SRC, "textures", mat["tex"])
-        for k in ("diff", "nor", "arm"):
-            p = os.path.join(d, k + ".jpg")
-            if os.path.exists(p):
-                t[k] = save(f"{name}_{k}", np.asarray(fit(Image.open(p).convert("RGB"), size)), 90 if k == "nor" else 86)
-    elif mat.get("files"):
-        f = mat["files"]
-        if "diff" in f:
-            t["diff"] = save(f"{name}_diff", np.asarray(fit(Image.open(os.path.join(SRC, f["diff"])).convert("RGB"), size)))
-        if "nor" in f:
-            t["nor"] = save(f"{name}_nor", np.asarray(fit(Image.open(os.path.join(SRC, f["nor"])).convert("RGB"), size)), 90)
-        if "arm" in f:
-            t["arm"] = save(f"{name}_arm", np.asarray(fit(Image.open(os.path.join(SRC, f["arm"])).convert("RGB"), size)), 90)
-        elif "rough" in f:
-            r = np.asarray(fit(Image.open(os.path.join(SRC, f["rough"])).convert("L"), size))
-            a = np.zeros((*r.shape, 3), np.uint8)
-            a[..., 0] = 255; a[..., 1] = r
-            t["arm"] = save(f"{name}_arm", a, 90)
-    mat["textures"] = t
-    for v in t.values():
-        if v:
-            total += os.path.getsize(os.path.join(OUT, v))
-json.dump(m, open(os.path.join(PUB, "library.json"), "w"), indent=1)
-print(f"{len(m['materials'])} materials, {total / 1e6:.1f} MB of WebP")
+import glob
+for path in sorted(glob.glob(os.path.join(PUB, "*.json"))):
+    m = json.load(open(path))
+    total = 0
+    for mat in m["materials"]:
+        t = {"diff": None, "nor": None, "arm": None}
+        size = mat["size"]
+        name = mat["name"]
+        if mat.get("gen") in ("spinelabel", "pages", "letter", "plaque", "cards", "grimoire", "brew", "spell1", "spell2", "spell3", "labplaque", "labcards", "starchart", "obsplaque"):
+            t = gen_typeset(mat["gen"])
+        elif mat.get("gen"):
+            g = mat["gen"]
+            img = {"paper": gen_paper, "rug": gen_rug, "globe": gen_globe}[g](size)
+            if isinstance(img, tuple):
+                t["diff"] = save(f"{name}_diff", img[0])
+                t["nor"] = save(f"{name}_nor", img[1], 90)
+            else:
+                t["diff"] = save(f"{name}_diff", img)
+        elif mat.get("tex"):
+            d = os.path.join(SRC, "textures", mat["tex"])
+            for k in ("diff", "nor", "arm"):
+                p = os.path.join(d, k + ".jpg")
+                if os.path.exists(p):
+                    t[k] = save(f"{name}_{k}", np.asarray(fit(Image.open(p).convert("RGB"), size)), 90 if k == "nor" else 86)
+        elif mat.get("files"):
+            f = mat["files"]
+            if "diff" in f:
+                t["diff"] = save(f"{name}_diff", np.asarray(fit(Image.open(os.path.join(SRC, f["diff"])).convert("RGB"), size)))
+            if "nor" in f:
+                t["nor"] = save(f"{name}_nor", np.asarray(fit(Image.open(os.path.join(SRC, f["nor"])).convert("RGB"), size)), 90)
+            if "arm" in f:
+                t["arm"] = save(f"{name}_arm", np.asarray(fit(Image.open(os.path.join(SRC, f["arm"])).convert("RGB"), size)), 90)
+            elif "rough" in f:
+                r = np.asarray(fit(Image.open(os.path.join(SRC, f["rough"])).convert("L"), size))
+                a = np.zeros((*r.shape, 3), np.uint8)
+                a[..., 0] = 255; a[..., 1] = r
+                t["arm"] = save(f"{name}_arm", a, 90)
+        mat["textures"] = t
+        for v in t.values():
+            if v:
+                total += os.path.getsize(os.path.join(OUT, v))
+    json.dump(m, open(path, "w"), indent=1)
+    print(f"{os.path.basename(path)}: {len(m['materials'])} materials, {total / 1e6:.1f} MB of WebP")

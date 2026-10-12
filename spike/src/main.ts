@@ -7,6 +7,23 @@ import down from './shaders/bloom-down.wgsl';
 import up from './shaders/bloom-up.wgsl';
 
 const canvas = document.getElementById('c') as HTMLCanvasElement;
+const FLOORS = [
+  { id: 'library', name: 'Library' },
+  { id: 'lab', name: 'Laboratory' },
+  { id: 'obs', name: 'Observatory' },
+];
+const floor = new URLSearchParams(location.search).get('floor') ?? 'library';
+
+// [ and ] (or the arrow keys) climb between floors; the page reloads onto the next one.
+addEventListener('keydown', (e) => {
+  const i = FLOORS.findIndex((f) => f.id === floor);
+  const next = e.key === ']' || e.key === 'ArrowRight' ? i + 1 : e.key === '[' || e.key === 'ArrowLeft' ? i - 1 : null;
+  if (next === null || next < 0 || next >= FLOORS.length) return;
+  const q = new URLSearchParams(location.search);
+  q.set('floor', FLOORS[next].id);
+  location.search = q.toString();
+});
+document.getElementById('note')!.textContent = `${FLOORS.find((f) => f.id === floor)?.name ?? floor} · vgpu · drag to look, scroll to move, [ ] to change floor`;
 
 function fail(why: string) {
   document.getElementById('note')!.remove();
@@ -22,8 +39,8 @@ async function main() {
   gpu.device.gpu.lost.then((i) => fail(`The graphics device was lost (${i.reason}).`));
 
   const [manifest, bin] = await Promise.all([
-    fetch('library.json').then((r) => r.json() as Promise<Manifest>),
-    fetch('library.bin').then((r) => r.arrayBuffer()),
+    fetch(`${floor}.json`).then((r) => r.json() as Promise<Manifest>),
+    fetch(`${floor}.bin`).then((r) => r.arrayBuffer()),
   ]);
 
   // Decode on the main thread to RGBA bytes; vgpu textures are built from those, mips and all, so the page and the

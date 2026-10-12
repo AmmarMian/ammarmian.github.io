@@ -7,11 +7,12 @@ import { LibraryScene } from '../src/library.ts';
 
 const args = process.argv.slice(2);
 const opt = (n, d) => { const i = args.indexOf(`--${n}`); return i >= 0 ? args[i + 1] : d; };
+const floor = opt('floor', 'library');
 const [W, H] = opt('size', '1920x1080').split('x').map(Number);
 const pixel = Number(opt('pixel', '1'));
 const N = Number(opt('frames', '300'));
-const manifest = JSON.parse(readFileSync('spike/public/library.json', 'utf8'));
-const bin = readFileSync('spike/public/library.bin');
+const manifest = JSON.parse(readFileSync(`spike/public/${floor}.json`, 'utf8'));
+const bin = readFileSync(`spike/public/${floor}.bin`);
 const ab = bin.buffer.slice(bin.byteOffset, bin.byteOffset + bin.byteLength);
 const sh = (n) => readFileSync(`spike/src/shaders/${n}.wgsl`, 'utf8');
 const src = { pbr: sh('pbr'), godrays: sh('godrays'), composite: sh('composite'), down: sh('bloom-down'), up: sh('bloom-up') };
