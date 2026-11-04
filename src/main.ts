@@ -274,7 +274,8 @@ for (const f of NAV_ORDER.filter((f) => NAV_MACHINERY.includes(f.slug))) navSect
 navRail.appendChild(navSections);
 
 const ICON = {
-  gate: '<svg viewBox="0 0 20 20" aria-hidden="true"><ellipse cx="10" cy="10" rx="5.2" ry="7.5"/><ellipse cx="10" cy="10" rx="2.2" ry="4"/></svg>',
+  // other worlds: a ringed planet, its ring passing behind the globe and across its front
+  gate: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="4.9"/><path d="M2.21 13.15 L2.41 13.43 L2.73 13.66 L3.18 13.83 L3.74 13.93 L4.41 13.96 L5.18 13.93 L6.03 13.83 L6.95 13.66 L7.92 13.43 L8.93 13.14 L9.95 12.80 L10.97 12.41 L11.98 11.98 L12.96 11.51 L13.88 11.02 L14.74 10.51 L15.51 10.00 L16.20 9.48 L16.77 8.97 L17.23 8.48 L17.57 8.02 L17.78 7.58 L17.85 7.19 L17.79 6.85 M17.79 6.85 L17.57 6.55 L17.21 6.31 L16.71 6.14 L16.07 6.05 L15.31 6.04 L14.45 6.11 M4.10 10.29 L3.43 10.84 L2.89 11.38 L2.50 11.88 L2.25 12.35 L2.15 12.78 L2.21 13.15"/></svg>',
   console: '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6l4 4-4 4M10 14.5h6"/></svg>',
   // display settings: sliders, so it never reads as the theme's sun
   gear: '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 6h13M3.5 14h13"/><circle cx="7.5" cy="6" r="1.9" fill="var(--bg)"/><circle cx="12.5" cy="14" r="1.9" fill="var(--bg)"/></svg>',
