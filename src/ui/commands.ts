@@ -1,3 +1,4 @@
+import { BASE } from '../router';
 import { PROFILE, CONTACT } from '../data/profile';
 import {
   fetchHalPublications, cachedHalPublications, filterHalDocs, toBibTeX, toBibTeXAll,
@@ -113,7 +114,7 @@ const OPEN_TARGETS: Record<string, string> = {
   hal: CONTACT.hal,
   site: CONTACT.website,
   email: `mailto:${CONTACT.email}`,
-  text: '/text',
+  text: `${BASE}/text`,
 };
 
 /* ------------------------------ helpers -------------------------------- */
@@ -516,7 +517,7 @@ export const COMMANDS: Record<string, Command> = {
       if (v === '3d' && ctx.mode === 'tower') { ctx.print('already here.'); return; }
       // A view switch rebuilds the page from scratch — the 3D tower and the
       // ASCII console are different worlds, not different stylesheets.
-      const path = v === 'text' ? '/text' : v === 'ascii' ? '/console' : '/';
+      const path = BASE + (v === 'text' ? '/text' : v === 'ascii' ? '/console' : '/');
       window.location.href = path;
     },
   },

@@ -241,14 +241,14 @@ export function textPageEnhance(): void {
 /** The short version, for the <noscript> inside the 3D page. Someone reading
  *  this has JavaScript switched off and is looking at a blank tower; they
  *  need who this is and where the real content is, not a full CV. */
-export function noscriptHtml(): string {
+export function noscriptHtml(base = ''): string {
   return `<main class="text-page">
     <h1>${esc(PROFILE.name)}</h1>
     <p>${esc(PROFILE.role)} — ${esc(PROFILE.affiliation)}.</p>
     <p>${esc(PROFILE.summary)}</p>
     <p>This site is an interactive 3D scene and needs JavaScript. Everything it contains is also available as plain text:</p>
     <ul>
-      <li><a href="/text">Text version — full CV, publications, projects and contact</a></li>
+      <li><a href="${esc(base)}/text">Text version — full CV, publications, projects and contact</a></li>
       <li>${ext(CONTACT.hal, 'Publications on HAL')}</li>
       <li>${ext(CONTACT.github, 'GitHub')}</li>
       <li><a href="mailto:${esc(CONTACT.email)}">${esc(CONTACT.email)}</a></li>

@@ -6,10 +6,15 @@
 <script>
   /* GitHub Pages has no server-side router — a direct load of, say,
      /contact lands here. Stash the real URL and bounce to the app
-     shell; index.html restores it via history.replaceState. */
+     shell; index.html restores it via history.replaceState.
+     The development preview lives under /preview/ in the same deploy and
+     shares this one 404 page (Pages only serves the root's), so a deep link
+     into the preview has to bounce to the preview's shell, not the live one. */
   sessionStorage.redirect = location.href;
+  var home = /^\/preview(\/|$)/.test(location.pathname) ? '/preview/' : '/';
+  location.replace(home);
 </script>
-<meta http-equiv="refresh" content="0;URL='/'">
+<noscript><meta http-equiv="refresh" content="0;URL='/'"></noscript>
 </head>
 <body></body>
 </html>

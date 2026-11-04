@@ -1,4 +1,12 @@
 import { defineConfig, type Plugin } from 'vite';
+
+/* Where the site is served from. '/' for ammarmian.fr itself; the deploy
+   workflow sets SITE_BASE=/preview/ to build a branch as a development
+   preview alongside it. Everything that writes a root-absolute path reads
+   this (or router.ts's BASE, which Vite derives from it). */
+const SITE_BASE = process.env.SITE_BASE || '/';
+const BASE_PATH = SITE_BASE.replace(/\/$/, '');
+const IS_PREVIEW = BASE_PATH !== '';
 import { readFileSync } from 'node:fs';
 import { textPageHtml, textPageEnhance, noscriptHtml, TEXT_TITLE, TEXT_DESCRIPTION, esc } from './src/ui/textHtml';
 
@@ -26,9 +34,9 @@ function prerenderText(): Plugin {
 <meta name="author" content="Ammar Mian">
 <link rel="canonical" href="${esc(canonical)}">
 <meta name="theme-color" content="#0a1a1d">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="${BASE_PATH}/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="${BASE_PATH}/favicon-16x16.png">
+<link rel="apple-touch-icon" href="${BASE_PATH}/apple-touch-icon.png">${IS_PREVIEW ? '\n<meta name="robots" content="noindex, nofollow">' : ''}
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Cormorant+SC:wght@500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500&family=Pirata+One&display=swap" rel="stylesheet">`;
 
@@ -39,15 +47,19 @@ function prerenderText(): Plugin {
        the text page. Generated from the same module now, so a changed title
        or affiliation reaches it without anyone remembering to look. */
     transformIndexHtml(html) {
-      return html.replace(
+      const out = html.replace(
         /<noscript>[\s\S]*?<\/noscript>/,
-        `<noscript>\n${noscriptHtml()}\n</noscript>`,
+        `<noscript>\n${noscriptHtml(BASE_PATH)}\n</noscript>`,
       );
+      // A preview is a copy of the site: keep it out of search results.
+      return IS_PREVIEW
+        ? out.replace('<head>', '<head>\n<meta name="robots" content="noindex, nofollow">')
+        : out;
     },
     generateBundle(_options, bundle) {
       // Whatever hash the stylesheet was given this build.
       const css = Object.keys(bundle).find((f) => f.endsWith('.css'));
-      const cssHref = css ? '/' + css : '';
+      const cssHref = css ? SITE_BASE + css : '';
       this.emitFile({
         type: 'asset',
         fileName: 'text/index.html',
@@ -57,7 +69,7 @@ function prerenderText(): Plugin {
 <link rel="stylesheet" href="${esc(cssHref)}">
 </head>
 <body>
-${textPageHtml('')}
+${textPageHtml(BASE_PATH)}
 <script>(${textPageEnhance.toString()})();</script>
 </body>
 </html>
@@ -116,7 +128,7 @@ function publicationsJsonLd(): Plugin {
 
 // Served from https://ammarmian.fr/ (the user/org root site).
 export default defineConfig({
-  base: '/',
+  base: SITE_BASE,
   plugins: [publicationsJsonLd(), prerenderText(() => cssHref)],
   build: {
     rollupOptions: {

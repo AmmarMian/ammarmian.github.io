@@ -1,7 +1,8 @@
 import { F } from './tower/scene-constants';
 
-// Served at the domain root (see vite.config.ts).
-export const BASE = '';
+// '' at the domain root; '/preview' for the development preview the deploy
+// workflow builds from a branch (see vite.config.ts, SITE_BASE).
+export const BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 export interface FloorRoute {
   index: number;

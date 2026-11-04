@@ -1,7 +1,7 @@
 import { PROFILE, CONTACT } from '../data/profile';
 import { runCommand, describeFloor, asciiTower, JUMP_TARGETS, type Ctx } from './commands';
 import { attachLineEditor } from './lineEditor';
-import { FLOORS, currentSlug, onRouteChange } from '../router';
+import { FLOORS, currentSlug, onRouteChange, BASE } from '../router';
 import { FLOOR_NAMES } from '../tower/scene-constants';
 import { setRouteMeta } from './meta';
 
@@ -21,7 +21,7 @@ export function renderAsciiConsole(root: HTMLElement) {
       <div class="ascii-name">${PROFILE.name}</div>
       <div class="ascii-role">${PROFILE.role} — LISTIC, Université Savoie Mont-Blanc</div>
       <nav class="ascii-modes" aria-label="Other views">
-        <a href="/?view=3d">3D tower</a><span aria-hidden="true">·</span><a href="/text">Text version</a>
+        <a href="${BASE}/?view=3d">3D tower</a><span aria-hidden="true">·</span><a href="${BASE}/text">Text version</a>
       </nav>
       <button class="ascii-tower-toggle" type="button" aria-controls="ascii-tower" aria-expanded="false">
         <span aria-hidden="true">⌂</span> Tower

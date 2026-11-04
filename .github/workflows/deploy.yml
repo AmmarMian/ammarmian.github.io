@@ -1,8 +1,19 @@
 name: Deploy to GitHub Pages
 
+# A repository has one Pages site, so the live site and the development
+# preview go up together as one deploy:
+#   · a push to master builds master at the root — ammarmian.fr — as before;
+#   · a push to a preview branch builds master at the root as well (so the
+#     live site is exactly what master says it is) and the branch beside it
+#     under /preview/ — ammarmian.fr/preview/ — marked noindex.
+# The next push to master, or the weekly rebuild, drops the preview again.
+#
+# Deploying from a branch other than master needs that branch allowed in
+# Settings → Environments → github-pages → Deployment branches and tags.
+
 on:
   push:
-    branches: [master]
+    branches: [master, 'claude/confident-carson-jvzrmo']
   workflow_dispatch:
   # The publication list is baked into the bundle at build time, so a new
   # paper on HAL only reaches the site when the site is rebuilt. Monday
@@ -22,23 +33,59 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      IS_PREVIEW: ${{ github.ref != 'refs/heads/master' }}
     steps:
+      # The live site: always master.
       - uses: actions/checkout@v4
+        with:
+          ref: master
+          path: live
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+          cache-dependency-path: live/package-lock.json
       # Refresh the snapshot from HAL before building. Deliberately not
       # committed back: the file in the repo is the offline fallback, and a
       # bot pushing to master on a schedule would retrigger this workflow.
       # If HAL is unreachable the script says so and leaves the snapshot
       # alone rather than failing the deploy.
-      - run: npm run hal
-      - run: npm run build
+      - name: Build the live site (master)
+        working-directory: live
+        run: |
+          npm ci
+          npm run hal
+          npm run build
+
+      # The preview: the pushed branch, built under /preview/.
+      - if: env.IS_PREVIEW == 'true'
+        uses: actions/checkout@v4
+        with:
+          path: preview
+      - name: Build the preview (${{ github.ref_name }})
+        if: env.IS_PREVIEW == 'true'
+        working-directory: preview
+        env:
+          SITE_BASE: /preview/
+        run: |
+          npm ci
+          npm run hal
+          npm run build
+      - name: Put the preview beside the live site
+        if: env.IS_PREVIEW == 'true'
+        run: |
+          mkdir -p live/dist/preview
+          cp -R preview/dist/. live/dist/preview/
+          # Pages serves only the root's 404 page, and its bounce has to know
+          # that /preview/... deep links belong to the preview's shell.
+          cp preview/public/404.html live/dist/404.html
+          # The custom domain belongs to the root, not the preview copy.
+          rm -f live/dist/preview/CNAME
+
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: live/dist
 
   deploy:
     needs: build
