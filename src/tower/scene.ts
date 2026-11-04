@@ -22,6 +22,7 @@ import { buildBathhouse, VISTAS, type Vista } from './floors/bathhouse';
 import { buildWizardMesh, createWizardController } from './wizard';
 import { buildFoxMesh, createFoxState, foxDecide } from './fox';
 import { loadGlb } from './glb';
+import { fadeWalls } from './wallfade';
 import { setAutoTheme, effectiveTheme } from '../ui/theme';
 import { makePoints, setBackdrop as setBackdropFx, suppressBackdrop, setGridTheme } from './fx';
 import { createFocusController } from './focus';
@@ -143,6 +144,9 @@ export function createTowerScene(container: HTMLElement, opts: {
   const groundBox = new THREE.Box3().setFromObject(floors[GROUND].g);
   model.position.set(-c0.x, -groundBox.min.y, -c0.z);
   fx.position.copy(model.position);
+  // walls between the eye and a room dissolve; the tower's axis is the
+  // model's origin, wherever the centring above has put it
+  fadeWalls(model, model.position);
   scene.add(model);
   scene.add(fx);
 

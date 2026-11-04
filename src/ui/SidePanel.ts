@@ -559,7 +559,7 @@ export class SidePanel {
     this.actionList([
       {
         label: 'Detail, resolution and the frame counter',
-        blurb: 'The gear, bottom right — or press S from anywhere',
+        blurb: 'The sliders in the header (in the menu on a phone) — or press S from anywhere',
         run: () => this.actions.openSettings?.(),
       },
       {
