@@ -4,6 +4,7 @@ import {
   toCSV, toPlainCitation, docSlugFor, type HalDoc,
 } from '../data/hal';
 import students from '../data/students.json';
+import { studentGroups } from '../data/studentGroups';
 import projects from '../data/projects.json';
 import { FLOORS, navigate } from '../router';
 import { FLOOR_NAMES } from '../tower/scene-constants';
@@ -370,9 +371,12 @@ export const COMMANDS: Record<string, Command> = {
         ctx.print(`github   ${CONTACT.github}`);
         ctx.print(`hal      ${CONTACT.hal}`);
       } else if (file === 'students.txt') {
-        for (const s of students as any[]) {
-          ctx.print(`  ${pad(s.name, 22)}${pad(s.kind, 10)}${s.period}${s.status === 'current' ? '  · current' : ''}`);
-          ctx.print(`  ${' '.repeat(22)}${s.topic}`, 'dim');
+        for (const g of studentGroups()) {
+          ctx.print(`${g.label.toLowerCase()}:`, 'head');
+          for (const s of g.rows) {
+            ctx.print(`  ${pad(s.name, 22)}${pad(s.kind, 6)}${s.period}`);
+            ctx.print(`  ${' '.repeat(22)}${s.topic}`, 'dim');
+          }
         }
       } else {
         ctx.print(`cat: ${file || 'missing operand'}: no such file — try cv.txt, contact.txt, students.txt`, 'err');
@@ -388,7 +392,10 @@ export const COMMANDS: Record<string, Command> = {
     complete: () => ['publications'],
     async run(args, ctx) {
       if (args[0] === 'publications' || args[0] === 'pubs') return COMMANDS.pubs.run([], ctx);
-      for (const p of projects as any[]) ctx.print(`  ${pad(p.name, 12)}${p.description}`);
+      for (const p of projects as any[]) {
+        ctx.print(`  ${pad(p.name, 15)}${p.description}`);
+        if (p.demo) ctx.print(`  ${' '.repeat(15)}demo: ${p.demo}`, 'dim');
+      }
       const current = (students as any[]).filter((s) => s.status === 'current');
       if (current.length) {
         ctx.print('');

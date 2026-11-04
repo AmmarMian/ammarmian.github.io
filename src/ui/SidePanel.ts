@@ -12,7 +12,7 @@ import { createYearRangeSlider } from './YearRange';
 import type { FloorRoute } from '../router';
 import { PROFILE, CONTACT } from '../data/profile';
 import { COLOPHON_TITLE, COLOPHON_BLOCK, COLOPHON_NOTE } from '../data/colophon';
-import students from '../data/students.json';
+import { studentGroups } from '../data/studentGroups';
 import { panelTaken } from './layout';
 import projects from '../data/projects.json';
 
@@ -458,7 +458,7 @@ export class SidePanel {
     list.className = 'proj-list';
     for (const p of projects as any[]) {
       const li = document.createElement('li');
-      li.innerHTML = `<h3>${escapeHtml(p.name)}</h3><p>${escapeHtml(p.description)}</p><a class="read-link" href="${escapeAttr(p.url)}" target="_blank" rel="noopener">View on GitHub &rarr;</a>`;
+      li.innerHTML = `<h3>${escapeHtml(p.name)}</h3><p>${escapeHtml(p.description)}</p>${p.demo ? `<a class="read-link" href="${escapeAttr(p.demo)}" target="_blank" rel="noopener">Live demo &rarr;</a>` : ''}<a class="read-link" href="${escapeAttr(p.url)}" target="_blank" rel="noopener">View on GitHub &rarr;</a>`;
       list.appendChild(li);
     }
     this.bodyEl.appendChild(list);
@@ -640,13 +640,10 @@ export class SidePanel {
 
   private renderNow() {
     const p = document.createElement('p');
-    p.textContent = 'What is simmering in the kitchen right now: students currently under supervision.';
+    p.textContent = 'What is simmering in the kitchen: the doctoral students and master’s interns I supervise, theses in progress first.';
     this.bodyEl.appendChild(p);
 
-    const groups: [string, string][] = [['current', 'Current'], ['done', 'Past & master’s']];
-    for (const [status, label] of groups) {
-      const rows = (students as any[]).filter((s) => s.status === status);
-      if (!rows.length) continue;
+    for (const { label, rows } of studentGroups()) {
       const h3 = document.createElement('div');
       h3.className = 'group-label';
       h3.textContent = label;
@@ -655,7 +652,7 @@ export class SidePanel {
       list.className = 'proj-list';
       for (const s of rows) {
         const li = document.createElement('li');
-        li.innerHTML = `<h3>${escapeHtml(s.name)}</h3><p>${escapeHtml(s.topic)}</p>${s.note ? `<p class="tl-org">${escapeHtml(s.note)}</p>` : ''}<span class="status status-${status}">${escapeHtml(s.kind)} &middot; ${escapeHtml(s.period)}</span>`;
+        li.innerHTML = `<h3>${escapeHtml(s.name)}</h3><p>${escapeHtml(s.topic)}</p>${s.note ? `<p class="tl-org">${escapeHtml(s.note)}</p>` : ''}<span class="status status-${s.status === 'current' ? 'current' : 'done'}">${escapeHtml(s.kind)} &middot; ${escapeHtml(s.period)}</span>`;
         list.appendChild(li);
       }
       this.bodyEl.appendChild(list);

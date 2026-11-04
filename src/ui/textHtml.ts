@@ -18,6 +18,7 @@ import projects from '../data/projects.json';
 import snapshot from '../data/hal-snapshot.json';
 import { COLOPHON_TITLE, COLOPHON_BLOCK, COLOPHON_NOTE } from '../data/colophon';
 import { toBibTeX, type HalDoc } from '../data/hal';
+import { studentGroups } from '../data/studentGroups';
 
 /* One line glyph per kind of record, drawn like the rest of the site's
    line-work (the leader lines, the rules): 18px, a 1.2px stroke in the
@@ -55,8 +56,7 @@ const ext = (href: string, label: string) =>
  *  screen and set above it on a narrow one. */
 export function textPageHtml(base = ''): string {
   const docs = snapshot as HalDoc[];
-  const studs = students as { name: string; topic: string; note?: string; kind: string; period: string; status: string }[];
-  const projs = projects as { name: string; description: string; url: string }[];
+    const projs = projects as { name: string; description: string; url: string; demo?: string }[];
 
   const cv = (rows: readonly { role: string; org: string; year: string }[]) => rows.map((r) => `
       <li><span class="tp-when">${esc(r.year)}</span><div><strong>${esc(r.role)}</strong><span>${esc(r.org)}</span></div></li>`).join('');
@@ -93,11 +93,17 @@ export function textPageHtml(base = ''): string {
       </ol>`;
   }).join('');
 
-  const people = (status: string) => studs.filter((x) => x.status === status).map((x) => `
+  const groups = studentGroups();
+  const people = (rows: typeof groups[number]['rows']) => rows.map((x) => `
       <li><span class="tp-when">${esc(x.kind)} · ${esc(x.period)}</span><div><strong>${esc(x.name)}</strong><span>${esc(x.topic)}</span>${x.note ? `<span class="tp-note">${esc(x.note)}</span>` : ''}</div></li>`).join('');
+  const studentSections = groups.map((g) => `
+        <h3 id="${g.id}">${esc(g.label)}</h3>
+        <ul class="tp-cv">${people(g.rows)}</ul>`).join('');
+  const studentToc = groups.map((g) => `<li><a href="#${g.id}">${esc(g.label)}</a></li>`).join('');
 
   const tools = projs.map((x) => `
-      <li><span class="tp-when">${ext(x.url, 'repository')}</span><div><strong>${esc(x.name)}</strong><span>${esc(x.description)}</span></div></li>`).join('');
+      <li><span class="tp-when">Software</span><div><strong>${esc(x.name)}</strong><span>${esc(x.description)}</span>
+        <span class="tp-acts">${x.demo ? `<a class="tp-chip" href="${esc(x.demo)}" target="_blank" rel="noopener">Live demo<span aria-hidden="true">&#8599;</span></a>` : ''}<a class="tp-chip" href="${esc(x.url)}" target="_blank" rel="noopener">Repository<span aria-hidden="true">&#8599;</span></a></span></div></li>`).join('');
 
   const colophon = COLOPHON_BLOCK.map((r) => (
     `<dt>${esc(r.field)}</dt><dd>${esc(r.value)}${r.note ? `<span>${esc(r.note)}</span>` : ''}</dd>`
@@ -118,7 +124,7 @@ export function textPageHtml(base = ''): string {
         <li><a href="#publications"><span>2</span>Publications</a>
           <div class="tp-toc-years">${yearLinks}</div></li>
         <li><a href="#students"><span>3</span>Students &amp; tools</a>
-          <ol><li><a href="#supervising">Supervising now</a></li><li><a href="#past">Past &amp; master's</a></li><li><a href="#software">Software</a></li></ol></li>
+          <ol>${studentToc}<li><a href="#software">Software</a></li></ol></li>
         <li><a href="#contact"><span>4</span>Contact</a></li>
         <li><a href="#colophon"><span>§</span>Colophon</a></li>
       </ol>
@@ -148,10 +154,7 @@ export function textPageHtml(base = ''): string {
 
       <section id="students">
         <h2><span>3</span>Students &amp; tools</h2>
-        <h3 id="supervising">Supervising now</h3>
-        <ul class="tp-cv">${people('current')}</ul>
-        <h3 id="past">Past &amp; master's</h3>
-        <ul class="tp-cv">${people('done')}</ul>
+${studentSections}
         <h3 id="software">Software</h3>
         <ul class="tp-cv">${tools}</ul>
       </section>

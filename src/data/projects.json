@@ -4,5 +4,12 @@
     "description": "A command-line tool for managing and reproducing numerical experiments.",
     "url": "https://github.com/ammarmian/qanat",
     "status": "current"
+  },
+  {
+    "name": "Endless Field",
+    "description": "An endless procedural grassland rendered with WebGPU. You are the wind: carry a stream of petals, bloom glowing flowers, and watch the dry field turn green behind you.",
+    "url": "https://github.com/AmmarMian/endless-field",
+    "status": "current",
+    "demo": "https://ammarmian.fr/endless-field/"
   }
 ]
