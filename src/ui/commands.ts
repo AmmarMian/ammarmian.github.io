@@ -1,7 +1,7 @@
 import { PROFILE, CONTACT } from '../data/profile';
 import {
   fetchHalPublications, cachedHalPublications, filterHalDocs, toBibTeX, toBibTeXAll,
-  toCSV, toPlainCitation, docSlugFor, type HalDoc,
+  toCSV, toPlainCitation, docSlugFor, venueLine, type HalDoc,
 } from '../data/hal';
 import students from '../data/students.json';
 import { studentGroups } from '../data/studentGroups';
@@ -431,7 +431,7 @@ export const COMMANDS: Record<string, Command> = {
       if (!doc) return;
       ctx.print(doc.title);
       ctx.print(doc.authors, 'dim');
-      ctx.print(`${doc.venue} · ${doc.year || 'n.d.'} · ${doc.kind}`, 'dim');
+      ctx.print([venueLine(doc), doc.year || 'n.d.', doc.kind].filter(Boolean).join(' · '), 'dim');
       if (doc.doi) ctx.print(`doi   ${doc.doi}`);
       ctx.print(`hal   ${doc.uri}`);
       if (doc.pdf) ctx.print(`pdf   ${doc.pdf}`);

@@ -1,7 +1,7 @@
 import type { TowerScene } from '../tower/scene';
 import { createSearchInput } from './SearchBox';
 import {
-  fetchHalPublications, filterHalDocs, shelfFor, docSlugFor,
+  fetchHalPublications, filterHalDocs, shelfFor, docSlugFor, venueLine,
   toBibTeX, toBibTeXAll, toCSV, toPlainCitation, type HalDoc,
 } from '../data/hal';
 import { copyText, downloadText, flashLabel, announce } from './io';
@@ -233,7 +233,7 @@ export class SidePanel {
         const li = document.createElement('li');
         const btn = document.createElement('button');
         btn.className = 'pub-item';
-        btn.innerHTML = `<strong>${escapeHtml(doc.title)}</strong><span>${escapeHtml(doc.venue)} &middot; ${doc.year || 'n.d.'} &middot; ${escapeHtml(doc.kind)}</span>`;
+        btn.innerHTML = `<strong>${escapeHtml(doc.title)}</strong><span>${[venueLine(doc), doc.year || 'n.d.', doc.kind].filter(Boolean).map((x) => escapeHtml(String(x))).join(' &middot; ')}</span>`;
         btn.addEventListener('click', () => this.openPublication(doc));
         li.appendChild(btn);
         list.appendChild(li);
@@ -339,7 +339,7 @@ export class SidePanel {
       <button class="back-link" type="button">&larr; back to the shelves</button>
       <h2>${escapeHtml(doc.title)}</h2>
       <p class="pub-meta">${escapeHtml(doc.authors)}</p>
-      <p class="pub-meta">${escapeHtml(doc.venue)} &middot; ${doc.year || 'n.d.'} &middot; ${escapeHtml(doc.kind)}</p>
+      <p class="pub-meta">${[venueLine(doc), doc.year || 'n.d.', doc.kind].filter(Boolean).map((x) => escapeHtml(String(x))).join(' &middot; ')}</p>
       ${doc.doi ? `<p class="pub-meta">doi: <a href="https://doi.org/${escapeAttr(doc.doi)}" target="_blank" rel="noopener">${escapeHtml(doc.doi)}</a></p>` : ''}
       <p class="pub-links">
         <a class="read-link" href="${escapeAttr(doc.uri)}" target="_blank" rel="noopener">Read on HAL &rarr;</a>
@@ -474,7 +474,7 @@ export class SidePanel {
       <li><span class="contact-label">Email</span><a href="mailto:${CONTACT.email}">${CONTACT.email}</a></li>
       <li><span class="contact-label">Office</span><span>${escapeHtml(CONTACT.office)}</span></li>
       <li><span class="contact-label">HAL</span><a href="${CONTACT.hal}" target="_blank" rel="noopener">search results</a></li>
-      <li><span class="contact-label">Elsewhere</span><span><a href="${CONTACT.github}" target="_blank" rel="noopener">GitHub</a> &middot; <a href="${CONTACT.website}" target="_blank" rel="noopener">website</a></span></li>
+      <li><span class="contact-label">GitHub</span><a href="${CONTACT.github}" target="_blank" rel="noopener">${CONTACT.github.replace(/^https:\/\//, '')}</a></li>
     `;
     this.bodyEl.appendChild(ul);
   }

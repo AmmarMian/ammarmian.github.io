@@ -21,6 +21,9 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'data', 'hal-snapshot.json');
+/* When the list was last actually fetched — written only on success, so a
+   build that fell back on the old snapshot does not claim to be fresh. */
+const META = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'data', 'hal-snapshot.meta.json');
 
 /* Kept in step with KINDS in src/data/hal.ts by hand. There are ten of them
    and they have not changed since HAL defined them; a shared module would
@@ -83,6 +86,7 @@ try {
   if (!docs.length) throw new Error('HAL returned no records');
 
   await writeFile(OUT, JSON.stringify(docs, null, 2) + '\n');
+  await writeFile(META, JSON.stringify({ fetchedAt: new Date().toISOString().slice(0, 10) }, null, 2) + '\n');
   console.log(`hal: ${docs.length} records written${held === null ? '' : ` (was ${held})`}`);
 } catch (err) {
   console.warn(`hal: ${err.message}`);

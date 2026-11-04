@@ -105,6 +105,46 @@ function bibKey(doc: HalDoc): string {
   return `${last}${doc.year || 'nd'}${word}`.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
+/* Short names for the venues that recur, so a list reads "ICASSP" and
+   "GRETSI" rather than a different long-form title on every line. Display
+   only: BibTeX and the CSV keep HAL's full venue. A venue that is only a
+   DOI or the archive's name says nothing a link does not, so it is dropped. */
+const SHORT_VENUES: [RegExp, string][] = [
+  [/ICASSP|International Conference on Acoustics, Speech/i, 'ICASSP'],
+  [/EUSIPCO|European Signal Processing Conference/i, 'EUSIPCO'],
+  [/GRETSI/i, 'GRETSI'],
+  [/IGARSS|International Geoscience and Remote Sensing Symposium/i, 'IGARSS'],
+  [/International Conference on Machine Learning\b|\bICML\b/i, 'ICML'],
+  [/European Conference on Machine Learning|ECML/i, 'ECML PKDD'],
+  [/Journal of Selected Topics in Applied Earth Observations/i, 'IEEE JSTARS'],
+];
+export function shortVenue(venue: string): string {
+  if (!venue || /^doi:/i.test(venue) || venue === 'HAL') return '';
+  for (const [re, name] of SHORT_VENUES) if (re.test(venue)) return name;
+  return venue;
+}
+
+/** Volume, issue and pages, set the way a reference list sets them:
+ *  "240(3), pp. 520–534", or "art. 110338" where the journal numbers
+ *  articles rather than pages. Empty when HAL has none of them. */
+export function citeTail(doc: HalDoc): string {
+  const one = (v: unknown) => String(Array.isArray(v) ? v[0] ?? '' : v ?? '').trim();
+  const vol = one(doc.volume), iss = one(doc.issue), pg = one(doc.pages);
+  const parts: string[] = [];
+  if (vol) parts.push(iss ? `${vol}(${iss})` : vol);
+  // an issue on its own only means something for a journal
+  else if (iss && doc.kind === 'Journal') parts.push(`no. ${iss}`);
+  if (pg) parts.push(/[-–]/.test(pg) ? `pp. ${pg.replace(/\s*-+\s*/, '–')}` : /^\d{5,}$/.test(pg) ? `art. ${pg}` : `p. ${pg}`);
+  return parts.join(', ');
+}
+
+/** "IEEE TSP 67(2), pp. 520–534" — the venue line every list shows. */
+export function venueLine(doc: HalDoc): string {
+  const v = shortVenue(doc.venue), t = citeTail(doc);
+  // "Signal Processing 240" runs on; "ICASSP, pp. 7445–7449" takes a comma
+  return v && t ? `${v}${/^\d/.test(t) ? ' ' : ', '}${t}` : v || t;
+}
+
 export function toBibTeX(doc: HalDoc): string {
   const type = BIB_TYPE[doc.kind] || 'misc';
   const venueField = type === 'inproceedings' ? 'booktitle' : type === 'incollection' ? 'booktitle' : 'journal';

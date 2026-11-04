@@ -226,6 +226,7 @@ body[data-backdrop="meadow"] { background: linear-gradient(#8fc4e8 0%, #bcd9ea 4
   display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
   margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--rule);
   font: 400 var(--fs-xs)/1 var(--font-mono); letter-spacing: 0.06em;
+  flex-wrap: wrap; color: var(--ink-faint);
 }
 .tp-ft a { color: var(--ink-faint) !important; text-decoration: none; }
 .tp-sig { font: 400 var(--fs-xl)/1 var(--font-blackletter); letter-spacing: 0; color: var(--accent); }

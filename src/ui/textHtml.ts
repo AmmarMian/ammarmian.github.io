@@ -17,7 +17,8 @@ import students from '../data/students.json';
 import projects from '../data/projects.json';
 import snapshot from '../data/hal-snapshot.json';
 import { COLOPHON_TITLE, COLOPHON_BLOCK, COLOPHON_NOTE } from '../data/colophon';
-import { toBibTeX, type HalDoc } from '../data/hal';
+import { toBibTeX, shortVenue, citeTail, type HalDoc } from '../data/hal';
+import snapshotMeta from '../data/hal-snapshot.meta.json';
 import { studentGroups } from '../data/studentGroups';
 
 /* One line glyph per kind of record, drawn like the rest of the site's
@@ -43,7 +44,7 @@ export function esc(s: unknown): string {
 }
 
 export const TEXT_TITLE = `${PROFILE.name} — text version`;
-export const TEXT_DESCRIPTION = `${PROFILE.role}, ${PROFILE.affiliation}. ${PROFILE.bio}`;
+export const TEXT_DESCRIPTION = `${PROFILE.role}, ${PROFILE.affiliation}. ${PROFILE.summary}`;
 
 const ext = (href: string, label: string) =>
   `<a href="${esc(href)}" target="_blank" rel="noopener">${esc(label)}</a>`;
@@ -71,7 +72,8 @@ export function textPageHtml(base = ''): string {
       <ol class="tp-pubs">${rows.map((d) => {
         // A preprint's "venue" is often just its DOI or the archive's name —
         // already a button below, so it is not repeated as a venue.
-        const venue = d.venue && !/^(doi:|hal$)/i.test(d.venue) ? `<i>${esc(d.venue)}</i>` : '';
+        const v = shortVenue(d.venue), tail = citeTail(d);
+        const venue = v || tail ? `<span>${v ? `<i>${esc(v)}</i>` : ''}${v && tail ? (/^\d/.test(tail) ? ' ' : ', ') : ''}${esc(tail)}</span>` : '';
         const btn = (href: string, label: string) =>
           `<a class="tp-chip" href="${esc(href)}" target="_blank" rel="noopener">${label}<span aria-hidden="true">&#8599;</span></a>`;
         return `
@@ -110,7 +112,9 @@ export function textPageHtml(base = ''): string {
   )).join('');
   const colophonNote = COLOPHON_NOTE.map((x) => `<p>${esc(x)}</p>`).join('');
 
-  const research = PROFILE.bio.replace(/^In the world outside the tower:\s*/i, '');
+  // The day the publication list was last fetched from HAL (scripts/fetch-hal.mjs).
+  const asOf = new Date(`${snapshotMeta.fetchedAt}T12:00:00Z`)
+    .toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
   const yearLinks = years.map((y) => `<a href="#y${y || 'nd'}">${y || 'n.d.'}</a>`).join('');
 
   return `<main class="text-page">${GLYPH_DEFS}
@@ -134,7 +138,7 @@ export function textPageHtml(base = ''): string {
       <header class="tp-hdr" id="top">
         <p class="tp-run"><b>Curriculum</b> · LISTIC · Université Savoie Mont-Blanc</p>
         <h1>Ammar Mian</h1>
-        <p class="tp-dek">${esc(PROFILE.role)}, ${esc(PROFILE.affiliation)} — ${esc(research)}</p>
+        <p class="tp-dek">${esc(PROFILE.role)} at ${esc(PROFILE.affiliation)}, working on ${esc(PROFILE.research)}.</p>
         <p class="tp-by"><a href="mailto:${esc(CONTACT.email)}">${esc(CONTACT.email)}</a><span>·</span>${ext(CONTACT.hal, 'HAL')}<span>·</span>${ext(CONTACT.github, 'GitHub')}</p>
       </header>
 
@@ -148,7 +152,7 @@ export function textPageHtml(base = ''): string {
 
       <section id="publications">
         <h2><span>2</span>Publications</h2>
-        <p class="tp-aside">A snapshot taken at build time. The library in the tower reads HAL live, with search, filters and BibTeX export.</p>
+        <p class="tp-aside">From the HAL open archive, as of ${esc(asOf)}. The library in the tower has the same list with search, filters and BibTeX export.</p>
         ${pubs}
       </section>
 
@@ -177,6 +181,7 @@ ${studentSections}
 
       <footer class="tp-ft">
         <span class="tp-sig">Ammar Mian</span>
+        <span>Publications updated ${esc(asOf)}</span>
         <a href="#top">Back to the top &uarr;</a>
       </footer>
     </article>
@@ -239,7 +244,7 @@ export function noscriptHtml(): string {
   return `<main class="text-page">
     <h1>${esc(PROFILE.name)}</h1>
     <p>${esc(PROFILE.role)} — ${esc(PROFILE.affiliation)}.</p>
-    <p>${esc(PROFILE.bio)}</p>
+    <p>${esc(PROFILE.summary)}</p>
     <p>This site is an interactive 3D scene and needs JavaScript. Everything it contains is also available as plain text:</p>
     <ul>
       <li><a href="/text">Text version — full CV, publications, projects and contact</a></li>

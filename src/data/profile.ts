@@ -2,7 +2,13 @@ export const PROFILE = {
   name: 'Ammar Mian',
   role: 'Associate professor (Maître de conférences)',
   affiliation: 'LISTIC, Polytech Annecy-Chambéry, Université Savoie Mont-Blanc',
-  bio: 'In the world outside the tower: associate professor at LISTIC (Université Savoie Mont-Blanc), working on statistical signal processing and Riemannian-geometry methods for robust and remote-sensing problems.',
+  /* The research in one phrase, with no role in it: every place that shows
+     it already shows the role right above, and the old bio repeated it. */
+  research: 'statistical signal processing and Riemannian-geometry methods for robust and remote-sensing problems',
+  /** The tower's own voice, for the 3D site and the consoles. */
+  bio: 'In the world outside the tower: working on statistical signal processing and Riemannian-geometry methods for robust and remote-sensing problems.',
+  /** The plain version, for the text page and search results. */
+  summary: 'Works on statistical signal processing and Riemannian-geometry methods for robust and remote-sensing problems.',
   positions: [
     { role: 'Maître de conférences', org: 'LISTIC, Polytech Annecy-Chambéry, Université Savoie Mont-Blanc', year: '2020—' },
     { role: 'Post-doctorant', org: 'Aalto University, Finland — Riemannian geometry for statistical learning, with Esa Ollila', year: '2019—2020' },
