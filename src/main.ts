@@ -22,6 +22,13 @@ import {
 } from './router';
 
 const app = document.getElementById('app')!;
+/* Which treatment the floor panel gets over a world (see the end of
+   style.css): card (default), glass, sheet or band. `?panel=` picks one, so
+   the alternatives can be compared on the preview. */
+{
+  const v = new URLSearchParams(location.search).get('panel');
+  if (v && ['card', 'glass', 'sheet', 'band'].includes(v)) document.documentElement.dataset.panel = v;
+}
 
 // Three ways in, all showing the same content:
 //   /text     — plain semantic HTML, for screen readers, crawlers and skimming

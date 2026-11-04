@@ -1318,3 +1318,51 @@ body[data-gl-lost="1"] #tower-host::after {
   }
 }
 
+/* ---------- alternatives for the panel over a world ----------
+   Chosen with ?panel= while they are being compared (main.ts).
+
+   glass — the world shows through, blurred and darkened: the panel reads as
+           a pane of smoked glass standing in the scene.
+   sheet — a full-height sheet of paper against the screen's edge, like a
+           slide resting on the desk, with the world on the other side; the
+           closest to the design system's own pages.
+   band  — no box: a deep gradient rises from the panel's side, as a film's
+           lower third does, and the type sits straight on it. */
+@media (min-width: 901px) {
+  :root[data-world][data-panel="glass"] .callout {
+    background: color-mix(in srgb, var(--bg) 52%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25);
+    border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+    border-radius: 14px; box-shadow: 0 20px 50px -20px #000000aa;
+  }
+
+  :root[data-world][data-panel="sheet"] .callout {
+    top: 0; bottom: 0; max-height: none; height: 100vh;
+    padding-top: 84px; border-radius: 0; border: none;
+    background: var(--surface);
+    box-shadow: var(--elev-slide), 0 0 80px -10px #00000088;
+  }
+  :root[data-world][data-panel="sheet"] .callout-left { left: 0; padding-left: 4vw; width: calc(clamp(380px, 42vw, 760px) + 4vw); }
+  :root[data-world][data-panel="sheet"] .callout-right { right: 0; padding-right: 4vw; width: calc(clamp(380px, 42vw, 760px) + 4vw); }
+  :root[data-world][data-panel="sheet"] .callout-head { padding: 26px 32px 0; }
+  :root[data-world][data-panel="sheet"] .leader-wrap { top: 104px; }
+  :root[data-world][data-panel="sheet"] .callout-body { padding: 4px 32px 32px; }
+
+  :root[data-world][data-panel="band"] .callout {
+    background: none; border: none; box-shadow: none;
+  }
+  :root[data-world][data-panel="band"] .callout::before {
+    display: block !important;
+    top: -92px; height: 100vh; width: calc(100% + 4vw + 260px);
+  }
+  :root[data-world][data-panel="band"] .callout-left::before {
+    left: -4vw;
+    background: linear-gradient(to right, color-mix(in srgb, var(--bg) 96%, transparent) 0%, color-mix(in srgb, var(--bg) 90%, transparent) 62%, transparent);
+  }
+  :root[data-world][data-panel="band"] .callout-right::before {
+    right: -4vw;
+    background: linear-gradient(to left, color-mix(in srgb, var(--bg) 96%, transparent) 0%, color-mix(in srgb, var(--bg) 90%, transparent) 62%, transparent);
+  }
+  :root[data-world][data-panel="band"] .callout h1 { font-size: var(--fs-x3); font-weight: 300; }
+}
+
