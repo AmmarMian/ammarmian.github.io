@@ -121,6 +121,7 @@ export function textPageHtml(base = ''): string {
   <div class="tp-layout">
     <nav class="tp-toc" aria-label="Contents">
       <a class="tp-toc-home" href="${esc(base)}/?view=3d">&larr; The interactive tower</a>
+      <button class="tp-theme" type="button" hidden>Theme: auto</button>
       <p class="tp-toc-h">Contents</p>
       <ol>
         <li><a href="#career"><span>1</span>Career</a>
@@ -221,6 +222,27 @@ export function textPageEnhance(): void {
     const top = a.closest('.tp-toc > ol > li')?.querySelector(':scope > a');
     if (top && top !== a) top.setAttribute('aria-current', 'true');
   };
+  // Light, dark or the reader's system setting; the same choice the tower
+  // remembers (ui/theme.ts uses the same key).
+  const themeBtn = toc.querySelector<HTMLButtonElement>('.tp-theme');
+  if (themeBtn) {
+    const order = ['auto', 'paper', 'night'];
+    const name: Record<string, string> = { auto: 'Theme: auto', paper: 'Theme: light', night: 'Theme: dark' };
+    let pref = 'auto';
+    try { pref = localStorage.getItem('lair-theme') || 'auto'; } catch {}
+    const apply = () => {
+      if (pref === 'auto') delete document.documentElement.dataset.theme;
+      else document.documentElement.dataset.theme = pref;
+      themeBtn.textContent = name[pref] || name.auto;
+    };
+    themeBtn.hidden = false;
+    themeBtn.addEventListener('click', () => {
+      pref = order[(order.indexOf(pref) + 1) % order.length];
+      try { if (pref === 'auto') localStorage.removeItem('lair-theme'); else localStorage.setItem('lair-theme', pref); } catch {}
+      apply();
+    });
+    apply();
+  }
   // BibTeX buttons: hidden without script, since copying needs it.
   scroller.querySelectorAll<HTMLButtonElement>('button[data-bib]').forEach((b) => {
     b.hidden = false;

@@ -115,6 +115,16 @@ body[data-backdrop="meadow"] { background: linear-gradient(#8fc4e8 0%, #bcd9ea 4
   color: var(--ink-faint) !important; text-decoration: none;
 }
 .tp-toc-home:hover { color: var(--accent) !important; }
+.tp-theme {
+  display: block; appearance: none; cursor: pointer; margin: -18px 0 26px; padding: 4px 11px;
+  border: 1px solid var(--rule); border-radius: 999px; background: none;
+  font: 400 var(--fs-xs)/1.4 var(--font-mono); letter-spacing: 0.04em; color: var(--ink-dim);
+}
+.tp-theme:hover { color: var(--ink); border-color: var(--accent); }
+.tp-theme[hidden] { display: none; }
+/* a pinned theme beats the reader's system preference on the plain page */
+:root[data-theme="paper"]:has(.text-page) { color-scheme: light !important; }
+:root[data-theme="night"]:has(.text-page) { color-scheme: dark !important; }
 .tp-toc-h {
   margin: 0 0 12px; font: 500 var(--fs-xs)/1.2 var(--font-mono);
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint);
@@ -324,107 +334,191 @@ body[data-backdrop="meadow"] { background: linear-gradient(#8fc4e8 0%, #bcd9ea 4
 .welcome-note p { margin: 0; font-family: var(--font-text); font-size: var(--fs-sm); line-height: 1.5; color: var(--ink); }
 .welcome-note p.welcome-keys { font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-faint); }
 
-/* ---------- nav rail: a horizontal spine across the top ---------- */
+/* ---------- the header ----------
+   A running head across the top, like the head of a page in the design
+   system: the signature on the left, the sections set in the text face in
+   the middle, the tools as a row of line icons on the right. Over the plain
+   page it stands on a soft band of the page colour; over a world it becomes
+   one card (see the end of this file). */
 .nav-rail {
-  position: fixed; left: 50%; top: 22px; transform: translateX(-50%); z-index: 6;
-  display: flex; flex-direction: row; align-items: center; gap: 26px;
+  position: fixed; left: 0; right: 0; top: 0; z-index: 6;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 24px;
+  padding: 14px 28px 0;
 }
-/* A band of the Night page behind the rail, fading down into the scene, so
-   the nav stays legible in a bright world (the forest, the beach) without
-   drawing a bar across the top. Full-bleed though the rail is centred. */
 body:has(.nav-rail) #tower-host::after {
   content: ''; position: absolute; left: 0; right: 0; top: 0; height: 104px;
   pointer-events: none;
   background: linear-gradient(to bottom, color-mix(in srgb, var(--bg) 90%, transparent), color-mix(in srgb, var(--bg) 55%, transparent) 55%, transparent);
 }
-/* The page you are on: full ink and a short vermilion rule under it. */
-.nav-item[aria-current="page"]::after {
-  content: ''; position: absolute; left: 1px; bottom: -2px; width: 14px; height: 2px;
-  background: var(--accent);
+.nav-whole {
+  justify-self: start; display: flex; flex-direction: column; gap: 3px;
+  text-decoration: none; color: var(--ink);
 }
-.nav-item {
-  position: relative; display: flex; align-items: baseline; gap: 7px;
-  padding: 6px 1px;
-  text-decoration: none; color: var(--ink-dim);
-  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; white-space: nowrap;
+.nav-sig {
+  font-family: var(--font-blackletter); font-size: 23px; line-height: 1; letter-spacing: 0.01em; color: var(--ink);
   transition: color 160ms ease;
 }
-.nav-num { font-size: 10px; color: var(--ink-faint); }
-.nav-item:hover, .nav-item[aria-current="page"] { color: var(--accent-bright); }
-.nav-item[aria-current="page"] .nav-num { color: var(--accent); }
-.nav-whole { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-dim); padding-right: 20px; border-right: 1px solid var(--rule); }
-.nav-whole .nav-sig {
-  font-family: var(--font-blackletter); font-size: 19px; line-height: 1;
-  letter-spacing: 0.01em; text-transform: none; color: var(--ink);
+.nav-role {
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint);
 }
 .nav-whole:hover .nav-sig, .nav-whole[aria-current] .nav-sig { color: var(--accent); }
-.nav-term {
-  appearance: none; background: none; border: none; cursor: pointer;
-}
-.nav-term .nav-label { font-size: 10px; letter-spacing: 0.1em; }
-.nav-util {
-  appearance: none; background: none; border: none; cursor: pointer;
-  font-size: 10px; letter-spacing: 0.1em; text-decoration: none;
-}
-.nav-util-on { color: var(--accent-bright); }
-.nav-util-on::before { content: '●'; font-size: 6px; vertical-align: middle; margin-right: 5px; color: var(--accent); }
 
-/* The utility group — how you look at the tower, kept clearly apart from
-   the floors, which are where you go. */
-.nav-utils {
-  display: flex; align-items: center; gap: 18px;
-  margin-left: 4px; padding-left: 22px; border-left: 1px solid var(--rule);
+.nav-sections { display: flex; align-items: center; gap: 4px; }
+.nav-item {
+  position: relative; display: block; padding: 8px 11px 9px;
+  text-decoration: none; white-space: nowrap;
+  font-family: var(--font-text); font-size: 15.5px; color: var(--ink-dim);
+  border-radius: 999px;
+  transition: color 160ms ease, background-color 160ms ease;
 }
+.nav-item:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.nav-item[aria-current="page"] { color: var(--ink); }
+/* the page you are on: a short vermilion rule under the word */
+.nav-item[aria-current="page"]::after {
+  content: ''; position: absolute; left: 50%; bottom: 2px; width: 16px; height: 2px; margin-left: -8px;
+  background: var(--accent);
+}
+.nav-item-quiet { font-size: 14px; font-style: italic; color: var(--ink-faint); }
+.nav-rule { width: 1px; height: 18px; margin: 0 8px; background: var(--rule); }
+
+.nav-tools { justify-self: end; display: flex; align-items: center; gap: 2px; }
 .nav-views-wrap { position: relative; }
-.nav-views { display: flex; align-items: center; gap: 5px; }
-.nav-caret { font-size: 8px; opacity: 0.7; transition: transform 160ms ease; }
-.nav-views-open .nav-caret { transform: rotate(180deg); }
-.nav-views-open .nav-views { color: var(--accent-bright); }
+.nav-tool {
+  position: relative; appearance: none; cursor: pointer;
+  display: grid; place-items: center; width: 36px; height: 36px; padding: 0;
+  background: none; border: none; border-radius: 999px; color: var(--ink-dim);
+  transition: color 140ms ease, background-color 140ms ease;
+}
+.nav-tool svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.nav-tool:hover, .nav-tool[aria-pressed="true"], .nav-tool[aria-expanded="true"] {
+  color: var(--ink); background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+.nav-tool[aria-pressed="true"] { color: var(--accent); }
+/* a label under the icon on hover, so an icon is never a riddle */
+.nav-tip {
+  position: absolute; top: calc(100% + 6px); right: 50%; transform: translateX(50%);
+  padding: 4px 8px; border-radius: 4px; white-space: nowrap; pointer-events: none;
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.04em;
+  color: var(--ink); background: var(--surface); box-shadow: var(--elev-3);
+  opacity: 0; transition: opacity 120ms ease 250ms;
+}
+.nav-tool:hover .nav-tip, .nav-tool:focus-visible .nav-tip { opacity: 1; }
+.nav-tools .nav-tool:last-child .nav-tip { right: 0; transform: none; }
+.nav-views-open .nav-tip { opacity: 0 !important; }
 
 .nav-menu {
   position: absolute; top: calc(100% + 10px); right: 0; z-index: 8;
   min-width: 240px; display: flex; flex-direction: column;
-  background: var(--bg); border: 1px solid var(--rule); border-radius: 4px;
-  padding: 6px; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  background: var(--surface); border: 1px solid var(--rule-soft); border-radius: 6px;
+  padding: 6px; box-shadow: var(--elev-3);
 }
 .nav-menu[hidden] { display: none; }
 .nav-menu-item {
   display: flex; flex-direction: column; gap: 2px;
-  padding: 9px 10px; border-radius: 3px;
+  padding: 9px 10px; border-radius: 4px;
   text-decoration: none; color: var(--ink);
   transition: background 140ms ease, color 140ms ease;
 }
-.nav-menu-item strong { font-weight: 500; font-size: 12px; letter-spacing: 0.02em; }
-.nav-menu-item span { font-size: 10.5px; color: var(--ink-dim); line-height: 1.45; }
-.nav-menu-item:hover { background: rgba(236, 128, 83, 0.08); color: var(--accent-bright); }
-.nav-menu-item[aria-current="true"] { color: var(--accent-bright); }
+.nav-menu-item strong { font-family: var(--font-text); font-weight: 500; font-size: 15px; }
+.nav-menu-item span { font-size: 12px; color: var(--ink-faint); line-height: 1.45; font-family: var(--font-text); font-style: italic; }
+.nav-menu-item:hover { background: var(--tint-2); }
 .nav-menu-item[aria-current="true"] strong::before {
-  content: '● '; font-size: 8px; color: var(--accent); vertical-align: middle;
+  content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 8px; border-radius: 50%;
+  vertical-align: middle; background: var(--accent);
 }
 
-/* ---------- dot nav: mobile-only, tap a dot or slide the row ---------- */
-.dot-nav {
-  display: none;
-  position: fixed; left: 50%; top: 14px; transform: translateX(-50%); z-index: 6;
-  flex-direction: column; align-items: center; gap: 6px;
+/* On a wide screen the tools live in the header; the round buttons go. */
+@media (min-width: 901px) {
+  .help-btn, .dest-btn, .gear-btn { display: none !important; }
+  .gear-panel { top: 70px; bottom: auto; right: 24px; }
 }
-.dot-label {
-  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--accent-bright); opacity: 0; transition: opacity 200ms ease;
-  background: color-mix(in srgb, var(--bg) 72%, transparent); padding: 3px 10px; border-radius: 10px;
+/* Narrower desktops: the role line goes first, then the quiet rooms. */
+@media (max-width: 1180px) { .nav-role { display: none; } }
+@media (max-width: 1040px) { .nav-item-quiet, .nav-rule { display: none; } .nav-item { padding: 8px 8px 9px; } }
+
+/* ---------- the phone: a bar at the bottom, and a sheet behind it ---------- */
+.mbar, .msheet { display: none; }
+@media (max-width: 900px) {
+  .mbar {
+    position: fixed; left: 12px; right: 12px; z-index: 30;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    display: grid; grid-template-columns: 52px 1fr 52px; align-items: stretch;
+    height: 58px; border-radius: 16px;
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
+    border: 1px solid var(--rule-soft); box-shadow: var(--elev-3);
+  }
+  .mbar button {
+    appearance: none; background: none; border: none; color: var(--ink); cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mbar-step { display: grid; place-items: center; }
+  .mbar-step svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .mbar-step:disabled { color: var(--ink-faint); opacity: 0.35; }
+  .mbar-step:active { background: var(--tint-2); }
+  .mbar-title {
+    display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto; align-content: center;
+    column-gap: 8px; padding: 0 12px; text-align: left; min-width: 0;
+    border-left: 1px solid var(--rule-soft) !important; border-right: 1px solid var(--rule-soft) !important;
+  }
+  .mbar-kicker {
+    grid-column: 1; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .mbar-name { grid-column: 1; font-family: var(--font-display); font-size: 22px; line-height: 1.05; color: var(--ink); }
+  .mbar-caret { grid-column: 2; grid-row: 1 / span 2; align-self: center; width: 18px; height: 18px; fill: none; stroke: var(--ink-faint); stroke-width: 1.6; stroke-linecap: round; }
+
+  .msheet {
+    display: block; position: fixed; inset: 0; z-index: 40;
+    background: color-mix(in srgb, var(--bg) 40%, transparent);
+    opacity: 0; transition: opacity 200ms ease;
+  }
+  .msheet[hidden] { display: none; }
+  .msheet.msheet-open { opacity: 1; }
+  .msheet-card {
+    position: absolute; left: 0; right: 0; bottom: 0; max-height: 86vh; overflow-y: auto;
+    padding: 8px 20px calc(20px + env(safe-area-inset-bottom));
+    background: var(--surface); border-radius: 18px 18px 0 0; box-shadow: var(--elev-3);
+    transform: translateY(24px); transition: transform 220ms ease;
+  }
+  .msheet-open .msheet-card { transform: translateY(0); }
+  .msheet-grip { width: 38px; height: 4px; margin: 0 auto 10px; border-radius: 2px; background: var(--rule); }
+  .msheet-head { display: flex; align-items: center; justify-content: space-between; padding: 4px 0 10px; border-bottom: 1px solid var(--rule-soft); }
+  .msheet-close {
+    appearance: none; background: none; border: none; width: 40px; height: 40px; margin-right: -10px;
+    font-size: 26px; line-height: 1; color: var(--ink-dim); cursor: pointer;
+  }
+  .msheet-list { list-style: none; margin: 6px 0 0; padding: 0; }
+  .msheet-gap { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--rule-soft); }
+  .msheet-item {
+    appearance: none; width: 100%; display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    padding: 11px 10px; margin: 0 -10px; width: calc(100% + 20px); border: none; border-radius: 10px;
+    background: none; cursor: pointer; text-align: left; color: var(--ink);
+  }
+  .msheet-item:active { background: var(--tint-2); }
+  .msheet-label { font-family: var(--font-display); font-size: 23px; line-height: 1.1; }
+  .msheet-room { font-family: var(--font-text); font-style: italic; font-size: 14px; color: var(--ink-faint); }
+  .msheet-item[aria-current] .msheet-label { color: var(--accent); }
+  .msheet-item[aria-current] .msheet-label::before {
+    content: ''; display: inline-block; width: 7px; height: 7px; margin-right: 10px; border-radius: 50%;
+    vertical-align: middle; background: var(--accent);
+  }
+  .msheet-tools {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule-soft);
+  }
+  .msheet-tool {
+    appearance: none; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 12px 6px; border: 1px solid var(--rule-soft); border-radius: 12px;
+    background: var(--tint); color: var(--ink); cursor: pointer;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em;
+  }
+  .msheet-tool svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  .msheet-tool:active { background: var(--tint-2); }
+
+  /* The bar replaces the round buttons, the header and the old dot row. */
+  .nav-rail, .help-btn, .dest-btn, .gear-btn { display: none !important; }
+  body:has(.nav-rail) #tower-host::after { display: none; }
 }
-.dot-label.dot-label-on { opacity: 1; }
-.dot-row { display: flex; align-items: center; gap: 10px; padding: 6px 10px; touch-action: none; }
-.dot {
-  appearance: none; padding: 0; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;
-  background: none; border: none; cursor: pointer;
-}
-.dot::after {
-  content: ''; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--ink-dim); opacity: 0.6; transition: all 180ms ease;
-}
-.dot.dot-active::after { width: 8px; height: 8px; background: var(--accent); opacity: 1; box-shadow: 0 0 6px var(--accent); }
-.dot.dot-preview::after { width: 10px; height: 10px; background: var(--accent-warm); opacity: 1; box-shadow: 0 0 10px var(--accent-warm); }
 
 #hint {
   position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
@@ -1083,30 +1177,24 @@ body[data-gl-lost="1"] #tower-host::after {
 }
 
 @media (max-width: 900px) {
-  .nav-rail { display: none; }
-  .dot-nav { display: flex; }
-  .help-btn { right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); }
-  .dest-btn { right: 16px; bottom: max(58px, calc(env(safe-area-inset-bottom) + 58px)); }
-  .gear-btn { right: 16px; bottom: max(100px, calc(env(safe-area-inset-bottom) + 100px)); }
-  /* No room to float beside the tower on a phone — the panel takes the
-     bottom of the screen the way the console does, still chromeless. */
+  /* The display panel: a sheet above the bar, like the menu's own sheet. */
   .gear-panel {
-    right: 0; left: 0; bottom: 0; width: auto; border-radius: 0;
-    padding: 20px 20px max(20px, env(safe-area-inset-bottom));
-    background: linear-gradient(to top, var(--bg) 62%, color-mix(in srgb, var(--bg) 86%, transparent));
+    right: 0; left: 0; bottom: 0; width: auto; border-radius: 18px 18px 0 0; z-index: 41;
+    padding: 22px 20px calc(22px + env(safe-area-inset-bottom));
+    background: var(--surface); box-shadow: var(--elev-3);
   }
   .quality-note {
     right: 16px; left: 16px; width: auto;
-    bottom: max(150px, calc(env(safe-area-inset-bottom) + 150px));
+    bottom: calc(84px + env(safe-area-inset-bottom));
   }
-  /* The dot nav owns the bottom-left corner on a phone. */
   .fps-meter { left: 12px; bottom: auto; top: max(12px, env(safe-area-inset-top)); }
   /* A bottom sheet on a phone: the room is framed in the upper half
      (see freeWindow in tower/focus.ts), the sheet owns the lower half, and
      the two no longer overlap — the type never sits on a bright room. */
+  /* The panel sits on top of the bar: the bar is the sheet's own foot. */
   .callout {
-    top: auto; bottom: 0; width: auto; max-height: 52vh;
-    padding-bottom: env(safe-area-inset-bottom);
+    top: auto; bottom: 0; width: auto; max-height: 56vh;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
     background: var(--bg);
     box-shadow: 0 -28px 28px -4px var(--bg);
   }
@@ -1121,23 +1209,28 @@ body[data-gl-lost="1"] #tower-host::after {
   .callout h1::after { margin-top: 10px; width: 36px; }
   .callout-right, .callout-left { right: 0; left: 0; }
   .leader-wrap { display: none; }
-  /* With a sheet open the round buttons would sit on its text — lift them
-     to the top-right corner, beside the room instead. */
-  body:has(.callout-visible) .gear-btn { bottom: auto; top: max(64px, calc(env(safe-area-inset-top) + 64px)); }
-  body:has(.callout-visible) .dest-btn { bottom: auto; top: max(106px, calc(env(safe-area-inset-top) + 106px)); }
-  body:has(.callout-visible) .help-btn { bottom: auto; top: max(148px, calc(env(safe-area-inset-top) + 148px)); }
-
-  /* The bottom sheet already owns the bottom of the screen here — keep
-     transient messages up near the dot nav instead of stacking on it. */
+  /* Help: a sheet from the bottom, like the menu, not a card in the middle. */
+  .help-overlay { align-items: flex-end !important; padding: 0 !important; z-index: 45 !important; }
+  .help-rows dd { font-family: var(--font-text); font-size: 15px !important; }
+  .help-card {
+    width: 100% !important; max-height: 86vh; overflow-y: auto;
+    border-radius: 18px 18px 0 0 !important; border: none !important; background: var(--surface) !important;
+    padding: 24px 22px calc(22px + env(safe-area-inset-bottom)) !important;
+  }
+  .help-rows { grid-template-columns: 1fr !important; gap: 2px 0 !important; }
+  .help-rows dd { margin-bottom: 10px !important; }
+  .help-keys { display: none !important; }
+  .help-card .kicker-sub { display: none; }
+  /* Transient messages go to the top, out of the bar's way. */
   #hint, .welcome-note {
-    bottom: auto; top: max(78px, calc(14px + env(safe-area-inset-top) + 64px));
+    bottom: auto; top: max(16px, calc(env(safe-area-inset-top) + 12px));
   }
 
   /* No room to stand beside the tower — the console takes the lower half
      of the screen, still chromeless, over a scrim that keeps it readable. */
   .console {
     right: 0; left: 0; top: auto; bottom: 0; width: 100%;
-    padding: 20px 20px max(16px, env(safe-area-inset-bottom));
+    padding: 20px 20px calc(80px + env(safe-area-inset-bottom));
     max-height: 70vh;
     background: linear-gradient(to top, var(--bg) 62%, transparent);
   }
@@ -1218,9 +1311,9 @@ body[data-gl-lost="1"] #tower-host::after {
     box-shadow: var(--elev-3);
   }
   :root[data-world] .nav-rail {
-    top: 16px; padding: 6px 22px;
-    background: color-mix(in srgb, var(--surface) 93%, transparent);
-    border: 1px solid var(--rule-soft); border-radius: 999px;
+    top: 12px; left: 16px; right: 16px; padding: 8px 14px 8px 20px;
+    background: color-mix(in srgb, var(--surface) 94%, transparent);
+    border: 1px solid var(--rule-soft); border-radius: 16px;
     box-shadow: var(--elev-3);
   }
 }

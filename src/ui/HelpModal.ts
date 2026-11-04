@@ -4,7 +4,7 @@ const ROWS: [string, string][] = [
   ['Look around', 'Drag — one finger on touch'],
   ['Zoom', 'Scroll — pinch on touch'],
   ['Pan', 'Right-click drag — two fingers on touch'],
-  ['Visit a floor', 'Click it, or use the floors above / the dots below'],
+  ['Visit a floor', 'Tap it, or a section in the header — on a phone, the bar at the bottom: ‹ › step through, the name opens the list'],
   ['Whole tower', 'Turns slowly on its own until you take the wheel'],
 ];
 

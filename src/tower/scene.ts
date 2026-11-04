@@ -22,6 +22,7 @@ import { buildBathhouse, VISTAS, type Vista } from './floors/bathhouse';
 import { buildWizardMesh, createWizardController } from './wizard';
 import { buildFoxMesh, createFoxState, foxDecide } from './fox';
 import { loadGlb } from './glb';
+import { setAutoTheme, effectiveTheme } from '../ui/theme';
 import { makePoints, setBackdrop as setBackdropFx, suppressBackdrop, setGridTheme } from './fx';
 import { createFocusController } from './focus';
 import { createQuality, gpuInfo, gpuSummary, type Tier, type Profile } from './quality';
@@ -1064,12 +1065,12 @@ export function createTowerScene(container: HTMLElement, opts: {
     // The type follows the light: Paper while the tower stands in daylight,
     // Night after dark. Worlds that clamp the hour (the city, space) clamp
     // the theme with it, since `night` is already the clamped amount.
-    const paper = night < 0.5;
-    document.documentElement.dataset.theme = paper ? 'paper' : 'night';
+    // (unless the visitor has pinned one: see ui/theme.ts)
+    setAutoTheme(night < 0.5 ? 'paper' : 'night');
     // The page's chrome changes approach over a world (see style.css).
     if (world) document.documentElement.dataset.world = world;
     else delete document.documentElement.dataset.world;
-    setGridTheme(paper);
+    setGridTheme(effectiveTheme() === 'paper');
   }
 
   function setLightMode(mode: 'auto' | 'day' | 'night') {
@@ -1327,6 +1328,9 @@ export function createTowerScene(container: HTMLElement, opts: {
   window.addEventListener('lair-teleport', (e: any) => {
     if (e.detail?.phase === 'done') applyDayNight();
   });
+
+  // the floor grid is inked to match the page, whichever theme won
+  window.addEventListener('lair-theme', () => setGridTheme(effectiveTheme() === 'paper'));
 
   function start() {
     try {

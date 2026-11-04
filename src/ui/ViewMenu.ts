@@ -19,10 +19,11 @@ export function createViewMenu(current: ViewKind) {
 
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = 'nav-item nav-util nav-views';
+  btn.className = 'nav-tool nav-views';
   btn.setAttribute('aria-haspopup', 'true');
   btn.setAttribute('aria-expanded', 'false');
-  btn.innerHTML = `<span class="nav-label">View</span><span class="nav-caret" aria-hidden="true">▾</span>`;
+  btn.setAttribute('aria-label', 'Other views');
+  btn.innerHTML = `<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="14" height="12" rx="1.5"/><path d="M3 8h14M7 8v8"/></svg><span class="nav-tip">Other views</span>`;
 
   const menu = document.createElement('div');
   menu.className = 'nav-menu';

@@ -15,6 +15,7 @@ import { createSettingsButton } from './ui/SettingsPanel';
 import { createFpsMeter } from './ui/FpsMeter';
 import { setRouteMeta } from './ui/meta';
 import { announce } from './ui/io';
+import { themePref, cycleTheme, THEME_ICON, THEME_LABEL } from './ui/theme';
 import {
   FLOORS, routeForSlug, routeForIndex, currentSlug, navigate, onRouteChange, BASE,
   worldFromUrl, setWorldInUrl,
@@ -224,150 +225,195 @@ const terminal = createTerminal(app, {
   },
 });
 
-/* ---------- nav rail: a horizontal spine across the top, out of the callout's way ---------- */
-const navRail = document.createElement('nav');
-navRail.className = 'nav-rail';
-navRail.setAttribute('aria-label', 'Tower floors');
-const links: HTMLAnchorElement[] = [];
+/* ---------- the header ----------
+   One bar across the top on a wide screen: the name on the left as the
+   site's signature, the sections in the middle in reading order, and the
+   tools on the right as a row of quiet icons — the gate to other worlds,
+   the console, light or dark, other views, display settings, help. The
+   round buttons that used to sit bottom right are gone from desktop; the
+   same things are here, where a header keeps them.
 
-const wholeTowerLink = document.createElement('a');
-wholeTowerLink.className = 'nav-item nav-whole';
-wholeTowerLink.href = BASE + '/';
-// The home link doubles as the wordmark, set as the design system's
-// signature (Pirata One). The accessible name stays "Home".
-wholeTowerLink.setAttribute('aria-label', 'Home');
-wholeTowerLink.innerHTML = `<span class="nav-label nav-sig" aria-hidden="true">Ammar Mian</span>`;
-wholeTowerLink.addEventListener('click', (e) => { e.preventDefault(); navigate(null); });
-navRail.appendChild(wholeTowerLink);
-
-/* Listed in reading order, not tower order. Bottom-to-top put the bath
-   cellar and the portal sanctum first — Settings and Elsewhere ahead of
-   About — because that is how the building is stacked, not how anyone reads
-   a page about a person. The work comes first; the two rooms that are about
-   the site itself sit with the other machinery after the rule. The storey
-   numbers stay with the rooms (kicker, figure caption, ASCII tower) and are
-   dropped here, where they would now run out of sequence. */
+   Listed in reading order, not tower order: the work first, then the two
+   rooms that are about the site itself, set apart after a rule. */
 const NAV_PRIMARY = ['about', 'publications', 'projects', 'now', 'contact'];
 const NAV_MACHINERY = ['elsewhere', 'settings'];
 const NAV_ORDER = [...NAV_PRIMARY, ...NAV_MACHINERY]
   .map((slug) => FLOORS.find((f) => f.slug === slug)!)
   .filter(Boolean);
 
+const navRail = document.createElement('header');
+navRail.className = 'nav-rail';
+const links: HTMLAnchorElement[] = [];
+
+const wholeTowerLink = document.createElement('a');
+wholeTowerLink.className = 'nav-whole';
+wholeTowerLink.href = BASE + '/';
+wholeTowerLink.setAttribute('aria-label', 'Home — the whole tower');
+wholeTowerLink.innerHTML = `<span class="nav-sig" aria-hidden="true">Ammar Mian</span><span class="nav-role" aria-hidden="true">LISTIC · Université Savoie Mont-Blanc</span>`;
+wholeTowerLink.addEventListener('click', (e) => { e.preventDefault(); navigate(null); });
+navRail.appendChild(wholeTowerLink);
+
 function floorLink(f: (typeof FLOORS)[number], extra = '') {
   const a = document.createElement('a');
   a.className = 'nav-item' + extra;
   a.href = BASE + '/' + f.slug;
-  a.innerHTML = `<span class="nav-label">${f.label}</span>`;
+  a.textContent = f.label;
   a.addEventListener('click', (e) => { e.preventDefault(); navigate(f.slug); });
   links.push(a);
   return a;
 }
-for (const f of NAV_ORDER.filter((f) => NAV_PRIMARY.includes(f.slug))) navRail.appendChild(floorLink(f));
-// Utilities live in their own group after a rule: the floors are where you
-// go, these are how you look at them. Three separate presentation links
-// used to sit inline with the floors, which made a nine-item row of things
-// that aren't remotely the same kind of thing.
-const navUtils = document.createElement('div');
-navUtils.className = 'nav-utils';
-for (const f of NAV_ORDER.filter((f) => NAV_MACHINERY.includes(f.slug))) navUtils.appendChild(floorLink(f, ' nav-util'));
+const navSections = document.createElement('nav');
+navSections.className = 'nav-sections';
+navSections.setAttribute('aria-label', 'Sections');
+for (const f of NAV_ORDER.filter((f) => NAV_PRIMARY.includes(f.slug))) navSections.appendChild(floorLink(f));
+const navRule = document.createElement('span');
+navRule.className = 'nav-rule';
+navRule.setAttribute('aria-hidden', 'true');
+navSections.appendChild(navRule);
+for (const f of NAV_ORDER.filter((f) => NAV_MACHINERY.includes(f.slug))) navSections.appendChild(floorLink(f, ' nav-item-quiet'));
+navRail.appendChild(navSections);
 
-const termBtn = document.createElement('button');
-termBtn.type = 'button';
-termBtn.className = 'nav-item nav-util nav-term';
-termBtn.setAttribute('aria-pressed', 'false');
-termBtn.innerHTML = `<span class="nav-label">&gt;_ Console</span>`;
-termBtn.addEventListener('click', () => terminal.toggle());
-navUtils.appendChild(termBtn);
-
-const viewMenu = createViewMenu('3d');
-navUtils.appendChild(viewMenu.el);
-
-navRail.appendChild(navUtils);
-document.body.appendChild(navRail);
-
-/* ---------- mobile nav: a row of dots, tap for a name, slide to move ---------- */
-const dotNav = document.createElement('nav');
-dotNav.className = 'dot-nav';
-dotNav.setAttribute('aria-label', 'Tower floors');
-const dotLabel = document.createElement('div');
-dotLabel.className = 'dot-label';
-dotNav.appendChild(dotLabel);
-const dotRow = document.createElement('div');
-dotRow.className = 'dot-row';
-dotNav.appendChild(dotRow);
-document.body.appendChild(dotNav);
-
-const dotStops: { slug: string | null; label: string }[] = [
-  { slug: null, label: 'Home' },
-  ...NAV_ORDER.map((f) => ({ slug: f.slug, label: f.label })),
-];
-const dots: HTMLButtonElement[] = dotStops.map((s) => {
+const ICON = {
+  gate: '<svg viewBox="0 0 20 20" aria-hidden="true"><ellipse cx="10" cy="10" rx="5.2" ry="7.5"/><ellipse cx="10" cy="10" rx="2.2" ry="4"/></svg>',
+  console: '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6l4 4-4 4M10 14.5h6"/></svg>',
+  // display settings: sliders, so it never reads as the theme's sun
+  gear: '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 6h13M3.5 14h13"/><circle cx="7.5" cy="6" r="1.9" fill="var(--bg)"/><circle cx="12.5" cy="14" r="1.9" fill="var(--bg)"/></svg>',
+  help: '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M7.8 7.8a2.3 2.3 0 1 1 3.2 2.1c-.6.3-1 .8-1 1.5v.6"/><circle cx="10" cy="14.4" r=".5" fill="currentColor"/></svg>',
+};
+const navTools = document.createElement('div');
+navTools.className = 'nav-tools';
+function toolBtn(icon: string, label: string, run: () => void) {
   const b = document.createElement('button');
   b.type = 'button';
-  b.className = 'dot';
-  b.setAttribute('aria-label', s.label);
-  dotRow.appendChild(b);
+  b.className = 'nav-tool';
+  b.innerHTML = icon + `<span class="nav-tip">${label}</span>`;
+  b.setAttribute('aria-label', label);
+  b.addEventListener('click', run);
+  navTools.appendChild(b);
   return b;
+}
+toolBtn(ICON.gate, 'Other worlds (G)', () => destModal.open());
+const termBtn = toolBtn(ICON.console, 'Console (/)', () => terminal.toggle());
+termBtn.setAttribute('aria-pressed', 'false');
+termBtn.classList.add('nav-term');
+const themeBtn = toolBtn(THEME_ICON[themePref()], 'Theme', () => cycleTheme());
+function syncThemeBtn() {
+  const p = themePref();
+  themeBtn.innerHTML = THEME_ICON[p] + `<span class="nav-tip">Theme: ${THEME_LABEL[p]}</span>`;
+  themeBtn.setAttribute('aria-label', `Theme: ${THEME_LABEL[p]}. Change`);
+}
+syncThemeBtn();
+window.addEventListener('lair-theme', syncThemeBtn);
+const viewMenu = createViewMenu('3d');
+navTools.appendChild(viewMenu.el);
+toolBtn(ICON.gear, 'Display (S)', () => settings.toggle());
+toolBtn(ICON.help, 'Help (?)', () => help.toggle());
+navRail.appendChild(navTools);
+document.body.appendChild(navRail);
+
+/* ---------- on a phone: a bar at the bottom, where the thumb is ----------
+   The row of dots across the top you had to slide a finger along is gone.
+   In its place, the plainest thing a phone offers: previous and next either
+   side of the section's name, and the name itself opens a sheet listing
+   every section and every tool. Nothing to discover, nothing to learn. */
+const stops: { slug: string | null; label: string; room: string }[] = [
+  { slug: null, label: 'Home', room: 'The whole tower' },
+  ...NAV_ORDER.map((f) => ({ slug: f.slug, label: f.label, room: f.title })),
+];
+const curStop = () => Math.max(0, stops.findIndex((s) => s.slug === currentSlug()));
+
+const mbar = document.createElement('nav');
+mbar.className = 'mbar';
+mbar.setAttribute('aria-label', 'Sections');
+mbar.innerHTML = `
+  <button type="button" class="mbar-step mbar-prev" aria-label="Previous section"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5L7 10l5.5 5.5"/></svg></button>
+  <button type="button" class="mbar-title" aria-haspopup="dialog" aria-expanded="false">
+    <span class="mbar-kicker"></span><span class="mbar-name"></span>
+    <svg class="mbar-caret" viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 12.5L10 8l4.5 4.5"/></svg>
+  </button>
+  <button type="button" class="mbar-step mbar-next" aria-label="Next section"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 4.5L13 10l-5.5 5.5"/></svg></button>`;
+app.appendChild(mbar);   // inside #app, so it stacks with the help and display sheets
+const mPrev = mbar.querySelector('.mbar-prev') as HTMLButtonElement;
+const mNext = mbar.querySelector('.mbar-next') as HTMLButtonElement;
+const mTitle = mbar.querySelector('.mbar-title') as HTMLButtonElement;
+mPrev.addEventListener('click', () => { const i = curStop(); if (i > 0) navigate(stops[i - 1].slug); });
+mNext.addEventListener('click', () => { const i = curStop(); if (i < stops.length - 1) navigate(stops[i + 1].slug); });
+
+const sheet = document.createElement('div');
+sheet.className = 'msheet';
+sheet.hidden = true;
+sheet.innerHTML = `
+  <div class="msheet-card" role="dialog" aria-modal="true" aria-label="Sections and tools">
+    <div class="msheet-grip" aria-hidden="true"></div>
+    <div class="msheet-head"><span class="nav-sig">Ammar Mian</span><button type="button" class="msheet-close" aria-label="Close">&times;</button></div>
+    <ol class="msheet-list"></ol>
+    <div class="msheet-tools"></div>
+  </div>`;
+app.appendChild(sheet);
+const sheetList = sheet.querySelector('.msheet-list') as HTMLElement;
+const sheetTools = sheet.querySelector('.msheet-tools') as HTMLElement;
+stops.forEach((st, i) => {
+  const li = document.createElement('li');
+  if (i === 6) li.className = 'msheet-gap';            // the two rooms about the site, set apart
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'msheet-item';
+  b.dataset.slug = st.slug ?? '';
+  b.innerHTML = `<span class="msheet-label">${st.label}</span><span class="msheet-room">${st.room}</span>`;
+  b.addEventListener('click', () => { setSheet(false); navigate(st.slug); });
+  li.appendChild(b);
+  sheetList.appendChild(li);
 });
-
-let dotLabelTimer: number | undefined;
-function showDotLabel(text: string) {
-  dotLabel.textContent = text;
-  dotLabel.classList.add('dot-label-on');
-  window.clearTimeout(dotLabelTimer);
-  dotLabelTimer = window.setTimeout(() => dotLabel.classList.remove('dot-label-on'), 1600);
+function sheetTool(icon: string, label: string, run: () => void, keepOpen = false) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'msheet-tool';
+  b.innerHTML = icon + `<span>${label}</span>`;
+  b.addEventListener('click', () => { if (!keepOpen) setSheet(false); run(); });
+  sheetTools.appendChild(b);
+  return b;
 }
+const SHORT = { auto: 'Auto', paper: 'Light', night: 'Dark' } as const;
+const themeShort = () => THEME_ICON[themePref()] + `<span>Theme: ${SHORT[themePref()]}</span>`;
+sheetTool(ICON.gate, 'Worlds', () => destModal.open());
+// the theme stays in the sheet, so the change can be seen happening
+const mTheme = sheetTool('', '', () => cycleTheme(), true);
+mTheme.innerHTML = themeShort();
+window.addEventListener('lair-theme', () => { mTheme.innerHTML = themeShort(); });
+sheetTool(ICON.console, 'Console', () => { window.location.href = BASE + '/console'; });
+sheetTool('<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 4.5h10M5 8.5h10M5 12.5h10M5 16.5h6"/></svg>', 'Text page', () => { window.location.href = BASE + '/text'; });
+sheetTool(ICON.gear, 'Display', () => settings.toggle());
+sheetTool(ICON.help, 'Help', () => help.toggle());
 
-// Press anywhere on the row, drag toward the stop you want — a preview
-// ring tracks the candidate under your finger the whole way, and letting
-// go commits to wherever it's sitting. A tap (no real movement) just
-// jumps straight to the dot under the finger.
-const DOT_STEP = 44;
-let dragStartX = 0, dragStartIdx = 0, previewIdx = -1, dragging = false;
-
-function curDotIdx() {
-  const i = dotStops.findIndex((s) => s.slug === currentSlug());
-  return i < 0 ? 0 : i;
-}
-function setPreview(idx: number) {
-  if (idx === previewIdx) return;
-  previewIdx = idx;
-  dots.forEach((d, i) => d.classList.toggle('dot-preview', i === idx));
-  showDotLabel(dotStops[idx].label);
-}
-function clearPreview() {
-  previewIdx = -1;
-  dots.forEach((d) => d.classList.remove('dot-preview'));
-}
-
-dotRow.addEventListener('pointerdown', (e) => {
-  dragStartX = e.clientX;
-  dragStartIdx = curDotIdx();
-  dragging = false;
-  dotRow.setPointerCapture(e.pointerId);
-});
-dotRow.addEventListener('pointermove', (e) => {
-  if (!e.buttons) return;
-  const dx = e.clientX - dragStartX;
-  if (Math.abs(dx) > 6) dragging = true;
-  if (!dragging) return;
-  const steps = Math.round(dx / DOT_STEP);
-  setPreview(Math.max(0, Math.min(dotStops.length - 1, dragStartIdx + steps)));
-});
-dotRow.addEventListener('pointerup', (e) => {
-  if (dragging) {
-    const idx = previewIdx === -1 ? dragStartIdx : previewIdx;
-    clearPreview();
-    showDotLabel(dotStops[idx].label);
-    navigate(dotStops[idx].slug);
-    return;
+function setSheet(open: boolean) {
+  if (open) {
+    sheet.hidden = false;
+    for (const b of sheetList.querySelectorAll<HTMLButtonElement>('.msheet-item')) {
+      b.toggleAttribute('aria-current', (b.dataset.slug || null) === currentSlug());
+    }
+    requestAnimationFrame(() => sheet.classList.add('msheet-open'));
+  } else {
+    sheet.classList.remove('msheet-open');
+    window.setTimeout(() => { sheet.hidden = true; }, 220);
   }
-  const el = document.elementFromPoint(e.clientX, e.clientY);
-  const btn = el instanceof Element ? el.closest('.dot') : null;
-  const idx = btn ? dots.indexOf(btn as HTMLButtonElement) : -1;
-  if (idx >= 0) { showDotLabel(dotStops[idx].label); navigate(dotStops[idx].slug); }
-});
-dotRow.addEventListener('pointercancel', () => { clearPreview(); dragging = false; });
+  mTitle.setAttribute('aria-expanded', String(open));
+}
+mTitle.addEventListener('click', () => setSheet(sheet.hidden));
+sheet.addEventListener('click', (e) => { if (e.target === sheet) setSheet(false); });
+sheet.querySelector('.msheet-close')!.addEventListener('click', () => setSheet(false));
+window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !sheet.hidden) setSheet(false); });
+
+function syncMobileBar() {
+  const i = curStop();
+  const st = stops[i];
+  (mbar.querySelector('.mbar-name') as HTMLElement).textContent = st.label;
+  const route = routeForSlug(st.slug);
+  (mbar.querySelector('.mbar-kicker') as HTMLElement).textContent =
+    route ? `${String(route.index).padStart(2, '0')} · ${route.title}` : `${stops.length - 1} rooms · tap for all`;
+  mPrev.disabled = i === 0;
+  mNext.disabled = i === stops.length - 1;
+}
+syncMobileBar();
 
 /* ---------- and when turning it down was not enough ----------
    Fired once, from the bottom of the quality scale. Deliberately not a modal:
@@ -571,7 +617,7 @@ async function applyRoute(slug: string | null) {
     if (isCurrent) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
   });
   wholeTowerLink.toggleAttribute('aria-current', !route);
-  dots.forEach((d, i) => d.classList.toggle('dot-active', dotStops[i].slug === slug));
+  syncMobileBar();
 
   // Hide any current panel content while the camera is still moving —
   // the record only appears once the tower has settled on the floor.
