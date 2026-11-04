@@ -3298,11 +3298,18 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
       vec2 cid = floor(cellUV);
       vec2 cf = fract(cellUV) - 0.5;
       cf += (vec2(hash21(cid + 3.1), hash21(cid + 7.7)) - 0.5) * 0.24;
-      float stone = 1.0 - smoothstep(0.25, 0.46, length(cf * vec2(1.0, 1.12)));
-      float jit = hash21(cid);
-      vec3 dry = mix(vec3(0.34,0.33,0.31), vec3(0.56,0.54,0.50), jit);
-      dry *= 0.88 + 0.24 * fbm(cellUV * 2.2);
-      dry = mix(dry * 0.45, dry, stone);                 // mortar, raked back
+      /* How many cobbles a pixel covers. At the tower's chunky pixel scale
+         the far setts are smaller than a pixel, and drawing their joints
+         anyway turned the whole square into a loud moiré. The joints, the
+         per-stone tone and the joint puddles fade toward their average as
+         the footprint grows (as Endless Field fades its fine detail). */
+      float foot = length(fwidth(cellUV));
+      float detail = 1.0 - smoothstep(0.25, 0.7, foot);
+      float stone = mix(0.62, 1.0 - smoothstep(0.25, 0.46, length(cf * vec2(1.0, 1.12))), detail);
+      float jit = mix(0.5, hash21(cid), detail);
+      vec3 dry = mix(vec3(0.36,0.35,0.33), vec3(0.52,0.50,0.47), jit);
+      dry *= 0.9 + 0.2 * fbm(cellUV * 2.2);
+      dry = mix(dry * 0.62, dry, stone);                 // mortar, raked back
       // worn paler down the middle of a street by cartwheels, and by feet
       float wear = 1.0 - smoothstep(0.0, 2.6, sd);
       dry = mix(dry, dry * 1.3, wear * 0.55);
@@ -3310,7 +3317,7 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
       float mud = smoothstep(190.0, 300.0, rr0);
       dry = mix(dry, mix(vec3(0.20,0.17,0.13), vec3(0.30,0.26,0.19), fbm(vWP.xz * 0.4)), mud);
       // standing water, in the joints and in the ruts
-      float pool = clamp((1.0 - stone) * 0.55 + smoothstep(0.42, 0.92, fbm(vWP.xz * 0.5)) * 0.85, 0.0, 1.0);
+      float pool = clamp((1.0 - stone) * 0.45 * detail + smoothstep(0.42, 0.92, fbm(vWP.xz * 0.5)) * 0.85, 0.0, 1.0);
       vec3 V = normalize(cameraPosition - vWP);
       float fres = pow(1.0 - clamp(V.y, 0.0, 1.0), 3.0);
     `;
