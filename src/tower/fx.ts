@@ -99,7 +99,9 @@ export function setBackdrop(scene: THREE.Scene, kind: 'void' | 'blueprint' | 'me
     tex.colorSpace = THREE.SRGBColorSpace;
     gridHelper = new THREE.Mesh(
       new THREE.PlaneGeometry(64, 64),
-      new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.5, depthWrite: false })
+      // Parchment rules on the Night page, at the weight of the design
+      // system's hairline — the floor reads as the sheet the type sits on.
+      new THREE.MeshBasicMaterial({ map: tex, color: 0xe8dfc9, transparent: true, opacity: 0.3, depthWrite: false })
     );
     gridHelper.name = 'backdrop_grid';
     gridHelper.rotation.x = -Math.PI / 2;

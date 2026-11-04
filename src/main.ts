@@ -233,7 +233,10 @@ const links: HTMLAnchorElement[] = [];
 const wholeTowerLink = document.createElement('a');
 wholeTowerLink.className = 'nav-item nav-whole';
 wholeTowerLink.href = BASE + '/';
-wholeTowerLink.innerHTML = `<span class="nav-label">Home</span>`;
+// The home link doubles as the wordmark, set as the design system's
+// signature (Pirata One). The accessible name stays "Home".
+wholeTowerLink.setAttribute('aria-label', 'Home');
+wholeTowerLink.innerHTML = `<span class="nav-label nav-sig" aria-hidden="true">Ammar Mian</span>`;
 wholeTowerLink.addEventListener('click', (e) => { e.preventDefault(); navigate(null); });
 navRail.appendChild(wholeTowerLink);
 

@@ -25,12 +25,12 @@ function prerenderText(): Plugin {
 <meta name="description" content="${esc(description)}">
 <meta name="author" content="Ammar Mian">
 <link rel="canonical" href="${esc(canonical)}">
-<meta name="theme-color" content="#0b0d16">
+<meta name="theme-color" content="#0a1a1d">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">`;
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Cormorant+SC:wght@500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500&family=Pirata+One&display=swap" rel="stylesheet">`;
 
   return {
     name: 'prerender-text',

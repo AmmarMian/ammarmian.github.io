@@ -13,15 +13,16 @@ import type { FloorRoute } from '../router';
 import { PROFILE, CONTACT } from '../data/profile';
 import { COLOPHON_TITLE, COLOPHON_BLOCK, COLOPHON_NOTE } from '../data/colophon';
 import students from '../data/students.json';
+import { panelTaken } from './layout';
 import projects from '../data/projects.json';
 
-// A horizontal run sits right above the title, bends to a true 45° and
-// drops away toward the tower, ending in a small ring — like a leader
-// line calling out a detail on a technical drawing.
+// A horizontal run leaves the sheet's edge level with the kicker, bends to
+// a true 45° and drops away toward the room, ending in a small ring — like a
+// leader line calling out a detail on a technical drawing.
 const LEADER_SVG = `
-  <svg class="leader" viewBox="0 0 220 220" aria-hidden="true">
-    <path d="M210 10 L140 10 L10 140" />
-    <circle cx="10" cy="140" r="4" />
+  <svg class="leader" viewBox="0 0 200 200" aria-hidden="true">
+    <path d="M200 10 L150 10 L13 147" />
+    <circle cx="10" cy="150" r="4" />
   </svg>`;
 
 /** The two things this panel needs that live outside it: emptying the site's
@@ -45,12 +46,21 @@ export class SidePanel {
   // async hash update and immediately reopen the same detail.
   private pendingDeepLink = false;
   private openSlug: string | null = null;
+  private caption: HTMLElement;
+  private captionSide: 'left' | 'right' = 'left';
 
   constructor(root: HTMLElement, tower: TowerScene, actions: PanelActions = {}) {
     this.el = document.createElement('aside');
     this.el.className = 'callout';
     this.el.hidden = true;
     root.appendChild(this.el);
+    // The room's figure caption lives outside the panel: it belongs under the
+    // room, in the part of the screen the panel leaves free.
+    this.caption = document.createElement('p');
+    this.caption.className = 'fig-caption';
+    this.caption.setAttribute('aria-hidden', 'true');
+    root.appendChild(this.caption);
+    window.addEventListener('resize', () => this.placeCaption());
     this.tower = tower;
     this.actions = actions;
   }
@@ -98,6 +108,7 @@ export class SidePanel {
     this.tower.shelveBook();
     this.clearDetailHandler();
     this.el.classList.remove('callout-visible');
+    this.caption.classList.remove('fig-caption-visible');
     window.setTimeout(() => { this.el.hidden = true; }, 280);
   }
 
@@ -108,13 +119,21 @@ export class SidePanel {
     this.el.innerHTML = `
       <div class="leader-wrap">${LEADER_SVG}</div>
       <div class="callout-inner">
-        <div class="kicker">${String(route.index).padStart(2, '0')} &middot; ${escapeHtml(route.title.toUpperCase())}</div>
-        <h1>${escapeHtml(route.label)}</h1>
+        <header class="callout-head">
+          <div class="kicker"><span class="kicker-index">${String(route.index).padStart(2, '0')}</span> &middot; ${escapeHtml(route.title)}</div>
+          <h1>${escapeHtml(route.label)}</h1>
+        </header>
         <div class="callout-body"></div>
       </div>
     `;
     this.bodyEl = this.el.querySelector('.callout-body')!;
-    requestAnimationFrame(() => this.el.classList.add('callout-visible'));
+    this.captionSide = route.side;
+    this.caption.innerHTML = `<b>Fig. ${String(route.index).padStart(2, '0')}</b>${escapeHtml(route.title)} <i>&mdash; drag to turn it</i>`;
+    this.placeCaption();
+    requestAnimationFrame(() => {
+      this.el.classList.add('callout-visible');
+      this.caption.classList.add('fig-caption-visible');
+    });
     this.pendingDeepLink = true;
     this.openSlug = route.slug;
 
@@ -127,6 +146,14 @@ export class SidePanel {
       case 'now': this.renderNow(); break;
       case 'settings': this.renderSettings(); break;
     }
+  }
+
+  /** Centre the caption under the room — the middle of the free strip. */
+  private placeCaption() {
+    const W = window.innerWidth;
+    const taken = Math.min(0.6 * W, panelTaken(W, false));
+    const x = this.captionSide === 'left' ? (taken + W) / 2 : (W - taken) / 2;
+    this.caption.style.left = `${Math.round(x)}px`;
   }
 
   private clearDetailHandler() {
@@ -156,6 +183,12 @@ export class SidePanel {
       }
       this.bodyEl.appendChild(list);
     }
+
+    // The one place the blackletter is allowed: a signature, small, once.
+    const sig = document.createElement('div');
+    sig.className = 'signature';
+    sig.textContent = PROFILE.name;
+    this.bodyEl.appendChild(sig);
   }
 
   private renderPublications() {
@@ -441,7 +474,7 @@ export class SidePanel {
       <li><span class="contact-label">Email</span><a href="mailto:${CONTACT.email}">${CONTACT.email}</a></li>
       <li><span class="contact-label">Office</span><span>${escapeHtml(CONTACT.office)}</span></li>
       <li><span class="contact-label">HAL</span><a href="${CONTACT.hal}" target="_blank" rel="noopener">search results</a></li>
-      <li><span class="contact-label">Elsewhere</span><a href="${CONTACT.github}" target="_blank" rel="noopener">GitHub</a> &middot; <a href="${CONTACT.website}" target="_blank" rel="noopener">website</a></li>
+      <li><span class="contact-label">Elsewhere</span><span><a href="${CONTACT.github}" target="_blank" rel="noopener">GitHub</a> &middot; <a href="${CONTACT.website}" target="_blank" rel="noopener">website</a></span></li>
     `;
     this.bodyEl.appendChild(ul);
   }

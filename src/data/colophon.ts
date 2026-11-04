@@ -25,7 +25,7 @@ export const COLOPHON_BLOCK: ColophonRow[] = [
   { field: 'Design', value: 'Ammar Mian' },
   { field: 'Drawn', value: 'Claude Opus 5', note: 'in Claude Code' },
   { field: 'Stack', value: 'three.js 0.184 · TypeScript 5.6', note: 'Vite 5.4 · anime.js 3.2' },
-  { field: 'Type', value: 'Space Grotesk · JetBrains Mono' },
+  { field: 'Type', value: 'Cormorant Garamond · Newsreader · JetBrains Mono · Pirata One' },
   { field: 'Source', value: 'HAL open archive', note: 'the shelves are fetched live, never a snapshot' },
   { field: 'Build', value: 'GitHub Actions → Pages', note: 'a static site; there is no server' },
 ];

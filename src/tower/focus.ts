@@ -2,12 +2,13 @@ import * as THREE from 'three';
 import anime from 'animejs';
 import { RAD, R, FH, WH, ROT } from './util';
 import { F, NF, floorY } from './scene-constants';
+import { panelTaken, FIGURE_TOP_PX, FIGURE_BOTTOM_PX, NARROW_QUERY } from '../ui/layout';
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 // Below this width the callout becomes a bottom sheet, not a side panel —
 // shifting the camera sideways would just push the tower off-frame for
 // no reason, so the tower stays centred there instead.
-const isNarrowViewport = () => window.matchMedia('(max-width: 900px)').matches;
+const isNarrowViewport = () => window.matchMedia(NARROW_QUERY).matches;
 
 // The default approach angle looks steeply down and the spiral stair
 // hides most of the sanctum floor behind its own treads at that pitch —
@@ -62,6 +63,45 @@ export function createFocusController(opts: {
     });
   }
 
+  /* The part of the screen the subject should sit in, as fractions of the
+     viewport (w, h) and the centre of that region in NDC (x, y). It used to
+     be "the whole screen, then slide the tower sideways by most of its own
+     radius", which put the room hard against the far edge with a dead gap
+     between it and the text. Centring it in what the panel leaves free puts
+     it next to the words that describe it. */
+  function freeWindow(panel: boolean): { w: number; h: number; x: number; y: number } {
+    const W = window.innerWidth;
+    if (isNarrowViewport()) {
+      // The bottom sheet takes roughly the lower half, the dot nav a strip
+      // at the top: the room goes in what is between.
+      if (!panel) return { w: 1, h: 1, x: 0, y: 0 };
+      const top = 0.07, bottom = 0.5;
+      return { w: 0.96, h: bottom - top, x: 0, y: 1 - (top + bottom) };
+    }
+    if (!panelSide) return { w: 1, h: 1, x: 0, y: 0 };
+    const H = window.innerHeight;
+    const consoleOpen = document.body.dataset.console === 'on';
+    const p = Math.min(0.6, panelTaken(W, consoleOpen) / W);
+    const centre = p; // NDC centre of the remaining [-1 + 2p, 1] strip
+    // Clear of the nav rail above and the figure caption below.
+    const t = FIGURE_TOP_PX / H, b = consoleOpen ? 0 : FIGURE_BOTTOM_PX / H;
+    return { w: 1 - p, h: 1 - t - b, x: panelSide === 'right' ? -centre : centre, y: b - t };
+  }
+
+  /** Move the look-at point so the subject lands at the window's centre. */
+  function offsetTarget(centre: THREE.Vector3, dir: THREE.Vector3, dist: number,
+    win: { x: number; y: number }): THREE.Vector3 {
+    if (!win.x && !win.y) return centre;
+    const forward = dir.clone().multiplyScalar(-1);
+    const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
+    const up = new THREE.Vector3().crossVectors(right, forward).normalize();
+    const halfH = dist * Math.tan((camera.fov * Math.PI) / 360);
+    const halfW = halfH * camera.aspect;
+    return centre
+      .addScaledVector(right, -win.x * halfW)
+      .addScaledVector(up, -win.y * halfH);
+  }
+
   // Remembered so the framing can be re-derived when something other than
   // navigation changes it — the console opening, for one.
   let framedFloor: number | null = null;
@@ -81,7 +121,6 @@ export function createFocusController(opts: {
     if (k === null) box.setFromObject(model); else box.setFromObject(floors[k].g);
     if (k !== null) box.max.y = Math.min(box.max.y, floorY(k) + WH + 0.5);
     const sph = box.getBoundingSphere(new THREE.Sphere());
-    const dist = (sph.radius / Math.tan((camera.fov * Math.PI) / 360)) * (k === null ? 1.25 : 1.05);
     const elev = k === null ? 0.5 : (ELEVATION[k] ?? 0.5);
     const dir = k === null
       ? new THREE.Vector3(1, elev, 1.2).normalize()
@@ -89,17 +128,13 @@ export function createFocusController(opts: {
         const a = 355 + k * ROT + (VIEW_TURN[k] ?? 0);
         return new THREE.Vector3(Math.sin(RAD(a)), elev, Math.cos(RAD(a))).normalize();
       })();
-    const target = sph.center.clone();
-    if (panelSide && !isNarrowViewport()) {
-      // Push the tower well clear of the panel's side, in *screen* space —
-      // each floor is approached from a different azimuth, so a world-axis
-      // shift would land in the wrong direction (or vanish) depending on
-      // which way the camera happens to be facing that floor.
-      const forward = dir.clone().multiplyScalar(-1);
-      const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
-      const shift = sph.radius * 0.85;
-      target.addScaledVector(right, panelSide === 'right' ? shift : -shift);
-    }
+    const win = freeWindow(k !== null);
+    const halfV = Math.tan((camera.fov * Math.PI) / 360);
+    // Fit the subject to whichever side of the free window is tighter, not
+    // always the height — on a phone the width is what runs out first.
+    const fit = Math.min(win.h * halfV, win.w * halfV * camera.aspect);
+    const dist = (sph.radius / fit) * (k === null ? 1.25 : 1.05);
+    const target = offsetTarget(sph.center.clone(), dir, dist, win);
     return flyTo(target.clone().add(dir.clone().multiplyScalar(dist)), target).then(() => {
       // A gentle idle turn on the whole-tower view — grabbing the camera
       // (drag/pan/zoom) interrupts it immediately, so it never fights the
@@ -122,16 +157,11 @@ export function createFocusController(opts: {
     if (k === null) box.setFromObject(model); else box.setFromObject(floors[k].g);
     if (k !== null) box.max.y = Math.min(box.max.y, floorY(k) + WH + 0.5);
     const sph = box.getBoundingSphere(new THREE.Sphere());
-    const target = sph.center.clone();
     // Keep the visitor's own azimuth — they may have turned the tower since
     // it was framed, and yanking it back would feel like a reset.
     const dir = camera.position.clone().sub(controls.target).normalize();
-    if (panelSide && !isNarrowViewport()) {
-      const forward = dir.clone().multiplyScalar(-1);
-      const right = new THREE.Vector3().crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
-      target.addScaledVector(right, sph.radius * 0.85 * (panelSide === 'right' ? 1 : -1));
-    }
     const dist = camera.position.distanceTo(controls.target);
+    const target = offsetTarget(sph.center.clone(), dir, dist, freeWindow(k !== null));
     const wasRotating = controls.autoRotate;
     return flyTo(target.clone().addScaledVector(dir, dist), target, dur).then(() => {
       controls.autoRotate = wasRotating;
