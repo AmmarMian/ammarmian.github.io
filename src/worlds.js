@@ -2877,23 +2877,49 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
       return m;
     })();
 
-    /* nebulae: soft colour washes far out, each its own slow-turning group so
-       the parallax between them reads even though the camera barely moves */
-    const nebGroup = new THREE.Group();
-    g.add(nebGroup);
-    const NEB = [
-      [0x9a6cff, new THREE.Vector3(-135, 60, -160), 85, 0.16],
-      [0x3fa0e0, new THREE.Vector3(160, -40, -125), 95, 0.15],
-      [0xe0508c, new THREE.Vector3(40, 100, 170), 78, 0.14],
-      [0x4fe8d0, new THREE.Vector3(-110, -90, 135), 72, 0.13],
-    ];
-    for (const [color, center, radius, opacity] of NEB) {
-      pointCloud(nebGroup, 1300, () => {
-        const d = new THREE.Vector3().randomDirection();
-        const r = radius * Math.pow(Math.random(), 0.5);
-        return { x: center.x + d.x * r, y: center.y + d.y * r * 0.55, z: center.z + d.z * r };
-      }, { color, size: 22, opacity, additive: true });
-    }
+    /* The nebula: a sky sphere painted in the fragment shader rather than a
+       few dozen soft sprites. Domain-warped noise gives the clouds their
+       filaments; three colours are layered by different octaves so they
+       overlap and mix; darker dust lanes cut through; and the faint band of
+       the galaxy runs across the sky behind it all, sown with fine stars. */
+    const nebula = new THREE.Mesh(new THREE.SphereGeometry(470, 48, 32), new THREE.ShaderMaterial({
+      side: THREE.BackSide, depthWrite: false, fog: false,
+      uniforms: { uT },
+      vertexShader: `varying vec3 vD;
+        void main(){ vD = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+      fragmentShader: `${NOISE}
+        varying vec3 vD; uniform float uT;
+        float n3(vec3 p){ return fbm(p.xy + p.z * 1.7) * 0.5 + fbm(p.yz * 1.3 - p.x) * 0.5; }
+        float hash(vec3 p){ return fract(sin(dot(p, vec3(12.9898, 78.233, 37.719))) * 43758.5453); }
+        void main(){
+          vec3 d = normalize(vD);
+          // warp the lookup by itself, twice: filaments, not blobs
+          vec3 q = d * 2.2;
+          vec3 w = vec3(n3(q + 1.3), n3(q + 7.1), n3(q + 4.4));
+          vec3 r = q + (w - 0.5) * 2.4;
+          float a = n3(r);
+          float b = n3(r * 1.9 + 3.0);
+          float c = n3(r * 0.7 - 2.0);
+          vec3 col = vec3(0.0);
+          col += vec3(0.55, 0.20, 0.85) * smoothstep(0.42, 0.78, a) * 0.55;    // violet
+          col += vec3(0.10, 0.45, 0.80) * smoothstep(0.45, 0.80, b) * 0.45;    // blue
+          col += vec3(0.90, 0.30, 0.45) * smoothstep(0.52, 0.85, c) * 0.40;    // rose
+          col += vec3(0.25, 0.85, 0.75) * smoothstep(0.66, 0.92, a * b * 1.8) * 0.35;  // teal knots
+          // dust lanes: dark filaments across the bright gas
+          float dust = smoothstep(0.55, 0.75, n3(r * 2.6 + 9.0));
+          col *= 1.0 - dust * 0.75;
+          // the galaxy's band, tilted, with fine stars thickest along it
+          float band = exp(-pow(dot(d, normalize(vec3(0.3, 1.0, 0.2))) * 3.2, 2.0));
+          col += vec3(0.16, 0.14, 0.20) * band * (0.5 + 0.5 * fbm(d.xz * 6.0));
+          vec3 cell = floor(d * 380.0);
+          float st = step(1.0 - 0.0018 - band * 0.008, hash(cell));
+          col += vec3(0.85, 0.88, 1.0) * st * (0.4 + 0.6 * hash(cell + 3.1));
+          gl_FragColor = vec4(col, 1.0);
+        }`,
+    }));
+    nebula.renderOrder = -10;
+    g.add(nebula);
+    const nebGroup = nebula;
 
     /* the sun: a small, hot red dwarf. Its direction also lights the ocean
        world below, so the two agree on where "up" is. */
@@ -2956,6 +2982,24 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
         }`,
     }));
     planet.add(body);
+    /* the atmosphere: a slightly larger shell, lit only at the limb, bluer
+       on the day side and reddened where the dwarf's light grazes it */
+    const atmo = new THREE.Mesh(new THREE.SphereGeometry(52, 48, 34), new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false, fog: false, side: THREE.BackSide, blending: THREE.AdditiveBlending,
+      uniforms: { uSunDir: { value: SUN_DIR } },
+      vertexShader: `varying vec3 vN; varying vec3 vW;
+        void main(){ vN = normalize(mat3(modelMatrix) * normal); vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz;
+          gl_Position = projectionMatrix * viewMatrix * w; }`,
+      fragmentShader: `varying vec3 vN; varying vec3 vW; uniform vec3 uSunDir;
+        void main(){
+          vec3 V = normalize(cameraPosition - vW);
+          float rim = pow(clamp(1.0 + dot(normalize(vN), V), 0.0, 1.0), 3.0);
+          float lit = clamp(dot(-normalize(vN), uSunDir) * 0.8 + 0.4, 0.0, 1.0);
+          vec3 c = mix(vec3(0.9, 0.4, 0.3), vec3(0.35, 0.6, 1.0), lit);
+          gl_FragColor = vec4(c * rim * (0.25 + 0.9 * lit), 1.0);
+        }`,
+    }));
+    planet.add(atmo);
     g.add(planet);
 
     const moon2 = new THREE.Mesh(new THREE.SphereGeometry(9, 16, 12),
@@ -2967,21 +3011,37 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
        rotating the whole group each frame — far cheaper than per-instance
        matrix updates for something this far from the camera */
     const belt = new THREE.Group();
-    const rockGeo = new THREE.DodecahedronGeometry(1, 0);
-    const rockMat = patchStd(new THREE.MeshStandardMaterial({
-      color: 0x6a6482, roughness: 1, flatShading: true, emissive: 0x1c1830, emissiveIntensity: 0.7,
-    }), {
-      frag: `diffuseColor.rgb *= 0.7 + 0.55 * fbm(vWP.xz * 0.4 + vWP.y * 0.3);`,
-    });
-    const rocks = new THREE.InstancedMesh(rockGeo, rockMat, 46);
-    for (let i = 0; i < 46; i++) {
-      const a = rnd(6.28), d = rnd(200, 130), y = rnd(40, -30), sz = rnd(4.5, 1);
-      _e.set(rnd(3), rnd(3), rnd(3));
-      rocks.setMatrixAt(i, _m4.compose(
-        _v.set(Math.cos(a) * d, y, Math.sin(a) * d), _q.setFromEuler(_e), _s.set(sz, sz * rnd(1, 0.5), sz)));
-    }
-    belt.add(rocks);
     g.add(belt);
+    const rockMat = patchStd(new THREE.MeshStandardMaterial({
+      vertexColors: true, roughness: 1, flatShading: true, emissive: 0x1c1830, emissiveIntensity: 0.5,
+    }), {});
+    /* The belt: cratered asteroids modelled in Blender (tools/blender/space.py),
+       a few large and many small, thick in a band and thinning out above and
+       below it. The dodecahedra they replace are the fallback. */
+    const placeBelt = (geos) => {
+      const n = 220;
+      const per = Math.ceil(n / geos.length);
+      for (const geo of geos) {
+        const m = new THREE.InstancedMesh(geo, rockMat, per);
+        for (let i = 0; i < per; i++) {
+          const a = rnd(6.28), d = rnd(230, 120);
+          const y = (Math.random() + Math.random() + Math.random() - 1.5) * 26;
+          const sz = Math.random() < 0.08 ? rnd(9, 5) : rnd(3.2, 0.6);
+          _e.set(rnd(6.28), rnd(6.28), rnd(6.28));
+          m.setMatrixAt(i, _m4.compose(_v.set(Math.cos(a) * d, y, Math.sin(a) * d), _q.setFromEuler(_e), _s.set(sz, sz, sz)));
+        }
+        m.frustumCulled = false;
+        belt.add(m);
+      }
+      applyDetail(g);
+    };
+    if (loadModel) {
+      loadModel('worlds/space.glb')
+        .then((ms) => placeBelt(['asteroid_a', 'asteroid_b', 'asteroid_c'].map((k) => { if (!ms[k]) throw new Error('no ' + k); return ms[k].geometry; })))
+        .catch((e) => { console.warn('space kit:', e); placeBelt([new THREE.DodecahedronGeometry(1, 0)]); });
+    } else {
+      placeBelt([new THREE.DodecahedronGeometry(1, 0)]);
+    }
 
     const motes = pointCloud(g, 420, () => ({
       x: rnd(180, -180), y: rnd(130, -130), z: rnd(180, -180), v: rnd(0.15, 0.02),
@@ -2998,7 +3058,7 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
         fill: { mul: 0.55, c: 0x7a8ad0 },
       },
       tick(t, dt) {
-        nebGroup.rotation.y = t * 0.004;
+        nebGroup.rotation.y = t * 0.002;
         planet.rotation.y = 0.2 + t * 0.02;
         belt.rotation.y = t * 0.015;
         const mp = motes.pos;

@@ -17,6 +17,6 @@ export const WORLD_BLURBS: Record<string, string> = {
   forest: 'A dense wood, ferns, a flower bed in the sun',
   beach: 'Shoaling waves, sun glitter, a surf line',
   city: 'Lit windows, stopped cars, a patrolling eye',
-  space: 'Nebulae, a red sun, an ocean world adrift',
+  space: 'A painted nebula, an asteroid belt, an ocean world',
   rain: 'Cobbled streets, a castle on the hill, carts in the wet',
 };
