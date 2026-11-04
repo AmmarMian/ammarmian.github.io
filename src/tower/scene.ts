@@ -21,6 +21,7 @@ import { buildKitchen } from './floors/kitchen';
 import { buildBathhouse, VISTAS, type Vista } from './floors/bathhouse';
 import { buildWizardMesh, createWizardController } from './wizard';
 import { buildFoxMesh, createFoxState, foxDecide } from './fox';
+import { loadGlb } from './glb';
 import { makePoints, setBackdrop as setBackdropFx, suppressBackdrop, setGridTheme } from './fx';
 import { createFocusController } from './focus';
 import { createQuality, gpuInfo, gpuSummary, type Tier, type Profile } from './quality';
@@ -155,6 +156,12 @@ export function createTowerScene(container: HTMLElement, opts: {
     nightFor: clampNight,
     // named rather than discovered — see the note at the rig in worlds.js
     rig: { hemi, key, fill },
+    /* Modelled scenery (public/worlds/*.glb), fetched the first time a world
+       that needs it is built. Read by a reader made for exactly what
+       tools/blender writes, not three's GLTFLoader: that one drags enough
+       of three's core in with it to cost every visitor ~7 KB, for files
+       that only ever hold positions, colours and indices. */
+    loadModel: (path: string) => loadGlb(import.meta.env.BASE_URL + path),
   });
 
   // Every candle, brazier and hearth the floor builders placed, so the

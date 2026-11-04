@@ -24,7 +24,10 @@
    couple of hundred kilobytes to the entry chunk with nothing to show for it. */
 import * as THREE from 'three';
 
-export function installWorlds({ scene, camera, renderer, model, fx, dims, nightFor, rig: hostRig }) {
+export function installWorlds({ scene, camera, renderer, model, fx, dims, nightFor, rig: hostRig, loadModel }) {
+  /* loadModel(path) → Promise<{ [meshName]: THREE.Mesh }>, for the worlds
+     whose scenery is modelled rather than generated (the forest). Optional:
+     without it those worlds build their procedural fallback. */
   /* NF here is the number of storeys *above ground*: the shell is masonry the
      world can see, and the tower's cellar is not one of those. GROUND is how
      many storeys sit below it, which the interior floor groups have been
@@ -100,7 +103,7 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
      binding a uniform the shader never declares does nothing, and *using* one
      that was never declared fails the compile outright, which three reports
      only to the console and which shows up on screen as a black surface. */
-  function patchStd(mat, { frag = '', vert = '', emis = '', occluder = false, dither = false, uniforms = {}, decl = '' } = {}) {
+  function patchStd(mat, { frag = '', vert = '', emis = '', occluder = false, dither = false, near = null, uniforms = {}, decl = '' } = {}) {
     mat.onBeforeCompile = (s) => {
       s.uniforms.uT = uT;
       s.uniforms.uWind = uWind;
@@ -136,7 +139,11 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
             vFade = smoothstep(0.02, 0.18, along) * (1.0 - smoothstep(1.06, 1.30, along))
                   * (1.0 - smoothstep(uFadeRad, uFadeRad * 1.7, perp));
             vFade = clamp(vFade * uFadeAmt, 0.0, 1.0);
-          }` : ''}`);
+          }` : ''}
+          ${occluder && near ? `
+          // and whatever comes within arm's reach of the eye, wherever it
+          // is: a crown that fills a corner of the frame is not scenery
+          vFade = max(vFade, 1.0 - smoothstep(${near[0].toFixed(1)}, ${near[1].toFixed(1)}, distance(vWP, cameraPosition)));` : ''}`);
       let fs = s.fragmentShader
         .replace('#include <color_fragment>', `#include <color_fragment>\n${frag}`)
         .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>\n${emis}`);
@@ -1119,141 +1126,297 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
     floor.receiveShadow = true;
     g.add(floor);
 
-    /* trunks — instanced, tapered, leaning a little, mossy at the base */
-    const trunkGeo = new THREE.CylinderGeometry(0.42, 0.95, 1, 8, 1, false);
-    trunkGeo.translate(0, 0.5, 0);
-    const TN = 140;
-    const trunks = new THREE.InstancedMesh(trunkGeo, patchStd(
-      new THREE.MeshStandardMaterial({ color: 0x4a3a2a, roughness: 1, flatShading: true }), {
-        occluder: true, dither: true,
-        frag: `
-          float bark = fbm(vec2(atan(vWN.z, vWN.x) * 6.0, vWP.y * 1.7));
-          diffuseColor.rgb *= 0.6 + 0.75 * bark;
-          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.15,0.24,0.13), smoothstep(3.0, 0.0, vWP.y) * 0.6);
-        `,
-      }), TN);
-    const trees = [];
-    let ti = 0;
-    for (let i = 0; i < TN * 5 && ti < TN; i++) {
-      const a = rnd(6.28), d = rnd(185, 26);
-      const x = Math.cos(a) * d, z = Math.sin(a) * d;
-      const h = rnd(36, 19);
-      const w = rnd(1.5, 0.75);
-      _e.set(rnd(0.09, -0.09), rnd(6.28), rnd(0.09, -0.09));
-      trunks.setMatrixAt(ti++, _m4.compose(_v.set(x, -0.2, z), _q.setFromEuler(_e), _s.set(w, h, w)));
-      trees.push({ x, z, h, w });
-    }
-    trunks.count = ti;
-    trunks.castShadow = true;
-    trunks.frustumCulled = false;
-    g.add(trunks);
-
-    /* canopy — thousands of cards clustered on the trunks plus a layer right
-       over the tower, so it sits half-buried in leaves. wind per-vertex,
-       colour per-instance, vertical tint fakes canopy occlusion. */
-    const cardGeo = new THREE.PlaneGeometry(1, 1);
-    /* Cut out, not blended. alphaTest alone gives the leaf its silhouette and
-       leaves the material in the opaque pass, where thousands of overlapping
-       cards are depth-tested instead of being sorted and shaded on top of one
-       another. `transparent: true` here bought nothing — the test was already
-       hard-edged at 0.42 — and cost the canopy its early-z. */
-    const foliage = (tint) => patchStd(new THREE.MeshStandardMaterial({
-      color: 0xffffff, map: leafTex, alphaMap: leafTex, alphaTest: 0.42,
-      roughness: 1, side: THREE.DoubleSide,
-    }), {
-      occluder: true, dither: true,
-      vert: `
-        vec3 base = (modelMatrix * wIM * vec4(0.0,0.0,0.0,1.0)).xyz;
-        float sway = sin(uT * 0.34 + base.x * 0.16 + base.z * 0.13) * 0.5
-                   + sin(uT * 0.68 + base.z * 0.4) * 0.15;
-        transformed.x += sway * uWind;
-        transformed.z += sway * 0.55 * uWind;
-        transformed.y += sin(uT * 0.47 + base.x * 0.2) * 0.11 * uWind;
-      `,
-      frag: tint,
-    });
-    const CN = 4800;
-    const canopy = new THREE.InstancedMesh(cardGeo, foliage(`
-      float depth = clamp((vWP.y - 3.0) / 34.0, 0.0, 1.0);
-      diffuseColor.rgb *= mix(vec3(0.28,0.38,0.24), vec3(1.15,1.18,0.88), pow(depth, 0.8));
-    `), CN);
-    canopy.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(CN * 3), 3);
-    let ci = 0;
-    const card = (x, y, z, s) => {
-      if (ci >= CN) return;
-      _e.set(rnd(1.1, -1.1), rnd(6.28), rnd(0.8, -0.8));
-      canopy.setMatrixAt(ci, _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e), _s.set(s, s, s)));
-      _c.setHSL(0.24 + rnd(0.09, -0.05), rnd(0.62, 0.34), rnd(0.42, 0.15));
-      canopy.setColorAt(ci, _c);
-      ci++;
+    /* The ground's own height, so anything stood on it stands on it: the same
+       function the floor's vertices were moved by (the plane is rotated -90°
+       about x, so its local y is world -z), flattened round the tower. */
+    const groundY = (x, z) => {
+      const d = Math.hypot(x, z);
+      const h = Math.sin(x * 0.06) * Math.cos(-z * 0.05) * 1.2 + Math.sin(x * 0.02 - z * 0.03) * 2.0;
+      return h * Math.min(1, Math.max(0, (d - 13) / 12)) - 0.06;
     };
-    for (const tr of trees) {
-      const n = 22 + Math.floor(rnd(16));
-      for (let k = 0; k < n; k++) {
-        const a = rnd(6.28), rr = rnd(7 * tr.w, 1);
-        card(tr.x + Math.cos(a) * rr, tr.h * rnd(1.02, 0.62) + rnd(3, -3), tr.z + Math.sin(a) * rr, rnd(9, 4.5));
-      }
-      for (let k = 0; k < 5; k++) {
-        const a = rnd(6.28), rr = rnd(5, 1.5);
-        card(tr.x + Math.cos(a) * rr, rnd(4, 1), tr.z + Math.sin(a) * rr, rnd(4.5, 2.2));
-      }
-    }
-    while (ci < CN) {
-      const a = rnd(6.28), rr = Math.sqrt(Math.random()) * 72;
-      card(Math.cos(a) * rr, rnd(TOP + 32, TOP + 7), Math.sin(a) * rr, rnd(13, 6));
-    }
-    canopy.count = ci;
-    canopy.frustumCulled = false;
-    g.add(canopy);
-
-    /* ferns filling the middle distance */
-    const FN = 1500;
-    const ferns = new THREE.InstancedMesh(cardGeo, foliage(
-      `diffuseColor.rgb *= vec3(0.32,0.46,0.26) * (0.7 + 0.7 * fbm(vWP.xz * 0.8));`), FN);
-    let fi = 0;
-    for (let i = 0; i < FN * 3 && fi < FN; i++) {
-      const a = rnd(6.28), d = rnd(165, 24);
-      if (d < 26) continue;
-      _e.set(rnd(0.4, -0.4), rnd(6.28), 0);
-      const s = rnd(4.6, 2.2);
-      ferns.setMatrixAt(fi++, _m4.compose(
-        _v.set(Math.cos(a) * d, rnd(2.6, 0.7), Math.sin(a) * d), _q.setFromEuler(_e), _s.set(s, s, s)));
-    }
-    ferns.count = fi;
-    ferns.frustumCulled = false;
-    g.add(ferns);
-
-    /* the flower bed: a ring of blooms circling the tower */
     const swayVert = `
       vec3 base = (modelMatrix * wIM * vec4(0.0,0.0,0.0,1.0)).xyz;
       float s = sin(uT * 0.5 + base.x * 0.5 + base.z * 0.4) * 0.08 * uWind;
       transformed.x += s * max(position.y, 0.2);
       transformed.z += s * 0.5 * max(position.y, 0.2);
     `;
-    const stemMat = patchStd(new THREE.MeshStandardMaterial({ color: 0x3f6b30, roughness: 1, flatShading: true }), { vert: swayVert });
+    // shared by both kinds of flora, because night() drives it
     const bloomMat = patchStd(new THREE.MeshStandardMaterial({
-      color: 0xffffff, roughness: 0.7, flatShading: true, emissive: 0x140c02, emissiveIntensity: 1,
+      color: 0xffffff, roughness: 0.7, flatShading: true, emissive: 0x140c02, emissiveIntensity: 1, vertexColors: true,
     }), { vert: swayVert });
-    const stemGeo = new THREE.BoxGeometry(0.07, 1, 0.07);
-    stemGeo.translate(0, 0.5, 0);
-    const BN = 1000;
-    const stems = new THREE.InstancedMesh(stemGeo, stemMat, BN);
-    const blooms = new THREE.InstancedMesh(new THREE.BoxGeometry(0.42, 0.1, 0.42), bloomMat, BN);
-    const pads = new THREE.InstancedMesh(new THREE.BoxGeometry(0.34, 0.06, 0.18), stemMat, BN);
-    blooms.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(BN * 3), 3);
-    const PAL = ['#e8d27a', '#e0728f', '#b98ce8', '#f2f0e2', '#f0a05a', '#8fd8e8'];
-    for (let i = 0; i < BN; i++) {
-      const a = rnd(6.28);
-      const d = 7.3 + Math.pow(Math.random(), 0.7) * 3.8;
-      const x = Math.cos(a) * d, z = Math.sin(a) * d;
-      const h = rnd(1.5, 0.6);
-      _q.setFromAxisAngle(YUP, rnd(6.28));
-      stems.setMatrixAt(i, _m4.compose(_v.set(x, 0, z), _q, _s.set(1, h, 1)));
-      blooms.setMatrixAt(i, _m4.compose(_v.set(x, h, z), _q, _s.set(rnd(1.3, 0.7), 1, rnd(1.3, 0.7))));
-      pads.setMatrixAt(i, _m4.compose(_v.set(x + rnd(0.5, -0.5), 0.05, z + rnd(0.5, -0.5)), _q, _s.set(1, 1, 1)));
-      blooms.setColorAt(i, _c.set(PAL[Math.floor(Math.random() * PAL.length)]));
+    const BLOOM_PAL = ['#e8d27a', '#e0728f', '#b98ce8', '#f2f0e2', '#f0a05a', '#8fd8e8'];
+
+    /* ---- the trees, rocks, ferns and flowers: a kit modelled in Blender ----
+       tools/blender/forest.py builds it (low-poly, flat-shaded, colour and
+       occlusion baked into the vertices, no textures) and writes one 60 KB
+       glTF, fetched only when someone first comes here. If it cannot be had
+       the forest falls back on the procedural one it used to be. */
+    const flora = new THREE.Group();
+    flora.name = 'forest_flora';
+    g.add(flora);
+    const done = () => {
+      applyDetail(g);
+      renderer?.compileAsync?.(flora, camera, scene).catch(() => {});
+    };
+    if (loadModel) {
+      loadModel('worlds/forest.glb')
+        .then((meshes) => { kitFlora(meshes); done(); })
+        .catch((e) => { console.warn('forest kit:', e); proceduralFlora(); done(); });
+    } else {
+      proceduralFlora();
     }
-    [stems, blooms, pads].forEach((m) => { m.frustumCulled = false; g.add(m); });
+
+    function kitFlora(meshes) {
+      const geo = (name) => {
+        const m = meshes[name];
+        if (!m) throw new Error(`no ${name} in the forest kit`);
+        const gg = m.geometry;
+        if (!gg.attributes.normal) gg.computeVertexNormals();
+        return gg;
+      };
+      /* Foliage and bark share one material: the colour is in the vertices.
+         The sway grows with height so trunks stay planted and crowns move. */
+      const treeMat = patchStd(new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1 }), {
+        occluder: true, dither: true, near: [10, 22],
+        vert: `
+          vec3 base = (modelMatrix * wIM * vec4(0.0,0.0,0.0,1.0)).xyz;
+          float k = smoothstep(6.0, 26.0, position.y);
+          float sway = sin(uT * 0.34 + base.x * 0.16 + base.z * 0.13) * 0.5
+                     + sin(uT * 0.68 + base.z * 0.4) * 0.15;
+          transformed.x += sway * 0.45 * k * uWind;
+          transformed.z += sway * 0.25 * k * uWind;
+        `,
+      });
+      const groundMat = patchStd(new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1 }),
+        { occluder: true, dither: true, near: [6, 14] });
+      const fernMat = patchStd(new THREE.MeshStandardMaterial({
+        vertexColors: true, flatShading: true, roughness: 1, side: THREE.DoubleSide,
+      }), { vert: swayVert });
+      const stemMat = patchStd(new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1 }),
+        { vert: swayVert });
+
+      const placed = (name, mat, n) => {
+        const m = new THREE.InstancedMesh(geo(name), mat, n);
+        m.count = 0;
+        m.frustumCulled = false;
+        m.castShadow = /oak|conifer/.test(name);
+        m.name = 'forest_' + name;
+        flora.add(m);
+        return m;
+      };
+      const put = (m, x, y, z, yaw, s, tilt = 0.05) => {
+        _e.set(rnd(tilt, -tilt), yaw, rnd(tilt, -tilt));
+        m.setMatrixAt(m.count++, _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e), _s.set(s, s, s)));
+      };
+
+      /* Trees, laid out as a glade. The whole-tower camera orbits some 70 m
+         out, so a ring of tall trees from 26 m outwards (as the procedural
+         forest had) put crowns right in front of the lens on every turn.
+         Instead: a few smaller trees close in, framing the tower; the band
+         the camera moves through holds only low conifers, ferns and stone;
+         the tall forest stands beyond it as the wall of the clearing. The
+         nearer trees draw at full detail, the far ones as lighter copies. */
+      const species = ['oak_a', 'oak_b', 'conifer'];
+      const T = {};
+      for (const sp of species) { T[sp] = placed(sp, treeMat, 60); T[sp + '_far'] = placed(sp + '_far', treeMat, 90); }
+      const pick = () => species[Math.random() < 0.4 ? 0 : Math.random() < 0.5 ? 1 : 2];
+      const plant = (n, dLo, dHi, sLo, sHi, only) => {
+        for (let i = 0, k = 0; i < n * 8 && k < n; i++) {
+          const a = rnd(6.28), d = rnd(dHi, dLo);
+          const x = Math.cos(a) * d, z = Math.sin(a) * d;
+          const sp = only || pick();
+          const m = T[d < 100 ? sp : sp + '_far'];
+          if (m.count >= m.instanceMatrix.count) continue;
+          put(m, x, groundY(x, z) - 0.3, z, rnd(6.28), rnd(sHi, sLo));
+          k++;
+        }
+      };
+      plant(14, 24, 42, 0.55, 0.8);               // close in, below the floors' eye line
+      plant(16, 46, 92, 0.4, 0.6, 'conifer');     // the camera's band: low and sparse
+      plant(110, 96, 190, 0.9, 1.5);              // the wall of the glade
+
+      /* a loose ceiling of leaves over the tower, so it stands under the
+         canopy rather than in a clearing open to the sky */
+      const C = placed('clump', treeMat, 70);
+      while (C.count < 70) {
+        // high enough that the observatory's own view is under it, not in it
+        const a = rnd(6.28), rr = 20 + Math.sqrt(Math.random()) * 56;
+        put(C, Math.cos(a) * rr, rnd(TOP + 34, TOP + 16), Math.sin(a) * rr, rnd(6.28), rnd(2.6, 1.4), 0.3);
+      }
+
+      // ground cover
+      const RA = placed('rock_a', groundMat, 40), RB = placed('rock_b', groundMat, 24), L = placed('log', groundMat, 12);
+      const scatter = (m, n, lo, hi, smin, smax) => {
+        for (let i = 0; i < n * 4 && m.count < n; i++) {
+          const a = rnd(6.28), d = rnd(hi, lo);
+          const x = Math.cos(a) * d, z = Math.sin(a) * d;
+          put(m, x, groundY(x, z), z, rnd(6.28), rnd(smax, smin), 0.1);
+        }
+      };
+      scatter(RA, 40, 22, 150, 0.6, 1.5);
+      scatter(RB, 24, 26, 160, 0.7, 1.7);
+      scatter(L, 12, 20, 120, 0.8, 1.3);
+      const F = placed('fern', fernMat, 520);
+      scatter(F, 520, 12.5, 150, 1.5, 3.1);
+
+      // the flower bed round the tower: stem and petals share each matrix
+      const BN = 700;
+      const stems = placed('bloom_stem', stemMat, BN), petals = placed('bloom_petals', bloomMat, BN);
+      petals.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(BN * 3), 3);
+      for (let i = 0; i < BN; i++) {
+        const a = rnd(6.28), d = 7.3 + Math.pow(Math.random(), 0.7) * 3.8;
+        const x = Math.cos(a) * d, z = Math.sin(a) * d;
+        const yaw = rnd(6.28), s = rnd(1.5, 0.75);
+        _e.set(rnd(0.12, -0.12), yaw, rnd(0.12, -0.12));
+        _m4.compose(_v.set(x, 0, z), _q.setFromEuler(_e), _s.set(s, s, s));
+        stems.setMatrixAt(stems.count++, _m4);
+        petals.setMatrixAt(petals.count++, _m4);
+        petals.setColorAt(i, _c.set(BLOOM_PAL[Math.floor(Math.random() * BLOOM_PAL.length)]));
+      }
+    }
+
+    /* The forest as it was before the kit: cones, leaf cards and boxes,
+       generated here. Kept as the fallback for a kit that fails to load. */
+    function proceduralFlora() {
+      const g = flora;
+      // the shared bloom material reads vertex colours; boxes have none
+      const whiteColors = (gg) => {
+        gg.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(gg.attributes.position.count * 3).fill(1), 3));
+        return gg;
+      };
+      /* trunks — instanced, tapered, leaning a little, mossy at the base */
+      const trunkGeo = new THREE.CylinderGeometry(0.42, 0.95, 1, 8, 1, false);
+      trunkGeo.translate(0, 0.5, 0);
+      const TN = 140;
+      const trunks = new THREE.InstancedMesh(trunkGeo, patchStd(
+        new THREE.MeshStandardMaterial({ color: 0x4a3a2a, roughness: 1, flatShading: true }), {
+          occluder: true, dither: true,
+          frag: `
+            float bark = fbm(vec2(atan(vWN.z, vWN.x) * 6.0, vWP.y * 1.7));
+            diffuseColor.rgb *= 0.6 + 0.75 * bark;
+            diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.15,0.24,0.13), smoothstep(3.0, 0.0, vWP.y) * 0.6);
+          `,
+        }), TN);
+      const trees = [];
+      let ti = 0;
+      for (let i = 0; i < TN * 5 && ti < TN; i++) {
+        const a = rnd(6.28), d = rnd(185, 26);
+        const x = Math.cos(a) * d, z = Math.sin(a) * d;
+        const h = rnd(36, 19);
+        const w = rnd(1.5, 0.75);
+        _e.set(rnd(0.09, -0.09), rnd(6.28), rnd(0.09, -0.09));
+        trunks.setMatrixAt(ti++, _m4.compose(_v.set(x, -0.2, z), _q.setFromEuler(_e), _s.set(w, h, w)));
+        trees.push({ x, z, h, w });
+      }
+      trunks.count = ti;
+      trunks.castShadow = true;
+      trunks.frustumCulled = false;
+      g.add(trunks);
+
+      /* canopy — thousands of cards clustered on the trunks plus a layer right
+         over the tower, so it sits half-buried in leaves. wind per-vertex,
+         colour per-instance, vertical tint fakes canopy occlusion. */
+      const cardGeo = new THREE.PlaneGeometry(1, 1);
+      /* Cut out, not blended. alphaTest alone gives the leaf its silhouette and
+         leaves the material in the opaque pass, where thousands of overlapping
+         cards are depth-tested instead of being sorted and shaded on top of one
+         another. `transparent: true` here bought nothing — the test was already
+         hard-edged at 0.42 — and cost the canopy its early-z. */
+      const foliage = (tint) => patchStd(new THREE.MeshStandardMaterial({
+        color: 0xffffff, map: leafTex, alphaMap: leafTex, alphaTest: 0.42,
+        roughness: 1, side: THREE.DoubleSide,
+      }), {
+        occluder: true, dither: true,
+        vert: `
+          vec3 base = (modelMatrix * wIM * vec4(0.0,0.0,0.0,1.0)).xyz;
+          float sway = sin(uT * 0.34 + base.x * 0.16 + base.z * 0.13) * 0.5
+                     + sin(uT * 0.68 + base.z * 0.4) * 0.15;
+          transformed.x += sway * uWind;
+          transformed.z += sway * 0.55 * uWind;
+          transformed.y += sin(uT * 0.47 + base.x * 0.2) * 0.11 * uWind;
+        `,
+        frag: tint,
+      });
+      const CN = 4800;
+      const canopy = new THREE.InstancedMesh(cardGeo, foliage(`
+        float depth = clamp((vWP.y - 3.0) / 34.0, 0.0, 1.0);
+        diffuseColor.rgb *= mix(vec3(0.28,0.38,0.24), vec3(1.15,1.18,0.88), pow(depth, 0.8));
+      `), CN);
+      canopy.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(CN * 3), 3);
+      let ci = 0;
+      const card = (x, y, z, s) => {
+        if (ci >= CN) return;
+        _e.set(rnd(1.1, -1.1), rnd(6.28), rnd(0.8, -0.8));
+        canopy.setMatrixAt(ci, _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e), _s.set(s, s, s)));
+        _c.setHSL(0.24 + rnd(0.09, -0.05), rnd(0.62, 0.34), rnd(0.42, 0.15));
+        canopy.setColorAt(ci, _c);
+        ci++;
+      };
+      for (const tr of trees) {
+        const n = 22 + Math.floor(rnd(16));
+        for (let k = 0; k < n; k++) {
+          const a = rnd(6.28), rr = rnd(7 * tr.w, 1);
+          card(tr.x + Math.cos(a) * rr, tr.h * rnd(1.02, 0.62) + rnd(3, -3), tr.z + Math.sin(a) * rr, rnd(9, 4.5));
+        }
+        for (let k = 0; k < 5; k++) {
+          const a = rnd(6.28), rr = rnd(5, 1.5);
+          card(tr.x + Math.cos(a) * rr, rnd(4, 1), tr.z + Math.sin(a) * rr, rnd(4.5, 2.2));
+        }
+      }
+      while (ci < CN) {
+        const a = rnd(6.28), rr = Math.sqrt(Math.random()) * 72;
+        card(Math.cos(a) * rr, rnd(TOP + 32, TOP + 7), Math.sin(a) * rr, rnd(13, 6));
+      }
+      canopy.count = ci;
+      canopy.frustumCulled = false;
+      g.add(canopy);
+
+      /* ferns filling the middle distance */
+      const FN = 1500;
+      const ferns = new THREE.InstancedMesh(cardGeo, foliage(
+        `diffuseColor.rgb *= vec3(0.32,0.46,0.26) * (0.7 + 0.7 * fbm(vWP.xz * 0.8));`), FN);
+      let fi = 0;
+      for (let i = 0; i < FN * 3 && fi < FN; i++) {
+        const a = rnd(6.28), d = rnd(165, 24);
+        if (d < 26) continue;
+        _e.set(rnd(0.4, -0.4), rnd(6.28), 0);
+        const s = rnd(4.6, 2.2);
+        ferns.setMatrixAt(fi++, _m4.compose(
+          _v.set(Math.cos(a) * d, rnd(2.6, 0.7), Math.sin(a) * d), _q.setFromEuler(_e), _s.set(s, s, s)));
+      }
+      ferns.count = fi;
+      ferns.frustumCulled = false;
+      g.add(ferns);
+
+      /* the flower bed: a ring of blooms circling the tower */
+      const swayVertP = `
+        vec3 base = (modelMatrix * wIM * vec4(0.0,0.0,0.0,1.0)).xyz;
+        float s = sin(uT * 0.5 + base.x * 0.5 + base.z * 0.4) * 0.08 * uWind;
+        transformed.x += s * max(position.y, 0.2);
+        transformed.z += s * 0.5 * max(position.y, 0.2);
+      `;
+      const stemMat = patchStd(new THREE.MeshStandardMaterial({ color: 0x3f6b30, roughness: 1, flatShading: true }), { vert: swayVertP });
+      const stemGeo = new THREE.BoxGeometry(0.07, 1, 0.07);
+      stemGeo.translate(0, 0.5, 0);
+      const BN = 1000;
+      const stems = new THREE.InstancedMesh(stemGeo, stemMat, BN);
+      const blooms = new THREE.InstancedMesh(whiteColors(new THREE.BoxGeometry(0.42, 0.1, 0.42)), bloomMat, BN);
+      const pads = new THREE.InstancedMesh(new THREE.BoxGeometry(0.34, 0.06, 0.18), stemMat, BN);
+      blooms.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(BN * 3), 3);
+      const PAL = ['#e8d27a', '#e0728f', '#b98ce8', '#f2f0e2', '#f0a05a', '#8fd8e8'];
+      for (let i = 0; i < BN; i++) {
+        const a = rnd(6.28);
+        const d = 7.3 + Math.pow(Math.random(), 0.7) * 3.8;
+        const x = Math.cos(a) * d, z = Math.sin(a) * d;
+        const h = rnd(1.5, 0.6);
+        _q.setFromAxisAngle(YUP, rnd(6.28));
+        stems.setMatrixAt(i, _m4.compose(_v.set(x, 0, z), _q, _s.set(1, h, 1)));
+        blooms.setMatrixAt(i, _m4.compose(_v.set(x, h, z), _q, _s.set(rnd(1.3, 0.7), 1, rnd(1.3, 0.7))));
+        pads.setMatrixAt(i, _m4.compose(_v.set(x + rnd(0.5, -0.5), 0.05, z + rnd(0.5, -0.5)), _q, _s.set(1, 1, 1)));
+        blooms.setColorAt(i, _c.set(PAL[Math.floor(Math.random() * PAL.length)]));
+      }
+      [stems, blooms, pads].forEach((m) => { m.frustumCulled = false; g.add(m); });
+    }
 
     const rays = lightShafts(g, { count: 12, color: 0xffe3a8, top: TOP + 16, len: TOP + 24, rTop: 1.6, rBot: 7, spread: 46, opacity: 0.1 });
     const pollen = pointCloud(g, 440, () => ({ x: rnd(95, -95), y: rnd(30, 0.5), z: rnd(95, -95), v: rnd(0.7, 0.1) }),
