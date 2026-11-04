@@ -1238,10 +1238,10 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
           k++;
         }
       };
-      plant(16, 24, 42, 0.45, 0.6, [0.35, 0.25, 0.4, 0]);       // framing the tower, low
-      plant(24, 44, 60, 0.75, 0.95, [0.35, 0.3, 0.25, 0.1]);    // the middle wood: crowns below the camera
-      plant(24, 62, 88, 0.3, 0.45, [0.2, 0.1, 0.55, 0.15], true); // saplings in the camera's band: small, so the light copy
-      plant(230, 90, 210, 1.4, 2.2, [0.34, 0.28, 0.22, 0.16]);  // the wood itself: tall and close
+      plant(16, 24, 42, 0.62, 0.8, [0.35, 0.25, 0.4, 0]);       // framing the tower: as tall as it is
+      plant(24, 44, 62, 0.85, 1.05, [0.35, 0.3, 0.25, 0.1]);    // the middle wood, crowns round the camera's height
+      plant(24, 62, 88, 0.25, 0.36, [0.2, 0.1, 0.55, 0.15], true); // saplings in the camera's band: small, so the light copy
+      plant(230, 90, 210, 1.35, 1.85, [0.34, 0.28, 0.22, 0.16]); // the wood itself: 40-60 m, close
 
       /* a ceiling of leaves over everything, so the glade is roofed and the
          sun comes through in shafts rather than flooding in */
@@ -1249,7 +1249,7 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
       while (C.count < 110) {
         // high enough that the observatory's own view is under it, not in it
         const a = rnd(6.28), rr = 18 + Math.sqrt(Math.random()) * 95;
-        put(C, Math.cos(a) * rr, rnd(TOP + 40, TOP + 16), Math.sin(a) * rr, rnd(6.28), rnd(2.8, 1.5), 0.3);
+        put(C, Math.cos(a) * rr, rnd(TOP + 44, TOP + 20), Math.sin(a) * rr, rnd(6.28), rnd(2.8, 1.5), 0.3);
       }
 
       // the understory
@@ -1478,7 +1478,9 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
       fog,
       css: '#1d2f1e',
       glass: { color: 0xfff0cc, emissive: 0xffc884, intensity: 2.0 },
-      fade: { on: 1, radius: 13, amount: 1.0 },
+      // wide: the trees close to the tower are tall now, and a crown leans
+      // well outside the trunk that carries it
+      fade: { on: 1, radius: 22, amount: 1.0 },
       light: {
         hemi: { i: 0.95, sky: 0xd0e29a, gnd: 0x2a2416 },
         key: { mul: 1.1, c: 0xffdc98, p: [10, 46, 14] },

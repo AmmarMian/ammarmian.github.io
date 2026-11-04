@@ -25,8 +25,8 @@ ambient occlusion, not from texture. What it makes, one mesh object each:
     daisy, bell, spike, bedleaf     the flower bed: three kinds of flower
                                     and the leafy cover they grow out of
 
-Units are metres, Z up here (the exporter writes Y up). Trees are about 24 m
-tall at scale 1; the runtime scales instances 0.8-1.5 uniformly.
+Units are metres, Z up here (the exporter writes Y up). Trees are 26-34 m
+tall at scale 1, with long bare trunks; the runtime scales them per ring.
 
 Vertex colour carries the paint and the occlusion: each vertex's colour is
 its material colour (graded by height and a little noise) times an AO term
@@ -222,7 +222,7 @@ def leaf_painter(top, mid, low, zlo, zhi):
 
 
 # ------------------------------------------------------------------- trees
-def broadleaf(name, seed, height=24.0, far=False, top=LEAF_TOP, low=LEAF_LOW):
+def broadleaf(name, seed, height=31.0, far=False, top=LEAF_TOP, low=LEAF_LOW):
     rnd = random.Random(seed)
     part = Part()
     sides = 5 if far else 8
@@ -232,10 +232,10 @@ def broadleaf(name, seed, height=24.0, far=False, top=LEAF_TOP, low=LEAF_LOW):
     lean = Vector((rnd.uniform(-0.6, 0.6), rnd.uniform(-0.6, 0.6), 0))
     for i in range(n):
         t = i / (n - 1)
-        z = -0.4 + t * height * 0.62
+        z = -0.4 + t * height * 0.72      # a long bare trunk: old forest, crowns held high
         wob = Vector((noise.noise(Vector((t * 3, seed, 0))), noise.noise(Vector((0, t * 3, seed))), 0)) * 0.5
         pts.append(Vector((0, 0, z)) + lean * t + wob)
-        radii.append(1.35 * (1 - 0.6 * t) + (1.1 * (1 - t / 0.2) if t < 0.2 else 0.0))
+        radii.append(1.6 * (1 - 0.62 * t) + (1.3 * (1 - t / 0.2) if t < 0.2 else 0.0))
     tube(part, pts, radii, sides, bark_painter(top))
 
     # branches: from the upper trunk, out and up, each ending in a clump
@@ -284,7 +284,7 @@ def broadleaf(name, seed, height=24.0, far=False, top=LEAF_TOP, low=LEAF_LOW):
     return finish(part, name + ("_far" if far else ""))
 
 
-def conifer(name, seed, height=26.0, far=False):
+def conifer(name, seed, height=34.0, far=False):
     rnd = random.Random(seed)
     part = Part()
     tube(part, [(0, 0, -0.4), (0, 0, height * 0.5), (0, 0, height * 0.92)],
@@ -323,7 +323,7 @@ def canopy_clump(name):
     return finish(part, name, ao_ground=False, ao_strength=0.6)
 
 
-def birch(name, seed, height=19.0, far=False):
+def birch(name, seed, height=26.0, far=False):
     """A pale, slender tree with a light crown: the contrast that keeps a
     dense wood from reading as one green mass."""
     rnd = random.Random(seed)
@@ -511,8 +511,8 @@ bpy.ops.wm.read_factory_settings(use_empty=True)
 print("forest kit:")
 broadleaf("oak_a", 1)
 broadleaf("oak_a", 1, far=True)
-broadleaf("oak_b", 2, height=21.0, top=LEAF_B_TOP, low=LEAF_B_LOW)
-broadleaf("oak_b", 2, height=21.0, far=True, top=LEAF_B_TOP, low=LEAF_B_LOW)
+broadleaf("oak_b", 2, height=28.0, top=LEAF_B_TOP, low=LEAF_B_LOW)
+broadleaf("oak_b", 2, height=28.0, far=True, top=LEAF_B_TOP, low=LEAF_B_LOW)
 conifer("conifer", 3)
 conifer("conifer", 3, far=True)
 canopy_clump("clump")
