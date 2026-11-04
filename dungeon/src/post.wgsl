@@ -3,7 +3,7 @@
 
 struct Post {
   scale: f32,
-  time: f32,
+  fade: f32,
   offset: vec2f,
   lowres: vec2f,
 }
@@ -30,7 +30,7 @@ fn luma(c: vec3f) -> f32 { return dot(c, vec3f(0.299, 0.587, 0.114)); }
   let dr = load(lp + vec2i(1, 0)).a;
   let du = load(lp + vec2i(0, -1)).a;
   let dd = load(lp + vec2i(0, 1)).a;
-  let thr = 4.0 / 800.0;
+  let thr = 4.0 / 1200.0;
   let behind = max(max(d - dl, d - dr), max(d - du, d - dd));
   if (behind > thr) {
     col = col * vec3f(0.42, 0.52, 0.55) + vec3f(0.0, 0.015, 0.02);
@@ -69,5 +69,5 @@ fn luma(c: vec3f) -> f32 { return dot(c, vec3f(0.299, 0.587, 0.114)); }
   let v = smoothstep(0.95, 0.35, length((uv - 0.5) * vec2f(1.1, 1.3)));
   col *= mix(0.72, 1.0, v);
 
-  return vec4f(clamp(col, vec3f(0.0), vec3f(1.0)), 1.0);
+  return vec4f(clamp(col * post.fade, vec3f(0.0), vec3f(1.0)), 1.0);
 }

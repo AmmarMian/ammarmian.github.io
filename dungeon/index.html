@@ -5,17 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sunken Tower</title>
 <style>
+  :root { --ink: #b9e0cc; --dim: #6f9a89; --panel: rgba(6, 16, 16, 0.62); --edge: rgba(150, 210, 180, 0.18); --accent: #e8d27a; }
   html, body { margin: 0; height: 100%; background: #04090a; overflow: hidden; }
-  canvas { display: block; width: 100vw; height: 100vh; image-rendering: pixelated; }
-  canvas { touch-action: none; cursor: grab; }
-  #hint { position: fixed; left: 16px; bottom: 14px; color: #5d8a7a; font: 12px ui-monospace, Menlo, monospace; letter-spacing: 0.06em; pointer-events: none; }
-  #msg { position: fixed; inset: 0; display: grid; place-items: center; color: #9fc; font: 14px monospace; pointer-events: none; }
+  canvas { display: block; width: 100vw; height: 100vh; image-rendering: pixelated; touch-action: none; cursor: grab; }
+  #msg { position: fixed; inset: 0; display: grid; place-items: center; color: var(--ink); font: 14px ui-monospace, Menlo, monospace; pointer-events: none; }
+  .hud { position: fixed; font: 12px/1.5 ui-monospace, Menlo, monospace; color: var(--ink); letter-spacing: 0.04em; }
+  #floor { left: 16px; top: 14px; pointer-events: none; }
+  #floorNum { color: var(--dim); text-transform: uppercase; letter-spacing: 0.14em; font-size: 11px; }
+  #floorName { font-size: 18px; letter-spacing: 0.02em; color: var(--ink); }
+  #room { margin-top: 10px; padding: 6px 10px; background: var(--panel); border: 1px solid var(--edge); display: inline-block; }
+  #roomName { color: var(--accent); font-size: 14px; }
+  #roomWays { color: var(--dim); }
+  #stairs { right: 16px; bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
+  #stairs button { font: 13px ui-monospace, Menlo, monospace; color: var(--ink); background: var(--panel); border: 1px solid var(--edge); padding: 8px 12px; cursor: pointer; }
+  #stairs button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  #stairs button:disabled { opacity: 0.35; cursor: default; }
+  #stairs button:focus-visible { outline: 1px solid var(--accent); }
+  #hint { left: 16px; bottom: 14px; color: var(--dim); pointer-events: none; max-width: calc(100vw - 170px); }
+  [hidden] { display: none !important; }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <div id="msg"></div>
-<div id="hint">drag to turn · scroll or pinch to zoom · right-drag to pan · Q/E rotate · R reset</div>
+<div id="floor" class="hud"><div id="floorNum"></div><div id="floorName"></div><div id="room" hidden><div id="roomName"></div><div id="roomWays"></div></div></div>
+<div id="stairs" class="hud"><button id="up" title="Climb (PageUp)">▲ Up</button><button id="down" title="Descend (PageDown)">▼ Down</button></div>
+<div id="hint" class="hud">click a room to focus · Esc or click again to step back · Tab next room · drag to turn · scroll to zoom · right-drag to pan</div>
 <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

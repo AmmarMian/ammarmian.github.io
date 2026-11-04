@@ -1,20 +1,19 @@
 /* Everything the scene shader needs for one frame, shared by the browser
  * loop and the headless renderer. */
-import { type View, BASE_ZOOM, basis, focus } from './camera.ts';
+import { type View, BASE_ZOOM, basis } from './camera.ts';
 import type { Particles } from './particles.ts';
-import { type Room, roomCenter, roomParams } from './room.ts';
+import type { FloorData } from './gen/types.ts';
 
-export function frameParams(room: Room, view: View, res: [number, number], time: number, particles: Particles) {
+export function frameParams(floor: FloorData, view: View, res: [number, number], time: number, particles: Particles, focus: number, focusAmt: number) {
   const b = basis(view.yaw);
-  const center = focus(roomCenter(room), b, view.pan);
   const zoom = BASE_ZOOM * view.zoom;
-  const nParticles = particles.update(time, b, center, res, zoom);
+  const nParticles = particles.update(time, b, view.target, res, zoom, focus, focusAmt);
   return {
-    ...roomParams(room),
-    center, time, zoom, res,
+    center: view.target, time, zoom, res,
     camR: b.R, camU: b.U, camD: b.D,
     cut: b.cut,
+    nRooms: floor.rooms.length,
     nParticles,
-    pad: [0, 0] as [number, number],
+    focus, focusAmt,
   };
 }
