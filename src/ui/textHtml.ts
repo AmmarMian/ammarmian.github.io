@@ -17,6 +17,23 @@ import students from '../data/students.json';
 import projects from '../data/projects.json';
 import snapshot from '../data/hal-snapshot.json';
 import { COLOPHON_TITLE, COLOPHON_BLOCK, COLOPHON_NOTE } from '../data/colophon';
+import { toBibTeX, type HalDoc } from '../data/hal';
+
+/* One line glyph per kind of record, drawn like the rest of the site's
+   line-work (the leader lines, the rules): 18px, a 1.2px stroke in the
+   current colour, no fill. Defined once as symbols and used by reference. */
+const KIND_GLYPHS: Record<string, string> = {
+  journal: '<rect x="4" y="2" width="10" height="14" rx="1"/><path d="M6.5 2v14M9 6h3M9 8.5h3"/>',
+  conference: '<path d="M3 6h12l-2 3H5z"/><path d="M9 9v6M6 15.5h6"/><circle cx="9" cy="3.5" r="1.3"/>',
+  preprint: '<path d="M5 2h6l3 3v11H5z"/><path d="M11 2v3h3M7 9h5M7 11.5h5M7 14h3"/>',
+  chapter: '<path d="M2 4.5c2.8-1 5-1 7 .8 2-1.8 4.2-1.8 7-.8v10c-2.8-1-5-1-7 .8-2-1.8-4.2-1.8-7-.8z"/><path d="M9 5.3v10"/>',
+  software: '<path d="M6 5 2.5 9 6 13M12 5l3.5 4-3.5 4M10.2 3.5 7.8 14.5"/>',
+  thesis: '<path d="M1.5 7 9 4l7.5 3L9 10z"/><path d="M5 8.6v3.6c2.2 1.6 5.8 1.6 8 0V8.6M16.5 7v4"/>',
+};
+const glyphFor = (kind: string) => (kind.toLowerCase() in KIND_GLYPHS ? kind.toLowerCase() : 'preprint');
+const GLYPH_DEFS = `<svg class="tp-defs" aria-hidden="true" width="0" height="0"><defs>${
+  Object.entries(KIND_GLYPHS).map(([k, d]) => `<symbol id="k-${k}" viewBox="0 0 18 18">${d}</symbol>`).join('')
+}</defs></svg>`;
 
 export function esc(s: unknown): string {
   return String(s).replace(/[&<>"']/g, (c) => (
@@ -33,13 +50,11 @@ const ext = (href: string, label: string) =>
 /** The whole page, `<main>` included. `base` is '' in production; it exists
  *  so the link home is correct wherever the site is mounted.
  *
- *  Set as a Paper & Night technical page: a sheet on the desk with a running
- *  head, the name and a dek, an outline strip in the manner of the system's
- *  outline slide, a row of key figures, then numbered sections in a 680px
- *  column with notes in the margin beside them. Still one static document
- *  with no script — the design is all in the stylesheet. */
+ *  Set in Paper & Night type: one narrow centred column on the page — name,
+ *  dek, numbered sections — with the contents pinned beside it on a wide
+ *  screen and set above it on a narrow one. */
 export function textPageHtml(base = ''): string {
-  const docs = snapshot as { title: string; authors: string; venue: string; year: number; kind: string; uri: string }[];
+  const docs = snapshot as HalDoc[];
   const studs = students as { name: string; topic: string; note?: string; kind: string; period: string; status: string }[];
   const projs = projects as { name: string; description: string; url: string }[];
 
@@ -52,11 +67,29 @@ export function textPageHtml(base = ''): string {
   const pubs = years.map((y) => {
     const rows = docs.filter((d) => (d.year || 0) === y);
     return `
-      <h3><span>${y || 'n.d.'}</span>${rows.length} record${rows.length === 1 ? '' : 's'}</h3>
-      <ol class="tp-pubs">${rows.map((d) => `
-        <li><strong>${esc(d.title)}</strong>
-          <span class="tp-au">${me(d.authors)}</span>
-          <span class="tp-meta"><i>${esc(d.venue)}</i> <b>${esc(d.kind)}</b>${d.uri && d.uri !== '#' ? ` ${ext(d.uri, 'HAL')}` : ''}</span></li>`).join('')}
+      <h3 id="y${y || 'nd'}"><span>${y || 'n.d.'}</span>${rows.length} record${rows.length === 1 ? '' : 's'}</h3>
+      <ol class="tp-pubs">${rows.map((d) => {
+        // A preprint's "venue" is often just its DOI or the archive's name —
+        // already a button below, so it is not repeated as a venue.
+        const venue = d.venue && !/^(doi:|hal$)/i.test(d.venue) ? `<i>${esc(d.venue)}</i>` : '';
+        const btn = (href: string, label: string) =>
+          `<a class="tp-chip" href="${esc(href)}" target="_blank" rel="noopener">${label}<span aria-hidden="true">&#8599;</span></a>`;
+        return `
+        <li>
+          <svg class="tp-kind" aria-hidden="true"><use href="#k-${glyphFor(d.kind)}"/></svg>
+          <div>
+            <strong>${esc(d.title)}</strong>
+            <span class="tp-au">${me(d.authors)}</span>
+            <span class="tp-meta">${venue}<b>${esc(d.kind)}</b></span>
+            <span class="tp-acts">${[
+              d.uri && d.uri !== '#' ? btn(d.uri, 'HAL') : '',
+              d.pdf ? btn(d.pdf, 'PDF') : '',
+              d.doi ? btn(`https://doi.org/${d.doi}`, 'DOI') : '',
+              `<button class="tp-chip" type="button" hidden data-bib="${esc(toBibTeX(d))}">BibTeX</button>`,
+            ].join('')}</span>
+          </div>
+        </li>`;
+      }).join('')}
       </ol>`;
   }).join('');
 
@@ -71,68 +104,59 @@ export function textPageHtml(base = ''): string {
   )).join('');
   const colophonNote = COLOPHON_NOTE.map((x) => `<p>${esc(x)}</p>`).join('');
 
-  const journals = docs.filter((d) => d.kind === 'Journal').length;
-  const current = studs.filter((x) => x.status === 'current').length;
   const research = PROFILE.bio.replace(/^In the world outside the tower:\s*/i, '');
+  const yearLinks = years.map((y) => `<a href="#y${y || 'nd'}">${y || 'n.d.'}</a>`).join('');
 
-  return `<main class="text-page">
-  <article class="tp-sheet">
-    <header class="tp-hdr">
-      <div class="tp-run"><span><b>Curriculum</b> · LISTIC · Université Savoie Mont-Blanc</span><a href="${esc(base)}/?view=3d">The interactive tower &rarr;</a></div>
-      <h1>Ammar Mian</h1>
-      <p class="tp-dek">${esc(PROFILE.role)}, ${esc(PROFILE.affiliation)} — ${esc(research)}</p>
-      <p class="tp-by"><a href="mailto:${esc(CONTACT.email)}">${esc(CONTACT.email)}</a><span>·</span>${ext(CONTACT.hal, 'HAL')}<span>·</span>${ext(CONTACT.github, 'GitHub')}</p>
-      <div class="tp-orn" aria-hidden="true"><i></i></div>
-    </header>
-
-    <nav class="tp-outline" aria-label="Contents">
-      <a href="#career"><span class="n">01</span><h4>Career</h4><p>Positions and education, since 2016.</p><span class="pg">${PROFILE.positions.length + PROFILE.education.length} entries</span></a>
-      <a href="#publications"><span class="n">02</span><h4>Publications</h4><p>From the HAL open archive, newest first.</p><span class="pg">${docs.length} records</span></a>
-      <a href="#students"><span class="n">03</span><h4>Students &amp; tools</h4><p>Doctoral and master's supervision, software.</p><span class="pg">${studs.length} students</span></a>
-      <a href="#contact"><span class="n">04</span><h4>Contact</h4><p>Where to write, and where else to look.</p><span class="pg">Annecy</span></a>
+  return `<main class="text-page">${GLYPH_DEFS}
+  <div class="tp-layout">
+    <nav class="tp-toc" aria-label="Contents">
+      <a class="tp-toc-home" href="${esc(base)}/?view=3d">&larr; The interactive tower</a>
+      <p class="tp-toc-h">Contents</p>
+      <ol>
+        <li><a href="#career"><span>1</span>Career</a>
+          <ol><li><a href="#positions">Positions</a></li><li><a href="#education">Education</a></li></ol></li>
+        <li><a href="#publications"><span>2</span>Publications</a>
+          <div class="tp-toc-years">${yearLinks}</div></li>
+        <li><a href="#students"><span>3</span>Students &amp; tools</a>
+          <ol><li><a href="#supervising">Supervising now</a></li><li><a href="#past">Past &amp; master's</a></li><li><a href="#software">Software</a></li></ol></li>
+        <li><a href="#contact"><span>4</span>Contact</a></li>
+        <li><a href="#colophon"><span>§</span>Colophon</a></li>
+      </ol>
     </nav>
 
-    <dl class="tp-figs">
-      <div><dt>Publications</dt><dd>${docs.length}</dd></div>
-      <div><dt>Journal articles</dt><dd>${journals}</dd></div>
-      <div><dt>Doctoral students now</dt><dd>${current}</dd></div>
-      <div><dt>At LISTIC since</dt><dd>2020</dd></div>
-    </dl>
+    <article class="tp-col">
+      <header class="tp-hdr" id="top">
+        <p class="tp-run"><b>Curriculum</b> · LISTIC · Université Savoie Mont-Blanc</p>
+        <h1>Ammar Mian</h1>
+        <p class="tp-dek">${esc(PROFILE.role)}, ${esc(PROFILE.affiliation)} — ${esc(research)}</p>
+        <p class="tp-by"><a href="mailto:${esc(CONTACT.email)}">${esc(CONTACT.email)}</a><span>·</span>${ext(CONTACT.hal, 'HAL')}<span>·</span>${ext(CONTACT.github, 'GitHub')}</p>
+      </header>
 
-    <div class="tp-row" id="career">
-      <section class="tp-main">
+      <section id="career">
         <h2><span>1</span>Career</h2>
-        <h3>Positions</h3>
+        <h3 id="positions">Positions</h3>
         <ul class="tp-cv">${cv(PROFILE.positions)}</ul>
-        <h3>Education</h3>
+        <h3 id="education">Education</h3>
         <ul class="tp-cv">${cv(PROFILE.education)}</ul>
       </section>
-      <aside class="tp-aside">The same record stands in the sleeping quarters of <a href="${esc(base)}/about?view=3d">the tower</a>.</aside>
-    </div>
 
-    <div class="tp-row" id="publications">
-      <section class="tp-main">
+      <section id="publications">
         <h2><span>2</span>Publications</h2>
+        <p class="tp-aside">A snapshot taken at build time. The library in the tower reads HAL live, with search, filters and BibTeX export.</p>
         ${pubs}
       </section>
-      <aside class="tp-aside">A snapshot taken at build time. The library in the tower reads HAL live, with search, filters and BibTeX export.</aside>
-    </div>
 
-    <div class="tp-row" id="students">
-      <section class="tp-main">
+      <section id="students">
         <h2><span>3</span>Students &amp; tools</h2>
-        <h3>Supervising now</h3>
+        <h3 id="supervising">Supervising now</h3>
         <ul class="tp-cv">${people('current')}</ul>
-        <h3>Past &amp; master's</h3>
+        <h3 id="past">Past &amp; master's</h3>
         <ul class="tp-cv">${people('done')}</ul>
-        <h3>Software</h3>
+        <h3 id="software">Software</h3>
         <ul class="tp-cv">${tools}</ul>
       </section>
-      <aside class="tp-aside">Co-supervisors are named with each thesis.</aside>
-    </div>
 
-    <div class="tp-row" id="contact">
-      <section class="tp-main">
+      <section id="contact">
         <h2><span>4</span>Contact</h2>
         <dl class="tp-dl">
           <dt>Email</dt><dd><a href="mailto:${esc(CONTACT.email)}">${esc(CONTACT.email)}</a></dd>
@@ -141,22 +165,68 @@ export function textPageHtml(base = ''): string {
           <dt>GitHub</dt><dd>${ext(CONTACT.github, CONTACT.github.replace(/^https:\/\//, ''))}</dd>
         </dl>
       </section>
-    </div>
 
-    <div class="tp-row">
-      <section class="tp-main tp-colophon">
+      <section id="colophon" class="tp-colophon">
         <h2><span>§</span>${esc(COLOPHON_TITLE)}</h2>
         <dl class="tp-dl">${colophon}</dl>
         ${colophonNote}
       </section>
-    </div>
 
-    <footer class="tp-ft">
-      <span class="tp-sig">Ammar Mian</span>
-      <span class="tp-au-ft">Text version of <a href="${esc(base)}/?view=3d">ammarmian.fr</a><i>— the same content as the tower</i></span>
-    </footer>
-  </article>
+      <footer class="tp-ft">
+        <span class="tp-sig">Ammar Mian</span>
+        <a href="#top">Back to the top &uarr;</a>
+      </footer>
+    </article>
+  </div>
 </main>`;
+}
+
+/** The one piece of script the plain page carries: it marks the section
+ *  being read in the contents. Everything works without it — the contents
+ *  are ordinary anchor links — so it is an enhancement, never a dependency.
+ *  Self-contained on purpose: vite.config.ts inlines its source into the
+ *  static /text/index.html, and TextPage.ts calls it in the SPA. */
+export function textPageEnhance(): void {
+  const toc = document.querySelector('.tp-toc');
+  const scroller = document.querySelector('.text-page');
+  if (!toc || !scroller) return;
+  const links: Record<string, HTMLAnchorElement> = {};
+  toc.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => { links[a.hash.slice(1)] = a; });
+  const targets = Object.keys(links)
+    .map((id) => document.getElementById(id))
+    .filter((el): el is HTMLElement => !!el)
+    .sort((x, y) => (x.compareDocumentPosition(y) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
+  let queued = false;
+  const mark = () => {
+    queued = false;
+    // The section being read is the last one whose heading has passed the
+    // top third of the screen.
+    const line = scroller.getBoundingClientRect().top + window.innerHeight * 0.3;
+    let current: HTMLElement | undefined;
+    for (const t of targets) { if (t.getBoundingClientRect().top <= line) current = t; else break; }
+    Object.values(links).forEach((a) => a.removeAttribute('aria-current'));
+    if (!current) return;
+    const a = links[current.id];
+    a.setAttribute('aria-current', 'location');
+    // and the part it belongs to, so a year lights "Publications" too
+    const top = a.closest('.tp-toc > ol > li')?.querySelector(':scope > a');
+    if (top && top !== a) top.setAttribute('aria-current', 'true');
+  };
+  // BibTeX buttons: hidden without script, since copying needs it.
+  scroller.querySelectorAll<HTMLButtonElement>('button[data-bib]').forEach((b) => {
+    b.hidden = false;
+    b.addEventListener('click', async () => {
+      let ok = false;
+      try { await navigator.clipboard.writeText(b.dataset.bib || ''); ok = true; } catch {}
+      const was = 'BibTeX';
+      b.textContent = ok ? 'Copied ✓' : 'Copy failed';
+      window.setTimeout(() => { b.textContent = was; }, 1400);
+    });
+  });
+  scroller.addEventListener('scroll', () => {
+    if (!queued) { queued = true; requestAnimationFrame(mark); }
+  }, { passive: true });
+  mark();
 }
 
 /** The short version, for the <noscript> inside the 3D page. Someone reading

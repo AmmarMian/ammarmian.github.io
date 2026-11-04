@@ -1,6 +1,6 @@
 import { defineConfig, type Plugin } from 'vite';
 import { readFileSync } from 'node:fs';
-import { textPageHtml, noscriptHtml, TEXT_TITLE, TEXT_DESCRIPTION, esc } from './src/ui/textHtml';
+import { textPageHtml, textPageEnhance, noscriptHtml, TEXT_TITLE, TEXT_DESCRIPTION, esc } from './src/ui/textHtml';
 
 /* /text as a real HTML file, and the <noscript> block that points at it.
  *
@@ -58,6 +58,7 @@ function prerenderText(): Plugin {
 </head>
 <body>
 ${textPageHtml('')}
+<script>(${textPageEnhance.toString()})();</script>
 </body>
 </html>
 `,
