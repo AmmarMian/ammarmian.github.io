@@ -2388,8 +2388,8 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
     /* blocks: instanced boxes with a procedural window grid. only a handful of
        panes are lit, and the lit ones flicker on their own clock. */
     const BN = 150;
-    const blocks = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), patchStd(
-      new THREE.MeshStandardMaterial({ color: 0x8a8578, roughness: 0.95, flatShading: true, emissive: 0x000000, emissiveIntensity: 1 }), {
+    const blockMat = patchStd(
+      new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: 0.95, flatShading: true, emissive: 0x000000, emissiveIntensity: 1 }), {
         frag: `
           vec3 n = normalize(vWN);
           vec2 face = abs(n.x) > 0.5 ? vec2(vWP.z, vWP.y) : vec2(vWP.x, vWP.y);
@@ -2399,11 +2399,21 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
           pane *= 1.0 - step(0.5, n.y);
           float bId = hash21(floor(vWP.xz / 26.0));
           float grime = fbm(vWP.xz * 0.4 + vWP.y * 0.05);
-          vec3 wall = mix(vec3(0.085,0.082,0.078), vec3(0.20,0.19,0.175), grime);
+          // the building's own material (concrete, ledges, rust, moss), from
+          // its vertex colour when it is modelled; the boxes carry white
+          vec3 base = diffuseColor.rgb;
+          vec3 wall = base * mix(0.30, 0.62, grime);
           wall *= 0.55 + 0.7 * smoothstep(0.0, 60.0, vWP.y);
-          wall = mix(wall, vec3(0.05,0.055,0.06), step(0.5, n.y));
+          wall = mix(wall, base * 0.14, step(0.5, n.y));
+          // the city being taken back: vines climbing from the street in a
+          // ragged front, higher on some walls than others
+          float vineN = fbm(face * 0.22 + bId * 13.0);
+          float reach = 7.0 + 30.0 * fbm(vec2(face.x * 0.04, bId * 7.0));
+          float vine = smoothstep(0.50, 0.56, vineN) * (1.0 - smoothstep(reach - 5.0, reach, vWP.y)) * (1.0 - step(0.5, n.y));
+          pane *= 1.0 - vine;
           diffuseColor.rgb = mix(wall, vec3(0.02,0.025,0.03), pane * 0.9);
-          float lit = step(0.952, hash21(id + bId * 37.0)) * pane;
+          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.12,0.22,0.08) * (0.7 + 0.7 * fbm(face * 1.3)), vine);
+          float lit = step(0.935, hash21(id + bId * 37.0)) * pane;
           float flick = 0.7 + 0.3 * sin(uT * (3.0 + hash21(id) * 9.0) + hash21(id) * 20.0);
           if (hash21(id + 3.0) > 0.9) flick *= step(0.35, fract(uT * 0.7 + hash21(id)));
           litAmt = lit * flick;
@@ -2411,12 +2421,17 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
         emis: `
           totalEmissiveRadiance += mix(vec3(1.0,0.76,0.40), vec3(0.55,0.85,0.75), step(0.6, hash21(vWP.xz))) * litAmt * 2.4;
         `,
-      }), BN);
-    blocks.material.onBeforeCompile = ((prev) => (s, r) => {
+      });
+    blockMat.onBeforeCompile = ((prev) => (s, r) => {
       prev(s, r);
       s.fragmentShader = s.fragmentShader.replace('void main() {', 'void main() {\n  float litAmt = 0.0;');
-    })(blocks.material.onBeforeCompile);
-    blocks.material.customProgramCacheKey = () => 'cityblock';
+    })(blockMat.onBeforeCompile);
+    blockMat.customProgramCacheKey = () => 'cityblock';
+    // the boxes the city had before its buildings were modelled: white
+    // vertex colour, so the shared material reads them as plain concrete
+    const boxGeo = new THREE.BoxGeometry(1, 1, 1);
+    boxGeo.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(boxGeo.attributes.position.count * 3).fill(0.55), 3));
+    const blocks = new THREE.InstancedMesh(boxGeo, blockMat, BN);
     /* A coarse skyline, filled as the blocks are placed: the tallest thing in
        each cell of a grid over the city. The eye flies by it — it is the only
        record of where the buildings actually ended up, since they are placed
@@ -2465,6 +2480,49 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
     blocks.receiveShadow = true;
     blocks.frustumCulled = false;
     g.add(blocks);
+
+    /* The buildings, modelled (tools/blender/city.py): towers with setbacks
+       and cornices, mid-rises, a broken-topped ruin, low blocks over an
+       arcade. Placed on the same plots the boxes took, each at a uniform
+       scale and a quarter-turn so the ledges keep their proportions, and
+       recorded on the same skyline the eye flies by. The boxes stay if the
+       kit cannot be had. */
+    if (loadModel) {
+      loadModel('worlds/city.glb').then((ms) => {
+        const kinds = [['tower', 74, 22], ['midrise', 38, 28], ['ruin', 48, 21], ['slab', 21, 32]];
+        const meshes = kinds.map(([k]) => {
+          if (!ms[k]) throw new Error('no ' + k + ' in the city kit');
+          const m = new THREE.InstancedMesh(ms[k].geometry, blockMat, BN);
+          m.count = 0; m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false;
+          return m;
+        });
+        skyline.fill(0);
+        const _p = new THREE.Vector3(), _r = new THREE.Quaternion(), _sc = new THREE.Vector3();
+        for (let i = 0; i < blocks.count; i++) {
+          blocks.getMatrixAt(i, _m4);
+          _m4.decompose(_p, _r, _sc);
+          const ht = _sc.y, fp = Math.max(_sc.x, _sc.z);
+          // the kind follows the plot: tall thin plots take towers, wide
+          // low ones take slabs, and some of the tall ones are ruins
+          let k = ht > 55 ? (Math.random() < 0.35 ? 2 : 0) : ht > 30 ? 1 : 3;
+          if (fp > 26 && k === 0) k = 1;
+          const [, kh, kw] = kinds[k];
+          const s = Math.min(ht / kh, fp / kw * 1.15);
+          _e.set(0, Math.floor(rnd(4)) * Math.PI / 2, 0);
+          const m = meshes[k];
+          m.setMatrixAt(m.count++, _m4.compose(_v.set(_p.x, -0.5, _p.z), _q.setFromEuler(_e), _s.set(s, s, s)));
+          const top = kh * s, reach = kw * s * 0.75;
+          const i0 = skyIx(_p.x - reach), i1 = skyIx(_p.x + reach), k0 = skyIx(_p.z - reach), k1 = skyIx(_p.z + reach);
+          for (let ii = i0; ii <= i1; ii++) for (let kk = k0; kk <= k1; kk++) {
+            const c = ii * SKY_N + kk;
+            if (top > skyline[c]) skyline[c] = top;
+          }
+        }
+        g.remove(blocks);
+        for (const m of meshes) g.add(m);
+        applyDetail(g);
+      }).catch((e) => console.warn('city kit:', e));
+    }
 
     // rubble where facades came down
     const rubble = new THREE.InstancedMesh(new THREE.DodecahedronGeometry(1, 0), patchStd(
@@ -2751,8 +2809,10 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
       css: '#080c12',
       glass: { color: 0xffdca8, emissive: 0xffa64a, intensity: 2.6 },
       light: {
-        hemi: { i: 0.8, sky: 0x4a5f8a, gnd: 0x1a140e },
-        key: { mul: 0.5, c: 0x7f9fd0, p: [-30, 40, -20] },
+        // a full moon over the ruins: enough cold light that the modelled
+        // buildings read as shapes, not as cut-outs against the sky
+        hemi: { i: 1.05, sky: 0x5a72a8, gnd: 0x1a140e },
+        key: { mul: 0.85, c: 0x9ab6e6, p: [-30, 40, -20] },
         fill: { mul: 0.85, c: 0xc07a3a },
       },
       tick(t, dt) {
