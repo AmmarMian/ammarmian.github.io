@@ -1688,7 +1688,9 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
           // 3 · and the drained residue just above the lip, patchy and faint
           float residue = smoothstep(-0.7, 0.05, edge) * smoothstep(0.2, -0.1, edge)
                         * smoothstep(0.45, 0.95, fbm(p * 5.0 + uT * 0.25)) * 0.45;
-          foam = clamp(lip * 0.9 + sheet + residue, 0.0, 1.0);
+          // the water draws its own surf now; the sand keeps only the
+          // thin lip it leaves and the residue, faint
+          foam = clamp(lip * 0.3 + residue * 0.25, 0.0, 1.0);
           }
           diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.97,0.98,0.99), foam);
         `,
@@ -1700,32 +1702,82 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
     sand.receiveShadow = true;
     g.add(sand);
 
-    /* The sea: a 4-term Gerstner sum in the vertex shader, all wave trains
-       running shoreward with a slight spread, amplitude shoaling as the bed
-       comes up. The same derivatives give the normal, so there is no normal
-       map and no reflection pass — one draw call for the whole ocean. */
-    const WAVES = `
-      void waveAt(vec2 p, out float h, out vec2 dh, out float crest){
-        h = 0.0; dh = vec2(0.0); crest = 0.0;
-        float shoal = smoothstep(0.0, 7.0, depthAt(p));
-        vec4 amp = vec4(0.55, 0.30, 0.15, 0.075);
-        vec4 wl  = vec4(46.0, 26.0, 14.0, 7.5);
-        vec4 spd = vec4(0.60, 0.78, 1.00, 1.30);
-        vec4 skew = vec4(0.0, 0.16, -0.22, 0.09);   // small spread in the swell
+    /* The sea, after Endless Field's ocean (sea.wgsl, lib/shore.wgsl), in GLSL:
+       · a Gerstner swell of four trains rolling shoreward, shoaling as the bed
+         comes up;
+       · surf: crests travel in and slow as the water shallows (they bunch up
+         toward the beach), steepen, break at ~0.8 of the depth and run on as
+         foaming bores; at the beach the same swash the sand draws;
+       · per-pixel normals from the analytic slopes plus fine ripples that
+         fade with the pixel's footprint before they could alias;
+       · Fresnel-weighted sky reflection and a sun (or moon) glitter path
+         whose sharpness also falls with the footprint;
+       · a water column that absorbs red first — turquoise over the sand,
+         ink offshore — with the crests lit through where the sun is behind
+         them;
+       · foam as lace (cellular: thick white when fresh, opening into holes as
+         it thins), and the breaking water glowing at night;
+       · blended as out = colour + scene × transmittance, so the sand shows
+         through the shallows rather than the sea being painted over it. */
+    const SURF = `
+      const float PERIOD = 7.5;
+      float h1(float n){ return fract(sin(n * 127.1 + 311.7) * 43758.5453); }
+      float setSize(float k){ return 0.55 + 0.45 * h1(k) * (0.6 + 0.4 * sin(k * 0.9)); }
+      // out to sea, in metres, from the depth (the bed falls at SLOPE per metre)
+      float outward(vec2 p){ return max(depthAt(p), 0.0) / ${SLOPE.toFixed(3)}; }
+      // phase of the incoming surf: crests slow in the shallows (c ~ sqrt(gh))
+      float surfPhase(vec2 p, float t){
+        float d = outward(p);
+        float bend = sin(p.x * 0.021 + 1.3) * 0.25 + sin(p.x * 0.067) * 0.08;
+        return (t + 2.6 * sqrt(d) + d * 0.02) / PERIOD + bend;
+      }
+      // x height above still water, y breaking, z phase in the cycle, w bore foam
+      vec4 surf(vec2 p, float t){
+        float depth = depthAt(p);
+        float ph = surfPhase(p, t);
+        float k = floor(ph), u = ph - k;
+        float size = mix(setSize(k), setSize(k + 1.0), smoothstep(0.75, 1.0, u));
+        float d = outward(p);
+        float a0 = 0.42 * size * (1.0 + 0.9 * (1.0 - smoothstep(8.0, 60.0, d)));
+        float lim = 0.55 * max(depth, 0.0) + 0.05;
+        float a = min(a0, lim);
+        float breaking = smoothstep(0.7, 1.0, a0 / max(lim, 1e-3)) * (1.0 - smoothstep(40.0, 80.0, d));
+        float front = smoothstep(0.80, 1.0, u), back = exp(-u * 4.5);
+        float eta = a * (max(front * front, back) - 0.28) * smoothstep(0.0, 0.4, depth + 0.3);
+        float bore = exp(-u * 5.5) * smoothstep(0.2, 1.0, breaking);
+        return vec4(eta, breaking, u, bore);
+      }`;
+    const SWELL = `
+      // four long trains running shoreward (+z) with a little spread
+      vec3 swell(vec2 p, float t, float k, out vec2 grad){
+        vec4 L = vec4(52.0, 33.0, 19.0, 11.0);
+        vec4 A = vec4(0.42, 0.24, 0.12, 0.06);
+        vec4 H = vec4(0.10, -0.26, 0.38, -0.55);
+        vec4 P = vec4(0.0, 1.7, 4.1, 2.6);
+        vec3 d = vec3(0.0); grad = vec2(0.0);
         for (int i = 0; i < 4; i++) {
-          float a = amp[i] * shoal;
-          float k = 6.28318 / wl[i];
-          vec2 dir = normalize(vec2(skew[i], 1.0));
-          float ph = k * dot(dir, p) + uT * spd[i] * 6.0;
-          h += a * sin(ph);
-          dh += dir * (a * k * cos(ph));
-          crest += a * k * pow(max(0.0, sin(ph)), 6.0);
+          vec2 dir = vec2(sin(H[i]), cos(H[i]));
+          float kw = 6.28318 / L[i];
+          float w = sqrt(9.81 * kw);
+          float th = kw * dot(dir, p) - w * t + P[i];
+          float a = A[i] * k;
+          float q = 0.5 / (kw * A[i] * 4.0);
+          d += vec3(dir.x * q * a * cos(th), a * sin(th), dir.y * q * a * cos(th));
+          grad += dir * (a * kw * cos(th));
         }
+        return d;
       }`;
     // as wide as the sand, and running out past the sky's horizon, so there is
     // never a strip of bare dome between the water and the sky
-    const sea = new THREE.Mesh(new THREE.PlaneGeometry(1400, 1260, 260, 220), new THREE.ShaderMaterial({
-      transparent: true, side: THREE.DoubleSide,
+    const sea = new THREE.Mesh(new THREE.PlaneGeometry(1400, 1260, 280, 240), new THREE.ShaderMaterial({
+      transparent: true, side: THREE.DoubleSide, depthWrite: false,
+      // premultiplied: out = colour + scene × transmittance (the alpha)
+      blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.SrcAlphaFactor,
+      blendEquation: THREE.AddEquation,
+      /* and leave the canvas's own alpha alone: the canvas is transparent
+         (the page shows through where nothing is drawn), so writing the
+         transmittance into it let the page's background through the sea */
+      blendSrcAlpha: THREE.ZeroFactor, blendDstAlpha: THREE.OneFactor,
       uniforms: {
         uT,
         /* Whichever body is actually above the horizon owns the glitter path.
@@ -1738,82 +1790,135 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
         uWarm: { value: 1 },
         uSky: { value: new THREE.Color(0x7fb4dc) },
         uHaze: { value: new THREE.Color(0xbcd4e0) },
+        uHorizon: { value: new THREE.Color(0xf2b478) },
       },
       vertexShader: `uniform float uT;
-        ${NOISE}${PROFILE}${WAVES}
-        varying vec3 vWP; varying vec3 vN; varying float vCrest; varying float vDepth;
+        ${NOISE}${PROFILE}${SURF}${SWELL}
+        varying vec3 vWP; varying float vDepth; varying vec2 vXZ;
         void main(){
           vec4 wp = modelMatrix * vec4(position, 1.0);
-          float h; vec2 dh; float crest;
-          waveAt(wp.xz, h, dh, crest);
-          wp.y += h;
-          vWP = wp.xyz;
-          vN = normalize(vec3(-dh.x, 1.0, -dh.y));
-          vCrest = crest;
-          vDepth = depthAt(wp.xz);
+          vec2 p = wp.xz;
+          float depth = depthAt(p);
+          vec2 g;
+          vec3 sw = swell(p, uT, smoothstep(0.3, 6.0, depth), g);
+          vec4 su = surf(p, uT);
+          wp.xyz += vec3(sw.x, sw.y + su.x, sw.z);
+          vWP = wp.xyz; vDepth = depth; vXZ = p;
           gl_Position = projectionMatrix * viewMatrix * wp;
         }`,
-      fragmentShader: `${NOISE}
+      fragmentShader: `${NOISE}${PROFILE}${SURF}${SWELL}
         uniform float uT; uniform vec3 uSun; uniform float uSunI; uniform vec3 uSunC;
-        uniform float uDark; uniform float uWarm; uniform vec3 uSky; uniform vec3 uHaze;
-        varying vec3 vWP; varying vec3 vN; varying float vCrest; varying float vDepth;
-        void main(){
-          vec3 N = normalize(vN);
-          vec3 V = normalize(cameraPosition - vWP);
-          float fres = pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 4.0);
-          // deep blue offshore, green over the shallow bed
-          // shallows to depths: turquoise over the bar, ink offshore
-          vec3 c = mix(vec3(0.10,0.62,0.62), vec3(0.004,0.09,0.30), smoothstep(0.3, 10.0, vDepth));
-          // sunlight pushes the shallows green-gold, the way a real bar reads
-          c += vec3(0.22,0.20,0.02) * uWarm * (1.0 - smoothstep(0.0, 6.0, vDepth));
-          c *= mix(1.0, 0.16, uDark);          // water is not lit from within
-          c = mix(c, uSky, fres * 0.55);
-          vec3 Hv = normalize(uSun + V);
-          float spec = pow(max(dot(N, Hv), 0.0), 200.0);
-          float sparkle = smoothstep(0.55, 1.0, fbm(vWP.xz * 3.0 + uT * 0.6));
-          c += uSunC * spec * (2.0 + sparkle * 4.5) * uSunI;
-
-          /* The écume, in four parts. Depth does all the work: every band is a
-             stripe in vDepth, so each one runs the full length of the shore
-             without ever breaking up, and the noise is applied *across* the
-             stripe rather than along it — foam tears into fingers, it does not
-             dissolve into static. */
-          float swash = 0.5 + 0.5 * sin(uT * 0.34) + 0.12 * sin(uT * 1.1);
-          float run = -0.9 - swash * 1.3;          // how far up the sand it reaches
-          float foam = 0.0;
-          // deep water has no surf in it; skip the four fbm calls out there
-          if (vDepth < 6.0) {
-          // 1 · the break: where the shoaling crest oversteepens offshore
-          float breakUp = smoothstep(0.5, 1.35, vCrest) * (0.45 + 0.55 * fbm(vWP.xz * 1.8 - uT * 1.5));
-          // 2 · the sheet sliding up the sand behind it
-          float sheet = smoothstep(run + 1.3, run, vDepth);
-          float lace = 0.5 + 0.5 * fbm(vWP.xz * 1.7 + uT * 0.9);
-          // 3 · the lip — the bright leading edge, and the thing you actually
-          //     read as surf. Narrow, near-white, and torn along its length by
-          //     a noise field stretched across the shore so it fingers.
-          float lip = exp(-pow((vDepth - run) * 1.4, 2.0));
-          float tear = 0.45 + 0.75 * fbm(vWP.xz * vec2(2.4, 7.0) - uT * 0.7);
-          // 4 · and the bubbles it leaves behind on the wet sand, finer and
-          //     patchier, only where the sheet has actually been
-          float bubbles = smoothstep(0.58, 0.96, fbm(vWP.xz * 6.5 + uT * 0.4)) * sheet;
-          /* And the shore end of the water. Without this the sea stays its full
-             offshore colour right up to the sand and then meets the beach's
-             foam in one step — the water has to pale as it shallows and carry
-             its own foam into the last few metres for the join to read. */
-          float shallow = smoothstep(1.9, -0.1, vDepth);
-          float shoreFoam = shallow * (0.35 + 0.65 * fbm(vec2(vWP.x * 1.6, vWP.z * 2.4) + uT * 0.5));
-          foam = clamp(breakUp * 1.0 + sheet * lace * 0.7 + lip * tear * 1.6
-                     + bubbles * 0.6 + shoreFoam * 0.85, 0.0, 1.0);
+        uniform float uDark; uniform float uWarm; uniform vec3 uSky; uniform vec3 uHaze; uniform vec3 uHorizon;
+        varying vec3 vWP; varying float vDepth; varying vec2 vXZ;
+        vec2 hash2(vec2 c){ return fract(sin(vec2(dot(c, vec2(127.1, 311.7)), dot(c, vec2(269.5, 183.3)))) * 43758.5453); }
+        // F2 - F1 of a jittered grid: the network of borders between bubbles
+        float cells(vec2 p, float t){
+          vec2 i = floor(p), f = p - i;
+          float d1 = 9.0, d2 = 9.0;
+          for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) {
+            vec2 o = vec2(float(x), float(y));
+            vec2 h = hash2(i + o);
+            vec2 c = o + 0.5 + 0.38 * sin(h * 6.2831 + t * (0.3 + h.yx * 0.4)) - f;
+            float d = dot(c, c);
+            if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) { d2 = d; }
           }
-          vec3 foamCol = mix(vec3(0.95,0.97,0.98), vec3(0.34,0.40,0.52), uDark);
-          c = mix(c, foamCol * 0.75, smoothstep(1.9, -0.1, vDepth) * 0.4);
-          c = mix(c, foamCol, foam);
-          c = mix(c, uHaze, smoothstep(220.0, 620.0, length(vWP - cameraPosition)) * 0.85);
-          /* Thin at the tip so the water dies on the sand instead of ending in
-             a drawn line — but the foam is carried a little further up than
-             the water is, because that is where the écume actually sits. */
-          float a = clamp((vDepth - run + 0.3) * 1.2, 0.0, 1.0);
-          gl_FragColor = vec4(c, clamp(max(a, foam * a * 2.8), 0.0, 1.0));
+          return sqrt(d2) - sqrt(d1);
+        }
+        // thick white when fresh, opening into lace as it thins
+        float lace(vec2 p, float a, float t, float aa){
+          if (a <= 0.003) return 0.0;
+          float e = cells(p * vec2(0.7, 1.1), t) * 0.6 + cells(p * 2.3 + vec2(5.2, 1.3), t * 1.3) * 0.4;
+          float w = clamp(a * 0.8, 0.0, 1.0) * 0.5;
+          float l = 1.0 - smoothstep(w - 0.05, w + 0.03, e);
+          return mix(clamp(a * 0.75, 0.0, 1.0), l * mix(0.55, 1.0, smoothstep(0.3, 0.8, a)), aa);
+        }
+        // the sky the water mirrors: the dome's own horizon colour low down,
+        // its zenith higher up (not the fog, which is paler than any sky)
+        vec3 sky(vec3 r){
+          return mix(uHorizon, uSky, pow(clamp(r.y, 0.0, 1.0), 0.6)) * 0.82;
+        }
+        void main(){
+          vec2 p = vXZ;
+          float t = uT;
+          float depth = vDepth;
+          float foot = length(fwidth(vWP.xz));
+          float aa = 1.0 - smoothstep(0.15, 1.2, foot);
+          // where the sand is above the water, there is no water
+          float swash = 0.5 + 0.5 * sin(uT * 0.34) + 0.12 * sin(uT * 1.1);
+          float run = -0.9 - swash * 1.3;
+          if (depth < run - 0.2) discard;
+
+          // slopes: the swell's, the surf's across the shore, and fine ripples
+          vec2 gs; swell(p, t, smoothstep(0.3, 6.0, depth), gs);
+          vec4 su = surf(p, t);
+          float e = 0.6;
+          float hz = surf(p + vec2(0.0, e), t).x;
+          vec2 gsurf = vec2(0.0, (hz - su.x) / e);
+          vec2 rp = p * 0.9 + vec2(t * 0.35, t * 0.6);
+          float r0 = fbm(rp), rx = fbm(rp + vec2(0.05, 0.0)), rz = fbm(rp + vec2(0.0, 0.05));
+          vec2 gr = vec2(rx - r0, rz - r0) / 0.05 * 0.16 * aa;
+          vec2 grad = gs + gsurf + gr;
+          vec3 N = normalize(vec3(-grad.x, 1.0, -grad.y));
+          vec3 V = normalize(cameraPosition - vWP);
+          float ndv = max(dot(N, V), 0.0);
+          // a rough sea reflects less at grazing angles than a mirror would
+          float fres = 0.02 + 0.80 * pow(1.0 - ndv, 5.0);
+
+          // reflection: the sky, and the glitter path, sharp near and soft far
+          vec3 R = reflect(-V, N);
+          vec3 refl = sky(normalize(vec3(R.x, max(R.y, 0.01), R.z)));
+          float gexp = 1400.0 / (1.0 + foot * 60.0);
+          float sd = max(dot(R, uSun), 0.0);
+          refl += uSunC * uSunI * (pow(sd, gexp) * 40.0 * gexp / 1400.0 + pow(sd, 90.0) * 0.5);
+
+          // the water column along the view: clear and turquoise over the bar,
+          // ink offshore; the crests glow where the sun shines through them
+          float path = max(depth, 0.0) / max(V.y, 0.1);
+          vec3 absorb = exp(-path * vec3(0.55, 0.12, 0.10));
+          float deep = smoothstep(1.0, 9.0, depth);
+          vec3 body = mix(vec3(0.04, 0.24, 0.22), vec3(0.008, 0.05, 0.10), deep);
+          vec3 light = mix(vec3(1.0), uSunC, 0.5) * mix(1.0, 0.1, uDark) + uSky * 0.5;
+          vec3 scatter = body * light;
+          float crest = clamp((vWP.y) * 0.9 + 0.45, 0.0, 1.0);
+          scatter *= mix(0.7, 1.3, crest);
+          scatter += vec3(0.05, 0.26, 0.20) * uSunC * uSunI * (0.25 + pow(max(dot(V, -uSun) * 0.5 + 0.5, 0.0), 3.0)) * crest * crest * 0.5;
+          scatter += vec3(0.20, 0.18, 0.02) * uWarm * (1.0 - smoothstep(0.0, 5.0, depth)) * 0.4;
+          float through = dot(absorb, vec3(0.25, 0.45, 0.30));
+          vec3 tint = scatter * (vec3(1.0) - absorb);
+          fres *= smoothstep(-0.2, 0.25, depth);
+          vec3 col = tint * (1.0 - fres) + refl * fres;
+          through *= 1.0 - fres;
+
+          // foam: whitecaps on the steepest swell, the spilling crest of a
+          // breaker, the bore behind it, and the lip of the swash
+          float ft = fbm(p * 0.35 + vec2(t * 0.05, -t * 0.03));
+          float u = su.z;
+          float crestBand = max(smoothstep(0.92, 1.0, u), 1.0 - smoothstep(0.0, 0.06, u));
+          float spill = su.y * crestBand;
+          /* NOTE THE UNITS: depth is in depth units, and the bed falls at
+             0.075 per metre, so one unit is thirteen metres of beach. The lip
+             is a couple of metres, the sheet behind it five or six. */
+          float lip = exp(-pow((depth - run) * 6.0, 2.0));
+          float sheet = smoothstep(run + 0.45, run, depth) * 0.45;
+          float whitecap = smoothstep(0.75, 1.15, length(gs)) * 0.5;
+          float amount = clamp(whitecap + spill * 1.1 + su.w * 0.85 + lip * 0.9 + sheet + smoothstep(0.55, 0.85, ft) * 0.08, 0.0, 1.0);
+          float fk = lace(p, amount, t, aa);
+          vec3 foamCol = mix(vec3(0.96, 0.97, 0.98), vec3(0.32, 0.38, 0.50), uDark) * mix(0.85, 1.0, ft);
+          col = mix(col, foamCol, fk);
+          through *= 1.0 - fk;
+          // at night the breaking water glows blue-green
+          float stir = max(spill * 1.2, max(su.w * 0.8, lip));
+          float spark = smoothstep(0.35, 0.9, fbm(p * 2.2 + vec2(t * 0.4, -t * 0.3)));
+          col += vec3(0.10, 0.65, 0.95) * stir * mix(0.4, 1.0, spark) * uDark * 0.55;
+
+          // and far out the sea goes into the sky's own horizon, not the fog
+          float fogK = smoothstep(300.0, 800.0, length(vWP - cameraPosition)) * 0.8;
+          col = mix(col, uHorizon * 0.85, fogK);
+          through = mix(through, 0.0, fogK);
+          // the very edge thins onto the sand instead of ending in a line
+          float edge = clamp((depth - run + 0.2) * 1.5, 0.0, 1.0);
+          col *= edge; through = mix(1.0, through, edge);
+          gl_FragColor = vec4(col, clamp(through, 0.0, 1.0));
         }`,
     }));
     sea.rotation.x = -Math.PI / 2;
@@ -1950,6 +2055,7 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
         u.uDark.value = Math.max(0, Math.min(1, (n - 0.45) / 0.35));
         u.uSky.value.set(mixC(0x7fb0e8, 0x18213f, n));
         u.uHaze.value.set(mixC(0xe8c8a0, 0x2a3352, n));
+        u.uHorizon.value.set(mixC(0xf2b478, 0x1b2450, n));
         u.uWarm.value = (1 - n) * (0.35 + dusk * 0.65);
 
         dome.setSky(mixC(0x1a63c4, 0x080f2a, n), mixC(0xf2b478, 0x1b2450, n), mixC(0xc9a276, 0x232a44, n));
