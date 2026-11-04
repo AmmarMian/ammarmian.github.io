@@ -133,9 +133,17 @@ export function createFocusController(opts: {
     const halfV = Math.tan((camera.fov * Math.PI) / 360);
     // Fit the subject to whichever side of the free window is tighter, not
     // always the height — on a phone the width is what runs out first.
-    const fit = Math.min(win.h * halfV, win.w * halfV * camera.aspect);
+    // (The whole tower is tall and thin: its bounding sphere is as wide as it
+    // is tall, so fitting that sphere to a phone's width left a tiny tower.
+    // Its height is what has to fit; a floor is wide, so it fits both.)
+    const fit = k === null ? win.h * halfV * 0.9 : Math.min(win.h * halfV, win.w * halfV * camera.aspect);
     const dist = (sph.radius / fit) * (k === null ? 1.25 : 1.05);
     const target = offsetTarget(sph.center.clone(), dir, dist, win);
+    /* On a tall narrow phone the whole tower needs the camera far further out
+       than the orbit's usual limit; without room for it the controls clamped
+       the camera back in on the first touch and the tower overflowed the
+       screen. The limit follows the framing. */
+    controls.maxDistance = Math.max(48, dist * 1.1);
     return flyTo(target.clone().add(dir.clone().multiplyScalar(dist)), target).then(() => {
       // A gentle idle turn on the whole-tower view — grabbing the camera
       // (drag/pan/zoom) interrupts it immediately, so it never fights the

@@ -463,6 +463,12 @@ body:has(.nav-rail) #tower-host::after {
   background: linear-gradient(to left, color-mix(in srgb, var(--bg) 94%, transparent) 0%, color-mix(in srgb, var(--bg) 86%, transparent) 72%, transparent);
 }
 .callout.callout-visible { opacity: 1; transform: translateY(0); }
+/* The panel sets display:flex, which overrides the [hidden] attribute — so a
+   closed panel stayed laid out, invisible, over the scene and swallowed every
+   touch on it (on a phone, the lower half of the screen: no drag to rotate
+   after visiting any floor). Closed means gone; fading out means untouchable. */
+.callout[hidden] { display: none !important; }
+.callout:not(.callout-visible) { pointer-events: none; }
 .callout-right { right: 4vw; }
 .callout-left { left: 4vw; }
 
