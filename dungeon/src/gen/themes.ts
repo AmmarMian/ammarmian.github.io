@@ -7,6 +7,8 @@ import {
   vines, wallFaces, wallMoss, walls, waterDistance,
 } from './build.ts';
 
+import { THEMES2 } from './themes2.ts';
+
 export interface Theme { id: string; name: string; build: (c: RoomCtx) => void }
 
 const dust = (c: RoomCtx, n: number) =>
@@ -19,7 +21,7 @@ const flooded: Theme = {
     const { W, D, r, g } = c;
     const pool = pondMask(c, [[0.62, 0.62, 0.3, 0.24], [0.36, 0.78, 0.18, 0.15]]);
     slab(c, 'flag', pool);
-    walls(c, 'brick');
+    walls(c, c.bio.wall);
     const dist = waterDistance(c);
     grassCover(c, 0, dist);
     // boardwalk across the pond
@@ -124,8 +126,8 @@ const lab: Theme = {
   id: 'lab', name: "Alchemist's Workshop",
   build(c) {
     const { W, D, r, g } = c;
-    slab(c, 'flag');
-    walls(c, 'brick');
+    slab(c, c.bio.floor === 'basalt' ? 'basalt' : 'flag');
+    walls(c, c.bio.wall);
     c.amb = [0.9, 1.05, 0.95];
     // the cauldron
     const cx = Math.round(W * 0.5), cz = Math.round(D * 0.5);
@@ -249,7 +251,7 @@ const garden: Theme = {
     const fx = Math.round(W * 0.68), fz = Math.round(D * 0.66), fr = 13;
     const pool = (x: number, z: number) => Math.hypot(x - fx, z - fz) < fr - 2;
     slab(c, 'grass', pool);
-    walls(c, 'brick');
+    walls(c, c.bio.wall);
     // flagstone paths crossing the lawn
     for (let z = WALL_T; z < D - WALL_T; z++) for (let x = WALL_T; x < W - WALL_T; x++) {
       const onPath = Math.abs(z - Math.round(D * 0.5) + Math.round(Math.sin(x * 0.05) * 6)) < 5 || Math.abs(x - fx) < 5;
@@ -300,8 +302,8 @@ const forge: Theme = {
   id: 'forge', name: 'Ember Forge',
   build(c) {
     const { W, D, r, g } = c;
-    slab(c, 'flag');
-    walls(c, 'brick');
+    slab(c, c.bio.floor === 'basalt' ? 'basalt' : 'flag');
+    walls(c, c.bio.wall);
     c.amb = [1.1, 0.82, 0.72];
     // hearth against the back wall with its chimney
     const hx = Math.round(W * 0.42), hw = 34, hd = 18;
@@ -351,7 +353,7 @@ const shrine: Theme = {
   build(c) {
     const { W, D, r, g } = c;
     slab(c, 'marble');
-    walls(c, 'brick');
+    walls(c, c.bio.wall);
     c.amb = [0.95, 0.95, 1.08];
     const cx = Math.round(W * 0.5);
     // colonnade
@@ -380,5 +382,5 @@ const shrine: Theme = {
   },
 };
 
-export const THEMES: Theme[] = [flooded, library, lab, grotto, garden, forge, shrine];
+export const THEMES: Theme[] = [flooded, library, lab, grotto, garden, forge, shrine, ...THEMES2];
 export const themeById = (id: string) => THEMES.find((t) => t.id === id)!;

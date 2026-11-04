@@ -6,6 +6,15 @@ import {
 } from './core.ts';
 
 export type Side = 'x0' | 'x1' | 'z0' | 'z1';
+
+/* What a floor's biome asks of every room on it. */
+export interface BiomeStyle {
+  wall: WallStyle;
+  floor: FloorStyle;
+  liquid: 0 | 1 | 2; // water, lava, ice
+  decor: 'vines' | 'icicles' | 'none';
+  mossy: boolean;
+}
 export interface Door { side: Side; at: number; width: number }
 
 export interface RoomCtx {
@@ -25,11 +34,12 @@ export interface RoomCtx {
   amb: V3;
   stairsUp: boolean;
   stairsDown: boolean;
+  bio: BiomeStyle;
 }
 
 /* ---------------------------------------------------------------- floors */
 
-export type FloorStyle = 'flag' | 'plank' | 'marble' | 'grass' | 'cave';
+export type FloorStyle = 'flag' | 'plank' | 'marble' | 'grass' | 'cave' | 'sand' | 'sandtile' | 'snow' | 'basalt';
 
 export function slab(c: RoomCtx, style: FloorStyle, pool?: (x: number, z: number) => boolean) {
   const { g, W, D, seed } = c;
@@ -63,6 +73,26 @@ export function slab(c: RoomCtx, style: FloorStyle, pool?: (x: number, z: number
       g.set(x, FLOOR - 1, z, M.DIRT);
       const n = fbm(x * 0.06, z * 0.06, seed + 5);
       g.set(x, FLOOR - 1, z, n > 0.62 ? M.MOSS : M.GRASS);
+    } else if (style === 'sand') {
+      // wind ripples
+      const rip = Math.sin(x * 0.35 + Math.sin(z * 0.08) * 3 + vnoise(x * 0.05, z * 0.05, seed) * 4);
+      g.set(x, FLOOR - 1, z, rip > 0.6 ? M.SANDSTONE : M.SAND);
+      if (rip > 0.85) g.set(x, FLOOR, z, M.SAND);
+    } else if (style === 'sandtile') {
+      const seam = x % 12 === 0 || (z + (Math.floor(x / 12) & 1) * 6) % 12 === 0;
+      g.set(x, FLOOR - 1, z, seam ? M.SANDSTONE_DARK : hash2(x >> 2, z >> 2, seed) < 0.12 ? M.SAND : M.SANDSTONE);
+    } else if (style === 'snow') {
+      const row = Math.floor(z / 10), ox = (row & 1) * 5;
+      const grout = (x + ox) % 10 === 0 || z % 10 === 0;
+      const drift = fbm(x * 0.05, z * 0.05, seed + 3);
+      g.set(x, FLOOR - 1, z, drift > 0.5 ? M.SNOW : grout ? M.GROUT : M.STONE);
+      if (drift > 0.66) g.set(x, FLOOR, z, M.SNOW);
+      if (drift > 0.78) g.set(x, FLOOR + 1, z, M.SNOW);
+    } else if (style === 'basalt') {
+      const cell = vnoise(x * 0.12, z * 0.12, seed) ;
+      const crack = Math.abs(cell - 0.5) < 0.025;
+      g.set(x, FLOOR - 1, z, crack ? (hash2(x, z, 3) < 0.5 ? M.LAVA : M.EMBER) : (x + z) % 9 === 0 ? M.COAL : M.BASALT);
+      if (crack) g.set(x, FLOOR - 2, z, M.LAVA);
     } else if (style === 'cave') {
       const n = fbm(x * 0.05, z * 0.05, seed + 9);
       const hgt = Math.floor(n * 6) - 2;
@@ -86,7 +116,7 @@ export function pondMask(c: RoomCtx, blobs: [number, number, number, number][], 
 
 /* ----------------------------------------------------------------- walls */
 
-export type WallStyle = 'brick' | 'cave' | 'plaster';
+export type WallStyle = 'brick' | 'cave' | 'plaster' | 'sandstone' | 'ice' | 'basalt' | 'marble';
 
 export function makeWindows(D: number): Window[] {
   const out: Window[] = [];
@@ -102,30 +132,39 @@ export function walls(c: RoomCtx, style: WallStyle = 'brick', withWindows = true
   const { g, W, D, seed } = c;
   const brick = (u: number, y: number) => (y % 6 === 0) || ((u + (Math.floor(y / 6) & 1) * 6) % 12 === 0);
   const wallMat = (u: number, y: number) => {
+    if (style === 'sandstone') {
+      // big blocks, with a painted frieze of glyphs at eye height
+      if (y >= 30 && y < 37) return y === 30 || y === 36 ? M.SANDSTONE_DARK : ((u * 7 + y * 3) % 11 < 4 || (u % 9 === 4 && y % 2 === 0)) ? M.GLYPH : M.SANDSTONE;
+      return (y % 8 === 0) || ((u + (Math.floor(y / 8) & 1) * 8) % 16 === 0) ? M.SANDSTONE_DARK : M.SANDSTONE;
+    }
+    if (style === 'ice') return (y % 7 === 0) || ((u + (Math.floor(y / 7) & 1) * 5) % 10 === 0) ? M.SNOW : hash2(u >> 1, y >> 1, 9) < 0.025 ? M.CRYSTAL : hash2(u, y, 4) < 0.3 ? M.SNOW : M.ICE;
+    if (style === 'basalt') return (y % 6 === 0) || ((u + (Math.floor(y / 6) & 1) * 6) % 12 === 0) ? (hash2(u, y, 5) < 0.06 ? M.LAVA : M.COAL) : M.BASALT;
+    if (style === 'marble') return (y % 10 === 0) || ((u + (Math.floor(y / 10) & 1) * 10) % 20 === 0) ? M.MARBLE_DARK : y > 66 ? M.GOLD : M.MARBLE;
     if (style === 'plaster') return y < 18 ? (y % 6 === 0 || u % 9 === 0 ? M.PLANK_DARK : M.PLANK) : (hash2(u, y, 7) < 0.08 ? M.MORTAR : M.STEP);
     return brick(u, y) ? M.MORTAR : M.BRICK;
   };
   for (let y = 0; y < WALL_H; y++) {
     for (let z = 0; z < D; z++) for (let t = 0; t < WALL_T; t++) {
       const m = wallMat(z, y);
-      const recess = style === 'brick' && t === WALL_T - 1 && m === M.MORTAR && z >= WALL_T && z < D - WALL_T;
+      const recess = style !== 'plaster' && style !== 'cave' && t === WALL_T - 1 && (m === M.MORTAR || m === M.SANDSTONE_DARK || m === M.SNOW || m === M.COAL) && z >= WALL_T && z < D - WALL_T;
       if (!recess) { g.set(t, y, z, m); g.set(W - 1 - t, y, z, m); }
     }
     for (let x = 0; x < W; x++) for (let t = 0; t < WALL_T; t++) {
       const m = wallMat(x, y);
-      const recess = style === 'brick' && t === WALL_T - 1 && m === M.MORTAR && x >= WALL_T && x < W - WALL_T;
+      const recess = style !== 'plaster' && style !== 'cave' && t === WALL_T - 1 && (m === M.MORTAR || m === M.SANDSTONE_DARK || m === M.SNOW || m === M.COAL) && x >= WALL_T && x < W - WALL_T;
       if (!recess) { g.set(x, y, t, m); g.set(x, y, D - 1 - t, m); }
     }
   }
-  const pillarMat = style === 'plaster' ? M.PLANK_DARK : M.STEP;
+  const pillarMat = ({ plaster: M.PLANK_DARK, sandstone: M.SANDSTONE_DARK, ice: M.SNOW, basalt: M.COAL, marble: M.MARBLE } as Record<string, number>)[style] ?? M.STEP;
+  const capMat = ({ sandstone: M.SANDSTONE_DARK, ice: M.SNOW, basalt: M.COAL, marble: M.GOLD } as Record<string, number>)[style] ?? M.STEP;
   const pillar = (x0: number, z0: number) =>
     g.box(x0, 0, z0, x0 + 6, WALL_H + 2, z0 + 6, (x, y) => (y % 8 === 0 ? M.MORTAR : pillarMat));
   pillar(WALL_T - 1, WALL_T - 1); pillar(W - WALL_T - 5, WALL_T - 1);
   pillar(WALL_T - 1, D - WALL_T - 5); pillar(W - WALL_T - 5, D - WALL_T - 5);
-  g.box(0, WALL_H, 0, WALL_T + 1, WALL_H + 2, D, M.STEP);
-  g.box(W - WALL_T - 1, WALL_H, 0, W, WALL_H + 2, D, M.STEP);
-  g.box(0, WALL_H, 0, W, WALL_H + 2, WALL_T + 1, M.STEP);
-  g.box(0, WALL_H, D - WALL_T - 1, W, WALL_H + 2, D, M.STEP);
+  g.box(0, WALL_H, 0, WALL_T + 1, WALL_H + 2, D, capMat);
+  g.box(W - WALL_T - 1, WALL_H, 0, W, WALL_H + 2, D, capMat);
+  g.box(0, WALL_H, 0, W, WALL_H + 2, WALL_T + 1, capMat);
+  g.box(0, WALL_H, D - WALL_T - 1, W, WALL_H + 2, D, capMat);
 
   if (style === 'cave') {
     // rough rock grown over the brick, thick and uneven
@@ -146,8 +185,8 @@ export function walls(c: RoomCtx, style: WallStyle = 'brick', withWindows = true
         if (y > archY && Math.hypot(z + 0.5 - cz, y - archY) > rad) continue;
         for (let x = 0; x < WALL_T + 8; x++) if (x < WALL_T || g.get(x, y, z) === M.CAVE || g.get(x, y, z) === M.ROCK) g.set(x, y, z, M.AIR);
       }
-      g.box(0, y0 - 2, z0 - 1, WALL_T + 2, y0, z1 + 1, M.STEP);
-      for (let z = z0; z < z1; z++) if (hash2(z, y0, 11) < 0.55) {
+      g.box(0, y0 - 2, z0 - 1, WALL_T + 2, y0, z1 + 1, capMat);
+      if (c.bio.decor === 'vines') for (let z = z0; z < z1; z++) if (hash2(z, y0, 11) < 0.55) {
         const len = 2 + Math.floor(hash2(z, y0, 12) * 10);
         for (let k = 0; k < len; k++) g.put(WALL_T + 1 + (k > len - 2 ? 1 : 0), y0 - 2 - k, z, k % 3 === 2 ? M.LEAF : M.VINE);
       }
@@ -169,6 +208,8 @@ export function wallFaces(c: RoomCtx) {
 
 export function vines(c: RoomCtx, density = 0.3, maxLen = 40) {
   const { g } = c;
+  if (c.bio.decor === 'icicles') return icicles(c, density + 0.2);
+  if (c.bio.decor === 'none') return;
   for (const [wi, wl] of wallFaces(c).entries()) {
     const s = 61 + wi * 3 + c.seed;
     for (let u = WALL_T; u < wl.len - WALL_T; u++) {
@@ -186,6 +227,7 @@ export function vines(c: RoomCtx, density = 0.3, maxLen = 40) {
 
 export function wallMoss(c: RoomCtx, amount = 0.8) {
   const { g } = c;
+  if (!c.bio.mossy) return;
   for (const [wi, wl] of wallFaces(c).entries()) {
     for (let y = 0; y < WALL_H + 2; y++) for (let u = 0; u < wl.len; u++) {
       const n = fbm(u * 0.07, y * 0.09, c.seed + 30 + wi) + Math.max(0, 1 - (y - FLOOR) / 16) * 0.4;
@@ -601,4 +643,182 @@ export function stairsDown(c: RoomCtx, hx: number, hz: number) {
   for (let w = -1; w <= hw; w++) g.set(hx + w, FLOOR - 1, hz - 1, M.STEP);
   candle(c, hx - 2, FLOOR, hz - 2, 3);
   candle(c, hx + hw + 1, FLOOR, hz - 2, 3);
+}
+
+/* ------------------------------------------------------- biome dressing */
+
+/* Icicles from the wall tops: tapering, a few long ones. */
+export function icicles(c: RoomCtx, density = 0.4) {
+  const { g } = c;
+  for (const [wi, wl] of wallFaces(c).entries()) {
+    for (let u = WALL_T; u < wl.len - WALL_T; u++) {
+      if (hash2(u, 7, c.seed + wi) > density) continue;
+      const len = 2 + Math.floor(Math.pow(hash2(u, 8, c.seed + wi), 3) * 20);
+      for (let k = 0; k < len; k++) {
+        const [x, y, z] = wl.at(u, WALL_H - 1 - k, 1);
+        g.put(x, y, z, k < 2 ? M.SNOW : M.ICE);
+        if (k < len / 3) { const [x2, y2, z2] = wl.at(u, WALL_H - 1 - k, 2); g.put(x2, y2, z2, M.ICE); }
+      }
+    }
+  }
+}
+
+/* Snow settles on every upward surface, deeper where the noise says. */
+export function snowCover(c: RoomCtx, amount = 0.55) {
+  const { g, W, D, seed } = c;
+  for (let z = 0; z < D; z++) for (let x = 0; x < W; x++) {
+    const ty = g.top(x, z);
+    if (ty < 0 || ty >= g.h - 2) continue;
+    const m = g.get(x, ty, z);
+    if (m === M.LAVA || m === M.FIRE || m === M.EMBER || m === M.FLAME || m === M.CRYSTAL || m === M.POOLBED) continue;
+    if (fbm(x * 0.07, z * 0.07, seed + 44) + (ty > FLOOR + 2 ? 0.15 : 0) > 1 - amount) {
+      g.set(x, ty + 1, z, M.SNOW);
+      if (fbm(x * 0.05, z * 0.05, seed + 45) > 0.68) g.put(x, ty + 2, z, M.SNOW);
+    }
+  }
+}
+
+/* Sand drifts heaped against the walls and blown into corners. */
+export function sandDrifts(c: RoomCtx, depth = 7) {
+  const { g, W, D, seed } = c;
+  for (let z = WALL_T; z < D - WALL_T; z++) for (let x = WALL_T; x < W - WALL_T; x++) {
+    if (g.get(x, 0, z) === M.POOLBED) continue;
+    const dw = Math.min(x - WALL_T, z - WALL_T, W - WALL_T - 1 - x, D - WALL_T - 1 - z);
+    const h = Math.floor(Math.max(0, depth * (1 - dw / 26)) * fbm(x * 0.04, z * 0.04, seed + 61) * 1.6 + (fbm(x * 0.03, z * 0.03, seed + 62) - 0.55) * 8);
+    for (let y = 0; y < h; y++) g.put(x, FLOOR + y, z, M.SAND);
+  }
+}
+
+export function palm(c: RoomCtx, cx: number, cz: number, h: number) {
+  const { g, r } = c;
+  let x = cx, z = cz;
+  const lean = (r() - 0.5) * 0.5, leanZ = (r() - 0.5) * 0.5;
+  for (let y = 0; y < h; y++) {
+    x += lean * (y / h); z += leanZ * (y / h);
+    g.box(Math.round(x) - 1, FLOOR - 1 + y, Math.round(z) - 1, Math.round(x) + 1, FLOOR + y, Math.round(z) + 1, y % 3 === 0 ? M.PLANK_DARK : M.BARK);
+  }
+  const tx = Math.round(x), ty = FLOOR + h, tz = Math.round(z);
+  for (let k = 0; k < 8; k++) {
+    const a = (k / 8) * Math.PI * 2 + r() * 0.3, len = 10 + r() * 6;
+    for (let s = 0; s < len; s++) {
+      const px = Math.round(tx + Math.cos(a) * s), pz = Math.round(tz + Math.sin(a) * s);
+      const py = Math.round(ty + 2 + s * 0.35 - (s * s) / len * 0.9);
+      g.put(px, py, pz, s % 3 === 0 ? M.GRASS_LIGHT : M.LEAF);
+      if (s > 2) g.put(px + Math.round(-Math.sin(a)), py - 1, pz + Math.round(Math.cos(a)), M.LEAF_DARK);
+    }
+  }
+  g.box(tx - 1, ty - 1, tz - 1, tx + 2, ty + 1, tz + 2, M.CHEST); // dates
+}
+
+export function cactus(c: RoomCtx, cx: number, cz: number, h: number) {
+  const { g, r } = c;
+  const col = (x: number, z: number, y0: number, y1: number) => {
+    for (let y = y0; y < y1; y++) for (let dz = -1; dz <= 1; dz++) for (let dx = -1; dx <= 1; dx++)
+      if (Math.abs(dx) + Math.abs(dz) < 2) g.set(x + dx, y, z + dz, (dx + dz + y) % 4 === 0 ? M.LEAF_DARK : M.CACTUS);
+  };
+  col(cx, cz, FLOOR - 1, FLOOR + h);
+  for (const side of [-1, 1]) {
+    if (r() < 0.3) continue;
+    const ay = FLOOR + 3 + Math.floor(r() * (h - 6));
+    for (let s = 1; s < 4; s++) g.box(cx + side * s, ay, cz, cx + side * s + 1, ay + 2, cz + 1, M.CACTUS);
+    col(cx + side * 4, cz, ay, ay + 5 + Math.floor(r() * 4));
+  }
+  g.put(cx, FLOOR + h, cz, M.FLOWER_P);
+}
+
+/* A fat clay jar. */
+export function jar(c: RoomCtx, cx: number, cz: number, h = 9, mat: number = M.TERRACOTTA) {
+  for (let y = 0; y < h; y++) {
+    const t = y / h;
+    const rad = y >= h - 2 ? 1.5 : 1.8 + Math.sin(t * Math.PI) * 2.2;
+    for (let dz = -4; dz <= 4; dz++) for (let dx = -4; dx <= 4; dx++) if (Math.hypot(dx, dz) <= rad)
+      c.g.set(cx + dx, FLOOR - 1 + y, cz + dz, y === Math.floor(h * 0.55) ? M.SANDSTONE_DARK : mat);
+  }
+}
+
+export function obelisk(c: RoomCtx, cx: number, cz: number, h: number) {
+  const { g } = c;
+  for (let y = 0; y < h; y++) {
+    const rad = Math.max(1, Math.round(4 - (y / h) * 2.5));
+    g.box(cx - rad, FLOOR - 1 + y, cz - rad, cx + rad + 1, FLOOR + y, cz + rad + 1, (x, yy, z) =>
+      (yy % 5 === 0 && (x + z) % 3 === 0) ? M.GLYPH : M.SANDSTONE_DARK);
+  }
+  g.box(cx - 1, FLOOR - 1 + h, cz - 1, cx + 2, FLOOR + h + 2, cz + 2, M.GOLD);
+}
+
+/* A lidded stone coffin on a plinth. */
+export function sarcophagus(c: RoomCtx, x0: number, z0: number) {
+  const { g } = c;
+  g.box(x0 - 3, FLOOR - 1, z0 - 3, x0 + 17, FLOOR + 2, z0 + 11, M.SANDSTONE_DARK);
+  g.box(x0, FLOOR + 2, z0, x0 + 14, FLOOR + 9, z0 + 8, (x, y, z) => (y === FLOOR + 5 ? M.GLYPH : M.SANDSTONE));
+  g.box(x0 + 1, FLOOR + 9, z0 + 1, x0 + 13, FLOOR + 11, z0 + 7, M.GOLD);
+  g.box(x0 + 2, FLOOR + 11, z0 + 2, x0 + 6, FLOOR + 12, z0 + 6, M.GLYPH); // the painted face
+}
+
+export function rug(c: RoomCtx, x0: number, z0: number, w: number, d: number, a: number, b: number) {
+  c.g.box(x0, FLOOR, z0, x0 + w, FLOOR + 1, z0 + d, (x, y, z) => {
+    const e = Math.min(x - x0, x0 + w - 1 - x, z - z0, z0 + d - 1 - z);
+    return e === 0 ? M.CARPET_TRIM : e === 2 || (Math.abs(x - x0 - w / 2) + Math.abs(z - z0 - d / 2)) % 6 === 0 ? b : a;
+  });
+}
+
+/* A bare, snow-laden tree. */
+export function deadTree(c: RoomCtx, cx: number, cz: number, h: number) {
+  const { g, r } = c;
+  for (let y = 0; y < h; y++) g.box(cx - 1, FLOOR - 1 + y, cz - 1, cx + 2, FLOOR + y, cz + 2, M.BARK);
+  const branch = (x: number, y: number, z: number, a: number, len: number, depth: number) => {
+    let px = x, py = y, pz = z;
+    for (let s = 0; s < len; s++) {
+      px += Math.cos(a); pz += Math.sin(a); py += 0.6;
+      g.set(Math.round(px), Math.round(py), Math.round(pz), M.BARK);
+      g.put(Math.round(px), Math.round(py) + 1, Math.round(pz), M.SNOW);
+    }
+    if (depth > 0) for (const da of [-0.6, 0.6]) branch(px, py, pz, a + da + (r() - 0.5) * 0.4, len * 0.6, depth - 1);
+  };
+  for (let k = 0; k < 4; k++) branch(cx, FLOOR + h * (0.55 + k * 0.1), cz, (k / 4) * Math.PI * 2 + r(), 8 + r() * 4, 2);
+}
+
+/* A pool of something that is not water: the shader reads the room's liquid. */
+export function liquidPond(c: RoomCtx, mask: (x: number, z: number) => boolean) {
+  const { g, W, D } = c;
+  for (let z = 0; z < D; z++) for (let x = 0; x < W; x++) {
+    if (!mask(x, z)) continue;
+    const bed = 3 + Math.floor(vnoise(x * 0.15, z * 0.15, 5) * 2);
+    for (let y = bed; y < g.h; y++) if (y < FLOOR + 1) g.set(x, y, z, M.AIR);
+    g.set(x, bed - 1, z, c.bio.liquid === 1 ? M.BASALT : M.ROCK);
+    g.set(x, 0, z, M.POOLBED);
+  }
+}
+
+/* Telescope on a tripod, pointing at the open sky. */
+export function telescope(c: RoomCtx, cx: number, cz: number) {
+  const { g } = c;
+  for (const [dx, dz] of [[-4, -3], [4, -3], [0, 5]]) for (let s = 0; s < 14; s++)
+    g.set(Math.round(cx + dx * (1 - s / 14)), FLOOR - 1 + s, Math.round(cz + dz * (1 - s / 14)), M.PLANK_DARK);
+  for (let s = -10; s < 18; s++) {
+    const rad = s > 14 ? 2.2 : 1.4;
+    for (let dz = -2; dz <= 2; dz++) for (let dy = -2; dy <= 2; dy++) if (Math.hypot(dz, dy) <= rad)
+      g.set(cx + Math.round(s * 0.7), FLOOR + 14 + Math.round(s * 0.7) + dy, cz + dz, s % 6 === 0 ? M.IRON : M.GOLD);
+  }
+}
+
+/* A throne on a dais. */
+export function throne(c: RoomCtx, cx: number, z0: number) {
+  const { g } = c;
+  for (let s = 0; s < 3; s++) g.box(cx - 16 + s * 3, FLOOR - 1, z0, cx + 17 - s * 3, FLOOR + 1 + s * 2, z0 + 22 - s * 4, s % 2 ? M.MARBLE_DARK : M.MARBLE);
+  const y0 = FLOOR + 5;
+  g.box(cx - 6, y0, z0 + 2, cx + 7, y0 + 5, z0 + 11, (x, y) => (y === y0 + 4 ? M.CARPET : M.GOLD));
+  g.box(cx - 6, y0, z0, cx + 7, y0 + 26, z0 + 3, (x, y) => (y > y0 + 22 ? M.GOLD : x === cx - 6 || x === cx + 6 ? M.GOLD : M.CARPET));
+  for (const x of [cx - 6, cx + 6]) g.box(x, y0, z0, x + 1, y0 + 12, z0 + 11, M.GOLD);
+  g.box(cx - 1, y0 + 27, z0, cx + 2, y0 + 30, z0 + 3, M.LANTERN);
+}
+
+/* A cloth banner hanging from the top of a wall. */
+export function banner(c: RoomCtx, side: Side, u: number, mat: number = M.CLOTH) {
+  const wl = wallFaces(c).find((w) => w.side === side)!;
+  for (let y = WALL_H - 30; y < WALL_H - 2; y++) for (let du = 0; du < 8; du++) {
+    if (y < WALL_H - 26 && Math.abs(du - 3.5) > (y - (WALL_H - 30)) * 1.0) continue;
+    const [x, yy, z] = wl.at(u + du, y, 1);
+    c.g.set(x, yy, z, du === 0 || du === 7 || y === WALL_H - 3 ? M.GOLD : (du === 3 || du === 4) && y % 6 === 0 ? M.GOLD : mat);
+  }
 }

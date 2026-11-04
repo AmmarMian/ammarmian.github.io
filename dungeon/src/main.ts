@@ -61,6 +61,11 @@ async function main() {
   let drift = 0;                // phase of the overview drift
   let fade = 0, fadeGoal = 1;   // post-pass fade, for floor changes
 
+  const tints = () => ({ tintLo: [...floor.biome.tintLo, 0], tintHi: [...floor.biome.tintHi, 0] });
+  const setMood = () => {
+    const [r, g, b] = floor.biome.bgFar.map((v) => Math.round(Math.min(1, v) * 255));
+    document.body.style.background = `rgb(${r},${g},${b})`;
+  };
   const overviewZoom = () => {
     const [x0, z0, x1, z1] = floor.bounds;
     return Math.max(0.45, Math.min(1, fitZoom(x1 - x0, z1 - z0, res, 1.0) * 1.3));
@@ -84,7 +89,7 @@ async function main() {
     tileBuf = storage(gpu, Particles.tileWords(res, parts.capacity) * 4, 'read');
     scene.set({ ptiles: tileBuf });
     offset = [Math.floor((width - lw * pxScale) / 2), Math.floor((height - lh * pxScale) / 2)];
-    post.set({ src: low, post: { scale: pxScale, fade, offset, lowres: [lw, lh] } });
+    post.set({ src: low, post: { scale: pxScale, fade, offset, lowres: [lw, lh], ...tints() } });
     if (focus < 0) view.zoom = goal.zoom = overviewZoom();
   });
 
@@ -120,7 +125,8 @@ async function main() {
     view.target = [...goal.target] as V3;
     view.target[1] += 30; // arrive from a little above, then settle
     view.zoom = goal.zoom = overviewZoom();
-    showFloor(); showRoom();
+    showFloor(); showRoom(); setMood();
+    post.set({ post: tints() });
     fadeGoal = 1;
     climbing = false;
     for (const n of [index - 1, index + 1]) if (n >= 0 && n < FLOOR_COUNT) void getFloor(n);
@@ -228,7 +234,7 @@ async function main() {
     else if (k === 'arrowdown' || k === 's') panBy(0, -14 / view.zoom);
   });
 
-  showFloor();
+  showFloor(); setMood();
   view.zoom = goal.zoom = overviewZoom();
   for (const n of [start - 1, start + 1]) if (n >= 0 && n < FLOOR_COUNT) void getFloor(n);
 

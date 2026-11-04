@@ -6,6 +6,8 @@ struct Post {
   fade: f32,
   offset: vec2f,
   lowres: vec2f,
+  tintLo: vec4f,  // colour grade for the shadows and highlights: the floor's mood
+  tintHi: vec4f,
 }
 
 @group(0) @binding(0) var<uniform> post: Post;
@@ -51,8 +53,8 @@ fn luma(c: vec3f) -> f32 { return dot(c, vec3f(0.299, 0.587, 0.114)); }
 
   // grade: cool teal shadows, warm green-yellow highlights
   let l = luma(col);
-  let shadowTint = vec3f(0.80, 1.0, 1.08);
-  let highTint = vec3f(1.06, 1.04, 0.86);
+  let shadowTint = post.tintLo.rgb;
+  let highTint = post.tintHi.rgb;
   col *= mix(shadowTint, highTint, smoothstep(0.15, 0.8, l));
   col = mix(vec3f(l), col, 1.12); // a touch more saturation
   col = col / (1.0 + max(col - 1.0, vec3f(0.0)) * 0.6); // soft shoulder

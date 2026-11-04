@@ -19,6 +19,8 @@ export const M = {
   POTION_P: 37, POTION_G: 38, POTION_R: 39, BREW: 40, CARPET: 41, CARPET_TRIM: 42,
   FIRE: 43, EMBER: 44, AMETHYST: 45, MARBLE: 46, BLOSSOM: 47, PAPER: 48, COAL: 49,
   CAVE: 50, COIN: 51, MARBLE_DARK: 52, GLASS: 53,
+  SANDSTONE: 54, SANDSTONE_DARK: 55, GLYPH: 56, ICE: 57, SNOW: 58, BASALT: 59, LAVA: 60,
+  CACTUS: 61, TERRACOTTA: 62, CLOTH: 63,
 } as const;
 
 /* Plants sway in the shader by up to SWAY voxels (their bricks are dilated). */
@@ -29,7 +31,7 @@ export type V3 = [number, number, number];
 /* A window in the room's x = 0 wall: z0, z1, y0, y1 (local). */
 export type Window = [number, number, number, number];
 export interface Light { pos: V3; radius: number; color: V3; flicker?: number }
-export type EmitterKind = 'dust' | 'firefly' | 'leaf' | 'petal' | 'ember' | 'bubble' | 'sparkle' | 'gold';
+export type EmitterKind = 'dust' | 'firefly' | 'leaf' | 'petal' | 'ember' | 'bubble' | 'sparkle' | 'gold' | 'snow' | 'sand' | 'ash' | 'star';
 export interface Emitter { kind: EmitterKind; pos: V3; size: V3; count: number; color?: V3 }
 
 /* Mulberry32: small, fast, seedable. */

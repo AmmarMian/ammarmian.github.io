@@ -52,9 +52,20 @@ const M_DARK: u32 = 26u;
 
 // towards the sun, which comes in through the windows of x = 0 walls
 const SUN_L = vec3f(-0.7360, 0.6133, 0.2862);
-const SUN_C = vec3f(1.55, 1.42, 0.92);
-const AMB_LO = vec3f(0.19, 0.30, 0.33);
-const AMB_HI = vec3f(0.44, 0.58, 0.50);
+const HEADER: i32 = 10; // vec4s before the room table (see packFloor)
+
+// the floor's biome: its light and colours, read once per pixel
+struct Biome {
+  ambLo: vec3f, ambHi: vec3f, sun: vec3f,
+  bgNear: vec3f, bgFar: vec3f,
+  mist: vec3f, shaft: vec3f, haze: vec3f, outside: vec3f,
+}
+var<private> BI: Biome;
+fn load_biome() {
+  BI.ambLo = roomData[1].xyz; BI.ambHi = roomData[2].xyz; BI.sun = roomData[3].xyz;
+  BI.bgNear = roomData[4].xyz; BI.bgFar = roomData[5].xyz;
+  BI.mist = roomData[6].xyz; BI.shaft = roomData[7].xyz; BI.haze = roomData[8].xyz; BI.outside = roomData[9].xyz;
+}
 
 var<private> PAL: array<vec3f, 64> = array<vec3f, 64>(
   vec3f(0.0, 0.0, 0.0),       // 0 air
@@ -111,15 +122,23 @@ var<private> PAL: array<vec3f, 64> = array<vec3f, 64>(
   vec3f(1.00, 0.90, 0.48),    // 51 coin
   vec3f(0.55, 0.58, 0.56),    // 52 marble dark
   vec3f(0.70, 0.90, 0.90),    // 53 glass
-  vec3f(1.0, 0.0, 1.0), vec3f(1.0, 0.0, 1.0), vec3f(1.0, 0.0, 1.0), vec3f(1.0, 0.0, 1.0), vec3f(1.0, 0.0, 1.0),
-  vec3f(1.0, 0.0, 1.0), vec3f(1.0, 0.0, 1.0), vec3f(1.0, 0.0, 1.0), vec3f(1.0, 0.0, 1.0), vec3f(1.0, 0.0, 1.0),
+  vec3f(0.82, 0.64, 0.42),    // 54 sandstone
+  vec3f(0.60, 0.43, 0.28),    // 55 sandstone dark
+  vec3f(0.24, 0.58, 0.62),    // 56 glyph paint
+  vec3f(0.55, 0.74, 0.86),    // 57 ice
+  vec3f(0.92, 0.96, 1.00),    // 58 snow
+  vec3f(0.33, 0.29, 0.30),    // 59 basalt
+  vec3f(1.00, 0.46, 0.10),    // 60 lava
+  vec3f(0.36, 0.58, 0.32),    // 61 cactus
+  vec3f(0.74, 0.39, 0.23),    // 62 terracotta
+  vec3f(0.80, 0.28, 0.24),    // 63 cloth
 );
 
 // material flags: plants sway, emissive materials light themselves
 const PLANTS_LO: u32 = (1u << 6u) | (1u << 12u) | (1u << 13u) | (1u << 14u) | (1u << 15u) |
                        (1u << 24u) | (1u << 28u) | (1u << 29u) | (1u << 30u);
 const EMIT_LO: u32 = (1u << 18u) | (1u << 19u) | (1u << 25u);
-const EMIT_HI: u32 = (1u << 4u) | (1u << 5u) | (1u << 6u) | (1u << 7u) | (1u << 8u) | (1u << 11u) | (1u << 12u) | (1u << 13u);
+const EMIT_HI: u32 = (1u << 4u) | (1u << 5u) | (1u << 6u) | (1u << 7u) | (1u << 8u) | (1u << 11u) | (1u << 12u) | (1u << 13u) | (1u << 28u);
 fn is_plant(m: u32) -> bool { return m < 32u && ((PLANTS_LO >> m) & 1u) == 1u; }
 fn is_emissive(m: u32) -> bool {
   if (m < 32u) { return ((EMIT_LO >> m) & 1u) == 1u; }
@@ -142,10 +161,10 @@ struct RoomInfo {
 var<private> RM: RoomInfo;
 
 fn load_room(i: i32) {
-  let a = roomData[1 + i * 4];
-  let b = roomData[2 + i * 4];
-  let c = roomData[3 + i * 4];
-  let d = roomData[4 + i * 4];
+  let a = roomData[HEADER + i * 4];
+  let b = roomData[HEADER + 1 + i * 4];
+  let c = roomData[HEADER + 2 + i * 4];
+  let d = roomData[HEADER + 3 + i * 4];
   RM.org = vec3f(a.x, 0.0, a.y);
   RM.dims = vec3i(i32(a.z), i32(b.x), i32(a.w));
   RM.voxOff = u32(b.y);
@@ -451,19 +470,19 @@ fn shade(h: Hit, p: vec3f) -> vec3f {
   }
   let n = h.n;
   let occ = ao(h.cell, n);
-  let amb = mix(AMB_LO, AMB_HI, n.y * 0.5 + 0.5) * occ * RM.amb;
+  let amb = mix(BI.ambLo, BI.ambHi, n.y * 0.5 + 0.5) * occ * RM.amb;
   let sv = sun_vis(h.cell, n);
   let ndl = max(dot(n, SUN_L), 0.0);
   // the open sky of a courtyard is gentler than a beam through a window
   let sunK = select(1.0, 0.5, (RM.flags & RF_SKY) != 0u);
-  let sun = SUN_C * band(sv * (0.35 + 0.65 * ndl), 3.0) * sunK;
+  let sun = BI.sun * band(sv * (0.35 + 0.65 * ndl), 3.0) * sunK;
   let height = clamp((p.y - 4.0) / 60.0, 0.0, 1.0);
   let gloom = mix(0.8, 1.08, height);
   var c = base * (amb * gloom + sun + point_lights(p, n));
-  if (p.y < WATER_Y) {
+  if (p.y < WATER_Y && liquid() == 0u) {
     let cz = vnoise(p.xz * 0.35 + vec2f(params.time * 0.4, params.time * 0.25)) +
              vnoise(p.xz * 0.5 - vec2f(params.time * 0.3, -params.time * 0.2));
-    c += SUN_C * smoothstep(1.15, 1.35, cz) * 0.35 * max(sv, 0.25) * base;
+    c += BI.sun * smoothstep(1.15, 1.35, cz) * 0.35 * max(sv, 0.25) * base;
   }
   return c;
 }
@@ -471,7 +490,39 @@ fn shade(h: Hit, p: vec3f) -> vec3f {
 fn background(px: vec2f) -> vec3f {
   let uv = px / params.res;
   let v = length((uv - 0.5) * vec2f(1.0, 1.3));
-  return mix(vec3f(0.05, 0.11, 0.11), vec3f(0.015, 0.035, 0.04), smoothstep(0.1, 0.8, v));
+  return mix(BI.bgNear, BI.bgFar, smoothstep(0.1, 0.8, v));
+}
+
+fn liquid() -> u32 { return (RM.flags >> 3u) & 3u; }
+
+// Molten rock: bright channels under a slow-drifting, cracking crust.
+fn shade_lava(pw: vec3f) -> vec3f {
+  let t = params.time;
+  let n1 = vnoise(pw.xz * 0.12 + vec2f(t * 0.08, t * 0.05));
+  let n2 = vnoise(pw.xz * 0.35 - vec2f(t * 0.15, 0.0) + n1 * 2.0);
+  let vein = 1.0 - smoothstep(0.0, 0.18, abs(n1 - 0.5));
+  var col = mix(vec3f(0.95, 0.38, 0.08), vec3f(1.0, 0.86, 0.38), vein);
+  let crust = smoothstep(0.58, 0.72, n2);
+  col = mix(col * 1.15, vec3f(0.17, 0.07, 0.05), crust * 0.85);
+  return col * (0.9 + 0.1 * sin(t * 3.0 + pw.x * 0.2));
+}
+
+// A frozen pond: what lies beneath shows dimly through clear ice, crazed
+// with white cracks, glinting where the light catches it.
+fn shade_ice(pw: vec3f, rd: vec3f) -> vec3f {
+  let h2 = trace(pw, rd, 60, true);
+  var under = vec3f(0.1, 0.2, 0.3);
+  if (h2.m != 0u) { under = shade(h2, pw + rd * h2.t); }
+  var col = mix(under * vec3f(0.55, 0.75, 0.9), vec3f(0.70, 0.87, 0.98), 0.55);
+  let n = vnoise(pw.xz * 0.18) + 0.5 * vnoise(pw.xz * 0.5);
+  let crack = 1.0 - smoothstep(0.0, 0.025, abs(n - 0.75));
+  col = mix(col, vec3f(0.96, 1.0, 1.0), crack * 0.7);
+  let cw = vec3i(floor(pw));
+  let sv = sun_vis(vec3i(cw.x, i32(WATER_Y), cw.z), vec3f(0.0, 1.0, 0.0));
+  col += sv * vec3f(0.18, 0.22, 0.26);
+  let glint = step(0.996, hash3(vec3i(cw.x, i32(params.time * 2.0), cw.z)));
+  col += glint * vec3f(0.8, 0.9, 1.0);
+  return col;
 }
 
 fn is_water(c: vec3i) -> bool {
@@ -480,6 +531,9 @@ fn is_water(c: vec3i) -> bool {
 
 // The water surface at local point pw, looking along rd.
 fn shade_water(pw: vec3f, rd: vec3f) -> vec3f {
+  let liq = liquid();
+  if (liq == 1u) { return shade_lava(pw); }
+  if (liq == 2u) { return shade_ice(pw, rd); }
   let cw = vec3i(floor(pw));
   let wob = vec2f(
     vnoise(pw.xz * 0.6 + vec2f(params.time * 0.8, 0.0)) - 0.5,
@@ -544,6 +598,7 @@ fn defocus(c: vec3f, amt: f32) -> vec3f {
 }
 
 @fragment fn fs_main(@builtin(position) frag: vec4f) -> @location(0) vec4f {
+  load_biome();
   let px = floor(frag.xy) + 0.5;
   let s = (px - params.res * 0.5) / params.zoom;
   let ro = params.center + params.camR * s.x - params.camU * s.y - params.camD * CAM_BACK;
@@ -556,8 +611,8 @@ fn defocus(c: vec3f, amt: f32) -> vec3f {
   var ids: array<i32, MAX_ROOMS>;
   var n = 0;
   for (var i = 0; i < min(i32(params.nRooms), MAX_ROOMS); i++) {
-    let b = roomData[1 + i * 4];
-    let hgt = roomData[2 + i * 4].x;
+    let b = roomData[HEADER + i * 4];
+    let hgt = roomData[HEADER + 1 + i * 4].x;
     let a0 = (vec3f(b.x, 0.0, b.y) - ro) * inv;
     let a1 = (vec3f(b.x + b.z, hgt, b.y + b.w) - ro) * inv;
     let t0 = max(max(min(a0.x, a1.x), min(a0.y, a1.y)), min(a0.z, a1.z));
@@ -602,7 +657,7 @@ fn defocus(c: vec3f, amt: f32) -> vec3f {
       // (not where the wall itself has been cut away)
       let pe = lro + rd * h.t;
       if (pe.y < WALL_TOP && pe.y > f32(CUT_Y) && (RM.flags & RF_CORRIDOR) == 0u) {
-        if (h.cell.x < 0 && !hidden(vec3i(0, i32(pe.y), i32(pe.z))) && in_window(pe.zy) > 0.0) { c = vec3f(0.80, 0.93, 0.62); t = h.t; found = true; }
+        if (h.cell.x < 0 && !hidden(vec3i(0, i32(pe.y), i32(pe.z))) && in_window(pe.zy) > 0.0) { c = BI.outside; t = h.t; found = true; }
         else if (h.cell.z < 0 && pe.y > 20.0 && !hidden(vec3i(i32(pe.x), i32(pe.y), 0))) { c = vec3f(0.02, 0.03, 0.04); t = h.t; found = true; }
       }
     }
@@ -661,10 +716,10 @@ fn defocus(c: vec3f, amt: f32) -> vec3f {
     litMist *= dt * 0.08;
     haze = clamp(haze * dt * 0.0016, 0.0, 0.35);
     let dim = select(1.0, 1.0 - params.focusAmt * 0.7, params.focus >= 0.0 && ids[k] != i32(params.focus));
-    col = mix(col, vec3f(0.10, 0.22, 0.22), haze);
-    col = mix(col, vec3f(0.42, 0.62, 0.56) * dim, band(mist, 5.0));
-    col += vec3f(0.95, 0.98, 0.70) * band(acc, 6.0) * 0.9 * dim;
-    col += vec3f(0.9, 0.95, 0.6) * band(litMist, 4.0) * dim;
+    col = mix(col, BI.haze, haze);
+    col = mix(col, BI.mist * dim, band(mist, 5.0));
+    col += BI.shaft * band(acc, 6.0) * 0.9 * dim;
+    col += BI.shaft * 0.95 * band(litMist, 4.0) * dim;
     let mote = step(0.985, hash3(vec3i(i32(px.x + params.time * 1.5), i32(px.y + params.time * 3.0), 7)));
     col += vec3f(1.0, 1.0, 0.8) * mote * smoothstep(0.03, 0.12, acc) * 0.8 * dim;
   }

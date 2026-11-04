@@ -40,7 +40,7 @@ partBuf.write(parts.data); tileBuf.write(parts.tiles);
 const low = target(gpu, { size: res, format: 'rgba16float' });
 const fin = target(gpu, { size: [w * s, h * s], format: 'rgba8unorm' });
 const scene = effect(gpu, await load('../src/scene.wgsl'), { set: { vox, roomData, particles: partBuf, ptiles: tileBuf, params } });
-const post = effect(gpu, await load('../src/post.wgsl'), { set: { src: low, post: { scale: s, fade: 1, offset: [0, 0], lowres: res } } });
+const post = effect(gpu, await load('../src/post.wgsl'), { set: { src: low, post: { scale: s, fade: 1, offset: [0, 0], lowres: res, tintLo: [...floor.biome.tintLo, 0], tintHi: [...floor.biome.tintHi, 0] } } });
 scene.draw(low);
 await low.color.read({ mipLevel: 0, region: 'all' });
 const N = Number(process.env.BENCH ?? 0);

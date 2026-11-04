@@ -121,6 +121,40 @@ export class Particles {
           push(q, 0, [c[0] * f, c[1] * f, c[2] * f]);
           break;
         }
+        case 'snow': {
+          // flakes drifting down, swaying, wrapping back to the top
+          const span = 2 * ey + 50;
+          const y = by + ey - wrap(s1 * span + time * (2.5 + s3 * 2), span);
+          if (y < 10) break;
+          const q: V3 = [bx + (s0 * 2 - 1) * ex + Math.sin(time * 0.8 + k) * 3, y, bz + (s2 * 2 - 1) * ez + Math.cos(time * 0.6 + k * 1.3) * 3];
+          const l = 0.55 + 0.45 * s3 + shaft(rm, q[0] - rm.x, q[1], q[2] - rm.z);
+          push(q, s3 > 0.85 ? 3 : 0, [0.78 * l, 0.84 * l, 0.92 * l]);
+          break;
+        }
+        case 'ash': {
+          const span = 2 * ey + 50;
+          const y = by + ey - wrap(s1 * span + time * (1.2 + s3), span);
+          if (y < 10) break;
+          const q: V3 = [bx + (s0 * 2 - 1) * ex + Math.sin(time * 0.5 + k) * 4, y, bz + (s2 * 2 - 1) * ez + Math.cos(time * 0.4 + k) * 4];
+          const hot = s3 > 0.94;
+          push(q, 0, hot ? [0.8, 0.3, 0.08] : [0.2, 0.17, 0.17]);
+          break;
+        }
+        case 'sand': {
+          // grains blown low and fast along the floor
+          const spanX = 2 * ex;
+          const x = bx - ex + wrap(s0 * spanX + time * (14 + s3 * 10), spanX);
+          const q: V3 = [x, 11 + s1 * ey * 1.5 + Math.sin(time * 2 + k) * 1.5, bz + (s2 * 2 - 1) * ez + Math.sin(time * 1.3 + k) * 2];
+          const l = 0.6 + 0.6 * shaft(rm, q[0] - rm.x, q[1], q[2] - rm.z) + (rm.sky ? 0.3 : 0);
+          push(q, 0, [0.85 * l, 0.68 * l, 0.45 * l]);
+          break;
+        }
+        case 'star': {
+          const q: V3 = [bx + (s0 * 2 - 1) * ex, by + (s1 * 2 - 1) * ey, bz + (s2 * 2 - 1) * ez];
+          const tw = 0.35 + 0.65 * Math.pow(Math.max(0, Math.sin(time * (0.8 + s3 * 1.6) + s3 * 50)), 4);
+          push(q, tw > 0.8 ? 3 : 0, [0.75 * tw, 0.82 * tw, 1.0 * tw]);
+          break;
+        }
         case 'sparkle': case 'gold': {
           const q: V3 = [bx + (s0 * 2 - 1) * ex + Math.sin(time * 0.3 + k) * 2, by + (s1 * 2 - 1) * ey + Math.sin(time * 0.5 + k * 2) * 1.5, bz + (s2 * 2 - 1) * ez];
           const tw = Math.pow(Math.max(0, Math.sin(time * (1.5 + s3 * 2.5) + s3 * 40)), 6);
