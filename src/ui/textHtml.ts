@@ -139,6 +139,7 @@ export function textPageHtml(base = ''): string {
         <p class="tp-run"><b>Curriculum</b> · LISTIC · Université Savoie Mont-Blanc</p>
         <h1>Ammar Mian</h1>
         <p class="tp-dek">${esc(PROFILE.role)} at ${esc(PROFILE.affiliation)}, working on ${esc(PROFILE.research)}.</p>
+        <p class="tp-now"><b>This year</b>${esc(PROFILE.currently)}</p>
         <p class="tp-by"><a href="mailto:${esc(CONTACT.email)}">${esc(CONTACT.email)}</a><span>·</span>${ext(CONTACT.hal, 'HAL')}<span>·</span>${ext(CONTACT.github, 'GitHub')}</p>
       </header>
 

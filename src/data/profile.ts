@@ -7,9 +7,12 @@ export const PROFILE = {
   research: 'statistical signal processing and Riemannian-geometry methods for robust and remote-sensing problems',
   /** The tower's own voice, for the 3D site and the consoles. */
   bio: 'In the world outside the tower: working on statistical signal processing and Riemannian-geometry methods for robust and remote-sensing problems.',
+  /** Where the work is happening this year, when it is not the usual place. */
+  currently: 'On a CNRS research delegation for 2026–2027, with the GAIA team at GIPSA-lab, Grenoble.',
   /** The plain version, for the text page and search results. */
   summary: 'Works on statistical signal processing and Riemannian-geometry methods for robust and remote-sensing problems.',
   positions: [
+    { role: 'Délégation CNRS', org: 'GAIA team, GIPSA-lab, Grenoble — research delegation for the year', year: '2026—2027' },
     { role: 'Maître de conférences', org: 'LISTIC, Polytech Annecy-Chambéry, Université Savoie Mont-Blanc', year: '2020—' },
     { role: 'Post-doctorant', org: 'Aalto University, Finland — Riemannian geometry for statistical learning, with Esa Ollila', year: '2019—2020' },
     { role: 'Doctorant', org: 'SONDRA, Université Paris-Saclay — SAR image time-series analysis', year: '2016—2019' },

@@ -148,6 +148,13 @@ body[data-backdrop="meadow"] { background: linear-gradient(#8fc4e8 0%, #bcd9ea 4
   color: var(--ink); margin: 22px 0 0;
 }
 .tp-dek { margin: 18px 0 0; font: italic 400 21px/1.45 var(--font-text); color: var(--ink-dim); }
+.tp-now {
+  margin: 14px 0 0; font-size: var(--fs-sm); color: var(--ink);
+}
+.tp-now b {
+  font: 500 var(--fs-xs)/1 var(--font-mono); letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent); margin-right: 10px;
+}
 .tp-by {
   display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 18px 0 0;
   font: 400 12.5px/1.4 var(--font-mono); letter-spacing: 0.02em; color: var(--ink-faint);

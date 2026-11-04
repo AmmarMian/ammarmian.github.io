@@ -640,8 +640,11 @@ export class SidePanel {
 
   private renderNow() {
     const p = document.createElement('p');
-    p.textContent = 'What is simmering in the kitchen: the doctoral students and master’s interns I supervise, theses in progress first.';
+    p.textContent = PROFILE.currently;
     this.bodyEl.appendChild(p);
+    const p2 = document.createElement('p');
+    p2.textContent = 'What is simmering in the kitchen: the doctoral students and master’s interns I supervise, theses in progress first.';
+    this.bodyEl.appendChild(p2);
 
     for (const { label, rows } of studentGroups()) {
       const h3 = document.createElement('div');
