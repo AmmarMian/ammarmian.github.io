@@ -339,7 +339,7 @@ body[data-backdrop="meadow"] { background: linear-gradient(#8fc4e8 0%, #bcd9ea 4
    system: the signature on the left, the sections set in the text face in
    the middle, the tools as a row of line icons on the right. Over the plain
    page it stands on a soft band of the page colour; over a world it becomes
-   one card (see the end of this file). */
+   one pane of glass (see the end of this file). */
 .nav-rail {
   position: fixed; left: 0; right: 0; top: 0; z-index: 6;
   display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 24px;
@@ -1286,83 +1286,40 @@ body[data-gl-lost="1"] #tower-host::after {
   font-size: 11px !important; line-height: 1.5 !important; color: var(--ink-faint) !important;
 }
 
-/* ---------- over a world: cards, not washes ----------
+/* ---------- over a world: glass, not washes ----------
    The soft side wash works on the plain page, where it fades into the same
    colour it is made of. Over a full scene — a forest, the sea floor, a city —
    it only muddies the picture. There the design system's own answer for
-   type over a full-bleed image applies: a raised card (elev-3). The panel,
-   the console and the nav each become one, and the washes switch off. */
+   type over a full-bleed image is a raised pane; here it is smoked glass,
+   so the world still shows through, blurred and darkened behind the type.
+   The panel, the console and the header each become one, and the washes
+   switch off. */
 :root[data-world] .callout::before,
 :root[data-world] .console::before,
 :root[data-world] #tower-host::after { display: none; }
 @media (min-width: 901px) {
+  /* smoked glass: the world shows through, blurred and darkened */
   :root[data-world] .callout {
-    background: color-mix(in srgb, var(--surface) 95%, transparent);
-    border: 1px solid var(--rule-soft); border-radius: 6px;
-    box-shadow: var(--elev-3);
+    background: color-mix(in srgb, var(--bg) 52%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25);
+    border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+    border-radius: 14px; box-shadow: 0 20px 50px -20px #000000aa;
     max-height: calc(100vh - 92px - 40px);
   }
   :root[data-world] .callout-head { padding: 24px 28px 0; }
   :root[data-world] .callout-body { padding: 4px 28px 24px; }
   :root[data-world] .console {
     padding: 22px 26px 18px;
-    background: color-mix(in srgb, var(--surface) 95%, transparent);
-    border: 1px solid var(--rule-soft); border-radius: 6px;
-    box-shadow: var(--elev-3);
-  }
-  :root[data-world] .nav-rail {
-    top: 12px; left: 16px; right: 16px; padding: 8px 14px 8px 20px;
-    background: color-mix(in srgb, var(--surface) 94%, transparent);
-    border: 1px solid var(--rule-soft); border-radius: 16px;
-    box-shadow: var(--elev-3);
-  }
-}
-
-/* ---------- alternatives for the panel over a world ----------
-   Chosen with ?panel= while they are being compared (main.ts).
-
-   glass — the world shows through, blurred and darkened: the panel reads as
-           a pane of smoked glass standing in the scene.
-   sheet — a full-height sheet of paper against the screen's edge, like a
-           slide resting on the desk, with the world on the other side; the
-           closest to the design system's own pages.
-   band  — no box: a deep gradient rises from the panel's side, as a film's
-           lower third does, and the type sits straight on it. */
-@media (min-width: 901px) {
-  :root[data-world][data-panel="glass"] .callout {
-    background: color-mix(in srgb, var(--bg) 52%, transparent);
+    background: color-mix(in srgb, var(--bg) 58%, transparent);
     -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25);
     border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
     border-radius: 14px; box-shadow: 0 20px 50px -20px #000000aa;
   }
-
-  :root[data-world][data-panel="sheet"] .callout {
-    top: 0; bottom: 0; max-height: none; height: 100vh;
-    padding-top: 84px; border-radius: 0; border: none;
-    background: var(--surface);
-    box-shadow: var(--elev-slide), 0 0 80px -10px #00000088;
+  :root[data-world] .nav-rail {
+    top: 12px; left: 16px; right: 16px; padding: 8px 14px 8px 20px;
+    background: color-mix(in srgb, var(--bg) 55%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25);
+    border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+    border-radius: 16px; box-shadow: 0 14px 40px -20px #000000aa;
   }
-  :root[data-world][data-panel="sheet"] .callout-left { left: 0; padding-left: 4vw; width: calc(clamp(380px, 42vw, 760px) + 4vw); }
-  :root[data-world][data-panel="sheet"] .callout-right { right: 0; padding-right: 4vw; width: calc(clamp(380px, 42vw, 760px) + 4vw); }
-  :root[data-world][data-panel="sheet"] .callout-head { padding: 26px 32px 0; }
-  :root[data-world][data-panel="sheet"] .leader-wrap { top: 104px; }
-  :root[data-world][data-panel="sheet"] .callout-body { padding: 4px 32px 32px; }
-
-  :root[data-world][data-panel="band"] .callout {
-    background: none; border: none; box-shadow: none;
-  }
-  :root[data-world][data-panel="band"] .callout::before {
-    display: block !important;
-    top: -92px; height: 100vh; width: calc(100% + 4vw + 260px);
-  }
-  :root[data-world][data-panel="band"] .callout-left::before {
-    left: -4vw;
-    background: linear-gradient(to right, color-mix(in srgb, var(--bg) 96%, transparent) 0%, color-mix(in srgb, var(--bg) 90%, transparent) 62%, transparent);
-  }
-  :root[data-world][data-panel="band"] .callout-right::before {
-    right: -4vw;
-    background: linear-gradient(to left, color-mix(in srgb, var(--bg) 96%, transparent) 0%, color-mix(in srgb, var(--bg) 90%, transparent) 62%, transparent);
-  }
-  :root[data-world][data-panel="band"] .callout h1 { font-size: var(--fs-x3); font-weight: 300; }
 }
-
