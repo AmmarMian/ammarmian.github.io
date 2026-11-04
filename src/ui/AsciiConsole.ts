@@ -1,5 +1,5 @@
 import { PROFILE, CONTACT } from '../data/profile';
-import { runCommand, describeFloor, asciiTower, JUMP_TARGETS, type Ctx } from './commands';
+import { runCommand, describeFloor, asciiTower, JUMP_TARGETS, columnsOf, type Ctx } from './commands';
 import { attachLineEditor } from './lineEditor';
 import { FLOORS, currentSlug, onRouteChange, BASE } from '../router';
 import { FLOOR_NAMES } from '../tower/scene-constants';
@@ -107,8 +107,9 @@ export function renderAsciiConsole(root: HTMLElement) {
 
   const ctx: Ctx = {
     print, clear, draw,
-    close: () => { window.location.href = '/'; },
+    close: () => { window.location.href = BASE + '/'; },
     isCompact: () => window.matchMedia('(max-width: 900px)').matches,
+    columns: () => columnsOf(log),
     mode: 'ascii',
     scene: null,
     // No 3D scene here, so nothing can hold a world; `jump` says so plainly

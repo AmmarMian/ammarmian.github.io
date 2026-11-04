@@ -74,6 +74,8 @@ export interface Ctx extends ConsoleHost {
   close: () => void;
   /** Whether the current console viewport needs compact text art. */
   isCompact?: () => boolean;
+  /** How many monospace characters fit across the output, if known. */
+  columns?: () => number;
   /** 'tower' drives the 3D scene; 'ascii' is the text-only console. */
   mode: 'tower' | 'ascii';
   /** ASCII console only — re-draw the tower diagram. */
@@ -237,6 +239,19 @@ function speechBubble(lines: string[], indent = 8): string[] {
   ];
 }
 
+/** Characters that fit across a monospace element, measured rather than
+ *  guessed, so text art can be fitted to the console it lands in. */
+export function columnsOf(el: HTMLElement): number {
+  const probe = document.createElement('span');
+  probe.textContent = '0'.repeat(20);
+  probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre';
+  el.appendChild(probe);
+  const ch = probe.getBoundingClientRect().width / 20;
+  probe.remove();
+  const inner = el.clientWidth - 12;   // the scrollbar's lane
+  return ch > 0 ? Math.floor(inner / ch) : 60;
+}
+
 function wrapBubbleLines(lines: string[], width: number): string[] {
   return lines.flatMap((line) => {
     if (!line) return [''];
@@ -333,9 +348,16 @@ export const COMMANDS: Record<string, Command> = {
     detail: 'The tower\'s wizard greets you, and points at where to start. He says something different depending on the hour, as he does in the tower itself.',
     examples: ['hello'],
     run(_args, ctx) {
-      const compact = ctx.isCompact?.() ?? false;
-      const lines = compact ? wrapBubbleLines(greeting(), 28) : greeting();
-      for (const line of speechBubble(lines, compact ? 0 : 8)) ctx.print(line, 'head');
+      /* Fitted to the console it is printed in: the bubble adds six
+         characters of frame, plus its indent where there is room for one.
+         It used to assume ~60 columns everywhere and spill out of any
+         console narrower than that. */
+      const cols = ctx.columns?.() ?? (ctx.isCompact?.() ? 34 : 70);
+      const natural = Math.max(...greeting().map((l) => l.length));
+      const indent = cols >= natural + 6 + 8 ? 8 : 0;
+      const width = Math.max(16, Math.min(natural, cols - 6 - indent));
+      const lines = width < natural ? wrapBubbleLines(greeting(), width) : greeting();
+      for (const line of speechBubble(lines, indent)) ctx.print(line, 'head');
       for (const line of WIZARD) ctx.print(line, 'pre');
     },
   },

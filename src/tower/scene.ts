@@ -1059,6 +1059,9 @@ export function createTowerScene(container: HTMLElement, opts: {
     // the theme with it, since `night` is already the clamped amount.
     const paper = night < 0.5;
     document.documentElement.dataset.theme = paper ? 'paper' : 'night';
+    // The page's chrome changes approach over a world (see style.css).
+    if (world) document.documentElement.dataset.world = world;
+    else delete document.documentElement.dataset.world;
     setGridTheme(paper);
   }
 

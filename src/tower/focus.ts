@@ -114,7 +114,8 @@ export function createFocusController(opts: {
     });
     markerList.forEach((m) => { m.visible = k !== null && (m.userData as any).floor === k; });
     dust.m.visible = true;
-    bubbles.m.visible = k === null || k === 2;
+    // the cauldron's bubbles belong to the laboratory
+    bubbles.m.visible = k === null || k === F.lab;
     onDustRange(k === null ? floorY(0) : floorY(k), k === null ? TOP : floorY(k) + WH);
 
     const box = new THREE.Box3();

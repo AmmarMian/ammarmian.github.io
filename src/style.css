@@ -1186,3 +1186,36 @@ body[data-gl-lost="1"] #tower-host::after {
   margin: 12px 0 0 !important;
   font-size: 11px !important; line-height: 1.5 !important; color: var(--ink-faint) !important;
 }
+
+/* ---------- over a world: cards, not washes ----------
+   The soft side wash works on the plain page, where it fades into the same
+   colour it is made of. Over a full scene — a forest, the sea floor, a city —
+   it only muddies the picture. There the design system's own answer for
+   type over a full-bleed image applies: a raised card (elev-3). The panel,
+   the console and the nav each become one, and the washes switch off. */
+:root[data-world] .callout::before,
+:root[data-world] .console::before,
+:root[data-world] #tower-host::after { display: none; }
+@media (min-width: 901px) {
+  :root[data-world] .callout {
+    background: color-mix(in srgb, var(--surface) 95%, transparent);
+    border: 1px solid var(--rule-soft); border-radius: 6px;
+    box-shadow: var(--elev-3);
+    max-height: calc(100vh - 92px - 40px);
+  }
+  :root[data-world] .callout-head { padding: 24px 28px 0; }
+  :root[data-world] .callout-body { padding: 4px 28px 24px; }
+  :root[data-world] .console {
+    padding: 22px 26px 18px;
+    background: color-mix(in srgb, var(--surface) 95%, transparent);
+    border: 1px solid var(--rule-soft); border-radius: 6px;
+    box-shadow: var(--elev-3);
+  }
+  :root[data-world] .nav-rail {
+    top: 16px; padding: 6px 22px;
+    background: color-mix(in srgb, var(--surface) 93%, transparent);
+    border: 1px solid var(--rule-soft); border-radius: 999px;
+    box-shadow: var(--elev-3);
+  }
+}
+

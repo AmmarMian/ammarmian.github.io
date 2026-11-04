@@ -1,5 +1,5 @@
 import { PROFILE } from '../data/profile';
-import { runCommand, type Ctx, type ConsoleHost } from './commands';
+import { runCommand, columnsOf, type Ctx, type ConsoleHost } from './commands';
 import { attachLineEditor } from './lineEditor';
 
 /** The console docks beside the tower rather than covering it: the two are
@@ -41,7 +41,7 @@ export function createTerminal(root: HTMLElement, host: ConsoleHost) {
   function clear() { log.innerHTML = ''; }
 
   let open = false;
-  const ctx: Ctx = { print, clear, close: () => setOpen(false), mode: 'tower', ...host };
+  const ctx: Ctx = { print, clear, close: () => setOpen(false), mode: 'tower', columns: () => columnsOf(log), ...host };
 
   function setOpen(v: boolean) {
     if (v === open) return;

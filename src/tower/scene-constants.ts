@@ -5,10 +5,13 @@
 
    Everything refers to these by name, so the order can change as long as all
    four lists stay in step — and as long as GROUND moves with them. */
-export const F = { bath: 0, sanctum: 1, quarters: 2, kitchen: 3, library: 4, lab: 5, observatory: 6 };
+/* Above ground the storeys follow the nav's reading order — About,
+   Publications, Projects, Now, Contact — so climbing the tower reads the
+   page top to bottom. Below it, the gate at ground level and the cellar. */
+export const F = { bath: 0, sanctum: 1, quarters: 2, library: 3, lab: 4, kitchen: 5, observatory: 6 };
 export const NF = 7;
-export const FLOOR_IDS = ['floor_bath', 'floor_sanctum', 'floor_sleeping', 'floor_kitchen', 'floor_library', 'floor_laboratory', 'floor_observatory'];
-export const FLOOR_NAMES = ['Bath cellar', 'Portal sanctum', 'Sleeping quarters', 'Kitchen', 'Library', 'Laboratory', 'Observatory'];
+export const FLOOR_IDS = ['floor_bath', 'floor_sanctum', 'floor_sleeping', 'floor_library', 'floor_laboratory', 'floor_kitchen', 'floor_observatory'];
+export const FLOOR_NAMES = ['Bath cellar', 'Portal sanctum', 'Sleeping quarters', 'Library', 'Laboratory', 'Kitchen', 'Observatory'];
 
 /** The storey that stands at ground level. Anything below it is underground. */
 export const GROUND = F.sanctum;
