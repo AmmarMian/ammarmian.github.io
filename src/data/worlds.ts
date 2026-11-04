@@ -13,7 +13,7 @@ export const WORLD_LABELS: Record<string, string> = {
 
 export const WORLD_BLURBS: Record<string, string> = {
   seafloor: 'Caustics, whales, fish schools, kelp',
-  moon: 'A ringed gas giant low over the horizon',
+  moon: 'Umbrella groves under a ringed gas giant',
   forest: 'A dense wood, ferns, a flower bed in the sun',
   beach: 'Shoaling waves, sun glitter, a surf line',
   city: 'Lit windows, stopped cars, a patrolling eye',

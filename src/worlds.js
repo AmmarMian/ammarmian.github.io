@@ -1076,7 +1076,7 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
     /* grass — a dense instanced meadow. the blade is pre-curved and the wind
        bends it further in the vertex shader; per-instance colour plus a
        height gradient keep 30k copies from reading as one flat mat. */
-    const bladeGeo = new THREE.PlaneGeometry(0.2, 1.5, 1, 5);
+    const bladeGeo = new THREE.PlaneGeometry(0.34, 1.5, 1, 5);
     bladeGeo.translate(0, 0.75, 0);
     (() => {
       const p = bladeGeo.attributes.position;
@@ -1098,13 +1098,20 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
           transformed.z += gust * k * 0.5 * uWind;
           vGH = clamp(position.y / 1.5, 0.0, 1.0);
         `,
-        frag: `diffuseColor.rgb *= 0.5 + 0.55 * vGH;`,
+        frag: `diffuseColor.rgb *= 0.72 + 0.4 * vGH;`,
       }), GN);
     // carry the blade-local height so the root can sit in shadow
     grass.material.onBeforeCompile = ((prev) => (s, r) => {
       prev(s, r);
       s.vertexShader = 'varying float vGH;\n' + s.vertexShader;
       s.fragmentShader = 'varying float vGH;\n' + s.fragmentShader;
+      /* Light every blade with the ground's normal, straight up, not its
+         own: a vertical blade's own normal points sideways and takes half
+         its light from the dark ground side of the sky, which is what made
+         the meadow read as black stubble. (Endless Field lights its grass
+         the same way.) */
+      s.fragmentShader = s.fragmentShader.replace('#include <normal_fragment_begin>',
+        'vec3 normal = normalize((viewMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz);\nvec3 nonPerturbedNormal = normal;\nfloat faceDirection = 1.0;');
     })(grass.material.onBeforeCompile);
     grass.material.customProgramCacheKey = () => 'grass';
     grass.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(GN * 3), 3);
@@ -1125,7 +1132,9 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
         grass.setMatrixAt(gi, _m4.compose(
           _v.set(x, h - 0.12, z), _q.setFromAxisAngle(YUP, rnd(6.28)),
           _s.set(rnd(1.4, 0.7), rnd(2.1, 0.55) * (1 + (1 - near) * 0.5), 1)));
-        _c.setHSL(0.23 + rnd(0.07, -0.04), rnd(0.6, 0.35), rnd(0.30, 0.12));
+        // close to the ground's own grass colour, so a gap between blades
+        // reads as more grass, not as dark specks in a pale field
+        _c.setHSL(0.24 + rnd(0.06, -0.04), rnd(0.55, 0.38), rnd(0.42, 0.26));
         grass.setColorAt(gi, _c);
         gi++;
       }
@@ -1134,37 +1143,113 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
     grass.frustumCulled = false;
     g.add(grass);
 
-    /* trees */
-    const barkMat = new THREE.MeshStandardMaterial({ color: 0x6b4a2c, roughness: 1, flatShading: true });
-    const leafMat = patchStd(new THREE.MeshStandardMaterial({ color: 0x3f6b34, roughness: 1, flatShading: true }), {
-      vert: `
-        vec3 base = (modelMatrix * wIM * vec4(0.0,0.0,0.0,1.0)).xyz;
-        float s = sin(uT * 1.1 + base.x * 0.05 + base.z * 0.04) * 0.24 * uWind;
-        transformed.x += s; transformed.z += s * 0.6;
-      `,
-      frag: `diffuseColor.rgb *= 0.7 + 0.55 * fbm(vWP.xz * 0.7 + vWP.y);`,
-    });
-    for (let i = 0; i < 26; i++) {
-      const a = rnd(6.28), d = rnd(200, 22);
-      const x = Math.cos(a) * d, z = Math.sin(a) * d;
-      if (x > CLIFF - 6 && x < CLIFF + 20) continue;
-      const y = ground(x, z);
-      if (y < -26) continue;
-      const tr = new THREE.Group();
-      tr.position.set(x, y, z);
-      tr.scale.setScalar(rnd(1.5, 0.7));
-      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.9, 7, 7), barkMat);
-      trunk.position.y = 3.5;
-      trunk.castShadow = true;
-      tr.add(trunk);
-      for (let k = 0; k < 3; k++) {
-        const c = new THREE.Mesh(new THREE.IcosahedronGeometry(3.4 - k * 0.75, 0), leafMat);
-        c.position.set(rnd(1, -1), 6.6 + k * 2.3, rnd(1, -1));
-        c.scale.y = 0.8;
-        c.castShadow = true;
-        tr.add(c);
+    /* ---- the flora: an alien kit modelled in Blender ----
+       tools/blender/moon.py: umbrella trees of stacked teal discs with warm
+       pods hanging under them, twisted spire-trees, crystal clusters,
+       puffballs and coiled ferns. The pods, crystals and puffballs glow
+       after dark. Fetched the first time anyone comes here; without it the
+       moon falls back on the round trees it had. */
+    const flora = new THREE.Group();
+    flora.name = 'moon_flora';
+    g.add(flora);
+    const glowMat = patchStd(new THREE.MeshStandardMaterial({
+      vertexColors: true, flatShading: true, roughness: 0.6, emissive: 0xffffff, emissiveIntensity: 0,
+    }), { emis: 'totalEmissiveRadiance *= diffuseColor.rgb;' });
+    const plainMat = (extra = {}) => patchStd(new THREE.MeshStandardMaterial({
+      vertexColors: true, flatShading: true, roughness: 1, side: THREE.DoubleSide,
+    }), extra);
+    const sway = (h, amt) => `
+      vec3 base = (modelMatrix * wIM * vec4(0.0,0.0,0.0,1.0)).xyz;
+      float k = smoothstep(${(h * 0.25).toFixed(1)}, ${h.toFixed(1)}, position.y);
+      float s = sin(uT * 0.9 + base.x * 0.05 + base.z * 0.04) * ${amt.toFixed(2)} * uWind;
+      transformed.x += s * k; transformed.z += s * 0.6 * k;`;
+    const moonDone = () => { applyDetail(g); renderer?.compileAsync?.(flora, camera, scene).catch(() => {}); };
+    if (loadModel) {
+      loadModel('worlds/moon.glb').then((meshes) => { moonFlora(meshes); moonDone(); })
+        .catch((e) => { console.warn('moon kit:', e); proceduralTrees(); moonDone(); });
+    } else {
+      proceduralTrees();
+    }
+    function moonFlora(meshes) {
+      const geo = (n) => { if (!meshes[n]) throw new Error(`no ${n} in the moon kit`); return meshes[n].geometry; };
+      const treeMat = plainMat({ vert: sway(26, 0.5), occluder: true, dither: true, near: [10, 22] });
+      const glowTree = patchStd(new THREE.MeshStandardMaterial({
+        vertexColors: true, flatShading: true, roughness: 0.6, emissive: 0xffffff, emissiveIntensity: 0,
+      }), { vert: sway(26, 0.5), occluder: true, dither: true, near: [10, 22], emis: 'totalEmissiveRadiance *= diffuseColor.rgb;' });
+      glowMats.push(glowTree);
+      const group = (parts, n) => parts.map(([name, mat]) => {
+        const m = new THREE.InstancedMesh(geo(name), mat, n);
+        m.count = 0; m.frustumCulled = false; m.castShadow = /wood|cap|spire/.test(name);
+        flora.add(m);
+        return m;
+      });
+      const put = (ms, x, z, s, tilt = 0.06) => {
+        if (ms[0].count >= ms[0].instanceMatrix.count) return;
+        if (x > CLIFF - 6 && x < CLIFF + 20) return;
+        const y = ground(x, z);
+        if (y < -26) return;
+        _e.set(rnd(tilt, -tilt), rnd(6.28), rnd(tilt, -tilt));
+        _m4.compose(_v.set(x, y - 0.2, z), _q.setFromEuler(_e), _s.set(s, s, s));
+        for (const m of ms) m.setMatrixAt(m.count++, _m4);
+      };
+      const ring = (lo, hi) => { const a = rnd(6.28), d = rnd(hi, lo); return [Math.cos(a) * d, Math.sin(a) * d]; };
+      const U = group([['umbrella_wood', treeMat], ['umbrella_cap', treeMat], ['umbrella_pods', glowTree]], 60);
+      const S = group([['spire', treeMat]], 70);
+      // groves: a few umbrellas with spires round them, not an even scatter
+      for (let k = 0; k < 16; k++) {
+        const [cx, cz] = k < 4 ? ring(24, 44) : ring(95, 210);
+        const big = k < 4 ? 0.55 : 1.0;
+        for (let j = 0; j < 3; j++) put(U, cx + rnd(12, -12), cz + rnd(12, -12), rnd(1.3, 0.8) * big);
+        for (let j = 0; j < 4; j++) put(S, cx + rnd(16, -16), cz + rnd(16, -16), rnd(1.3, 0.7) * big);
       }
-      g.add(tr);
+      for (let j = 0; j < 20; j++) { const [x, z] = ring(50, 90); put(S, x, z, rnd(0.45, 0.3)); }
+      const C = group([['crystal', glowMat]], 140);
+      for (let k = 0; k < 26; k++) {
+        const [cx, cz] = ring(14, 180);
+        for (let j = 0; j < 5; j++) put(C, cx + rnd(3, -3), cz + rnd(3, -3), rnd(1.6, 0.6), 0.3);
+      }
+      const P = group([['puff_stem', plainMat({ vert: sway(2, 0.12) })], ['puff_head', glowMat]], 600);
+      for (let j = 0; j < 600; j++) { const [x, z] = ring(10, 150); put(P, x, z, rnd(1.5, 0.7), 0.15); }
+      const F = group([['fern_alien', plainMat({ vert: sway(1.5, 0.08) })]], 500);
+      for (let j = 0; j < 500; j++) { const [x, z] = ring(10, 170); put(F, x, z, rnd(2.2, 1.0), 0.1); }
+    }
+    const glowMats = [glowMat];
+
+    /* The round trees the moon had before the kit; the fallback. */
+    function proceduralTrees() {
+      const g = flora;
+      /* trees */
+      const barkMat = new THREE.MeshStandardMaterial({ color: 0x6b4a2c, roughness: 1, flatShading: true });
+      const leafMat = patchStd(new THREE.MeshStandardMaterial({ color: 0x3f6b34, roughness: 1, flatShading: true }), {
+        vert: `
+          vec3 base = (modelMatrix * wIM * vec4(0.0,0.0,0.0,1.0)).xyz;
+          float s = sin(uT * 1.1 + base.x * 0.05 + base.z * 0.04) * 0.24 * uWind;
+          transformed.x += s; transformed.z += s * 0.6;
+        `,
+        frag: `diffuseColor.rgb *= 0.7 + 0.55 * fbm(vWP.xz * 0.7 + vWP.y);`,
+      });
+      for (let i = 0; i < 26; i++) {
+        const a = rnd(6.28), d = rnd(200, 22);
+        const x = Math.cos(a) * d, z = Math.sin(a) * d;
+        if (x > CLIFF - 6 && x < CLIFF + 20) continue;
+        const y = ground(x, z);
+        if (y < -26) continue;
+        const tr = new THREE.Group();
+        tr.position.set(x, y, z);
+        tr.scale.setScalar(rnd(1.5, 0.7));
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.9, 7, 7), barkMat);
+        trunk.position.y = 3.5;
+        trunk.castShadow = true;
+        tr.add(trunk);
+        for (let k = 0; k < 3; k++) {
+          const c = new THREE.Mesh(new THREE.IcosahedronGeometry(3.4 - k * 0.75, 0), leafMat);
+          c.position.set(rnd(1, -1), 6.6 + k * 2.3, rnd(1, -1));
+          c.scale.y = 0.8;
+          c.castShadow = true;
+          tr.add(c);
+        }
+        g.add(tr);
+      }
     }
 
     /* clouds — deliberately few, chunky slabs drifting past */
@@ -1222,6 +1307,8 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
         moon2.material.opacity = mixN(0.35, 1, n);
         rays.mat.opacity = mixN(0.05, 0.012, n);
         cloudMat.color.set(mixC(0xf0eaf8, 0x9a94b8, n));
+        // the pods, crystals and puffballs come up as the light goes
+        for (const m of glowMats) m.emissiveIntensity = mixN(0.08, 1.3, n);
         this.css = n > 0.5 ? '#1a1830' : '#4a5590';
       },
       tick(t, dt) {
