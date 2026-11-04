@@ -21,7 +21,7 @@ import { buildKitchen } from './floors/kitchen';
 import { buildBathhouse, VISTAS, type Vista } from './floors/bathhouse';
 import { buildWizardMesh, createWizardController } from './wizard';
 import { buildFoxMesh, createFoxState, foxDecide } from './fox';
-import { makePoints, setBackdrop as setBackdropFx, suppressBackdrop } from './fx';
+import { makePoints, setBackdrop as setBackdropFx, suppressBackdrop, setGridTheme } from './fx';
 import { createFocusController } from './focus';
 import { createQuality, gpuInfo, gpuSummary, type Tier, type Profile } from './quality';
 import { createInteractionSystem } from './interactions';
@@ -1054,6 +1054,12 @@ export function createTowerScene(container: HTMLElement, opts: {
       worlds.rebase();
     }
     applyAmbience(world, night, sim.lamps);
+    // The type follows the light: Paper while the tower stands in daylight,
+    // Night after dark. Worlds that clamp the hour (the city, space) clamp
+    // the theme with it, since `night` is already the clamped amount.
+    const paper = night < 0.5;
+    document.documentElement.dataset.theme = paper ? 'paper' : 'night';
+    setGridTheme(paper);
   }
 
   function setLightMode(mode: 'auto' | 'day' | 'night') {

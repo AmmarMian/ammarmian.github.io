@@ -65,6 +65,20 @@ export function suppressBackdrop(on: boolean) {
   applyBackdropVisibility();
 }
 
+/* The grid is drawn in the page's ink: parchment rules on the Night page,
+   dark ink on Paper by day — the same hairline the type uses either way. */
+let gridPaper = false;
+function tintGrid() {
+  if (!gridHelper) return;
+  const m = gridHelper.material as THREE.MeshBasicMaterial;
+  m.color.setHex(gridPaper ? 0x1f1e1b : 0xe8dfc9);
+  m.opacity = gridPaper ? 0.2 : 0.3;
+}
+export function setGridTheme(paper: boolean) {
+  gridPaper = paper;
+  tintGrid();
+}
+
 export function setBackdrop(scene: THREE.Scene, kind: 'void' | 'blueprint' | 'meadow', persist = true) {
   if (!groundPlane) {
     groundPlane = new THREE.Mesh(
@@ -109,6 +123,7 @@ export function setBackdrop(scene: THREE.Scene, kind: 'void' | 'blueprint' | 'me
     scene.add(gridHelper);
   }
   backdropKind = kind;
+  tintGrid();
   applyBackdropVisibility();
   document.body.dataset.backdrop = kind;
   if (persist) { try { localStorage.setItem('lair-backdrop', kind); } catch {} }

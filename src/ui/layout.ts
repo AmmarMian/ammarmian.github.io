@@ -4,7 +4,7 @@
 export const NARROW_QUERY = '(max-width: 900px)';
 
 export function panelColumn(W: number): number {
-  return Math.min(600, Math.max(380, 0.4 * W));
+  return Math.min(760, Math.max(380, 0.42 * W));
 }
 
 export function panelTaken(W: number, consoleOpen: boolean): number {

@@ -240,24 +240,36 @@ wholeTowerLink.innerHTML = `<span class="nav-label nav-sig" aria-hidden="true">A
 wholeTowerLink.addEventListener('click', (e) => { e.preventDefault(); navigate(null); });
 navRail.appendChild(wholeTowerLink);
 
-// Displayed in physical tower order (bottom to top), not declaration order.
-const FLOORS_BY_LEVEL = [...FLOORS].sort((a, b) => a.index - b.index);
+/* Listed in reading order, not tower order. Bottom-to-top put the bath
+   cellar and the portal sanctum first — Settings and Elsewhere ahead of
+   About — because that is how the building is stacked, not how anyone reads
+   a page about a person. The work comes first; the two rooms that are about
+   the site itself sit with the other machinery after the rule. The storey
+   numbers stay with the rooms (kicker, figure caption, ASCII tower) and are
+   dropped here, where they would now run out of sequence. */
+const NAV_PRIMARY = ['about', 'publications', 'projects', 'now', 'contact'];
+const NAV_MACHINERY = ['elsewhere', 'settings'];
+const NAV_ORDER = [...NAV_PRIMARY, ...NAV_MACHINERY]
+  .map((slug) => FLOORS.find((f) => f.slug === slug)!)
+  .filter(Boolean);
 
-for (const f of FLOORS_BY_LEVEL) {
+function floorLink(f: (typeof FLOORS)[number], extra = '') {
   const a = document.createElement('a');
-  a.className = 'nav-item';
+  a.className = 'nav-item' + extra;
   a.href = BASE + '/' + f.slug;
-  a.innerHTML = `<span class="nav-num">${String(f.index).padStart(2, '0')}</span><span class="nav-label">${f.label}</span>`;
+  a.innerHTML = `<span class="nav-label">${f.label}</span>`;
   a.addEventListener('click', (e) => { e.preventDefault(); navigate(f.slug); });
-  navRail.appendChild(a);
   links.push(a);
+  return a;
 }
+for (const f of NAV_ORDER.filter((f) => NAV_PRIMARY.includes(f.slug))) navRail.appendChild(floorLink(f));
 // Utilities live in their own group after a rule: the floors are where you
 // go, these are how you look at them. Three separate presentation links
 // used to sit inline with the floors, which made a nine-item row of things
 // that aren't remotely the same kind of thing.
 const navUtils = document.createElement('div');
 navUtils.className = 'nav-utils';
+for (const f of NAV_ORDER.filter((f) => NAV_MACHINERY.includes(f.slug))) navUtils.appendChild(floorLink(f, ' nav-util'));
 
 const termBtn = document.createElement('button');
 termBtn.type = 'button';
@@ -287,7 +299,7 @@ document.body.appendChild(dotNav);
 
 const dotStops: { slug: string | null; label: string }[] = [
   { slug: null, label: 'Home' },
-  ...FLOORS_BY_LEVEL.map((f) => ({ slug: f.slug, label: f.label })),
+  ...NAV_ORDER.map((f) => ({ slug: f.slug, label: f.label })),
 ];
 const dots: HTMLButtonElement[] = dotStops.map((s) => {
   const b = document.createElement('button');
@@ -456,10 +468,10 @@ window.addEventListener('lair-act', (e: any) => {
 /* ---------- keyboard navigation ----------
    The tower was mouse-only: nothing in the canvas takes focus, so without
    this there is no way to reach a floor from the keyboard at all. Arrow
-   keys walk the storeys in physical order, digits jump, and the single
+   keys walk the storeys in physical order, digits jump in the nav's order, and the single
    letters mirror the three buttons. Anything typed into a field is left
    well alone. */
-const FLOOR_ORDER = FLOORS_BY_LEVEL.map((f) => f.slug);
+const FLOOR_ORDER = [...FLOORS].sort((a, b) => a.index - b.index).map((f) => f.slug);
 
 function isTyping(target: EventTarget | null) {
   const el = target as HTMLElement | null;
@@ -494,7 +506,8 @@ window.addEventListener('keydown', (e) => {
     default:
       if (/^[1-7]$/.test(e.key)) {
         e.preventDefault();
-        navigate(FLOOR_ORDER[Number(e.key) - 1]);
+        // Digits follow the nav's reading order (1 = About), arrows the stairs.
+        navigate(NAV_ORDER[Number(e.key) - 1].slug);
       }
   }
 });
