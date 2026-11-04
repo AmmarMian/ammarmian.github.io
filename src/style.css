@@ -358,9 +358,9 @@ body:has(.nav-rail) #tower-host::after {
   font-family: var(--font-blackletter); font-size: 25px; line-height: 1; letter-spacing: 0.01em; color: var(--ink);
   transition: color 160ms ease;
 }
-/* the affiliation under the name, as a running head's gloss: italic text */
+/* the affiliation under the name, in the same small caps as the sections */
 .nav-role {
-  font-family: var(--font-text); font-style: italic; font-size: 13px; line-height: 1.2; color: var(--ink-faint);
+  font-family: var(--font-sc); font-weight: 500; font-size: 13.5px; line-height: 1.2; letter-spacing: 0.05em; color: var(--ink-faint);
 }
 .nav-whole:hover .nav-sig, .nav-whole[aria-current] .nav-sig { color: var(--accent); }
 
@@ -383,7 +383,9 @@ body:has(.nav-rail) #tower-host::after {
   content: ''; position: absolute; left: 50%; bottom: 2px; width: 16px; height: 2px; margin-left: -8px;
   background: var(--accent);
 }
-.nav-item-quiet { font-family: var(--font-display); font-weight: 400; font-style: italic; font-size: 17px; letter-spacing: 0.01em; color: var(--ink-faint); }
+/* the two rooms about the site: the same small caps, set apart by the rule
+   and a fainter ink */
+.nav-item-quiet { color: var(--ink-faint); }
 .nav-rule { width: 1px; height: 18px; margin: 0 8px; background: var(--rule); }
 
 .nav-tools { justify-self: end; display: flex; align-items: center; gap: 2px; }
