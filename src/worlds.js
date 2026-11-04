@@ -1075,7 +1075,7 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
   function buildForest() {
     const g = new THREE.Group();
     g.name = 'world_forest';
-    const dome = skyDome(0x9fc47a, 0x2f4a2a, 0x1c3222);   // bottom == fog
+    const dome = skyDome(0xd8e2a0, 0x4f7038, 0x26402a);   // bottom == fog: the deep green of the wood
     g.add(dome);
 
     /* one alpha-tested card stands in for a dozen leaves — the standard trick
@@ -1115,10 +1115,15 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
           vec2 p = vWP.xz * 0.13;
           float m = fbm(p) * 0.65 + fbm(p * 4.2) * 0.35;
           vec3 soil = mix(vec3(0.12,0.09,0.06), vec3(0.27,0.20,0.13), m);
-          vec3 moss = mix(vec3(0.11,0.20,0.10), vec3(0.25,0.37,0.16), m);
-          diffuseColor.rgb = mix(soil, moss, smoothstep(0.42, 0.72, fbm(p * 0.7 + 3.0)));
+          vec3 moss = mix(vec3(0.13,0.24,0.11), vec3(0.30,0.42,0.17), m);
+          diffuseColor.rgb = mix(soil, moss, smoothstep(0.30, 0.62, fbm(p * 0.7 + 3.0)));
+          // the flower bed: a band of dark, rich soil round the tower
+          float dc = length(vWP.xz);
+          float bed = smoothstep(6.3, 7.1, dc) * (1.0 - smoothstep(12.3, 13.4, dc));
+          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.10,0.07,0.05) + 0.05 * m, bed * 0.85);
+          // sun through the leaves: warm pools that drift slowly
           float dapple = fbm(vWP.xz * 0.05 + vec2(uT * 0.012, 0.0));
-          diffuseColor.rgb += vec3(0.32,0.27,0.12) * pow(smoothstep(0.60, 0.95, dapple), 2.0);
+          diffuseColor.rgb += vec3(0.42,0.34,0.14) * pow(smoothstep(0.52, 0.92, dapple), 2.0) * (1.0 - bed * 0.6);
         `,
       }));
     floor.rotation.x = -Math.PI / 2;
@@ -1146,9 +1151,9 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
     }), { vert: swayVert });
     const BLOOM_PAL = ['#e8d27a', '#e0728f', '#b98ce8', '#f2f0e2', '#f0a05a', '#8fd8e8'];
 
-    /* ---- the trees, rocks, ferns and flowers: a kit modelled in Blender ----
+    /* ---- the trees, understory and flowers: a kit modelled in Blender ----
        tools/blender/forest.py builds it (low-poly, flat-shaded, colour and
-       occlusion baked into the vertices, no textures) and writes one 60 KB
+       occlusion baked into the vertices, no textures) and writes one ~100 KB
        glTF, fetched only when someone first comes here. If it cannot be had
        the forest falls back on the procedural one it used to be. */
     const flora = new THREE.Group();
@@ -1199,7 +1204,7 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
         const m = new THREE.InstancedMesh(geo(name), mat, n);
         m.count = 0;
         m.frustumCulled = false;
-        m.castShadow = /oak|conifer/.test(name);
+        m.castShadow = /^(oak_a|oak_b|birch|conifer)$/.test(name);
         m.name = 'forest_' + name;
         flora.add(m);
         return m;
@@ -1209,43 +1214,45 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
         m.setMatrixAt(m.count++, _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e), _s.set(s, s, s)));
       };
 
-      /* Trees, laid out as a glade. The whole-tower camera orbits some 70 m
-         out, so a ring of tall trees from 26 m outwards (as the procedural
-         forest had) put crowns right in front of the lens on every turn.
-         Instead: a few smaller trees close in, framing the tower; the band
-         the camera moves through holds only low conifers, ferns and stone;
-         the tall forest stands beyond it as the wall of the clearing. The
-         nearer trees draw at full detail, the far ones as lighter copies. */
-      const species = ['oak_a', 'oak_b', 'conifer'];
+      /* A dense wood round a glade. The whole-tower camera orbits some 70 m
+         out, so tall trees there would put crowns in front of the lens on
+         every turn. So the tall forest stands just beyond the orbit, close
+         and deep enough that its crowns fill the background rather than
+         open ground; the band the camera moves through is understory —
+         young trees, bushes, stumps, ferns; and a few trees close in frame
+         the tower without rising into the floors' eye line. Trees within
+         115 m draw at full detail, the rest as their lighter copies, and
+         only the full-detail ones cast shadows. */
+      const species = ['oak_a', 'oak_b', 'birch', 'conifer'];
       const T = {};
-      for (const sp of species) { T[sp] = placed(sp, treeMat, 60); T[sp + '_far'] = placed(sp + '_far', treeMat, 90); }
-      const pick = () => species[Math.random() < 0.4 ? 0 : Math.random() < 0.5 ? 1 : 2];
-      const plant = (n, dLo, dHi, sLo, sHi, only) => {
+      for (const sp of species) { T[sp] = placed(sp, treeMat, 70); T[sp + '_far'] = placed(sp + '_far', treeMat, 110); }
+      const pick = (w) => { let r = Math.random(); for (let i = 0; i < w.length; i++) { r -= w[i]; if (r < 0) return species[i]; } return species[0]; };
+      const plant = (n, dLo, dHi, sLo, sHi, w, light = false) => {
         for (let i = 0, k = 0; i < n * 8 && k < n; i++) {
           const a = rnd(6.28), d = rnd(dHi, dLo);
           const x = Math.cos(a) * d, z = Math.sin(a) * d;
-          const sp = only || pick();
-          const m = T[d < 100 ? sp : sp + '_far'];
+          const sp = pick(w);
+          const m = T[d < 115 && !light ? sp : sp + '_far'];
           if (m.count >= m.instanceMatrix.count) continue;
           put(m, x, groundY(x, z) - 0.3, z, rnd(6.28), rnd(sHi, sLo));
           k++;
         }
       };
-      plant(14, 24, 42, 0.55, 0.8);               // close in, below the floors' eye line
-      plant(16, 46, 92, 0.4, 0.6, 'conifer');     // the camera's band: low and sparse
-      plant(110, 96, 190, 0.9, 1.5);              // the wall of the glade
+      plant(16, 24, 42, 0.45, 0.6, [0.35, 0.25, 0.4, 0]);       // framing the tower, low
+      plant(24, 44, 60, 0.75, 0.95, [0.35, 0.3, 0.25, 0.1]);    // the middle wood: crowns below the camera
+      plant(24, 62, 88, 0.3, 0.45, [0.2, 0.1, 0.55, 0.15], true); // saplings in the camera's band: small, so the light copy
+      plant(230, 90, 210, 1.4, 2.2, [0.34, 0.28, 0.22, 0.16]);  // the wood itself: tall and close
 
-      /* a loose ceiling of leaves over the tower, so it stands under the
-         canopy rather than in a clearing open to the sky */
-      const C = placed('clump', treeMat, 70);
-      while (C.count < 70) {
+      /* a ceiling of leaves over everything, so the glade is roofed and the
+         sun comes through in shafts rather than flooding in */
+      const C = placed('clump', treeMat, 110);
+      while (C.count < 110) {
         // high enough that the observatory's own view is under it, not in it
-        const a = rnd(6.28), rr = 20 + Math.sqrt(Math.random()) * 56;
-        put(C, Math.cos(a) * rr, rnd(TOP + 34, TOP + 16), Math.sin(a) * rr, rnd(6.28), rnd(2.6, 1.4), 0.3);
+        const a = rnd(6.28), rr = 18 + Math.sqrt(Math.random()) * 95;
+        put(C, Math.cos(a) * rr, rnd(TOP + 40, TOP + 16), Math.sin(a) * rr, rnd(6.28), rnd(2.8, 1.5), 0.3);
       }
 
-      // ground cover
-      const RA = placed('rock_a', groundMat, 40), RB = placed('rock_b', groundMat, 24), L = placed('log', groundMat, 12);
+      // the understory
       const scatter = (m, n, lo, hi, smin, smax) => {
         for (let i = 0; i < n * 4 && m.count < n; i++) {
           const a = rnd(6.28), d = rnd(hi, lo);
@@ -1253,25 +1260,61 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
           put(m, x, groundY(x, z), z, rnd(6.28), rnd(smax, smin), 0.1);
         }
       };
-      scatter(RA, 40, 22, 150, 0.6, 1.5);
-      scatter(RB, 24, 26, 160, 0.7, 1.7);
-      scatter(L, 12, 20, 120, 0.8, 1.3);
-      const F = placed('fern', fernMat, 520);
-      scatter(F, 520, 12.5, 150, 1.5, 3.1);
+      scatter(placed('bush_a', groundMat, 170), 170, 14, 170, 0.9, 1.9);
+      scatter(placed('bush_b', groundMat, 110), 110, 18, 190, 0.9, 1.7);
+      scatter(placed('stump', groundMat, 9), 9, 18, 110, 0.7, 1.1);
+      scatter(placed('log', groundMat, 10), 10, 22, 120, 0.8, 1.3);
+      scatter(placed('fern', fernMat, 760), 760, 13, 150, 1.8, 3.4);
 
-      // the flower bed round the tower: stem and petals share each matrix
-      const BN = 700;
-      const stems = placed('bloom_stem', stemMat, BN), petals = placed('bloom_petals', bloomMat, BN);
-      petals.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(BN * 3), 3);
-      for (let i = 0; i < BN; i++) {
-        const a = rnd(6.28), d = 7.3 + Math.pow(Math.random(), 0.7) * 3.8;
+      /* The flower bed round the tower: planted in drifts — a run of one
+         kind, then the next — over leafy cover, the way a bed is planted
+         rather than sown. Daisies, bellflowers and spikes carry their own
+         colours; the cup flowers take one from the palette per drift. */
+      const BED_IN = 6.9, BED_OUT = 12.4;
+      const kinds = {
+        daisy: placed('daisy', bloomMat, 520),
+        bell: placed('bell', bloomMat, 300),
+        spike: placed('spike', bloomMat, 220),
+        cup: placed('bloom_stem', stemMat, 460),
+      };
+      const cupPetals = placed('bloom_petals', bloomMat, 460);
+      cupPetals.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(460 * 3), 3);
+      const leaf = placed('bedleaf', fernMat, 300);
+      const inBed = () => {
+        const a = rnd(6.28), d = BED_IN + Math.random() * (BED_OUT - BED_IN);
+        return [Math.cos(a) * d, Math.sin(a) * d];
+      };
+      for (let i = 0; i < 300; i++) {
+        const [x, z] = inBed();
+        put(leaf, x, 0, z, rnd(6.28), rnd(1.6, 0.9), 0.1);
+      }
+      const names = ['daisy', 'daisy', 'bell', 'spike', 'cup', 'cup'];
+      for (let drift = 0; drift < 64; drift++) {
+        const kind = names[drift % names.length];
+        const m = kinds[kind];
+        const tint = BLOOM_PAL[Math.floor(Math.random() * BLOOM_PAL.length)];
+        const [cx, cz] = inBed();
+        const n = 14 + Math.floor(rnd(22));
+        for (let k = 0; k < n && m.count < m.instanceMatrix.count; k++) {
+          const r = Math.abs(rnd(1.6, -1.6)) * Math.random(), a = rnd(6.28);
+          const x = cx + Math.cos(a) * r, z = cz + Math.sin(a) * r;
+          const d = Math.hypot(x, z);
+          if (d < BED_IN - 0.3 || d > BED_OUT + 0.6) continue;
+          const s = kind === 'spike' ? rnd(1.6, 1.0) : rnd(1.5, 0.8);
+          _e.set(rnd(0.15, -0.15), rnd(6.28), rnd(0.15, -0.15));
+          _m4.compose(_v.set(x, 0, z), _q.setFromEuler(_e), _s.set(s, s, s));
+          if (kind === 'cup') {
+            cupPetals.setColorAt(cupPetals.count, _c.set(tint));
+            cupPetals.setMatrixAt(cupPetals.count++, _m4);
+          }
+          m.setMatrixAt(m.count++, _m4);
+        }
+      }
+      // and a scatter of daisies out under the trees, where the light gets in
+      for (let i = 0; i < 220 && kinds.daisy.count < kinds.daisy.instanceMatrix.count; i++) {
+        const a = rnd(6.28), d = rnd(70, 14);
         const x = Math.cos(a) * d, z = Math.sin(a) * d;
-        const yaw = rnd(6.28), s = rnd(1.5, 0.75);
-        _e.set(rnd(0.12, -0.12), yaw, rnd(0.12, -0.12));
-        _m4.compose(_v.set(x, 0, z), _q.setFromEuler(_e), _s.set(s, s, s));
-        stems.setMatrixAt(stems.count++, _m4);
-        petals.setMatrixAt(petals.count++, _m4);
-        petals.setColorAt(i, _c.set(BLOOM_PAL[Math.floor(Math.random() * BLOOM_PAL.length)]));
+        put(kinds.daisy, x, groundY(x, z), z, rnd(6.28), rnd(1.3, 0.8), 0.15);
       }
     }
 
@@ -1418,28 +1461,28 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
       [stems, blooms, pads].forEach((m) => { m.frustumCulled = false; g.add(m); });
     }
 
-    const rays = lightShafts(g, { count: 12, color: 0xffe3a8, top: TOP + 16, len: TOP + 24, rTop: 1.6, rBot: 7, spread: 46, opacity: 0.1 });
-    const pollen = pointCloud(g, 440, () => ({ x: rnd(95, -95), y: rnd(30, 0.5), z: rnd(95, -95), v: rnd(0.7, 0.1) }),
-      { color: 0xffe9b0, size: 0.34, opacity: 0.42 });
-    const flies = pointCloud(g, 100, () => ({ x: rnd(55, -55), y: rnd(9, 1), z: rnd(55, -55), v: rnd(6.28) }),
-      { color: 0xd8ff9f, size: 0.5, opacity: 0.7 });
+    const rays = lightShafts(g, { count: 14, color: 0xffe0a0, top: TOP + 22, len: TOP + 30, rTop: 1.4, rBot: 7, spread: 72, opacity: 0.06 });
+    const pollen = pointCloud(g, 620, () => ({ x: rnd(95, -95), y: rnd(30, 0.5), z: rnd(95, -95), v: rnd(0.7, 0.1) }),
+      { color: 0xffe6a0, size: 0.34, opacity: 0.5 });
+    const flies = pointCloud(g, 170, () => ({ x: rnd(55, -55), y: rnd(9, 1), z: rnd(55, -55), v: rnd(6.28) }),
+      { color: 0xe8ff9a, size: 0.5, opacity: 0.7 });
 
     /* Under this canopy the moon is never actually in shot — but it is up
        there, and what reaches the floor is a cold blue wash with the warm
        shafts all but gone. The blooms take over instead: barely lit by day,
        faintly luminous once it is dark, which is the whole effect. */
-    const fog = new THREE.FogExp2(0x1c3222, 0.0115);
+    const fog = new THREE.FogExp2(0x26402a, 0.0068);
     let rayK = 1, fliesK = 0.35;
     return {
       group: g,
       fog,
-      css: '#0e1a11',
+      css: '#1d2f1e',
       glass: { color: 0xfff0cc, emissive: 0xffc884, intensity: 2.0 },
       fade: { on: 1, radius: 13, amount: 1.0 },
       light: {
-        hemi: { i: 0.95, sky: 0xa8d88f, gnd: 0x241c12 },
-        key: { mul: 0.95, c: 0xffe6b0, p: [10, 46, 14] },
-        fill: { mul: 0.55, c: 0x6f9f5f },
+        hemi: { i: 0.95, sky: 0xd0e29a, gnd: 0x2a2416 },
+        key: { mul: 1.1, c: 0xffdc98, p: [10, 46, 14] },
+        fill: { mul: 0.55, c: 0x7fae6a },
       },
       lightNight: {
         hemi: { i: 0.42, sky: 0x5f7ad0, gnd: 0x0a1018 },
@@ -1447,8 +1490,8 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
         fill: { mul: 0.3, c: 0x3a5f8f },
       },
       night(n) {
-        dome.setSky(mixC(0x9fc47a, 0x101a3a, n), mixC(0x2f4a2a, 0x0a1424, n), mixC(0x1c3222, 0x0b1424, n));
-        fog.color.set(mixC(0x1c3222, 0x0b1424, n));
+        dome.setSky(mixC(0xd8e2a0, 0x101a3a, n), mixC(0x4f7038, 0x0a1424, n), mixC(0x26402a, 0x0b1820, n));
+        fog.color.set(mixC(0x26402a, 0x0b1820, n));
         rays.mat.color.set(mixC(0xffe3a8, 0x9fb8ff, n));
         rayK = mixN(1, 0.22, n);
         // the blooms: a colour each, so the emissive is left white and only
@@ -1456,7 +1499,7 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
         bloomMat.emissive.set(mixC(0x140c02, 0x4a6a8f, n));
         bloomMat.emissiveIntensity = mixN(1, 1.7, n);
         fliesK = mixN(0.35, 1.25, n);   // fireflies barely register in daylight
-        this.css = n > 0.5 ? '#070c14' : '#0e1a11';
+        this.css = n > 0.5 ? '#070c14' : '#1d2f1e';
       },
       tick(t, dt) {
         rays.forEach((m) => { m.rotation.z = m.userData.b + Math.sin(t * 0.3 + m.userData.p) * 0.06; });

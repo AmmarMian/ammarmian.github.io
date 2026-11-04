@@ -17,10 +17,13 @@ ambient occlusion, not from texture. What it makes, one mesh object each:
                                     triangles, for the trees past ~75 m
     clump                           a loose canopy clump, for the leaf ceiling
                                     over the tower
-    rock_a, rock_b, log             ground cover, mossy where they face up
+    birch, birch_far                a pale, slender tree for contrast
+    bush_a, bush_b, stump, log      the understory, mossy where they face up
     fern                            a rosette of arched fronds
     bloom_stem, bloom_petals        a flower in two parts, so the runtime can
                                     tint the petals per instance
+    daisy, bell, spike, bedleaf     the flower bed: three kinds of flower
+                                    and the leafy cover they grow out of
 
 Units are metres, Z up here (the exporter writes Y up). Trees are about 24 m
 tall at scale 1; the runtime scales instances 0.8-1.5 uniformly.
@@ -44,24 +47,31 @@ AO_RAYS = 40            # rays per vertex for the baked occlusion
 AO_REACH = 6.0          # metres a ray looks for an occluder
 
 # ------------------------------------------------------------------ palette
-# Desaturated, a little warm: a forest at the edge of evening rather than a
-# saturated game green, so it sits under either theme of the page.
-LEAF_TOP = (0.47, 0.58, 0.25)
-LEAF_MID = (0.31, 0.44, 0.19)
-LEAF_LOW = (0.17, 0.27, 0.13)
-LEAF_B_TOP = (0.58, 0.58, 0.24)      # the second oak, more olive
-LEAF_B_LOW = (0.24, 0.29, 0.12)
+# A cosy storybook forest: sunlit crowns that go warm yellow-green at the
+# top and cool to a teal shadow underneath, mossy bark, soft colour rather
+# than a saturated game green, so it sits under either theme of the page.
+LEAF_TOP = (0.62, 0.71, 0.30)
+LEAF_MID = (0.32, 0.50, 0.24)
+LEAF_LOW = (0.11, 0.25, 0.20)
+LEAF_B_TOP = (0.70, 0.70, 0.30)      # the second oak, more golden
+LEAF_B_LOW = (0.20, 0.28, 0.16)
+BIRCH_TOP = (0.74, 0.78, 0.38)       # birch: lighter, yellower leaves
+BIRCH_LOW = (0.30, 0.42, 0.22)
+BIRCH_BARK = (0.86, 0.84, 0.76)
 NEEDLE_TOP = (0.27, 0.40, 0.25)
 NEEDLE_LOW = (0.12, 0.21, 0.15)
 BARK = (0.33, 0.25, 0.18)
 BARK_DARK = (0.19, 0.14, 0.10)
 MOSS = (0.30, 0.40, 0.17)
-ROCK = (0.38, 0.37, 0.33)
-ROCK_DARK = (0.22, 0.22, 0.20)
 FERN_TIP = (0.45, 0.60, 0.26)
 FERN_BASE = (0.20, 0.33, 0.14)
 STEM = (0.25, 0.42, 0.18)
 WHITE = (1.0, 1.0, 1.0)
+DAISY = (0.97, 0.95, 0.88)
+DAISY_EYE = (0.95, 0.74, 0.20)
+BELL = (0.55, 0.45, 0.85)
+SPIKE_LOW = (0.86, 0.45, 0.62)
+SPIKE_TOP = (0.97, 0.82, 0.88)
 
 
 def mix(a, b, t):
@@ -231,32 +241,46 @@ def broadleaf(name, seed, height=24.0, far=False, top=LEAF_TOP, low=LEAF_LOW):
     # branches: from the upper trunk, out and up, each ending in a clump
     zlo, zhi = height * 0.42, height * 1.02
     paint = leaf_painter(top, LEAF_MID if top == LEAF_TOP else mix(LEAF_MID, top, 0.4), low, zlo, zhi)
-    nb = 4 if far else 6
+    # One billowing mass of foliage in two tiers, not balls on sticks: the
+    # clumps overlap. A crown cap, branches ending in clumps that reach back
+    # into it, a lower skirt of clumps, and fillers to close it from below.
+    nb = 5 if far else 7
     crown_top = pts[-1]
-    # One mass of foliage, not balls on sticks: the clumps overlap. A big
-    # one caps the trunk, the branches end in clumps that reach back into
-    # it, and a ring of fillers closes the crown from below.
-    clumps = [(crown_top + Vector((0, 0, height * 0.12)), height * 0.21)]
+    clumps = [(crown_top + Vector((0, 0, height * 0.14)), height * 0.20)]
     for b in range(nb):
         a = (b / nb) * 2 * math.pi + rnd.uniform(-0.35, 0.35)
-        t0 = rnd.uniform(0.6, 0.9)
+        t0 = rnd.uniform(0.55, 0.9)
         base = pts[int(t0 * (len(pts) - 1))]
-        reach = height * rnd.uniform(0.13, 0.20)
-        rise = height * rnd.uniform(0.10, 0.18)
+        reach = height * rnd.uniform(0.14, 0.22)
+        rise = height * rnd.uniform(0.08, 0.18)
         d = Vector((math.cos(a), math.sin(a), 0))
         bp = [base, base + d * reach * 0.45 + Vector((0, 0, rise * 0.5)), base + d * reach + Vector((0, 0, rise))]
         if not far:
             tube(part, bp, [radii[int(t0 * (len(pts) - 1))] * 0.6, 0.4, 0.2], 5, bark_painter(top))
-        clumps.append((bp[-1] + Vector((0, 0, height * 0.03)), height * rnd.uniform(0.15, 0.19)))
+        clumps.append((bp[-1] + Vector((0, 0, height * 0.03)), height * rnd.uniform(0.13, 0.18)))
+    if not far:
+        for k in range(6):          # the skirt: lower and wider, so it reads as a canopy
+            a = (k / 6) * 2 * math.pi + 0.3 + rnd.uniform(-0.2, 0.2)
+            d = Vector((math.cos(a), math.sin(a), 0))
+            clumps.append((crown_top + d * height * rnd.uniform(0.17, 0.24) - Vector((0, 0, height * 0.06)),
+                           height * rnd.uniform(0.10, 0.13)))
+        for k in range(3):          # and the high crown, broken up
+            a = (k / 3) * 2 * math.pi + 1.1
+            d = Vector((math.cos(a), math.sin(a), 0))
+            clumps.append((crown_top + d * height * 0.09 + Vector((0, 0, height * 0.22)), height * 0.11))
+    # roots: three short buttresses running into the moss
     if not far:
         for k in range(4):
-            a = (k / 4) * 2 * math.pi + 0.6
+            a = (k / 4) * 2 * math.pi + rnd.uniform(-0.3, 0.3)
             d = Vector((math.cos(a), math.sin(a), 0))
-            clumps.append((crown_top + d * height * 0.12 - Vector((0, 0, height * 0.02)),
-                           height * rnd.uniform(0.11, 0.14)))
+            tube(part, [Vector((0, 0, 1.4)), d * 1.3 + Vector((0, 0, 0.4)), d * 2.4 + Vector((0, 0, -0.2))],
+                 [0.55, 0.35, 0.12], 5, bark_painter(top))
     for i, (c, s) in enumerate(clumps):
+        # the cap and the branch clumps carry the silhouette and get the finer
+        # mesh; the skirt and fillers are coarse — they sit inside the mass
+        fine = not far and i <= nb
         blob(part, c, (s, s * rnd.uniform(0.85, 1.1), s * 0.78), paint,
-             subdiv=1 if far else 2, rough=0.28, seed=seed * 3.1 + i)
+             subdiv=2 if fine else 1, rough=0.28, seed=seed * 3.1 + i)
     return finish(part, name + ("_far" if far else ""))
 
 
@@ -299,14 +323,58 @@ def canopy_clump(name):
     return finish(part, name, ao_ground=False, ao_strength=0.6)
 
 
-# -------------------------------------------------------------- ground cover
-def rock(name, seed, size):
+def birch(name, seed, height=19.0, far=False):
+    """A pale, slender tree with a light crown: the contrast that keeps a
+    dense wood from reading as one green mass."""
+    rnd = random.Random(seed)
+    part = Part()
+
+    def bark(co, n):
+        # white bark with dark horizontal marks, a mossy foot
+        mark = noise.noise(Vector((co.x * 3, co.y * 3, co.z * 2.2))) > 0.35
+        c = scale(BIRCH_BARK, 0.35) if mark else BIRCH_BARK
+        return mix(c, MOSS, max(0.0, 1.0 - co.z / 1.5))
+    lean = Vector((rnd.uniform(-0.8, 0.8), rnd.uniform(-0.8, 0.8), 0))
+    pts = [Vector((0, 0, -0.3)) + lean * (i / 5) ** 2 + Vector((0, 0, height * 0.75 * i / 5)) for i in range(6)]
+    tube(part, pts, [0.55, 0.45, 0.38, 0.3, 0.22, 0.12], 4 if far else 6, bark)
+    paint = leaf_painter(BIRCH_TOP, mix(BIRCH_LOW, BIRCH_TOP, 0.5), BIRCH_LOW, height * 0.35, height * 1.05)
+    for i in range(4 if far else 9):
+        t = rnd.uniform(0.45, 1.0)
+        c = pts[int(t * 5)] + Vector((rnd.uniform(-2.2, 2.2), rnd.uniform(-2.2, 2.2), rnd.uniform(0.5, 3.0)))
+        s_ = height * rnd.uniform(0.09, 0.13)
+        blob(part, c, (s_, s_, s_ * 1.2), paint, subdiv=1 if far else 2, rough=0.3, seed=seed + i)
+    return finish(part, name + ("_far" if far else ""))
+
+
+def bush(name, seed, size=2.4):
+    """Understory: a low mound of leaf clumps, darker underneath."""
+    rnd = random.Random(seed)
+    part = Part()
+    paint = leaf_painter(mix(LEAF_TOP, LEAF_MID, 0.3), LEAF_MID, LEAF_LOW, 0.0, size * 1.4)
+    for i in range(5):
+        a = rnd.uniform(0, 2 * math.pi)
+        r = rnd.uniform(0, size * 0.55)
+        c = (math.cos(a) * r, math.sin(a) * r, size * rnd.uniform(0.35, 0.7))
+        s_ = size * rnd.uniform(0.45, 0.65)
+        # two finer clumps on top, the rest coarse: bushes come by the hundred
+        blob(part, c, (s_, s_ * rnd.uniform(0.85, 1.1), s_ * 0.8), paint, subdiv=2 if i < 2 else 1,
+             rough=0.3, seed=seed + i, flatten=0.4)
+    return finish(part, name, ao_strength=0.6)
+
+
+def stump(name):
     part = Part()
 
     def paint(co, n):
-        c = mix(ROCK_DARK, ROCK, 0.5 + 0.5 * noise.noise(co * 1.3))
-        return mix(c, MOSS, max(0.0, (n.z - 0.55) / 0.45) * 0.85)
-    blob(part, (0, 0, size[2] * 0.35), size, paint, subdiv=2, rough=0.33, seed=seed, flatten=0.5)
+        if n.z > 0.8 and co.z > 0.9:
+            return (0.62, 0.48, 0.32)                     # the cut face, pale wood
+        return mix(bark_painter(None)(co, n), MOSS, max(0.0, n.z) * 0.8)
+    tube(part, [(0, 0, -0.2), (0, 0, 0.5), (0.05, 0, 1.1)], [1.3, 0.95, 0.85], 9, paint, cap_end=True)
+    for k in range(3):
+        a = k * 2.1 + 0.4
+        d = Vector((math.cos(a), math.sin(a), 0))
+        tube(part, [d * 0.7 + Vector((0, 0, 0.6)), d * 1.7 + Vector((0, 0, 0.1)), d * 2.3 + Vector((0, 0, -0.2))],
+             [0.4, 0.25, 0.1], 5, paint)
     return finish(part, name)
 
 
@@ -379,6 +447,65 @@ def bloom():
     return s, p
 
 
+def daisy(name):
+    """White petals round a golden eye, on a thin stem: the bed's light."""
+    part = Part()
+    bm = part.bm
+    tube(part, [(0, 0, 0), (0.04, 0, 0.45), (0, 0.02, 0.85)], [0.035, 0.03, 0.025], 4, lambda c, n: STEM)
+    eye = [bm.verts.new((math.cos(k * 1.2566) * 0.08, math.sin(k * 1.2566) * 0.08, 0.9)) for k in range(5)]
+    top = bm.verts.new((0, 0, 0.94))
+    part.add_faces([bm.faces.new((top, eye[k], eye[(k + 1) % 5])) for k in range(5)], lambda c, n: DAISY_EYE)
+    faces = []
+    for k in range(9):
+        a0 = 2 * math.pi * k / 9
+        p0 = bm.verts.new((math.cos(a0 - 0.15) * 0.08, math.sin(a0 - 0.15) * 0.08, 0.89))
+        p1 = bm.verts.new((math.cos(a0 + 0.15) * 0.08, math.sin(a0 + 0.15) * 0.08, 0.89))
+        tip = bm.verts.new((math.cos(a0) * 0.32, math.sin(a0) * 0.32, 0.86))
+        faces.append(bm.faces.new((p0, tip, p1)))
+    part.add_faces(faces, lambda c, n: DAISY)
+    return finish(part, name, ao_ground=False, ao_strength=0.2)
+
+
+def bell(name):
+    """An arching stem with three violet bells hanging from it."""
+    part = Part()
+    bm = part.bm
+    pts = [(0, 0, 0), (0.05, 0, 0.6), (0.25, 0, 1.0), (0.55, 0, 1.05)]
+    tube(part, pts, [0.04, 0.035, 0.03, 0.02], 4, lambda c, n: STEM)
+    for i, (x, z) in enumerate(((0.18, 0.88), (0.38, 1.0), (0.55, 0.98))):
+        top = bm.verts.new((x, 0, z - 0.04))
+        rim = [bm.verts.new((x + math.cos(k * 1.257) * 0.09, math.sin(k * 1.257) * 0.09, z - 0.22)) for k in range(5)]
+        part.add_faces([bm.faces.new((top, rim[k], rim[(k + 1) % 5])) for k in range(5)],
+                       lambda c, n: mix(scale(BELL, 0.75), BELL, (c.z - 0.6) * 2))
+    return finish(part, name, ao_ground=False, ao_strength=0.3)
+
+
+def spike(name):
+    """A tall spike of small blossoms, deep at the base and pale at the tip."""
+    part = Part()
+    bm = part.bm
+    tube(part, [(0, 0, 0), (0, 0.03, 0.8), (0.02, 0, 1.6)], [0.045, 0.035, 0.02], 4, lambda c, n: STEM)
+    faces = []
+    for i in range(14):
+        z = 0.75 + i * 0.06
+        a = i * 2.4
+        r = 0.17 * (1 - i / 16)
+        c = Vector((math.cos(a) * r, math.sin(a) * r, z))
+        v0, v1, v2 = bm.verts.new(c), bm.verts.new(c * 0.3 + Vector((0, 0, z * 0.7 + 0.05))), bm.verts.new(c + Vector((0.04, 0.04, 0.1)))
+        faces.append(bm.faces.new((v0, v1, v2)))
+    part.add_faces(faces, lambda c, n: mix(SPIKE_LOW, SPIKE_TOP, (c.z - 0.75) / 0.85))
+    return finish(part, name, ao_ground=False, ao_strength=0.2)
+
+
+def bedleaf(name):
+    """Low leafy cover for the flower bed, so it reads as planted, not sown."""
+    part = Part()
+    paint = leaf_painter(mix(LEAF_TOP, STEM, 0.4), STEM, LEAF_LOW, 0.0, 0.7)
+    blob(part, (0, 0, 0.25), (0.7, 0.6, 0.45), paint, subdiv=2, rough=0.35, seed=31, flatten=0.3)
+    blob(part, (0.45, 0.2, 0.18), (0.45, 0.45, 0.32), paint, subdiv=1, rough=0.35, seed=32, flatten=0.3)
+    return finish(part, name, ao_strength=0.5)
+
+
 # -------------------------------------------------------------------- build
 bpy.ops.wm.read_factory_settings(use_empty=True)
 print("forest kit:")
@@ -389,11 +516,18 @@ broadleaf("oak_b", 2, height=21.0, far=True, top=LEAF_B_TOP, low=LEAF_B_LOW)
 conifer("conifer", 3)
 conifer("conifer", 3, far=True)
 canopy_clump("clump")
-rock("rock_a", 21, (1.6, 1.3, 1.1))
-rock("rock_b", 22, (2.6, 1.9, 1.3))
+birch("birch", 4)
+birch("birch", 4, far=True)
+bush("bush_a", 41, 2.4)
+bush("bush_b", 42, 3.4)
+stump("stump")
 log("log")
 fern("fern")
 bloom()
+daisy("daisy")
+bell("bell")
+spike("spike")
+bedleaf("bedleaf")
 
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 bpy.ops.export_scene.gltf(
