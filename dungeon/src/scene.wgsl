@@ -239,6 +239,14 @@ fn sway(p: vec3f) -> vec3f {
   return vec3f(a, 0.0, a * 0.4);
 }
 
+// Part of a room's walls (with the pillars and what hangs on them), above
+// the cut line: the parts that may stand in front of the next room.
+fn is_wall(c: vec3i) -> bool {
+  if (c.y < CUT_Y || (RM.flags & RF_CORRIDOR) != 0u) { return false; }
+  let band = i32(WALL_T) + 5;
+  return c.x < band || c.x >= RM.dims.x - band || c.z < band || c.z >= RM.dims.z - band;
+}
+
 struct Hit {
   t: f32,
   cell: vec3i,
@@ -565,8 +573,15 @@ fn defocus(c: vec3f, amt: f32) -> vec3f {
   }
 
   var col = background(px);
-  var tSurf = 1e9;
+  var tSurf = 1e9;   // where the view ends (behind a see-through wall, if any)
+  var tDepth = 1e9;  // the nearest surface, for the outline pass
   var hitRoom = -1;
+  // A wall that stands in front of another room turns see-through: the first
+  // wall hit is remembered, and the ray carries on into the rooms behind it.
+  var ghost = false;
+  var ghostCol = vec3f(0.0);
+  var ghostT = 0.0;
+  var ghostRoom = -1;
   for (var k = 0; k < n; k++) {
     load_room(ids[k]);
     let lro = ro - RM.org;
@@ -574,29 +589,41 @@ fn defocus(c: vec3f, amt: f32) -> vec3f {
     let tw = (WATER_Y - lro.y) / rd.y;
     let pw = lro + rd * tw;
     let cw = vec3i(floor(pw));
+    var found = false;
+    var c = vec3f(0.0);
+    var t = 0.0;
     if (tw < h.t && inb(cw) && is_water(cw)) {
-      col = shade_water(pw, rd);
-      tSurf = tw; hitRoom = ids[k];
-      break;
-    }
-    if (h.m != 0u) {
-      col = shade(h, lro + rd * h.t);
-      tSurf = h.t; hitRoom = ids[k];
-      break;
-    }
-    // left the room without hitting anything: a window shows the bright
-    // world outside, the archway at the top of the stairs shows darkness
-    if (h.cell.y < 1000) {
+      c = shade_water(pw, rd); t = tw; found = true;
+    } else if (h.m != 0u) {
+      c = shade(h, lro + rd * h.t); t = h.t; found = true;
+    } else if (h.cell.y < 1000) {
+      // left the room without hitting anything: a window shows the bright
+      // world outside, the archway at the top of the stairs shows darkness
+      // (not where the wall itself has been cut away)
       let pe = lro + rd * h.t;
       if (pe.y < WALL_TOP && pe.y > f32(CUT_Y) && (RM.flags & RF_CORRIDOR) == 0u) {
-        // (not where the wall itself has been cut away)
-        if (h.cell.x < 0 && !hidden(vec3i(0, i32(pe.y), i32(pe.z))) && in_window(pe.zy) > 0.0) { col = vec3f(0.80, 0.93, 0.62); tSurf = h.t; hitRoom = ids[k]; break; }
-        if (h.cell.z < 0 && pe.y > 20.0 && !hidden(vec3i(i32(pe.x), i32(pe.y), 0))) { col = vec3f(0.02, 0.03, 0.04); tSurf = h.t; hitRoom = ids[k]; break; }
+        if (h.cell.x < 0 && !hidden(vec3i(0, i32(pe.y), i32(pe.z))) && in_window(pe.zy) > 0.0) { c = vec3f(0.80, 0.93, 0.62); t = h.t; found = true; }
+        else if (h.cell.z < 0 && pe.y > 20.0 && !hidden(vec3i(i32(pe.x), i32(pe.y), 0))) { c = vec3f(0.02, 0.03, 0.04); t = h.t; found = true; }
       }
     }
+    if (!found) { continue; }
+    if (params.focus >= 0.0 && ids[k] != i32(params.focus)) { c = defocus(c, params.focusAmt * 0.75); }
+    if (!ghost && h.m != 0u && t == h.t && k < n - 1 && is_wall(h.cell)) {
+      ghost = true; ghostCol = c; ghostT = t; ghostRoom = ids[k];
+      continue;
+    }
+    if (ghost) {
+      // the wall as a faint pane over the room behind it
+      col = mix(c, ghostCol * vec3f(0.85, 1.0, 1.0), 0.3);
+      tSurf = t; tDepth = ghostT; hitRoom = ids[k];
+    } else {
+      col = c; tSurf = t; tDepth = t; hitRoom = ids[k];
+    }
+    break;
   }
-  if (hitRoom >= 0 && params.focus >= 0.0 && hitRoom != i32(params.focus)) {
-    col = defocus(col, params.focusAmt * 0.75);
+  if (ghost && hitRoom < 0) {
+    // nothing behind after all: the wall stays solid
+    col = ghostCol; tSurf = ghostT; tDepth = ghostT; hitRoom = ghostRoom;
   }
 
   // the air in front of the surface: light shafts, ground mist, haze
@@ -672,6 +699,6 @@ fn defocus(c: vec3f, amt: f32) -> vec3f {
   }
 
   var depth = 1.0;
-  if (hitRoom >= 0) { depth = clamp((tSurf - CAM_BACK + 600.0) / 1200.0, 0.0, 0.999); }
+  if (hitRoom >= 0) { depth = clamp((tDepth - CAM_BACK + 600.0) / 1200.0, 0.0, 0.999); }
   return vec4f(col, depth);
 }
