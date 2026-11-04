@@ -50,10 +50,10 @@ AO_REACH = 6.0          # metres a ray looks for an occluder
 # A cosy storybook forest: sunlit crowns that go warm yellow-green at the
 # top and cool to a teal shadow underneath, mossy bark, soft colour rather
 # than a saturated game green, so it sits under either theme of the page.
-LEAF_TOP = (0.62, 0.71, 0.30)
+LEAF_TOP = (0.54, 0.66, 0.27)
 LEAF_MID = (0.32, 0.50, 0.24)
 LEAF_LOW = (0.11, 0.25, 0.20)
-LEAF_B_TOP = (0.70, 0.70, 0.30)      # the second oak, more golden
+LEAF_B_TOP = (0.62, 0.64, 0.27)      # the second oak, more golden
 LEAF_B_LOW = (0.20, 0.28, 0.16)
 BIRCH_TOP = (0.74, 0.78, 0.38)       # birch: lighter, yellower leaves
 BIRCH_LOW = (0.30, 0.42, 0.22)
@@ -221,145 +221,223 @@ def leaf_painter(top, mid, low, zlo, zhi):
     return p
 
 
-# ------------------------------------------------------------------- trees
-def broadleaf(name, seed, height=31.0, far=False, top=LEAF_TOP, low=LEAF_LOW):
-    rnd = random.Random(seed)
-    part = Part()
-    sides = 5 if far else 8
-    # the trunk leans and wanders a little; a root flare at the base
-    pts, radii = [], []
-    n = 6 if far else 9
-    lean = Vector((rnd.uniform(-0.6, 0.6), rnd.uniform(-0.6, 0.6), 0))
-    for i in range(n):
-        t = i / (n - 1)
-        z = -0.4 + t * height * 0.72      # a long bare trunk: old forest, crowns held high
-        wob = Vector((noise.noise(Vector((t * 3, seed, 0))), noise.noise(Vector((0, t * 3, seed))), 0)) * 0.5
-        pts.append(Vector((0, 0, z)) + lean * t + wob)
-        radii.append(1.6 * (1 - 0.62 * t) + (1.3 * (1 - t / 0.2) if t < 0.2 else 0.0))
-    tube(part, pts, radii, sides, bark_painter(top))
+# ------------------------------------------------------------- leaf cards
+class Cards:
+    """Foliage as cards: small alpha-cut quads with a leaf texture, grouped
+    into clusters. Each card's normal is bent toward the outside of its
+    crown, so the crown lights as one soft volume instead of as facets —
+    the standard trick for stylized trees. Cards carry UVs into a 2x2 atlas
+    the page draws at runtime, and a vertex colour (tint and shade)."""
 
-    # branches: from the upper trunk, out and up, each ending in a clump
-    zlo, zhi = height * 0.42, height * 1.02
-    paint = leaf_painter(top, LEAF_MID if top == LEAF_TOP else mix(LEAF_MID, top, 0.4), low, zlo, zhi)
-    # One billowing mass of foliage in two tiers, not balls on sticks: the
-    # clumps overlap. A crown cap, branches ending in clumps that reach back
-    # into it, a lower skirt of clumps, and fillers to close it from below.
-    nb = 5 if far else 7
-    crown_top = pts[-1]
-    clumps = [(crown_top + Vector((0, 0, height * 0.14)), height * 0.20)]
-    for b in range(nb):
-        a = (b / nb) * 2 * math.pi + rnd.uniform(-0.35, 0.35)
-        t0 = rnd.uniform(0.55, 0.9)
-        base = pts[int(t0 * (len(pts) - 1))]
-        reach = height * rnd.uniform(0.14, 0.22)
-        rise = height * rnd.uniform(0.08, 0.18)
+    def __init__(self):
+        self.co, self.nor, self.uv, self.col, self.faces = [], [], [], [], []
+
+    def card(self, centre, size, crown, crown_r, colour, rnd, droop=0.0):
+        c = Vector(centre)
+        # a random orientation, mostly facing outward from the crown
+        out = (c - crown).normalized() if (c - crown).length > 1e-3 else Vector((0, 0, 1))
+        rand = Vector((rnd.uniform(-1, 1), rnd.uniform(-1, 1), rnd.uniform(-1, 1))).normalized()
+        n = (out * 0.6 + rand * 0.8).normalized()
+        u = n.cross(Vector((0, 0, 1)) if abs(n.z) < 0.95 else Vector((1, 0, 0))).normalized()
+        v = n.cross(u).normalized()
+        # spin the card in its own plane
+        ang = rnd.uniform(0, math.tau)
+        u, v = u * math.cos(ang) + v * math.sin(ang), -u * math.sin(ang) + v * math.cos(ang)
+        h = size * 0.5
+        cell = rnd.randrange(4)
+        cu, cv = (cell % 2) * 0.5, (cell // 2) * 0.5
+        corners = [(-1, -1), (1, -1), (1, 1), (-1, 1)]
+        base = len(self.co)
+        for (x, y) in corners:
+            p = c + u * (x * h) + v * (y * h)
+            p.z -= droop * (y + 1) * 0.5 * size
+            self.co.append(p)
+            # the lighting normal: mostly the crown's sphere, a little the card
+            sph = (p - crown) / max(crown_r, 1e-3)
+            self.nor.append((sph.normalized() * 0.82 + n * 0.18).normalized())
+            self.uv.append((cu + (x + 1) * 0.25, cv + (y + 1) * 0.25))
+            # deeper inside the crown is darker: cheap occlusion
+            depth = min(1.0, (p - crown).length / max(crown_r, 1e-3))
+            self.col.append(scale(colour, 0.55 + 0.45 * depth))
+        self.faces.append((base, base + 1, base + 2, base + 3))
+
+    def cluster(self, centre, radii, count, size, crown, crown_r, paint, rnd, droop=0.0):
+        """Cards spread through an ellipsoid, thicker near its skin."""
+        c = Vector(centre)
+        for _ in range(count):
+            d = Vector((rnd.gauss(0, 1), rnd.gauss(0, 1), rnd.gauss(0, 1))).normalized()
+            r = rnd.uniform(0.45, 1.0) ** 0.6
+            p = c + Vector((d.x * radii[0], d.y * radii[1], d.z * radii[2])) * r
+            self.card(p, size * rnd.uniform(0.75, 1.2), crown, crown_r, paint(p), rnd, droop)
+
+    def finish(self, name):
+        me = bpy.data.meshes.new(name)
+        me.from_pydata([tuple(p) for p in self.co], [], self.faces)
+        me.update()
+        uvl = me.uv_layers.new(name="UVMap")
+        for poly in me.polygons:
+            for li in poly.loop_indices:
+                uvl.data[li].uv = self.uv[me.loops[li].vertex_index]
+        attr = me.color_attributes.new("Col", "BYTE_COLOR", "POINT")
+        for i, c in enumerate(self.col):
+            attr.data[i].color = (*c, 1.0)
+        me.color_attributes.active_color = attr
+        me.normals_split_custom_set_from_vertices([tuple(n) for n in self.nor])
+        obj = bpy.data.objects.new(name, me)
+        bpy.context.collection.objects.link(obj)
+        print(f"  {name}: {len(self.faces)} cards")
+        return obj
+
+
+def leaf_tint(top, mid, low, zlo, zhi, rnd):
+    """Colour by height in the crown, with a little variation per card."""
+    def p(co):
+        h = max(0.0, min(1.0, (co.z - zlo) / max(0.001, zhi - zlo)))
+        c = mix(low, mid, h * 1.7) if h < 0.6 else mix(mid, top, (h - 0.6) / 0.4)
+        return scale(c, rnd.uniform(0.9, 1.1))
+    return p
+
+
+# ------------------------------------------------------------------- trees
+def branches(part, rnd, start, direction, length, radius, depth, tips, painter, sides=5):
+    """A limb that forks: each level shorter and thinner, bending upward.
+    The ends are where the foliage clusters go."""
+    d = Vector(direction).normalized()
+    p0 = Vector(start)
+    mid = p0 + d * length * 0.5 + Vector((rnd.uniform(-0.4, 0.4), rnd.uniform(-0.4, 0.4), length * 0.08))
+    p1 = p0 + d * length + Vector((0, 0, length * 0.12))
+    tube(part, [p0, mid, p1], [radius, radius * 0.8, radius * 0.6], sides, painter)
+    if depth == 0:
+        tips.append((p1, length))
+        return
+    for k in range(rnd.choice((2, 3))):
+        a = rnd.uniform(-0.9, 0.9)
+        nd = (d + Vector((math.cos(a + k * 2.1), math.sin(a + k * 2.1), rnd.uniform(0.2, 0.6))) * 0.7).normalized()
+        branches(part, rnd, p1, nd, length * rnd.uniform(0.55, 0.7), radius * 0.6, depth - 1, tips, painter, max(4, sides - 1))
+    tips.append((p1, length * 0.8))
+
+
+def broadleaf(name, seed, height=31.0, far=False, top=LEAF_TOP, low=LEAF_LOW):
+    """A broad old tree: a long trunk that splits into limbs, the limbs
+    forking twice, and leaf clusters at every fork and tip — so the crown is
+    broad and broken, with sky through it, not a ball."""
+    rnd = random.Random(seed)
+    wood = Part()
+    bark = bark_painter(top)
+    trunk_h = height * 0.62
+    lean = Vector((rnd.uniform(-0.5, 0.5), rnd.uniform(-0.5, 0.5), 0))
+    pts = [Vector((0, 0, -0.4)) + lean * (i / 6) ** 1.5 + Vector((0, 0, trunk_h * i / 6)) for i in range(7)]
+    radii = [1.6 * (1 - 0.5 * i / 6) + (1.2 if i == 0 else 0.4 if i == 1 else 0.0) for i in range(7)]
+    tube(wood, pts, radii, 5 if far else 8, bark)
+    for k in range(4):                                     # roots
+        a = (k / 4) * math.tau + rnd.uniform(-0.3, 0.3)
         d = Vector((math.cos(a), math.sin(a), 0))
-        bp = [base, base + d * reach * 0.45 + Vector((0, 0, rise * 0.5)), base + d * reach + Vector((0, 0, rise))]
-        if not far:
-            tube(part, bp, [radii[int(t0 * (len(pts) - 1))] * 0.6, 0.4, 0.2], 5, bark_painter(top))
-        clumps.append((bp[-1] + Vector((0, 0, height * 0.03)), height * rnd.uniform(0.13, 0.18)))
-    if not far:
-        for k in range(6):          # the skirt: lower and wider, so it reads as a canopy
-            a = (k / 6) * 2 * math.pi + 0.3 + rnd.uniform(-0.2, 0.2)
-            d = Vector((math.cos(a), math.sin(a), 0))
-            clumps.append((crown_top + d * height * rnd.uniform(0.17, 0.24) - Vector((0, 0, height * 0.06)),
-                           height * rnd.uniform(0.10, 0.13)))
-        for k in range(3):          # and the high crown, broken up
-            a = (k / 3) * 2 * math.pi + 1.1
-            d = Vector((math.cos(a), math.sin(a), 0))
-            clumps.append((crown_top + d * height * 0.09 + Vector((0, 0, height * 0.22)), height * 0.11))
-    # roots: three short buttresses running into the moss
-    if not far:
-        for k in range(4):
-            a = (k / 4) * 2 * math.pi + rnd.uniform(-0.3, 0.3)
-            d = Vector((math.cos(a), math.sin(a), 0))
-            tube(part, [Vector((0, 0, 1.4)), d * 1.3 + Vector((0, 0, 0.4)), d * 2.4 + Vector((0, 0, -0.2))],
-                 [0.55, 0.35, 0.12], 5, bark_painter(top))
-    for i, (c, s) in enumerate(clumps):
-        # the cap and the branch clumps carry the silhouette and get the finer
-        # mesh; the skirt and fillers are coarse — they sit inside the mass
-        fine = not far and i <= nb
-        blob(part, c, (s, s * rnd.uniform(0.85, 1.1), s * 0.78), paint,
-             subdiv=2 if fine else 1, rough=0.28, seed=seed * 3.1 + i)
-    return finish(part, name + ("_far" if far else ""))
+        tube(wood, [Vector((0, 0, 1.6)), d * 1.5 + Vector((0, 0, 0.4)), d * 2.8 + Vector((0, 0, -0.2))],
+             [0.6, 0.38, 0.12], 5, bark)
+    tips = []
+    top_p = pts[-1]
+    nl = 4 if far else 5
+    for k in range(nl):
+        a = (k / nl) * math.tau + rnd.uniform(-0.4, 0.4)
+        d = Vector((math.cos(a), math.sin(a), rnd.uniform(0.6, 1.1)))
+        start = pts[rnd.randint(4, 6)]
+        branches(wood, rnd, start, d, height * rnd.uniform(0.16, 0.22), radii[-1] * 0.7, 1 if far else 2, tips, bark)
+    w = wood
+    wobj = finish(w, name + ("_far" if far else "") + "_wood", ao_strength=0.5)
+
+    crown = top_p + Vector((0, 0, height * 0.18))
+    crown_r = height * 0.32
+    cards = Cards()
+    tint = leaf_tint(top, mix(low, top, 0.5), low, crown.z - crown_r, crown.z + crown_r, rnd)
+    for (tp, ln) in tips:
+        r = ln * (0.75 if far else 0.62)
+        cards.cluster(tp + Vector((0, 0, r * 0.25)), (r, r, r * 0.7), 5 if far else 11,
+                      height * (0.2 if far else 0.145), crown, crown_r, tint, rnd)
+    cards.finish(name + ("_far" if far else "") + "_leaf")
+    return wobj
 
 
 def conifer(name, seed, height=34.0, far=False):
+    """A spruce: whorls of branches with drooping sprays of needles, the
+    tiers shrinking toward a spire."""
     rnd = random.Random(seed)
-    part = Part()
-    tube(part, [(0, 0, -0.4), (0, 0, height * 0.5), (0, 0, height * 0.92)],
-         [0.8, 0.45, 0.12], 5 if far else 7, bark_painter(NEEDLE_TOP))
-    tiers = 4 if far else 7
-    sides = 7 if far else 9
-    bm = part.bm
-    paint = leaf_painter(NEEDLE_TOP, mix(NEEDLE_LOW, NEEDLE_TOP, 0.5), NEEDLE_LOW, height * 0.2, height)
+    wood = Part()
+    bark = bark_painter(NEEDLE_TOP)
+    tube(wood, [(0, 0, -0.4), (0, 0, height * 0.5), (0, 0, height * 0.97)], [0.95, 0.5, 0.1], 5 if far else 7, bark)
+    finish(wood, name + ("_far" if far else "") + "_wood", ao_strength=0.4)
+    cards = Cards()
+    crown = Vector((0, 0, height * 0.55))
+    tint = leaf_tint(NEEDLE_TOP, mix(NEEDLE_LOW, NEEDLE_TOP, 0.5), NEEDLE_LOW, height * 0.15, height, rnd)
+    tiers = 6 if far else 10
     for i in range(tiers):
         t = i / (tiers - 1)
-        z0 = height * (0.22 + 0.68 * t)
-        r = height * (0.24 * (1 - t) + 0.05)
-        h = height * (0.30 - 0.12 * t)
-        # a cone with a ragged, drooping rim: alternate long and short points
-        apex = bm.verts.new((0, 0, z0 + h))
-        rim = []
-        for k in range(sides * 2):
-            a = math.pi * k / sides + i * 0.37
-            rr = r * (1.0 if k % 2 == 0 else 0.72) * rnd.uniform(0.9, 1.08)
-            rim.append(bm.verts.new((math.cos(a) * rr, math.sin(a) * rr, z0 - (0.6 if k % 2 == 0 else 0.1))))
-        inner = bm.verts.new((0, 0, z0 + h * 0.12))
-        faces = []
-        for k in range(len(rim)):
-            faces.append(bm.faces.new((apex, rim[k], rim[(k + 1) % len(rim)])))
-            faces.append(bm.faces.new((inner, rim[(k + 1) % len(rim)], rim[k])))
-        part.add_faces(faces, paint)
-    return finish(part, name + ("_far" if far else ""))
+        z = height * (0.18 + 0.78 * t)
+        reach = height * (0.26 * (1 - t) + 0.03)
+        arms = 5 if far else 7
+        for k in range(arms):
+            a = (k / arms) * math.tau + i * 0.9
+            d = Vector((math.cos(a), math.sin(a), 0))
+            n = 1 if far else 2
+            for j in range(n):
+                f = (j + 1) / n
+                p = Vector((0, 0, z)) + d * reach * f - Vector((0, 0, reach * 0.25 * f * f))
+                cards.card(p, height * (0.15 if far else 0.11) * (1.2 - 0.4 * t), crown + Vector((0, 0, z - crown.z)) * 0.6,
+                           height * 0.3, tint(p), rnd, droop=0.35)
+    cards.finish(name + ("_far" if far else "") + "_leaf")
 
 
 def canopy_clump(name):
-    part = Part()
-    paint = leaf_painter(LEAF_TOP, LEAF_MID, LEAF_LOW, -3.0, 3.0)
-    blob(part, (0, 0, 0), (4.2, 3.6, 2.6), paint, subdiv=2, rough=0.3, seed=11)
-    blob(part, (2.6, 1.0, 0.6), (2.6, 2.4, 1.9), paint, subdiv=2, rough=0.3, seed=12)
-    blob(part, (-2.2, -1.2, 0.4), (2.4, 2.2, 1.8), paint, subdiv=2, rough=0.3, seed=13)
-    return finish(part, name, ao_ground=False, ao_strength=0.6)
+    """A free-floating cluster of foliage for the leaf ceiling."""
+    rnd = random.Random(11)
+    cards = Cards()
+    tint = leaf_tint(LEAF_TOP, LEAF_MID, LEAF_LOW, -3.0, 3.0, rnd)
+    c = Vector((0, 0, 0))
+    for off, r in (((0, 0, 0), 4.2), ((3.0, 1.2, 0.4), 2.8), ((-2.6, -1.0, 0.3), 2.6)):
+        cards.cluster(Vector(off), (r, r * 0.9, r * 0.6), 16, 3.6, c, 5.0, tint, rnd)
+    cards.finish(name + "_leaf")
 
 
 def birch(name, seed, height=26.0, far=False):
-    """A pale, slender tree with a light crown: the contrast that keeps a
-    dense wood from reading as one green mass."""
+    """A pale, slender tree with a light, loose crown: the contrast that
+    keeps a dense wood from reading as one green mass."""
     rnd = random.Random(seed)
-    part = Part()
+    wood = Part()
 
     def bark(co, n):
-        # white bark with dark horizontal marks, a mossy foot
         mark = noise.noise(Vector((co.x * 3, co.y * 3, co.z * 2.2))) > 0.35
         c = scale(BIRCH_BARK, 0.35) if mark else BIRCH_BARK
         return mix(c, MOSS, max(0.0, 1.0 - co.z / 1.5))
     lean = Vector((rnd.uniform(-0.8, 0.8), rnd.uniform(-0.8, 0.8), 0))
-    pts = [Vector((0, 0, -0.3)) + lean * (i / 5) ** 2 + Vector((0, 0, height * 0.75 * i / 5)) for i in range(6)]
-    tube(part, pts, [0.55, 0.45, 0.38, 0.3, 0.22, 0.12], 4 if far else 6, bark)
-    paint = leaf_painter(BIRCH_TOP, mix(BIRCH_LOW, BIRCH_TOP, 0.5), BIRCH_LOW, height * 0.35, height * 1.05)
-    for i in range(4 if far else 9):
-        t = rnd.uniform(0.45, 1.0)
-        c = pts[int(t * 5)] + Vector((rnd.uniform(-2.2, 2.2), rnd.uniform(-2.2, 2.2), rnd.uniform(0.5, 3.0)))
-        s_ = height * rnd.uniform(0.09, 0.13)
-        blob(part, c, (s_, s_, s_ * 1.2), paint, subdiv=1 if far else 2, rough=0.3, seed=seed + i)
-    return finish(part, name + ("_far" if far else ""))
+    pts = [Vector((0, 0, -0.3)) + lean * (i / 5) ** 2 + Vector((0, 0, height * 0.82 * i / 5)) for i in range(6)]
+    tube(wood, pts, [0.6, 0.48, 0.4, 0.3, 0.22, 0.12], 4 if far else 6, bark)
+    tips = []
+    for k in range(3 if far else 6):
+        a = (k / 6) * math.tau + rnd.uniform(-0.3, 0.3)
+        d = Vector((math.cos(a), math.sin(a), rnd.uniform(0.9, 1.6)))
+        branches(wood, rnd, pts[rnd.randint(3, 5)], d, height * rnd.uniform(0.12, 0.17), 0.18, 0 if far else 1, tips, bark, 4)
+    finish(wood, name + ("_far" if far else "") + "_wood", ao_strength=0.4)
+    crown = pts[-1] - Vector((0, 0, height * 0.12))
+    cards = Cards()
+    tint = leaf_tint(BIRCH_TOP, mix(BIRCH_LOW, BIRCH_TOP, 0.5), BIRCH_LOW, crown.z - height * 0.3, crown.z + height * 0.25, rnd)
+    for (tp, ln) in tips:
+        r = ln * 0.7
+        cards.cluster(tp, (r, r, r * 1.1), 5 if far else 8, height * (0.14 if far else 0.1), crown, height * 0.3, tint, rnd, droop=0.15)
+    cards.finish(name + ("_far" if far else "") + "_leaf")
 
 
 def bush(name, seed, size=2.4):
-    """Understory: a low mound of leaf clumps, darker underneath."""
+    """Understory: a low mound of leaf cards."""
     rnd = random.Random(seed)
-    part = Part()
-    paint = leaf_painter(mix(LEAF_TOP, LEAF_MID, 0.3), LEAF_MID, LEAF_LOW, 0.0, size * 1.4)
-    for i in range(5):
-        a = rnd.uniform(0, 2 * math.pi)
-        r = rnd.uniform(0, size * 0.55)
-        c = (math.cos(a) * r, math.sin(a) * r, size * rnd.uniform(0.35, 0.7))
-        s_ = size * rnd.uniform(0.45, 0.65)
-        # two finer clumps on top, the rest coarse: bushes come by the hundred
-        blob(part, c, (s_, s_ * rnd.uniform(0.85, 1.1), s_ * 0.8), paint, subdiv=2 if i < 2 else 1,
-             rough=0.3, seed=seed + i, flatten=0.4)
-    return finish(part, name, ao_strength=0.6)
+    cards = Cards()
+    tint = leaf_tint(mix(LEAF_TOP, LEAF_MID, 0.3), LEAF_MID, LEAF_LOW, 0.0, size * 1.4, rnd)
+    crown = Vector((0, 0, size * 0.2))
+    for i in range(4):
+        a = rnd.uniform(0, math.tau)
+        r = rnd.uniform(0, size * 0.5)
+        c = Vector((math.cos(a) * r, math.sin(a) * r, size * rnd.uniform(0.4, 0.7)))
+        s_ = size * rnd.uniform(0.5, 0.7)
+        cards.cluster(c, (s_, s_, s_ * 0.75), 9, size * 0.7, crown, size, tint, rnd)
+    cards.finish(name + "_leaf")
 
 
 def stump(name):
@@ -511,8 +589,8 @@ bpy.ops.wm.read_factory_settings(use_empty=True)
 print("forest kit:")
 broadleaf("oak_a", 1)
 broadleaf("oak_a", 1, far=True)
-broadleaf("oak_b", 2, height=28.0, top=LEAF_B_TOP, low=LEAF_B_LOW)
-broadleaf("oak_b", 2, height=28.0, far=True, top=LEAF_B_TOP, low=LEAF_B_LOW)
+broadleaf("oak_b", 7, height=28.0, top=LEAF_B_TOP, low=LEAF_B_LOW)
+broadleaf("oak_b", 7, height=28.0, far=True, top=LEAF_B_TOP, low=LEAF_B_LOW)
 conifer("conifer", 3)
 conifer("conifer", 3, far=True)
 canopy_clump("clump")
@@ -529,11 +607,105 @@ bell("bell")
 spike("spike")
 bedleaf("bedleaf")
 
+# ------------------------------------------------------------------ export
+def write_glb(path):
+    """Write every mesh as a quantized glTF (KHR_mesh_quantization): 16-bit
+    positions dequantized by the node's scale and translation, 8-bit
+    normals, UVs and colours, 16-bit indices. About a quarter of what the
+    stock exporter writes in 32-bit floats, and still a plain glTF that
+    Blender and any viewer open — no decoder needed at runtime.
+    Blender is Z up, glTF Y up: (x, y, z) -> (x, z, -y)."""
+    import json, struct
+    bin_, views, accessors, meshes, nodes = bytearray(), [], [], [], []
+
+    def view(data, stride=None, target=None):
+        while len(bin_) % 4:
+            bin_.append(0)
+        v = {"buffer": 0, "byteOffset": len(bin_), "byteLength": len(data)}
+        if stride:
+            v["byteStride"] = stride
+        if target:
+            v["target"] = target
+        bin_.extend(data)
+        views.append(v)
+        return len(views) - 1
+
+    def accessor(vi, ctype, count, typ, normalized=False, mn=None, mx=None):
+        a = {"bufferView": vi, "componentType": ctype, "count": count, "type": typ}
+        if normalized:
+            a["normalized"] = True
+        if mn is not None:
+            a["min"], a["max"] = mn, mx
+        accessors.append(a)
+        return len(accessors) - 1
+
+    for obj in sorted(bpy.data.objects, key=lambda o: o.name):
+        me = obj.data
+        me.calc_loop_triangles()
+        n = len(me.vertices)
+        P = [(v.co.x, v.co.z, -v.co.y) for v in me.vertices]
+        lo = [min(p[i] for p in P) for i in range(3)]
+        hi = [max(p[i] for p in P) for i in range(3)]
+        sc = [max((hi[i] - lo[i]) / 2, 1e-6) for i in range(3)]
+        mid = [(hi[i] + lo[i]) / 2 for i in range(3)]
+        q = bytearray()
+        for p in P:
+            q += struct.pack("<hhhh", *[round((p[i] - mid[i]) / sc[i] * 32767) for i in range(3)], 0)
+        attrs = {"POSITION": accessor(view(q, 8, 34962), 5122, n, "VEC3", True, [-1, -1, -1], [1, 1, 1])}
+
+        if me.has_custom_normals:
+            acc = [[0.0, 0.0, 0.0] for _ in range(n)]
+            for li, l in enumerate(me.loops):
+                cn = me.corner_normals[li].vector
+                a_ = acc[l.vertex_index]
+                a_[0] += cn.x; a_[1] += cn.z; a_[2] -= cn.y
+            nb = bytearray()
+            for a_ in acc:
+                ln = math.sqrt(sum(c * c for c in a_)) or 1.0
+                nb += struct.pack("<bbbb", *[round(c / ln * 127) for c in a_], 0)
+            attrs["NORMAL"] = accessor(view(nb, 4, 34962), 5120, n, "VEC3", True)
+
+        if me.uv_layers:
+            uv = [(0.0, 0.0)] * n
+            for li, l in enumerate(me.loops):
+                u = me.uv_layers[0].data[li].uv
+                uv[l.vertex_index] = (u.x, 1.0 - u.y)
+            ub = bytearray()
+            for u in uv:
+                ub += struct.pack("<BBBB", round(u[0] * 255), round(u[1] * 255), 0, 0)
+            attrs["TEXCOORD_0"] = accessor(view(ub, 4, 34962), 5121, n, "VEC2", True)
+
+        if me.color_attributes:
+            ca = me.color_attributes.active_color or me.color_attributes[0]
+            cb = bytearray()
+            for i in range(n):
+                c = ca.data[i].color
+                cb += struct.pack("<BBBB", *[round(max(0, min(1, x)) * 255) for x in c[:3]], 255)
+            attrs["COLOR_0"] = accessor(view(cb, 4, 34962), 5121, n, "VEC4", True)
+
+        ib = bytearray()
+        for t in me.loop_triangles:
+            ib += struct.pack("<HHH", *t.vertices)
+        idx = accessor(view(ib, None, 34963), 5123, len(me.loop_triangles) * 3, "SCALAR")
+        meshes.append({"name": obj.name, "primitives": [{"attributes": attrs, "indices": idx}]})
+        nodes.append({"name": obj.name, "mesh": len(meshes) - 1, "translation": mid, "scale": sc})
+
+    gltf = {
+        "asset": {"version": "2.0", "generator": "tools/blender/forest.py"},
+        "extensionsUsed": ["KHR_mesh_quantization"], "extensionsRequired": ["KHR_mesh_quantization"],
+        "scene": 0, "scenes": [{"nodes": list(range(len(nodes)))}], "nodes": nodes, "meshes": meshes,
+        "accessors": accessors, "bufferViews": views, "buffers": [{"byteLength": len(bin_)}],
+    }
+    js = json.dumps(gltf, separators=(",", ":")).encode()
+    js += b" " * (-len(js) % 4)
+    while len(bin_) % 4:
+        bin_.append(0)
+    with open(path, "wb") as f:
+        f.write(struct.pack("<III", 0x46546C67, 2, 12 + 8 + len(js) + 8 + len(bin_)))
+        f.write(struct.pack("<II", len(js), 0x4E4F534A) + js)
+        f.write(struct.pack("<II", len(bin_), 0x004E4942) + bytes(bin_))
+
+
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
-bpy.ops.export_scene.gltf(
-    filepath=OUT, export_format="GLB",
-    export_normals=False, export_texcoords=False, export_materials="NONE",
-    export_vertex_color="ACTIVE", export_all_vertex_colors=False,
-    export_yup=True, export_apply=True,
-)
+write_glb(OUT)
 print(f"wrote {OUT}: {os.path.getsize(OUT) / 1024:.0f} KB")

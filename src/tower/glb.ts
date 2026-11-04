@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 
 /* A reader for the glTF binaries tools/blender writes, and nothing more:
-   named meshes, one primitive each, with POSITION, an optional COLOR_0 and
-   indices — no materials, textures, skins or node transforms (the exporter
-   applies them). Anything else in a file is ignored rather than guessed at.
+   named meshes, one primitive each, with POSITION and optional NORMAL,
+   TEXCOORD_0 and COLOR_0, plain or quantized (KHR_mesh_quantization: the
+   node's scale and translation place the positions), and indices — no
+   materials, textures or skins. Anything else in a file is ignored rather than guessed at.
    Returns the meshes by name, with plain BufferGeometry the caller instances. */
 
 const COMPONENT: Record<number, { array: any; bytes: number; max: number }> = {
@@ -51,20 +52,41 @@ export async function loadGlb(url: string): Promise<Record<string, THREE.Mesh>> 
     return { data: out, n, c, normalized: !!a.normalized };
   };
 
+  // Any attribute as plain floats, dequantized if it was stored normalized.
+  const floats = (i: number) => {
+    const a = accessor(i);
+    if (a.data instanceof Float32Array) return a;
+    const out = new Float32Array(a.data.length);
+    const k = a.normalized ? 1 / a.c.max : 1;
+    for (let j = 0; j < out.length; j++) out[j] = Math.max(-1, a.data[j] * k);
+    return { ...a, data: out };
+  };
+
   const meshes: Record<string, THREE.Mesh> = {};
   for (const node of json.nodes || []) {
     if (node.mesh === undefined) continue;
     const prim = json.meshes[node.mesh].primitives[0];
     const geo = new THREE.BufferGeometry();
-    const pos = accessor(prim.attributes.POSITION);
-    geo.setAttribute('position', new THREE.BufferAttribute(pos.data, 3));
+    /* Positions may be quantized (KHR_mesh_quantization): stored as
+       normalized 16-bit and placed by the node's scale and translation. */
+    const pos = floats(prim.attributes.POSITION).data as Float32Array;
+    const sc = node.scale || [1, 1, 1], tr = node.translation || [0, 0, 0];
+    for (let j = 0; j < pos.length; j += 3) {
+      pos[j] = pos[j] * sc[0] + tr[0]; pos[j + 1] = pos[j + 1] * sc[1] + tr[1]; pos[j + 2] = pos[j + 2] * sc[2] + tr[2];
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    if (prim.attributes.NORMAL !== undefined) {
+      geo.setAttribute('normal', new THREE.BufferAttribute(floats(prim.attributes.NORMAL).data, 3));
+    }
+    if (prim.attributes.TEXCOORD_0 !== undefined) {
+      geo.setAttribute('uv', new THREE.BufferAttribute(floats(prim.attributes.TEXCOORD_0).data, 2));
+    }
     if (prim.attributes.COLOR_0 !== undefined) {
-      const col = accessor(prim.attributes.COLOR_0);
+      const col = floats(prim.attributes.COLOR_0);
       // keep RGB only; three wants itemSize 3 unless asked for alpha
       const rgb = new Float32Array((col.data.length / col.n) * 3);
-      const k = col.c.max === 1 ? 1 : 1 / col.c.max;
       for (let v = 0, w = 0; v < col.data.length; v += col.n, w += 3) {
-        rgb[w] = col.data[v] * k; rgb[w + 1] = col.data[v + 1] * k; rgb[w + 2] = col.data[v + 2] * k;
+        rgb[w] = col.data[v]; rgb[w + 1] = col.data[v + 1]; rgb[w + 2] = col.data[v + 2];
       }
       geo.setAttribute('color', new THREE.BufferAttribute(rgb, 3));
     }

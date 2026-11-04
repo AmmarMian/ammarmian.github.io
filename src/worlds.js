@@ -1179,19 +1179,66 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
         if (!gg.attributes.normal) gg.computeVertexNormals();
         return gg;
       };
-      /* Foliage and bark share one material: the colour is in the vertices.
-         The sway grows with height so trunks stay planted and crowns move. */
-      const treeMat = patchStd(new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1 }), {
-        occluder: true, dither: true, near: [10, 22],
-        vert: `
+      /* The sway grows with height so trunks stay planted and crowns move;
+         wood and leaves share it, so a crown never slides off its limbs. */
+      const treeSway = `
           vec3 base = (modelMatrix * wIM * vec4(0.0,0.0,0.0,1.0)).xyz;
           float k = smoothstep(6.0, 26.0, position.y);
           float sway = sin(uT * 0.34 + base.x * 0.16 + base.z * 0.13) * 0.5
                      + sin(uT * 0.68 + base.z * 0.4) * 0.15;
           transformed.x += sway * 0.45 * k * uWind;
           transformed.z += sway * 0.25 * k * uWind;
-        `,
+      `;
+      const treeMat = patchStd(new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1 }), {
+        occluder: true, dither: true, near: [10, 22], vert: treeSway,
       });
+
+      /* Leaves: alpha-cut cards with a drawn leaf texture, their normals bent
+         to the crown's sphere in Blender so a crown lights as one soft volume.
+         Double-sided, but without three's flip of the normal on back faces —
+         that flip would turn every card facing away from the eye dark and
+         break the volume. A little self-light keeps the shade side green
+         rather than black, the way light through leaves does. */
+      const leafAtlas = (() => {
+        const S = 256, c = document.createElement('canvas');
+        c.width = c.height = S;
+        const x = c.getContext('2d');
+        x.fillStyle = '#fff';
+        x.strokeStyle = '#fff';
+        for (let cell = 0; cell < 4; cell++) {
+          const ox = (cell % 2) * 128, oy = Math.floor(cell / 2) * 128;
+          for (let i = 0; i < 15; i++) {
+            const a = (i / 15) * Math.PI * 2 + Math.random() * 0.5;
+            const d = 10 + Math.random() * 42;
+            const lx = ox + 64 + Math.cos(a) * d, ly = oy + 64 + Math.sin(a) * d * 0.9;
+            x.save();
+            x.translate(lx, ly);
+            x.rotate(a + Math.PI / 2 + (Math.random() - 0.5) * 0.6);
+            x.beginPath();
+            x.ellipse(0, 0, 5 + Math.random() * 4, 10 + Math.random() * 6, 0, 0, Math.PI * 2);
+            x.fill();
+            x.restore();
+          }
+          x.beginPath(); x.ellipse(ox + 64, oy + 64, 20, 22, 0, 0, Math.PI * 2); x.fill();
+        }
+        const t = new THREE.CanvasTexture(c);
+        t.colorSpace = THREE.SRGBColorSpace;
+        return t;
+      })();
+      const leafMat = patchStd(new THREE.MeshStandardMaterial({
+        map: leafAtlas, alphaTest: 0.5, side: THREE.DoubleSide, vertexColors: true, roughness: 1,
+      }), {
+        occluder: true, dither: true, near: [10, 22], vert: treeSway,
+        emis: 'totalEmissiveRadiance += diffuseColor.rgb * 0.14;',
+      });
+      {
+        const prev = leafMat.onBeforeCompile;
+        leafMat.onBeforeCompile = (sh, r) => {
+          prev(sh, r);
+          sh.fragmentShader = sh.fragmentShader.replace('#include <normal_fragment_begin>',
+            THREE.ShaderChunk.normal_fragment_begin.replace('normal *= faceDirection;', ''));
+        };
+      }
       const groundMat = patchStd(new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1 }),
         { occluder: true, dither: true, near: [6, 14] });
       const fernMat = patchStd(new THREE.MeshStandardMaterial({
@@ -1204,14 +1251,21 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
         const m = new THREE.InstancedMesh(geo(name), mat, n);
         m.count = 0;
         m.frustumCulled = false;
-        m.castShadow = /^(oak_a|oak_b|birch|conifer)$/.test(name);
         m.name = 'forest_' + name;
         flora.add(m);
         return m;
       };
       const put = (m, x, y, z, yaw, s, tilt = 0.05) => {
         _e.set(rnd(tilt, -tilt), yaw, rnd(tilt, -tilt));
-        m.setMatrixAt(m.count++, _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e), _s.set(s, s, s)));
+        _m4.compose(_v.set(x, y, z), _q.setFromEuler(_e), _s.set(s, s, s));
+        if (m.isTree) { m.wood.setMatrixAt(m.count, _m4); m.leaf.setMatrixAt(m.count, _m4); m.count++; m.wood.count = m.leaf.count = m.count; }
+        else m.setMatrixAt(m.count++, _m4);
+      };
+      // a tree is two instanced meshes, wood and leaves, on one set of matrices
+      const tree = (name, n) => {
+        const wood = placed(name + '_wood', treeMat, n), leaf = placed(name + '_leaf', leafMat, n);
+        leaf.castShadow = wood.castShadow = !/_far$/.test(name);
+        return { isTree: true, wood, leaf, count: 0, cap: n };
       };
 
       /* A dense wood round a glade. The whole-tower camera orbits some 70 m
@@ -1225,7 +1279,7 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
          only the full-detail ones cast shadows. */
       const species = ['oak_a', 'oak_b', 'birch', 'conifer'];
       const T = {};
-      for (const sp of species) { T[sp] = placed(sp, treeMat, 70); T[sp + '_far'] = placed(sp + '_far', treeMat, 110); }
+      for (const sp of species) { T[sp] = tree(sp, 70); T[sp + '_far'] = tree(sp + '_far', 110); }
       const pick = (w) => { let r = Math.random(); for (let i = 0; i < w.length; i++) { r -= w[i]; if (r < 0) return species[i]; } return species[0]; };
       const plant = (n, dLo, dHi, sLo, sHi, w, light = false) => {
         for (let i = 0, k = 0; i < n * 8 && k < n; i++) {
@@ -1233,7 +1287,7 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
           const x = Math.cos(a) * d, z = Math.sin(a) * d;
           const sp = pick(w);
           const m = T[d < 115 && !light ? sp : sp + '_far'];
-          if (m.count >= m.instanceMatrix.count) continue;
+          if (m.count >= m.cap) continue;
           put(m, x, groundY(x, z) - 0.3, z, rnd(6.28), rnd(sHi, sLo));
           k++;
         }
@@ -1245,7 +1299,7 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
 
       /* a ceiling of leaves over everything, so the glade is roofed and the
          sun comes through in shafts rather than flooding in */
-      const C = placed('clump', treeMat, 110);
+      const C = placed('clump_leaf', leafMat, 110);
       while (C.count < 110) {
         // high enough that the observatory's own view is under it, not in it
         const a = rnd(6.28), rr = 18 + Math.sqrt(Math.random()) * 95;
@@ -1260,8 +1314,8 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
           put(m, x, groundY(x, z), z, rnd(6.28), rnd(smax, smin), 0.1);
         }
       };
-      scatter(placed('bush_a', groundMat, 170), 170, 14, 170, 0.9, 1.9);
-      scatter(placed('bush_b', groundMat, 110), 110, 18, 190, 0.9, 1.7);
+      scatter(placed('bush_a_leaf', leafMat, 170), 170, 14, 170, 0.9, 1.9);
+      scatter(placed('bush_b_leaf', leafMat, 110), 110, 18, 190, 0.9, 1.7);
       scatter(placed('stump', groundMat, 9), 9, 18, 110, 0.7, 1.1);
       scatter(placed('log', groundMat, 10), 10, 22, 120, 0.8, 1.3);
       scatter(placed('fern', fernMat, 760), 760, 13, 150, 1.8, 3.4);
