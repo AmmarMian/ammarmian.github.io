@@ -30,7 +30,7 @@ fn luma(c: vec3f) -> f32 { return dot(c, vec3f(0.299, 0.587, 0.114)); }
   let dr = load(lp + vec2i(1, 0)).a;
   let du = load(lp + vec2i(0, -1)).a;
   let dd = load(lp + vec2i(0, 1)).a;
-  let thr = 4.0 / 700.0;
+  let thr = 4.0 / 800.0;
   let behind = max(max(d - dl, d - dr), max(d - du, d - dd));
   if (behind > thr) {
     col = col * vec3f(0.42, 0.52, 0.55) + vec3f(0.0, 0.015, 0.02);

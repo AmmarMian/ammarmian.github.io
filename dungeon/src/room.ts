@@ -28,6 +28,7 @@ export interface Light { pos: [number, number, number]; radius: number; color: [
 
 export interface Room {
   grid: Grid;
+  bricks: Uint32Array<ArrayBuffer>;
   w: number;
   d: number;
   windows: Window[];
@@ -102,7 +103,7 @@ export function buildRoom(seed = 7, W = 256, D = 208): Room {
 
   /* ---- pool mask: a kidney-shaped pond across the front of the room ---- */
   const pool = (x: number, z: number) => {
-    if (x < WALL_T + 3 || z < WALL_T + 3 || x > W - 9 || z > D - 9) return false;
+    if (x < WALL_T + 3 || z < WALL_T + 3 || x > W - WALL_T - 9 || z > D - WALL_T - 9) return false;
     const n = fbm(x * 0.045, z * 0.045, seed) - 0.5;
     const cx = X(104), cz = Z(102);
     const dx = (x - cx) / X(50), dz = (z - cz) / Z(40);
@@ -156,10 +157,10 @@ export function buildRoom(seed = 7, W = 256, D = 208): Room {
       distPool[xx + W * zz] = d;
     }
 
-  for (let z = WALL_T; z < D; z++) for (let x = WALL_T; x < W; x++) {
+  for (let z = WALL_T; z < D - WALL_T; z++) for (let x = WALL_T; x < W - WALL_T; x++) {
     if (g.get(x, 0, z) === M.POOLBED) continue;
     const dp = distPool[x + W * z];
-    const dw = Math.min(x - WALL_T, z - WALL_T);
+    const dw = Math.min(x - WALL_T, z - WALL_T, W - WALL_T - 1 - x, D - WALL_T - 1 - z);
     const n = fbm(x * 0.08, z * 0.08, seed + 21);
     const moss = n + Math.max(0, 1 - dp / 14) * 0.55 + Math.max(0, 1 - dw / 10) * 0.25;
     if (moss > 0.72) {
@@ -195,25 +196,30 @@ export function buildRoom(seed = 7, W = 256, D = 208): Room {
     const off = (course & 1) * 6;
     return (y % 6 === 0) || ((u + off) % 12 === 0);
   };
+  // Four walls. The two facing the camera are cut down by the renderer, so
+  // the room can be turned to any side.
   for (let y = 0; y < WALL_H; y++) {
-    for (let z = 0; z < D; z++) for (let x = 0; x < WALL_T; x++) {
-      const face = x === WALL_T - 1;
+    for (let z = 0; z < D; z++) for (let t = 0; t < WALL_T; t++) {
       const m = brick(z, y) ? M.MORTAR : M.BRICK;
-      if (face && m === M.MORTAR) continue; // recessed
-      g.set(x, y, z, m);
+      const face = t === WALL_T - 1;
+      if (!(face && m === M.MORTAR && z >= WALL_T && z < D - WALL_T)) { g.set(t, y, z, m); g.set(W - 1 - t, y, z, m); }
     }
-    for (let x = 0; x < W; x++) for (let z = 0; z < WALL_T; z++) {
-      const face = z === WALL_T - 1;
+    for (let x = 0; x < W; x++) for (let t = 0; t < WALL_T; t++) {
       const m = brick(x, y) ? M.MORTAR : M.BRICK;
-      if (face && m === M.MORTAR && x >= WALL_T) continue;
-      g.set(x, y, z, m);
+      const face = t === WALL_T - 1;
+      if (!(face && m === M.MORTAR && x >= WALL_T && x < W - WALL_T)) { g.set(x, y, t, m); g.set(x, y, D - 1 - t, m); }
     }
   }
-  // corner pillar
-  g.box(WALL_T - 1, 0, WALL_T - 1, WALL_T + 5, WALL_H + 2, WALL_T + 5, (x, y, z) => (y % 8 === 0 ? M.MORTAR : M.STEP));
+  // corner pillars
+  const pillar = (x0: number, z0: number) =>
+    g.box(x0, 0, z0, x0 + 6, WALL_H + 2, z0 + 6, (x, y, z) => (y % 8 === 0 ? M.MORTAR : M.STEP));
+  pillar(WALL_T - 1, WALL_T - 1); pillar(W - WALL_T - 5, WALL_T - 1);
+  pillar(WALL_T - 1, D - WALL_T - 5); pillar(W - WALL_T - 5, D - WALL_T - 5);
   // cap stones on wall tops
   g.box(0, WALL_H, 0, WALL_T + 1, WALL_H + 2, D, M.STEP);
+  g.box(W - WALL_T - 1, WALL_H, 0, W, WALL_H + 2, D, M.STEP);
   g.box(0, WALL_H, 0, W, WALL_H + 2, WALL_T + 1, M.STEP);
+  g.box(0, WALL_H, D - WALL_T - 1, W, WALL_H + 2, D, M.STEP);
 
   /* ---- arched windows in the left wall ---- */
   for (const [z0, z1, y0, y1] of windows) {
@@ -239,7 +245,7 @@ export function buildRoom(seed = 7, W = 256, D = 208): Room {
   const sz0 = WALL_T, sw = 16, steps = 12;
   const stepTop = (i: number) => FLOOR + 3 + i * 3;
   for (let i = 0; i < steps; i++) {
-    const x1 = W - i * 4, x0 = x1 - 4;
+    const x1 = W - WALL_T - i * 4, x0 = x1 - 4;
     const ytop = stepTop(i);
     g.box(x0, FLOOR - 1, sz0, x1, ytop, sz0 + sw, (x, y, z) => {
       if (y === ytop - 1) return M.STEP;
@@ -249,8 +255,8 @@ export function buildRoom(seed = 7, W = 256, D = 208): Room {
   }
   // landing under the door
   const landTop = stepTop(steps - 1);
-  const doorX0 = W - steps * 4 - 18;
-  g.box(doorX0 - 2, FLOOR - 1, sz0, W - steps * 4, landTop, sz0 + sw, (x, y, z) =>
+  const doorX0 = W - WALL_T - steps * 4 - 18;
+  g.box(doorX0 - 2, FLOOR - 1, sz0, W - WALL_T - steps * 4, landTop, sz0 + sw, (x, y, z) =>
     y === landTop - 1 ? M.STEP : (z === sz0 + sw - 1 || x === doorX0 - 2) && (y % 6 === 0 || (x + z) % 8 === 0) ? M.MORTAR : M.BRICK);
   // dark doorway in the wall at the top of the stairs
   const doorY0 = landTop;
@@ -436,35 +442,33 @@ export function buildRoom(seed = 7, W = 256, D = 208): Room {
     g.set(x, ty + 4, z, M.SHROOM);
   }
 
-  /* ---- vines hanging from the wall tops ---- */
-  for (let z = WALL_T; z < D; z += 1) {
-    if (hash2(z, 0, 61) > 0.32) continue;
-    const len = 6 + Math.floor(hash2(z, 1, 62) * hash2(z, 2, 63) * 40);
-    for (let k = 0; k < len; k++) {
-      const y = WALL_H - k;
-      if (g.get(WALL_T, y, z)) break;
-      g.set(WALL_T, y, z, k % 4 === 3 ? M.LEAF : M.VINE);
-      if (k % 5 === 2) g.set(WALL_T, y, z + 1, M.LEAF_DARK);
+  /* ---- vines hanging from the wall tops, moss creeping up their feet ----
+     Each wall is walked along u; `at(u, y, k)` maps to the cell k voxels
+     into the room from that wall's inner face. */
+  const walls: { len: number; at: (u: number, y: number, k: number) => [number, number, number]; s: number }[] = [
+    { len: D, at: (u, y, k) => [WALL_T - 1 + k, y, u], s: 61 },
+    { len: W, at: (u, y, k) => [u, y, WALL_T - 1 + k], s: 64 },
+    { len: D, at: (u, y, k) => [W - WALL_T - k, y, u], s: 67 },
+    { len: W, at: (u, y, k) => [u, y, D - WALL_T - k], s: 70 },
+  ];
+  for (const wl of walls) {
+    for (let u = WALL_T; u < wl.len - WALL_T; u++) {
+      if (hash2(u, 0, wl.s) > 0.3) continue;
+      const len = 6 + Math.floor(hash2(u, 1, wl.s + 1) * hash2(u, 2, wl.s + 2) * 40);
+      for (let k = 0; k < len; k++) {
+        const y = WALL_H - k;
+        const [x, yy, z] = wl.at(u, y, 1);
+        if (g.get(x, yy, z)) break;
+        g.set(x, yy, z, k % 4 === 3 ? M.LEAF : M.VINE);
+        if (k % 5 === 2) { const [x2, , z2] = wl.at(u + 1, y, 1); if (!g.get(x2, yy, z2)) g.set(x2, yy, z2, M.LEAF_DARK); }
+      }
     }
-  }
-  for (let x = WALL_T; x < W; x += 1) {
-    if (hash2(x, 3, 64) > 0.3) continue;
-    const len = 6 + Math.floor(hash2(x, 4, 65) * hash2(x, 5, 66) * 40);
-    for (let k = 0; k < len; k++) {
-      const y = WALL_H - k;
-      if (g.get(x, y, WALL_T)) break;
-      g.set(x, y, WALL_T, k % 4 === 3 ? M.LEAF : M.VINE);
-      if (k % 5 === 2) g.set(x + 1, y, WALL_T, M.LEAF_DARK);
+    for (let y = 0; y < WALL_H + 2; y++) for (let u = 0; u < wl.len; u++) {
+      const n = fbm(u * 0.07, y * 0.09, wl.s + 30) + Math.max(0, 1 - (y - FLOOR) / 16) * 0.4;
+      const [x, , z] = wl.at(u, y, 0);
+      const [xi, , zi] = wl.at(u, y, 1);
+      if (n > 0.8 && g.get(x, y, z) && !g.get(xi, y, zi)) g.set(x, y, z, M.MOSS);
     }
-  }
-  // moss on the wall foot and on the wall caps
-  for (let y = 0; y < WALL_H + 2; y++) for (let z = 0; z < D; z++) {
-    const n = fbm(z * 0.07, y * 0.09, 91) + Math.max(0, 1 - (y - FLOOR) / 16) * 0.4;
-    if (n > 0.8 && g.get(WALL_T - 1, y, z) && !g.get(WALL_T, y, z)) g.set(WALL_T - 1, y, z, M.MOSS);
-  }
-  for (let y = 0; y < WALL_H + 2; y++) for (let x = 0; x < W; x++) {
-    const n = fbm(x * 0.07, y * 0.09, 92) + Math.max(0, 1 - (y - FLOOR) / 16) * 0.4;
-    if (n > 0.8 && g.get(x, y, WALL_T - 1) && !g.get(x, y, WALL_T)) g.set(x, y, WALL_T - 1, M.MOSS);
   }
   for (let z = 0; z < D; z++) for (let x = 0; x < W; x++) {
     const ty = g.top(x, z);
@@ -512,7 +516,39 @@ export function buildRoom(seed = 7, W = 256, D = 208): Room {
   root(false, X(28), 80, 103);
   if (W > 200) root(false, X(70), 80, 104);
 
-  return { grid: g, w: W, d: D, windows, lights };
+  return { grid: g, bricks: buildBricks(g), w: W, d: D, windows, lights };
+}
+
+export const BRICK = 8;
+/* Plants sway in the shader by up to SWAY voxels, so their bricks are dilated. */
+export const SWAY = 2;
+const PLANTS = new Set<number>([M.GRASS, M.LEAF, M.VINE, M.FLOWER_W, M.FLOWER_P, M.REED, M.GRASS_LIGHT, M.LEAF_DARK, M.CATTAIL]);
+
+/* Coarse occupancy, one u32 per 8x8x8 brick: bit 0 = something solid,
+   bit 1 = plants that may sway into it. Lets rays skip empty air. */
+export function buildBricks(g: Grid): Uint32Array<ArrayBuffer> {
+  const bw = Math.ceil(g.w / BRICK), bh = Math.ceil(H / BRICK), bd = Math.ceil(g.d / BRICK);
+  const out = new Uint32Array(bw * bh * bd);
+  const mark = (x: number, y: number, z: number, bit: number) => {
+    if (x < 0 || z < 0 || x >= g.w || z >= g.d) return;
+    out[(x >> 3) + bw * ((z >> 3) + bd * (y >> 3))] |= bit;
+  };
+  for (let y = 0; y < H; y++) for (let z = 0; z < g.d; z++) for (let x = 0; x < g.w; x++) {
+    const m = g.v[x + g.w * (z + g.d * y)];
+    if (!m) continue;
+    mark(x, y, z, 1);
+    if (PLANTS.has(m)) for (let dz = -SWAY; dz <= SWAY; dz += SWAY) for (let dx = -SWAY; dx <= SWAY; dx += SWAY) mark(x + dx, y, z + dz, 2);
+  }
+  return out;
+}
+
+/* The voxel bytes padded to whole u32s, then the bricks: the `vox` buffer. */
+export function packVoxels(room: Room): Uint32Array<ArrayBuffer> {
+  const words = Math.ceil(room.grid.v.length / 4);
+  const out = new Uint32Array(words + room.bricks.length);
+  new Uint8Array(out.buffer, 0, room.grid.v.length).set(room.grid.v);
+  out.set(room.bricks, words);
+  return out;
 }
 
 /* Windows then lights, as the vec4f array scene.wgsl reads (`meta`). */
@@ -527,9 +563,10 @@ export function packMeta(room: Room): Float32Array<ArrayBuffer> {
 /* The room-dependent part of the scene uniforms. */
 export function roomParams(room: Room) {
   return {
-    dims: [room.w, H, room.d],
-    center: [room.w / 2, 30, room.d / 2],
+    dims: [room.w, H, room.d] as [number, number, number],
     nWin: room.windows.length,
     nLights: room.lights.length,
   };
 }
+
+export const roomCenter = (room: Room): [number, number, number] => [room.w / 2, 26, room.d / 2];

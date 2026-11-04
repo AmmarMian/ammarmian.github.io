@@ -1,7 +1,8 @@
 // Isometric voxel room, ray-marched at low resolution.
 //
-// One fragment = one art pixel. The primary ray is orthographic (fixed 2:1
-// dimetric camera) and walks the voxel grid with a DDA; sun shadows, water
+// One fragment = one art pixel. The primary ray is orthographic (30 degree
+// pitch, any yaw) and walks the voxel grid with a two-level DDA: 8^3 bricks
+// let it skip empty air, then single voxels. Sun shadows, water
 // refraction and the light shafts are all derived from the same grid, so the
 // generator in room.ts is the only description of the room.
 
@@ -9,21 +10,37 @@ struct Params {
   center: vec3f,
   time: f32,
   dims: vec3f,     // room size in voxels
-  zoom: f32,
-  res: vec2f,
+  zoom: f32,       // art pixels per voxel unit
+  camR: vec3f,     // screen right
   nWin: f32,
+  camU: vec3f,     // screen up
   nLights: f32,
+  camD: vec3f,     // view direction
+  nParticles: f32,
+  cut: vec4f,      // 1 = wall faces the camera and is cut down: -x, +x, -z, +z
+  res: vec2f,
+  pad: vec2f,
 }
 
 @group(0) @binding(0) var<uniform> params: Params;
+// one byte per voxel, packed four to a u32, followed by one u32 per 8^3
+// brick: bit 0 solid, bit 1 swaying plants may reach it
 @group(0) @binding(1) var<storage, read> vox: array<u32>;
 // windows (z0, z1, y0, y1) first, then lights as (pos, radius), (colour, 0) pairs
 @group(0) @binding(2) var<storage, read> roomData: array<vec4f>;
+// two vec4 per particle, computed on the CPU each frame:
+// (screen x, screen y, depth t, kind) and (rgb, extra)
+@group(0) @binding(3) var<storage, read> particles: array<vec4f>;
+// particles binned into 16px screen tiles: tile offsets, then indices
+@group(0) @binding(4) var<storage, read> ptiles: array<u32>;
 
 const H: i32 = 80;
 const WATER_Y: f32 = 8.6;
 const WALL_T: f32 = 6.0;
 const WALL_TOP: f32 = 73.0;
+const FLOOR: i32 = 10;
+const CUT_Y: i32 = 14;       // walls facing the camera are cut down to this height
+const CAM_BACK: f32 = 600.0; // rays start this far behind the focus plane
 
 const M_POOLBED: u32 = 10u;
 const M_LILY: u32 = 11u;
@@ -31,11 +48,6 @@ const M_LANTERN: u32 = 18u;
 const M_CRYSTAL: u32 = 19u;
 const M_SHROOM: u32 = 25u;
 const M_DARK: u32 = 26u;
-
-// camera: yaw 45, pitch 30 (2:1 pixel lines)
-const CAM_D = vec3f(-0.61237244, -0.5, -0.61237244);
-const CAM_R = vec3f(0.70710678, 0.0, -0.70710678);
-const CAM_U = vec3f(-0.35355339, 0.8660254, -0.35355339);
 
 // towards the sun, which comes in through the windows of the x = 0 wall
 const SUN_L = vec3f(-0.7360, 0.6133, 0.2862);
@@ -115,6 +127,51 @@ fn mat(c: vec3i) -> u32 {
   return (vox[i >> 2u] >> ((i & 3u) * 8u)) & 0xffu;
 }
 
+// grass, leaves, vines, flowers, reeds, cattails
+const PLANTS: u32 = (1u << 6u) | (1u << 12u) | (1u << 13u) | (1u << 14u) | (1u << 15u) |
+                    (1u << 24u) | (1u << 28u) | (1u << 29u) | (1u << 30u);
+fn is_plant(m: u32) -> bool { return ((PLANTS >> m) & 1u) == 1u; }
+
+fn brick_flags(c: vec3i) -> u32 {
+  let bd = (dimsi() + 7) / 8;
+  let b = c >> vec3u(3u);
+  let d = dimsi();
+  let voxWords = u32(d.x * d.y * d.z + 3) / 4u;
+  return vox[voxWords + u32(b.x + bd.x * (b.z + bd.z * b.y))];
+}
+
+// Walls on the camera side are cut down so the room stays visible from any
+// angle. A couple of voxels inside the wall go too, taking the vines with it.
+fn hidden(c: vec3i) -> bool {
+  if (c.y < CUT_Y) { return false; }
+  let d = dimsi();
+  let band = i32(WALL_T) + 5; // wall, corner pillar, and what hangs on them
+  return (params.cut.x > 0.5 && c.x < band) || (params.cut.y > 0.5 && c.x >= d.x - band) ||
+         (params.cut.z > 0.5 && c.z < band) || (params.cut.w > 0.5 && c.z >= d.z - band);
+}
+
+// Wind. Grass bends more the higher up the blade; vines hanging from the
+// wall tops swing at their free end, along the wall they hang on. Offsets are
+// whole voxels so the sway reads as pixel animation, not as blur.
+fn sway(c: vec3i) -> vec3i {
+  let t = params.time;
+  let d = dimsi();
+  let fc = vec2f(c.xz);
+  let gust = sin(t * 0.7 + fc.x * 0.021 + fc.y * 0.013) * 0.5 + 0.5;
+  let w = sin(t * 1.9 + fc.x * 0.09 + fc.y * 0.05) * (0.55 + 0.6 * gust);
+  let nearX = c.x < i32(WALL_T) + 3 || c.x >= d.x - i32(WALL_T) - 3;
+  let nearZ = c.z < i32(WALL_T) + 3 || c.z >= d.z - i32(WALL_T) - 3;
+  if (c.y > FLOOR + 14 && (nearX || nearZ)) {
+    let free = clamp((WALL_TOP - f32(c.y)) / 26.0, 0.0, 1.0);
+    let a = round(w * free * 2.0);
+    if (nearX) { return vec3i(0, 0, i32(a)); }
+    return vec3i(i32(a), 0, 0);
+  }
+  let hgt = clamp(f32(c.y - FLOOR) / 6.0, 0.0, 1.0);
+  let a = w * hgt * 1.7;
+  return vec3i(i32(round(a)), 0, i32(round(a * 0.4)));
+}
+
 fn solid(c: vec3i) -> f32 {
   return select(0.0, 1.0, mat(c) != 0u);
 }
@@ -133,9 +190,16 @@ fn safe_inv(v: vec3f) -> vec3f {
     select(1e8, 1.0 / v.z, abs(v.z) > 1e-6));
 }
 
-// Amanatides & Woo. On a miss, `cell` is the first cell outside the grid,
-// which tells the caller which face the ray left through.
-fn trace(ro: vec3f, rd: vec3f, maxSteps: i32) -> Hit {
+fn cell_tmax(cell: vec3i, ro: vec3f, rd: vec3f, inv: vec3f) -> vec3f {
+  let tm = (vec3f(cell) + max(sign(rd), vec3f(0.0)) - ro) * inv;
+  return select(vec3f(1e9), tm, abs(rd) > vec3f(1e-6));
+}
+
+// Two-level Amanatides & Woo: empty 8^3 bricks are crossed in one jump.
+// `primary` turns on the camera-only effects (wall cutaway, swaying plants);
+// shadow rays see the room as it stands. On a miss, `cell` is the first cell
+// outside the grid, which tells the caller which face the ray left through.
+fn trace(ro: vec3f, rd: vec3f, maxSteps: i32, primary: bool) -> Hit {
   var h: Hit;
   h.m = 0u;
   h.t = 1e9;
@@ -150,21 +214,49 @@ fn trace(ro: vec3f, rd: vec3f, maxSteps: i32) -> Hit {
   let tmax = min(min(tf.x, tf.y), tf.z);
   if (tmax < max(tmin, 0.0)) { return h; }
   var t = max(tmin, 0.0);
-  let p = ro + rd * (t + 1e-4);
-  var cell = clamp(vec3i(floor(p)), vec3i(0), dimsi() - 1);
+  var cell = clamp(vec3i(floor(ro + rd * (t + 1e-4))), vec3i(0), dimsi() - 1);
   let stp = vec3i(sign(rd));
   let tDelta = abs(inv);
-  var tMax = (vec3f(cell) + max(sign(rd), vec3f(0.0)) - ro) * inv;
-  tMax = select(vec3f(1e9), tMax, abs(rd) > vec3f(1e-6));
+  var tMax = cell_tmax(cell, ro, rd, inv);
   var n = vec3f(0.0);
   if (tn.x >= tn.y && tn.x >= tn.z) { n = vec3f(-sign(rd.x), 0.0, 0.0); }
   else if (tn.y >= tn.z) { n = vec3f(0.0, -sign(rd.y), 0.0); }
   else { n = vec3f(0.0, 0.0, -sign(rd.z)); }
 
   for (var i = 0; i < maxSteps; i++) {
-    let m = mat(cell);
+    let flags = brick_flags(cell);
+    if (flags == 0u) {
+      // jump to where the ray leaves this brick
+      let b0 = vec3f((cell >> vec3u(3u)) * 8);
+      let tb = (b0 + max(sign(rd), vec3f(0.0)) * 8.0 - ro) * inv;
+      let tbs = select(vec3f(1e9), tb, abs(rd) > vec3f(1e-6));
+      var te = tbs.x;
+      n = vec3f(-sign(rd.x), 0.0, 0.0);
+      if (tbs.y < te) { te = tbs.y; n = vec3f(0.0, -sign(rd.y), 0.0); }
+      if (tbs.z < te) { te = tbs.z; n = vec3f(0.0, 0.0, -sign(rd.z)); }
+      t = te;
+      cell = vec3i(floor(ro + rd * (t + 1e-3)));
+      if (!inb(cell)) { break; }
+      tMax = cell_tmax(cell, ro, rd, inv);
+      continue;
+    }
+    var m = mat(cell);
+    var hc = cell;
+    if (primary) {
+      if (m != 0u && hidden(cell)) { m = 0u; }
+      if ((flags & 2u) != 0u && (m == 0u || is_plant(m))) {
+        let off = sway(cell);
+        if (any(off != vec3i(0))) {
+          // a plant voxel here has blown away; whatever blew in comes from upwind
+          let src = cell - off;
+          let ms = mat(src);
+          m = select(0u, ms, is_plant(ms) && !hidden(src));
+          hc = src;
+        }
+      }
+    }
     if (m != 0u) {
-      h.m = m; h.t = t; h.cell = cell; h.n = n;
+      h.m = m; h.t = t; h.cell = hc; h.n = n;
       return h;
     }
     if (tMax.x < tMax.y && tMax.x < tMax.z) {
@@ -187,7 +279,7 @@ fn sun_vis(cell: vec3i, n: vec3f) -> f32 {
   if (dot(n, SUN_L) <= 0.0) { return 0.0; }
   let o = vec3f(cell) + 0.5 + n * 0.51;
   if (o.y > WALL_TOP) { return 0.0; } // the roof we cut away still shades the wall tops
-  let h = trace(o, SUN_L, 260);
+  let h = trace(o, SUN_L, 260, false);
   if (h.m != 0u) { return 0.0; }
   return select(0.0, 1.0, h.cell.x < 0);
 }
@@ -310,8 +402,10 @@ fn background(px: vec2f) -> vec3f {
 
 fn miss_color(h: Hit, px: vec2f, ro: vec3f, rd: vec3f) -> vec3f {
   let pe = ro + rd * h.t;
-  if (h.cell.x < 0 && pe.y < WALL_TOP) { return vec3f(0.80, 0.93, 0.62); } // through a window: bright foliage
-  if (h.cell.z < 0) { return vec3f(0.02, 0.03, 0.04); }          // the stairwell beyond the door
+  if (h.cell.y < 1000 && pe.y < WALL_TOP && pe.y > f32(CUT_Y)) {
+    if (h.cell.x < 0 && in_window(vec2f(pe.z, pe.y)) > 0.0) { return vec3f(0.80, 0.93, 0.62); } // a window: bright foliage
+    if (h.cell.z < 0) { return vec3f(0.02, 0.03, 0.04); }  // the stairwell beyond the door
+  }
   return background(px);
 }
 
@@ -319,29 +413,13 @@ fn is_water(c: vec3i) -> bool {
   return mat(vec3i(c.x, 0, c.z)) == M_POOLBED;
 }
 
-struct Firefly { pos: vec3f, glow: f32 }
-
-fn firefly(i: i32) -> Firefly {
-  let fi = f32(i);
-  let base = vec3f(
-    14.0 + (params.dims.x - 28.0) * hash3(vec3i(i, 1, 5)),
-    14.0 + 30.0 * hash3(vec3i(i, 2, 5)),
-    14.0 + (params.dims.z - 28.0) * hash3(vec3i(i, 3, 5)));
-  let t = params.time * (0.25 + 0.2 * hash3(vec3i(i, 4, 5)));
-  let off = vec3f(sin(t + fi) * 7.0, sin(t * 1.7 + fi * 2.0) * 3.0, cos(t * 0.8 + fi * 3.0) * 7.0);
-  var f: Firefly;
-  f.pos = base + off;
-  f.glow = smoothstep(0.2, 0.9, 0.5 + 0.5 * sin(params.time * (1.0 + hash3(vec3i(i, 6, 5))) + fi * 4.0));
-  return f;
-}
-
 @fragment fn fs_main(@builtin(position) frag: vec4f) -> @location(0) vec4f {
   let px = floor(frag.xy) + 0.5;
   let s = (px - params.res * 0.5) / params.zoom;
-  let ro = params.center + CAM_R * s.x - CAM_U * s.y - CAM_D * 300.0;
-  let rd = CAM_D;
+  let ro = params.center + params.camR * s.x - params.camU * s.y - params.camD * CAM_BACK;
+  let rd = params.camD;
 
-  let h = trace(ro, rd, 900);
+  let h = trace(ro, rd, 700, true);
   var col: vec3f;
   var depth = 1.0;
   var tSurf = h.t;
@@ -359,7 +437,7 @@ fn firefly(i: i32) -> Firefly {
       vnoise(pw.xz * 0.6 + vec2f(params.time * 0.8, 0.0)) - 0.5,
       vnoise(pw.zx * 0.6 + vec2f(0.0, params.time * 0.7)) - 0.5);
     let rd2 = normalize(rd + vec3f(wob.x, 0.0, wob.y) * 0.25);
-    let h2 = trace(pw, rd2, 80);
+    let h2 = trace(pw, rd2, 60, true);
     var under = vec3f(0.05, 0.2, 0.2);
     var dpt = 6.0;
     if (h2.m != 0u) {
@@ -415,7 +493,7 @@ fn firefly(i: i32) -> Firefly {
   } else {
     col = miss_color(h, px, ro, rd);
   }
-  if (h.m != 0u || hitsWater) { depth = clamp(tSurf / 700.0, 0.0, 0.999); }
+  if (h.m != 0u || hitsWater) { depth = clamp((tSurf - CAM_BACK + 400.0) / 800.0, 0.0, 0.999); }
 
   // light shafts: march the air in front of the surface
   let inv = safe_inv(rd);
@@ -424,7 +502,7 @@ fn firefly(i: i32) -> Firefly {
   let tIn = max(max(min(a0.x, a1.x), min(a0.y, a1.y)), min(a0.z, a1.z));
   let tOut = min(tSurf, min(min(max(a0.x, a1.x), max(a0.y, a1.y)), max(a0.z, a1.z)));
   if (tOut > tIn) {
-    let N = 40;
+    let N = 24;
     let bayer = fract(dot(floor(px), vec2f(0.5, 0.25)) + fract(floor(px.y) * 0.5) * 0.5);
     let dt = (tOut - tIn) / f32(N);
     var acc = 0.0;
@@ -437,13 +515,15 @@ fn firefly(i: i32) -> Firefly {
       let sh = shaft(p);
       acc += sh;
       // ground mist: hugs the water and the flagstones, drifts slowly
-      let over = select(0.45, 1.0, is_water(vec3i(i32(p.x), 0, i32(p.z))));
-      let hfall = 1.0 - smoothstep(WATER_Y, WATER_Y + 9.0 * over + 3.0, p.y);
-      let n = vnoise(p.xz * 0.05 + vec2f(params.time * 0.07, params.time * 0.03))
-            + 0.5 * vnoise(p.xz * 0.13 - vec2f(params.time * 0.05, 0.0) + p.y * 0.1);
-      let m = hfall * over * smoothstep(0.55, 1.2, n);
-      mist += m;
-      litMist += m * sh;
+      if (p.y < WATER_Y + 12.0) {
+        let over = select(0.45, 1.0, is_water(vec3i(i32(p.x), 0, i32(p.z))));
+        let hfall = 1.0 - smoothstep(WATER_Y, WATER_Y + 9.0 * over + 3.0, p.y);
+        let n = vnoise(p.xz * 0.05 + vec2f(params.time * 0.07, params.time * 0.03))
+              + 0.5 * vnoise(p.xz * 0.13 - vec2f(params.time * 0.05, 0.0) + p.y * 0.1);
+        let m = hfall * over * smoothstep(0.55, 1.2, n);
+        mist += m;
+        litMist += m * sh;
+      }
       // thin overall haze, denser low down
       haze += 0.25 + 0.75 * (1.0 - smoothstep(10.0, 50.0, p.y));
     }
@@ -460,60 +540,31 @@ fn firefly(i: i32) -> Firefly {
     col += vec3f(1.0, 1.0, 0.8) * mote * smoothstep(0.03, 0.12, acc) * 0.8;
   }
 
-  // drifting dust and pollen: dim in the gloom, glinting where a beam catches them
-  for (var i = 0; i < 160; i++) {
-    let fi = f32(i);
-    let span = vec3f(params.dims.x - 12.0, 48.0, params.dims.z - 12.0);
-    let seed = vec3f(hash3(vec3i(i, 1, 21)), hash3(vec3i(i, 2, 21)), hash3(vec3i(i, 3, 21)));
-    var q = seed * span + vec3f(6.0, 10.0, 6.0);
-    // slow sinking drift with a wobble, wrapping vertically
-    q.y = 10.0 + fract((q.y - 10.0 - params.time * (0.6 + seed.x * 0.8)) / 48.0) * 48.0;
-    q.x += sin(params.time * 0.4 + fi) * 3.0 + params.time * 0.8;
-    q.z += cos(params.time * 0.3 + fi * 1.7) * 3.0;
-    q.x = 6.0 + fract((q.x - 6.0) / span.x) * span.x;
-    let rel = q - params.center;
-    let sp = params.res * 0.5 + vec2f(dot(rel, CAM_R), -dot(rel, CAM_U)) * params.zoom;
-    if (any(abs(floor(px) - floor(sp)) > vec2f(0.0))) { continue; }
-    if (dot(q - ro, rd) > tSurf) { continue; }
-    let lit = shaft(q);
-    col += mix(vec3f(0.22, 0.32, 0.26), vec3f(1.0, 0.98, 0.72), clamp(lit * 2.0, 0.0, 1.0)) * (0.5 + lit * 1.5);
-  }
-
-  // leaves spiralling down from the vines and the tops of the walls
-  for (var i = 0; i < 16; i++) {
-    let fi = f32(i);
-    let period = 9.0 + 6.0 * hash3(vec3i(i, 1, 31));
-    let tt = params.time + period * hash3(vec3i(i, 2, 31));
-    let cyc = floor(tt / period);
-    let a = fract(tt / period);
-    let ci = vec3i(i, i32(cyc), 33);
-    let start = vec3f(10.0 + (params.dims.x - 20.0) * hash3(ci), 70.0, 10.0 + (params.dims.z - 20.0) * hash3(ci + vec3i(0, 0, 1)));
-    let q = start + vec3f(sin(a * 9.0 + fi) * 5.0 + a * 10.0, -a * 62.0, cos(a * 7.0 + fi) * 5.0);
-    if (q.y < 9.0) { continue; }
-    let rel = q - params.center;
-    let sp = params.res * 0.5 + vec2f(dot(rel, CAM_R), -dot(rel, CAM_U)) * params.zoom;
-    let o = floor(px) - floor(sp);
-    let flip = sin(a * 40.0 + fi) > 0.0;
-    let wide = select(vec2f(1.0, 0.0), vec2f(0.0, 1.0), flip);
-    let on = all(o == vec2f(0.0)) || all(o == wide);
-    if (!on) { continue; }
-    if (dot(q - ro, rd) > tSurf) { continue; }
-    let lc = select(vec3f(0.40, 0.66, 0.28), vec3f(0.78, 0.74, 0.30), hash3(ci + vec3i(5)) > 0.6);
-    col = lc * (0.75 + 0.6 * shaft(q)) * select(1.0, 0.75, all(o == wide));
-  }
-
-  // fireflies
-  for (var i = 0; i < 28; i++) {
-    let f = firefly(i);
-    let rel = f.pos - params.center;
-    let sp = params.res * 0.5 + vec2f(dot(rel, CAM_R), -dot(rel, CAM_U)) * params.zoom;
-    let d = length(px - sp);
-    if (d > 3.5) { continue; }
-    let tf = dot(f.pos - ro, rd);
-    if (tf > tSurf + 1.0) { continue; }
-    let core = step(d, 0.8);
-    let halo = (1.0 - smoothstep(0.8, 3.5, d)) * 0.35;
-    col += vec3f(0.85, 1.0, 0.55) * (core + halo) * f.glow;
+  // particles (dust, leaves, fireflies), placed on the CPU each frame
+  let tdim = vec2u(ceil(params.res / 16.0));
+  let tcell = min(vec2u(px) / 16u, tdim - 1u);
+  let tk = tcell.x + tdim.x * tcell.y;
+  let base = tdim.x * tdim.y + 1u;
+  for (var j = ptiles[tk]; j < ptiles[tk + 1u]; j++) {
+    let i = i32(ptiles[base + j]);
+    let a = particles[2 * i];
+    let o = floor(px) - floor(a.xy);
+    if (abs(o.x) > 3.0 || abs(o.y) > 3.0) { continue; }
+    if (a.z > tSurf + 1.0) { continue; }
+    let b = particles[2 * i + 1];
+    let kind = i32(a.w);
+    if (kind == 0) {          // dust: one pixel
+      if (all(o == vec2f(0.0))) { col += b.rgb; }
+    } else if (kind == 1) {   // firefly: a core and a soft halo
+      let d = length(px - a.xy);
+      let core = step(d, 0.8);
+      let halo = (1.0 - smoothstep(0.8, 3.5, d)) * 0.35;
+      col += b.rgb * (core + halo);
+    } else {                  // leaf: two pixels, flipping as it tumbles
+      let wide = select(vec2f(1.0, 0.0), vec2f(0.0, 1.0), b.w > 0.0);
+      if (all(o == vec2f(0.0))) { col = b.rgb; }
+      else if (all(o == wide)) { col = b.rgb * 0.75; }
+    }
   }
 
   return vec4f(col, depth);

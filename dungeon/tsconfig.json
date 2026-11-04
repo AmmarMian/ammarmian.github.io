@@ -5,6 +5,7 @@
     "moduleResolution": "bundler",
     "strict": true,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "skipLibCheck": true,
     "types": ["@webgpu/types", "vite/client"]
   },

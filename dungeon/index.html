@@ -7,12 +7,15 @@
 <style>
   html, body { margin: 0; height: 100%; background: #04090a; overflow: hidden; }
   canvas { display: block; width: 100vw; height: 100vh; image-rendering: pixelated; }
+  canvas { touch-action: none; cursor: grab; }
+  #hint { position: fixed; left: 16px; bottom: 14px; color: #5d8a7a; font: 12px ui-monospace, Menlo, monospace; letter-spacing: 0.06em; pointer-events: none; }
   #msg { position: fixed; inset: 0; display: grid; place-items: center; color: #9fc; font: 14px monospace; pointer-events: none; }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <div id="msg"></div>
+<div id="hint">drag to turn · scroll or pinch to zoom · right-drag to pan · Q/E rotate · R reset</div>
 <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
