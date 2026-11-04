@@ -463,11 +463,39 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
 
   /* ======================= 1 · underwater seafloor ======================= */
 
+  /* Caustics: the bright web a rippled surface focuses onto whatever lies
+     below it. Drawn as the borders between cells of two drifting Voronoi
+     fields at different scales — where both borders meet, the light is
+     brightest — which is the shape real caustics have. */
+  const CAUSTIC = `
+    vec2 cH2(vec2 c){ return fract(sin(vec2(dot(c, vec2(127.1, 311.7)), dot(c, vec2(269.5, 183.3)))) * 43758.5453); }
+    float cEdge(vec2 p, float t){
+      vec2 i = floor(p), f = p - i;
+      float d1 = 9.0, d2 = 9.0;
+      for (int y = -1; y <= 1; y++) for (int x = -1; x <= 1; x++) {
+        vec2 o = vec2(float(x), float(y));
+        vec2 h = cH2(i + o);
+        vec2 c = o + 0.5 + 0.4 * sin(h * 6.2831 + t * (0.6 + h.yx * 0.5)) - f;
+        float d = dot(c, c);
+        if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) { d2 = d; }
+      }
+      return sqrt(d2) - sqrt(d1);
+    }
+    float caustic(vec3 wp, float t){
+      vec2 p = wp.xz * 0.16 + vec2(t * 0.04, t * 0.03);
+      float a = 1.0 - smoothstep(0.0, 0.16, cEdge(p, t));
+      float b = 1.0 - smoothstep(0.0, 0.22, cEdge(p * 1.7 + 3.1, t * 1.3));
+      return a * 0.65 + b * 0.45 + a * b * 0.9;
+    }`;
+
   function buildSeafloor() {
     const g = new THREE.Group();
     g.name = 'world_seafloor';
     const dome = skyDome(0x3f97b8, 0x0d3f60, 0x0e4a68);   // bottom == fog
     g.add(dome);
+    // how strongly the surface focuses light onto the bottom; dims at night
+    const uCaus = { value: 1 };
+    const uFogC = { value: new THREE.Color(0x0e4a68) };
 
     /* sand: CPU dunes, then caustics in the fragment shader. two scrolling fbm
        fields subtracted give the ridged web of light a wave-lensed surface
@@ -485,82 +513,205 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
       new THREE.MeshStandardMaterial({ color: 0xa9946d, roughness: 1, flatShading: true }), {
         frag: `
           vec2 cp = vWP.xz * 0.11;
-          float a = fbm(cp + vec2(uT * 0.055, uT * 0.041));
-          float b = fbm(cp * 1.63 - vec2(uT * 0.032, uT * 0.06));
-          float caus = pow(max(0.0, 1.0 - abs(a - b) * 4.4), 3.0);
-          diffuseColor.rgb *= 0.6 + 0.62 * fbm(cp * 0.42);
-          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.20,0.40,0.42), 0.36);
-          diffuseColor.rgb += vec3(0.40,0.78,0.72) * caus * 0.9;
+          // ripples across the current, darker troughs, pale crests
+          float rip = sin(vWP.x * 1.1 + fbm(cp * 2.0) * 4.0) * 0.5 + 0.5;
+          diffuseColor.rgb *= (0.62 + 0.55 * fbm(cp * 0.42)) * mix(0.9, 1.06, rip);
+          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.20,0.40,0.42), 0.34);
+          diffuseColor.rgb += vec3(0.45,0.82,0.74) * caustic(vWP, uT) * uCaus * 0.75;
         `,
+        decl: 'uniform float uCaus;\n' + CAUSTIC,
+        uniforms: { uCaus },
       }));
     sand.rotation.x = -Math.PI / 2;
     sand.position.y = -0.06;
     sand.receiveShadow = true;
     g.add(sand);
 
-    const rockMat = patchStd(new THREE.MeshStandardMaterial({ color: 0x4a5a5c, roughness: 1, flatShading: true }), {
-      frag: `diffuseColor.rgb *= 0.7 + 0.6 * fbm(vWP.xz * 0.5 + vWP.y * 0.3);
-             diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.18,0.34,0.30), 0.3);`,
-    });
-    const rockGeo = new THREE.DodecahedronGeometry(1, 0);
-    const rocks = new THREE.InstancedMesh(rockGeo, rockMat, 40);
-    for (let i = 0; i < 40; i++) {
-      const a = rnd(6.28), d = rnd(190, 13), sz = rnd(5, 1);
-      _e.set(rnd(3), rnd(3), rnd(3));
-      rocks.setMatrixAt(i, _m4.compose(
-        _v.set(Math.cos(a) * d, -sz * 0.4, Math.sin(a) * d),
-        _q.setFromEuler(_e), _s.set(sz, sz * rnd(1, 0.45), sz)));
-    }
-    rocks.receiveShadow = true;
-    g.add(rocks);
-
-    /* the surface, far overhead — its own shader so fog doesn't flatten it */
-    const surf = new THREE.Mesh(new THREE.PlaneGeometry(760, 760), new THREE.ShaderMaterial({
-      transparent: true, depthWrite: false, fog: false, side: THREE.DoubleSide,
-      blending: THREE.AdditiveBlending,
-      uniforms: { uT },
-      vertexShader: `varying vec2 vP;
-        void main(){ vP = position.xy; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+    /* The surface, far overhead, seen from below (after Endless Field's
+       sea.wgsl): looking up through it within ~49° of straight up you see
+       out — Snell's window, the bright sky squeezed into a disc — and past
+       that the surface is a mirror, total internal reflection throwing the
+       dim water back down. Rippled, so the window's edge shimmers. */
+    const surf = new THREE.Mesh(new THREE.PlaneGeometry(900, 900, 1, 1), new THREE.ShaderMaterial({
+      transparent: false, depthWrite: false, fog: false, side: THREE.DoubleSide,
+      uniforms: { uT, uFogC, uSkyC: { value: new THREE.Color(0xcfeeff) }, uSunI: { value: 1 } },
+      vertexShader: `varying vec3 vWP;
+        void main(){ vec4 w = modelMatrix * vec4(position, 1.0); vWP = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
       fragmentShader: `${NOISE}
-        varying vec2 vP; uniform float uT;
+        varying vec3 vWP; uniform float uT; uniform vec3 uFogC; uniform vec3 uSkyC; uniform float uSunI;
         void main(){
-          vec2 p = vP * 0.035;
-          float a = fbm(p + vec2(uT*0.09, uT*0.05));
-          float b = fbm(p*1.7 - vec2(uT*0.05, uT*0.08));
-          float w = pow(max(0.0, 1.0 - abs(a-b)*3.6), 2.4);
-          float fade = 1.0 - smoothstep(120.0, 340.0, length(vP));
-          gl_FragColor = vec4(vec3(0.52,0.86,0.92) * (0.09 + w * 0.95) * fade, 1.0);
+          vec2 p = vWP.xz * 0.05;
+          float h0 = fbm(p + vec2(uT * 0.06, uT * 0.04));
+          float hx = fbm(p + vec2(0.04, 0.0) + vec2(uT * 0.06, uT * 0.04));
+          float hz = fbm(p + vec2(0.0, 0.04) + vec2(uT * 0.06, uT * 0.04));
+          vec3 N = normalize(vec3(-(hx - h0) * 9.0, 1.0, -(hz - h0) * 9.0));   // up, out of the water
+          vec3 I = normalize(vWP - cameraPosition);                            // the eye's ray, rising
+          vec3 T = refract(I, -N, 1.333);
+          vec3 deep = uFogC * 0.55;
+          vec3 col;
+          if (dot(T, T) < 1e-4) {
+            col = deep;                                     // total internal reflection
+          } else {
+            float edge = smoothstep(0.0, 0.25, length(T.xz) < 0.98 ? 1.0 - length(T.xz) : 0.0);
+            col = mix(deep, uSkyC * (0.6 + 0.4 * uSunI), 0.35 + 0.65 * edge);
+            col += vec3(1.0, 0.97, 0.9) * pow(max(T.y, 0.0), 40.0) * 1.4 * uSunI;
+          }
+          // the ripple lines, faint, everywhere
+          float w = 1.0 - smoothstep(0.0, 0.06, abs(h0 - 0.5));
+          col += vec3(0.5, 0.8, 0.9) * w * 0.12;
+          // and into the water's own colour with distance
+          float d = length(vWP - cameraPosition);
+          col = mix(col, uFogC, smoothstep(160.0, 420.0, d));
+          gl_FragColor = vec4(col, 1.0);
         }`,
     }));
     surf.rotation.x = Math.PI / 2;
     surf.position.y = 86;
+    surf.renderOrder = -5;
     g.add(surf);
 
     const rays = lightShafts(g, { count: 10, color: 0x9fe8ff, top: 84, len: 98, rTop: 3, rBot: 13, spread: 92, opacity: 0.1 });
 
-    /* kelp — instanced blades swayed entirely on the GPU */
-    const kelpGeo = new THREE.PlaneGeometry(0.3, 2.9, 1, 4);
-    kelpGeo.translate(0, 1.45, 0);
-    const kelp = new THREE.InstancedMesh(kelpGeo, patchStd(
-      new THREE.MeshStandardMaterial({ color: 0x2f6b4a, roughness: 1, flatShading: true, side: THREE.DoubleSide }), {
-        vert: `
-          vec3 base = (modelMatrix * wIM * vec4(0.0,0.0,0.0,1.0)).xyz;
-          float ph = base.x * 0.28 + base.z * 0.19;
-          float k = pow(clamp(transformed.y / 2.9, 0.0, 1.0), 1.6);
-          transformed.x += sin(uT * 0.9 + ph) * k * 0.75 * uWind;
-          transformed.z += cos(uT * 0.7 + ph * 1.3) * k * 0.5 * uWind;
-        `,
-        frag: `diffuseColor.rgb *= 0.45 + 0.85 * clamp(vWP.y / 2.9, 0.0, 1.0);`,
-      }), 900);
-    for (let i = 0; i < 900; i++) {
-      const a = rnd(6.28), d = rnd(180, 11);
-      kelp.setMatrixAt(i, _m4.compose(
-        _v.set(Math.cos(a) * d, -0.2, Math.sin(a) * d),
-        _q.setFromAxisAngle(YUP, rnd(6.28)),
-        _s.set(rnd(1.3, 0.6), rnd(1.7, 0.55), 1)));
+    /* ---- the reef, the kelp and the meadow: a kit modelled in Blender ----
+       tools/blender/seafloor.py builds it (vertex colour and baked occlusion,
+       no textures); fetched the first time anyone comes down here. Without
+       it the floor falls back on the procedural kelp and stones it had. */
+    const flora = new THREE.Group();
+    flora.name = 'seafloor_flora';
+    g.add(flora);
+    const lit = (extra = {}) => patchStd(new THREE.MeshStandardMaterial({
+      vertexColors: true, flatShading: true, roughness: 0.9, side: THREE.DoubleSide,
+    }), {
+      decl: 'uniform float uCaus;\n' + CAUSTIC,
+      uniforms: { uCaus },
+      // the caustic web lands on whatever faces up
+      frag: `diffuseColor.rgb += vec3(0.40,0.75,0.70) * caustic(vWP, uT) * uCaus * 0.45 * smoothstep(0.1, 0.9, vWN.y);`,
+      ...extra,
+    });
+    // sways with height: kelp and seagrass lean with the current
+    const current = (h) => `
+      vec3 base = (modelMatrix * wIM * vec4(0.0,0.0,0.0,1.0)).xyz;
+      float ph = base.x * 0.21 + base.z * 0.17;
+      float k = pow(clamp(position.y / ${h.toFixed(1)}, 0.0, 1.0), 1.4);
+      transformed.x += (sin(uT * 0.55 + ph) * 0.8 + sin(uT * 1.3 + ph * 2.0) * 0.2) * k * ${(h * 0.12).toFixed(2)} * uWind;
+      transformed.z += cos(uT * 0.45 + ph * 1.3) * k * ${(h * 0.08).toFixed(2)} * uWind;`;
+    const whaleMeshes = { body: null, tail: null };
+    const done = () => { applyDetail(g); renderer?.compileAsync?.(g, camera, scene).catch(() => {}); };
+    if (loadModel) {
+      loadModel('worlds/seafloor.glb').then((meshes) => { reefFlora(meshes); done(); })
+        .catch((e) => { console.warn('seafloor kit:', e); proceduralFlora(); done(); });
+    } else {
+      proceduralFlora();
     }
-    kelp.frustumCulled = false;
-    g.add(kelp);
+
+    function reefFlora(meshes) {
+      const geo = (name) => {
+        const m = meshes[name];
+        if (!m) throw new Error(`no ${name} in the seafloor kit`);
+        return m.geometry;
+      };
+      const groundY = (x, z) => {
+        const d = Math.hypot(x, z);
+        const h = Math.sin(x * 0.045) * Math.cos(-z * 0.037) * 1.6 + Math.sin(x * 0.012 - z * 0.02) * 3.4;
+        return h * Math.min(1, Math.max(0, (d - 7.5) / 14)) - 0.06;
+      };
+      const placed = (name, mat, n) => {
+        const m = new THREE.InstancedMesh(geo(name), mat, n);
+        m.count = 0; m.frustumCulled = false; m.name = 'seafloor_' + name;
+        flora.add(m);
+        return m;
+      };
+      const put = (m, x, z, s, tilt = 0.1, yaw = rnd(6.28)) => {
+        if (m.count >= m.instanceMatrix.count) return;
+        _e.set(rnd(tilt, -tilt), yaw, rnd(tilt, -tilt));
+        m.setMatrixAt(m.count++, _m4.compose(_v.set(x, groundY(x, z) - 0.1, z), _q.setFromEuler(_e), _s.set(s, s, s)));
+      };
+      const ring = (lo, hi) => { const a = rnd(6.28), d = rnd(hi, lo); return [Math.cos(a) * d, Math.sin(a) * d]; };
+
+      /* Kelp in groves: a ring of them close round the tower, and a forest
+         of them beyond the camera's orbit, tall enough to reach halfway to
+         the surface. Anything that comes close to the eye dissolves. */
+      const kelpMat = lit({ vert: current(14), occluder: true, dither: true, near: [8, 18] });
+      const K = placed('kelp', kelpMat, 420);
+      const grove = (n, lo, hi, smin, smax) => {
+        for (let gI = 0; gI < n; gI++) {
+          const [cx, cz] = ring(lo, hi);
+          const m = 6 + Math.floor(rnd(10));
+          for (let k = 0; k < m; k++) put(K, cx + rnd(7, -7), cz + rnd(7, -7), rnd(smax, smin), 0.06);
+        }
+      };
+      grove(5, 18, 38, 0.6, 1.0);
+      grove(26, 92, 200, 1.0, 2.2);
+
+      // a seagrass meadow over the open sand
+      const G = placed('seagrass', lit({ vert: current(2.2) }), 1400);
+      for (let i = 0; i < 1400; i++) { const [x, z] = ring(9, 120); put(G, x, z, rnd(1.6, 0.8), 0.15); }
+
+      /* Reefs: a few patches, each a knot of every kind of coral, so it
+         reads as a reef and not a scatter. */
+      const reefMat = lit({ occluder: true, dither: true, near: [6, 14] });
+      const R = {
+        staghorn: placed('staghorn', reefMat, 120), fan: placed('fan', reefMat, 80),
+        brain: placed('brain', reefMat, 90), tube_sponge: placed('tube_sponge', reefMat, 90),
+      };
+      for (let p = 0; p < 18; p++) {
+        const [cx, cz] = p < 7 ? ring(12, 32) : ring(40, 170);
+        const big = p < 7 ? 1.6 : 2.2;
+        for (let k = 0; k < 7; k++) put(R.brain, cx + rnd(4, -4), cz + rnd(4, -4), rnd(1.6, 0.7) * big, 0.2);
+        for (let k = 0; k < 7; k++) put(R.staghorn, cx + rnd(4.5, -4.5), cz + rnd(4.5, -4.5), rnd(1.5, 0.8) * big, 0.15);
+        for (let k = 0; k < 5; k++) put(R.tube_sponge, cx + rnd(4, -4), cz + rnd(4, -4), rnd(1.4, 0.8) * big, 0.15);
+        for (let k = 0; k < 5; k++) put(R.fan, cx + rnd(5, -5), cz + rnd(5, -5), rnd(2.0, 1.1) * big, 0.1);
+      }
+
+      whaleMeshes.body = geo('whale_body');
+      whaleMeshes.tail = geo('whale_tail');
+      for (const w of whales) dressWhale(w);
+    }
+
+    /* The floor as it was before the kit: flat kelp blades and stones.
+       Kept as the fallback for a kit that fails to load. */
+    function proceduralFlora() {
+      const g = flora;
+      const rockMat = patchStd(new THREE.MeshStandardMaterial({ color: 0x4a5a5c, roughness: 1, flatShading: true }), {
+        frag: `diffuseColor.rgb *= 0.7 + 0.6 * fbm(vWP.xz * 0.5 + vWP.y * 0.3);
+               diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.18,0.34,0.30), 0.3);`,
+      });
+      const rockGeo = new THREE.DodecahedronGeometry(1, 0);
+      const rocks = new THREE.InstancedMesh(rockGeo, rockMat, 40);
+      for (let i = 0; i < 40; i++) {
+        const a = rnd(6.28), d = rnd(190, 13), sz = rnd(5, 1);
+        _e.set(rnd(3), rnd(3), rnd(3));
+        rocks.setMatrixAt(i, _m4.compose(
+          _v.set(Math.cos(a) * d, -sz * 0.4, Math.sin(a) * d),
+          _q.setFromEuler(_e), _s.set(sz, sz * rnd(1, 0.45), sz)));
+      }
+      rocks.receiveShadow = true;
+      g.add(rocks);
+
+      /* kelp — instanced blades swayed entirely on the GPU */
+      const kelpGeo = new THREE.PlaneGeometry(0.3, 2.9, 1, 4);
+      kelpGeo.translate(0, 1.45, 0);
+      const kelp = new THREE.InstancedMesh(kelpGeo, patchStd(
+        new THREE.MeshStandardMaterial({ color: 0x2f6b4a, roughness: 1, flatShading: true, side: THREE.DoubleSide }), {
+          vert: `
+            vec3 base = (modelMatrix * wIM * vec4(0.0,0.0,0.0,1.0)).xyz;
+            float ph = base.x * 0.28 + base.z * 0.19;
+            float k = pow(clamp(transformed.y / 2.9, 0.0, 1.0), 1.6);
+            transformed.x += sin(uT * 0.9 + ph) * k * 0.75 * uWind;
+            transformed.z += cos(uT * 0.7 + ph * 1.3) * k * 0.5 * uWind;
+          `,
+          frag: `diffuseColor.rgb *= 0.45 + 0.85 * clamp(vWP.y / 2.9, 0.0, 1.0);`,
+        }), 900);
+      for (let i = 0; i < 900; i++) {
+        const a = rnd(6.28), d = rnd(180, 11);
+        kelp.setMatrixAt(i, _m4.compose(
+          _v.set(Math.cos(a) * d, -0.2, Math.sin(a) * d),
+          _q.setFromAxisAngle(YUP, rnd(6.28)),
+          _s.set(rnd(1.3, 0.6), rnd(1.7, 0.55), 1)));
+      }
+      kelp.frustumCulled = false;
+      g.add(kelp);
+    }
 
     /* fish schools — one draw call each; the orbit and the tail flap are both
        computed in the vertex shader from per-instance attributes */
@@ -630,7 +781,7 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
       g.add(im);
       return im;
     }
-    school(340, [-22, 20, -28], 26, 20, 0xd8e7a0, 0.6, 0.22);
+    school(340, [-30, 10, -42], 30, 10, 0xd8e7a0, 0.42, 0.22);   // kept below the observatory's eye line
     school(240, [34, 30, 22], 22, 30, 0x9fd8e8, 0.5, -0.3);
     school(180, [8, 12, 44], 18, 12, 0xe8b070, 0.45, 0.35);
 
@@ -665,11 +816,29 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
       return w;
     }
     const whales = [
-      { m: whale(1.0), r: 88, y: 36, sp: 0.03, ph: 0 },
-      { m: whale(0.6), r: 62, y: 24, sp: -0.05, ph: 2.1 },
-      { m: whale(0.4), r: 52, y: 18, sp: -0.05, ph: 2.5 },
+      { m: whale(1.0), r: 88, y: 36, sp: 0.03, ph: 0, s: 1.7 },
+      { m: whale(0.6), r: 62, y: 24, sp: -0.05, ph: 2.1, s: 1.05 },
+      { m: whale(0.4), r: 52, y: 18, sp: -0.05, ph: 2.5, s: 0.7 },
     ];
     whales.forEach((w) => g.add(w.m));
+    /* Swap the box whale for the modelled one once the kit is here: the
+       body, and the tail on its own pivot at the root of the peduncle so it
+       can beat. The kit's whale faces -z; the swimming code expects +z. */
+    const whaleMat = patchStd(new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.8 }), {});
+    function dressWhale(w) {
+      w.m.clear();
+      w.m.scale.setScalar(w.s);
+      const inner = new THREE.Group();
+      inner.rotation.y = Math.PI;
+      inner.add(new THREE.Mesh(whaleMeshes.body, whaleMat));
+      const pivot = new THREE.Group();
+      pivot.position.set(0, 0, 5.4);
+      pivot.add(new THREE.Mesh(whaleMeshes.tail, whaleMat));
+      inner.add(pivot);
+      w.m.add(inner);
+      const still = new THREE.Object3D();
+      w.m.userData = { tail: pivot, finL: still, finR: still };
+    }
 
     const bubbles = pointCloud(g, 280, () => {
       const a = rnd(6.28), d = rnd(160, 8);
@@ -704,6 +873,10 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
         fog.density = mixN(0.0092, 0.0128, n);   // deeper water reads darker still
         rays.mat.color.set(mixC(0xbfe8ff, 0x9fb8e8, n));
         rayK = mixN(1, 0.3, n);
+        uCaus.value = mixN(1, 0.12, n);
+        uFogC.value.set(mixC(0x0e4a68, 0x04192b, n));
+        surf.material.uniforms.uSkyC.value.set(mixC(0xcfeeff, 0x3a5a8a, n));
+        surf.material.uniforms.uSunI.value = mixN(1, 0.15, n);
         this.css = n > 0.5 ? '#03121e' : '#062033';
       },
       tick(t, dt) {
@@ -716,7 +889,7 @@ export function installWorlds({ scene, camera, renderer, model, fx, dims, nightF
           w.m.position.set(Math.cos(a) * w.r, w.y + Math.sin(t * 0.15 + w.ph) * 5, Math.sin(a) * w.r);
           w.m.rotation.y = -a + Math.PI / 2 + (w.sp < 0 ? Math.PI : 0);
           w.m.rotation.x = Math.sin(t * 0.15 + w.ph) * 0.12;
-          w.m.userData.tail.rotation.x = Math.sin(t * 0.9 + w.ph) * 0.2;
+          w.m.userData.tail.rotation.x = Math.sin(t * 0.9 + w.ph) * 0.28;
           w.m.userData.finL.rotation.z = Math.sin(t * 0.7 + w.ph) * 0.18;
           w.m.userData.finR.rotation.z = -Math.sin(t * 0.7 + w.ph) * 0.18;
         }
