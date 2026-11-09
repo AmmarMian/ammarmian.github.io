@@ -108,6 +108,8 @@ function resetEverything() {
   if (!ok) return;
   try { localStorage.clear(); } catch {}
   try { sessionStorage.clear(); } catch {}
+  // The keeper's sentence model, if he was ever allowed one (see ui/ask.ts).
+  try { void caches.delete('transformers-cache'); } catch {}
   tower.drainBath();
   window.location.href = BASE + '/';
 }

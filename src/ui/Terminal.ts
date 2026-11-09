@@ -37,6 +37,7 @@ export function createTerminal(root: HTMLElement, host: ConsoleHost) {
     row.textContent = line;
     log.appendChild(row);
     log.scrollTop = log.scrollHeight;
+    return row;
   }
   function clear() { log.innerHTML = ''; }
 

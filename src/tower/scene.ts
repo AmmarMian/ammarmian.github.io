@@ -22,7 +22,7 @@ import { buildBathhouse, VISTAS, type Vista } from './floors/bathhouse';
 import { buildWizardMesh, createWizardController } from './wizard';
 import { buildFoxMesh, createFoxState, foxDecide } from './fox';
 import { loadGlb } from './glb';
-import { setAutoTheme, effectiveTheme } from '../ui/theme';
+import { setAutoTheme, effectiveTheme, linkThemeToLight, themeFollowsLight } from '../ui/theme';
 import { makePoints, setBackdrop as setBackdropFx, suppressBackdrop, setGridTheme } from './fx';
 import { createFocusController } from './focus';
 import { createQuality, gpuInfo, gpuSummary, type Tier, type Profile } from './quality';
@@ -1076,6 +1076,7 @@ export function createTowerScene(container: HTMLElement, opts: {
   function setLightMode(mode: 'auto' | 'day' | 'night') {
     lightMode = mode;
     applyDayNight();
+    themeFollowsLight(mode);   // one setting: see ui/theme.ts
     return lightMode;
   }
 
@@ -1331,6 +1332,10 @@ export function createTowerScene(container: HTMLElement, opts: {
 
   // the floor grid is inked to match the page, whichever theme won
   window.addEventListener('lair-theme', () => setGridTheme(effectiveTheme() === 'paper'));
+
+  // From here on the theme button pins the light, and a remembered Paper or
+  // Night choice comes back as a remembered day or night.
+  linkThemeToLight((mode) => { lightMode = mode; applyDayNight(); });
 
   function start() {
     try {

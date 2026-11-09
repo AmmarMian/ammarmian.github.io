@@ -244,6 +244,13 @@ export function createSettingsButton(root: HTMLElement, host: SettingsHost) {
   });
   // An automatic demotion while the panel is open should move the highlight.
   window.addEventListener('lair-quality', () => { if (open) refresh(); });
+  // The theme button pins the light too (ui/theme.ts), so the Lighting row
+  // has to follow it rather than keep showing whatever was last clicked here.
+  window.addEventListener('lair-theme', (e: any) => {
+    const p = e.detail?.pref;
+    lightAt = p === 'paper' ? 'day' : p === 'night' ? 'night' : 'auto';
+    if (open) refresh();
+  });
 
   root.append(btn, panel);
   return { toggle: () => setOpen(!open), close: () => setOpen(false), refresh };

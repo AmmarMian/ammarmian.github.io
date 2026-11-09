@@ -11,6 +11,7 @@
     "model:forest": "python3 tools/blender/forest.py public/worlds/forest.glb"
   },
   "dependencies": {
+    "@huggingface/transformers": "4.3.1",
     "animejs": "^3.2.2",
     "three": "^0.184.0"
   },

@@ -126,10 +126,26 @@ function publicationsJsonLd(): Plugin {
   };
 }
 
+/* The ONNX runtime's WebAssembly, which Vite copies out of onnxruntime-web
+   because the library names it with new URL(…, import.meta.url). It is 27 MB
+   and never fetched from here: transformers.js points the runtime at the same
+   file on jsDelivr before that fallback is reached (brotli, ~5 MB, and shared
+   with every other site that uses it). Shipping it would add 27 MB to every
+   deploy for nothing. Only the keeper's `ask on` ever loads the runtime. */
+function dropOrtWasm(): Plugin {
+  return {
+    name: 'drop-ort-wasm',
+    apply: 'build',
+    generateBundle(_options, bundle) {
+      for (const f of Object.keys(bundle)) if (/ort-wasm[^/]*\.wasm$/.test(f)) delete bundle[f];
+    },
+  };
+}
+
 // Served from https://ammarmian.fr/ (the user/org root site).
 export default defineConfig({
   base: SITE_BASE,
-  plugins: [publicationsJsonLd(), prerenderText(() => cssHref)],
+  plugins: [publicationsJsonLd(), prerenderText(() => cssHref), dropOrtWasm()],
   build: {
     rollupOptions: {
       output: {

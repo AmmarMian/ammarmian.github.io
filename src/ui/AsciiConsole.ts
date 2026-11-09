@@ -22,6 +22,8 @@ export function renderAsciiConsole(root: HTMLElement) {
       <div class="ascii-role">${PROFILE.role} — LISTIC, Université Savoie Mont-Blanc</div>
       <nav class="ascii-modes" aria-label="Other views">
         <a href="${BASE}/?view=3d">3D tower</a><span aria-hidden="true">·</span><a href="${BASE}/text">Text version</a>
+        <span class="ascii-hide-wrap"><span aria-hidden="true">·</span><button class="ascii-tower-hide" type="button"
+          aria-controls="ascii-tower" aria-pressed="false">Hide drawing</button></span>
       </nav>
       <button class="ascii-tower-toggle" type="button" aria-controls="ascii-tower" aria-expanded="false">
         <span aria-hidden="true">⌂</span> Tower
@@ -35,7 +37,7 @@ export function renderAsciiConsole(root: HTMLElement) {
       <label class="ascii-prompt" for="ascii-input">&gt;</label>
       <input class="ascii-input" id="ascii-input" type="text" autocomplete="off"
              autocapitalize="off" autocorrect="off" spellcheck="false"
-             placeholder="type a command, or tap a storey" aria-label="Console command">
+             placeholder="type a command, ask a question, or tap a storey" aria-label="Console command">
     </form>
     <div class="ascii-keys" role="group" aria-label="Common commands"></div>
   `;
@@ -61,12 +63,33 @@ export function renderAsciiConsole(root: HTMLElement) {
     setTowerOpen(!towerEl.classList.contains('ascii-tower-open'));
   });
 
+  /* On a wide screen the drawing takes a fixed column beside the log. Some
+     output — long paper titles, the coauthor chart — wants that width, so
+     the drawing can be put away, and stays put away on the next visit.
+     (Phones already show it only on demand, through the toggle above.) */
+  const hideBtn = view.querySelector('.ascii-tower-hide') as HTMLButtonElement;
+  const HIDE_KEY = 'lair-ascii-drawing';
+  function setDrawingHidden(hidden: boolean) {
+    view.classList.toggle('ascii-drawing-hidden', hidden);
+    hideBtn.setAttribute('aria-pressed', String(hidden));
+    hideBtn.textContent = hidden ? 'Show drawing' : 'Hide drawing';
+    try { if (hidden) localStorage.setItem(HIDE_KEY, 'hidden'); else localStorage.removeItem(HIDE_KEY); } catch {}
+  }
+  let startHidden = false;
+  try { startHidden = localStorage.getItem(HIDE_KEY) === 'hidden'; } catch {}
+  setDrawingHidden(startHidden);
+  hideBtn.addEventListener('click', () => {
+    setDrawingHidden(!view.classList.contains('ascii-drawing-hidden'));
+    input.focus();
+  });
+
   function print(line: string, cls = '') {
     const row = document.createElement('div');
     row.className = 'ascii-line' + (cls ? ' ascii-' + cls : '');
     row.textContent = line;
     log.appendChild(row);
     log.scrollTop = log.scrollHeight;
+    return row;
   }
   function clear() { log.innerHTML = ''; }
 
@@ -179,7 +202,7 @@ export function renderAsciiConsole(root: HTMLElement) {
       print(PROFILE.bio);
       print('');
       print('Tap a storey above, or type a command — "help" lists them all,', 'dim');
-      print('and "hello" introduces the keeper.', 'dim');
+      print('"hello" introduces the keeper, and he answers plain questions too.', 'dim');
       print(`Reach me at ${CONTACT.email}.`, 'dim');
       print('');
     }

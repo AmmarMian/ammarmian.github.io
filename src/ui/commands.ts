@@ -12,6 +12,8 @@ import { FLOOR_NAMES } from '../tower/scene-constants';
 import { copyText, downloadText } from './io';
 import { WORLD_BLURBS } from '../data/worlds';
 import { COLOPHON_TITLE, COLOPHON_BLOCK, COLOPHON_NOTE } from '../data/colophon';
+import { askCommand, wordTopic } from './ask';
+import { planCommand } from './intents';
 
 export interface WorldsApi {
   kinds: string[];
@@ -69,7 +71,8 @@ export interface ConsoleHost {
 }
 
 export interface Ctx extends ConsoleHost {
-  print: (line: string, cls?: string) => void;
+  /** Returns the printed row where there is one, so a line can be updated in place. */
+  print: (line: string, cls?: string) => HTMLElement | void;
   clear: () => void;
   close: () => void;
   /** Whether the current console viewport needs compact text art. */
@@ -137,12 +140,14 @@ async function loadDocs(ctx: Ctx): Promise<HalDoc[] | null> {
   }
 }
 
-function listDocs(ctx: Ctx, docs: HalDoc[], limit = 20) {
+function listDocs(ctx: Ctx, docs: HalDoc[], limit = 20, query = '') {
   ctx.results = docs;
   docs.slice(0, limit).forEach((d, i) => {
     ctx.print(`  ${String(i + 1).padStart(3)}  ${String(d.year || 'n.d.').padEnd(6)} ${d.title}`, 'hit');
   });
-  if (docs.length > limit) ctx.print(`  … ${docs.length - limit} more — narrow with \`pubs <terms>\``, 'dim');
+  if (docs.length > limit) {
+    ctx.print(`  … ${docs.length - limit} more — \`pubs --all${query ? ' ' + query : ''}\` lists every one, \`pubs <terms>\` narrows`, 'dim');
+  }
   ctx.print(`${docs.length} record${docs.length === 1 ? '' : 's'}. \`cite <n>\` for BibTeX, \`export bib\` for the set.`, 'dim');
 }
 
@@ -166,6 +171,66 @@ async function copyOut(ctx: Ctx, text: string, what: string) {
   ctx.print((await copyText(text)) ? `${what} copied to the clipboard.` : `${what} printed above — copy it by hand.`, 'ok');
 }
 
+/** What each storey holds, drawn in type — the room's one piece of furniture
+ *  that says what the room is for, as the 3D tower shows it. Kept under 30
+ *  columns so a phone never wraps them. */
+const ROOM_ART: Record<string, string> = {
+  about: String.raw`
+           z  Z
+      z
+   |\_____________________
+   | |  ___               |
+   | | (___)~~~~~~~~~~~~~~|
+   | |____________________|
+   |/                     |`,
+  publications: String.raw`
+   .------------------------.
+   | |=||#|| |=| |#||=| ||  |
+   | |=||#|| |=| |#||=| ||  |
+   |------------------------|
+   | ||#| |=|| |#| ||=| |#| |
+   | ||#| |=|| |#| ||=| |#| |
+   '------------------------'`,
+  projects: String.raw`
+      _         ___       o
+     | |       |   |    o
+     | |       |___|   . o
+     / \        | |    _|_
+    /~~~\      /~~~\  |~~~|
+   /_____\    /_____\ |___|`,
+  contact: String.raw`
+     *          .        *
+          .  ______
+     *    __/  o   )==O   .
+         /  \_____/
+     .     //  \\       *
+          //    \\`,
+  elsewhere: String.raw`
+          .-~~~~~~-.
+        .'  .  *  . '.
+       /  *    .    * \
+      |  .    (@)    . |
+       \  .  *    .   /
+        '.  .   *   .'
+          '-~~~~~~-'`,
+  now: String.raw`
+        (   )  (   )  )
+         ) (    ) (  (
+      .-''''''''''''''''-.
+     (  ~~~~~~~~~~~~~~~~  )
+      \                  /
+       '-.____________.-'
+         /            \ `,
+  settings: String.raw`
+            _
+           ( )======,
+                  ~ |
+     .-----------------.
+     |  ~  ~  ~  ~  ~  |
+      \_______________/
+        ||           ||`,
+};
+
 /** In the ASCII console there is no side panel to open, so arriving at a
  *  floor has to print what that floor holds. Each one delegates to the
  *  command that already knows how to render it. */
@@ -173,6 +238,11 @@ export async function describeFloor(slug: string, ctx: Ctx) {
   const route = FLOORS.find((f) => f.slug === slug);
   if (!route) return;
   ctx.print(`${String(route.index + 1).padStart(2, '0')} · ${route.title.toUpperCase()} — ${route.label}`, 'head');
+  const art = ROOM_ART[slug];
+  if (art) {
+    for (const line of art.replace(/^\n/, '').split('\n')) ctx.print(line, 'pre');
+    ctx.print('');
+  }
   switch (slug) {
     case 'about':
       return COMMANDS.cat.run(['cv.txt'], ctx);
@@ -428,19 +498,174 @@ export const COMMANDS: Record<string, Command> = {
     },
   },
 
-  pubs: {
-    args: '[terms…]',
-    help: 'search the HAL record',
-    detail: 'Search the live HAL record. Every term must match somewhere in the title, authors, venue, type or year. The numbered result set is what show, cite and export then work from.',
-    examples: ['pubs', 'pubs riemannian', 'pubs sar 2021'],
+  ask: {
+    args: '<question>|on|off',
+    help: 'ask the keeper, or tell him, in plain words',
+    detail: 'Plain requests are carried out with the command that does them, which is printed first so you can type it next time — "take me to the moon", "make it night", "papers from 2021", "email him about a collaboration". Questions about the work, the students, the papers, the projects or the tower are answered by quoting the parts of this site that fit — never anything made up. Any line that is not a command goes here too. Out of the box it matches on keywords; `ask on` downloads a small sentence model (once, about 28 MB in all) so it follows phrasing as well, and `ask off` deletes it again. Either way, nothing you type leaves the browser.',
+    examples: ['ask who do you supervise?', 'teleport the tower to deep space', 'papers with ginolhac', 'ask on'],
+    complete: () => ['on', 'off'],
+    run: (args, ctx) => askCommand(args, ctx, (line) => runCommand(line, ctx)),
+  },
+
+  now: {
+    help: 'what is happening this year',
+    detail: 'Where the work is being done this year, and who is being supervised at the moment.',
+    examples: ['now'],
+    run(_args, ctx) {
+      ctx.print(PROFILE.currently);
+      const current = (students as any[]).filter((s) => s.status === 'current');
+      if (current.length) {
+        ctx.print('');
+        ctx.print('in the kitchen right now:', 'head');
+        for (const s of current) ctx.print(`  ${pad(s.name, 22)}${pad(s.kind, 6)}${s.topic}`);
+      }
+    },
+  },
+
+  students: {
+    args: '[current|past|phd|masters|<name>]',
+    help: 'everyone supervised, or some of them',
+    detail: 'The supervision list, filtered: `current` for theses and internships in progress, `past` for finished ones, `phd` or `masters` by kind, or any part of a name or topic.',
+    examples: ['students', 'students current', 'students phd', 'students sonar'],
+    complete: () => ['current', 'past', 'phd', 'masters'],
+    run(args, ctx) {
+      const f = args.join(' ').toLowerCase();
+      const all = students as any[];
+      const rows = !f ? all
+        : f === 'current' ? all.filter((s) => s.status === 'current')
+        : f === 'past' ? all.filter((s) => s.status !== 'current')
+        : f === 'phd' ? all.filter((s) => s.kind === 'PhD')
+        : f === 'masters' || f === 'master' || f === 'm2' ? all.filter((s) => s.kind !== 'PhD')
+        : all.filter((s) => `${s.name} ${s.topic} ${s.note ?? ''}`.toLowerCase().includes(f));
+      if (!rows.length) { ctx.print(`students: nobody matches '${f}'.`, 'err'); return; }
+      for (const s of rows) {
+        ctx.print(`  ${pad(s.name, 22)}${pad(s.kind, 6)}${s.period}${s.status === 'current' ? '  · in progress' : ''}`);
+        ctx.print(`  ${' '.repeat(22)}${s.topic}`, 'dim');
+        if (s.note) ctx.print(`  ${' '.repeat(22)}${s.note}`, 'dim');
+      }
+      ctx.print(`${rows.length} of ${all.length}.`, 'dim');
+    },
+  },
+
+  coauthors: {
+    args: '[name]',
+    help: 'who the papers were written with',
+    detail: 'With no argument, the people who appear most often beside me on the HAL record. With a name, the papers written together — which then work with show, cite and export.',
+    examples: ['coauthors', 'coauthors ginolhac'],
     async run(args, ctx) {
       const docs = await loadDocs(ctx);
       if (!docs) return;
-      const q = args.join(' ');
+      const who = args.join(' ').toLowerCase();
+      if (who) {
+        const hits = docs.filter((d) => d.authorList.some((a) => a.toLowerCase().includes(who)));
+        if (!hits.length) { ctx.print(`coauthors: no paper with '${who}' on it.`, 'err'); return; }
+        listDocs(ctx, hits);
+        return;
+      }
+      const count = new Map<string, number>();
+      for (const d of docs) for (const a of d.authorList) {
+        if (a === PROFILE.name) continue;
+        count.set(a, (count.get(a) ?? 0) + 1);
+      }
+      const top = [...count].sort((a, b) => b[1] - a[1]).slice(0, 12);
+      const w = Math.max(...top.map(([, c]) => c));
+      for (const [name, c] of top) ctx.print(`  ${pad(name, 24)}${'█'.repeat(Math.max(1, Math.round(c / w * 16))).padEnd(17)}${c}`);
+      ctx.print(`${count.size} coauthors across ${docs.length} records. \`coauthors <name>\` lists the shared papers.`, 'dim');
+    },
+  },
+
+  stats: {
+    help: 'the record, counted',
+    detail: 'Publications per year and by kind, from the HAL snapshot this site was built with.',
+    examples: ['stats'],
+    async run(_args, ctx) {
+      const docs = await loadDocs(ctx);
+      if (!docs) return;
+      const years = new Map<number, number>();
+      const kinds = new Map<string, number>();
+      for (const d of docs) {
+        if (d.year) years.set(d.year, (years.get(d.year) ?? 0) + 1);
+        kinds.set(d.kind || 'other', (kinds.get(d.kind || 'other') ?? 0) + 1);
+      }
+      const w = Math.max(...years.values());
+      ctx.print('per year:', 'head');
+      for (const [y, c] of [...years].sort((a, b) => b[0] - a[0])) {
+        ctx.print(`  ${y}  ${'█'.repeat(Math.max(1, Math.round(c / w * 20))).padEnd(21)}${c}`);
+      }
+      ctx.print('by kind:', 'head');
+      for (const [k, c] of [...kinds].sort((a, b) => b[1] - a[1])) ctx.print(`  ${pad(k, 28)}${c}`);
+      ctx.print(`${docs.length} records in all.`, 'dim');
+    },
+  },
+
+  random: {
+    help: 'a paper off the shelf, at random',
+    detail: 'Pulls one record at random and shows it in full. `cite 1` then gives its BibTeX.',
+    examples: ['random', 'cite 1'],
+    async run(_args, ctx) {
+      const docs = await loadDocs(ctx);
+      if (!docs?.length) return;
+      const d = docs[Math.floor(Math.random() * docs.length)];
+      ctx.results = [d];
+      return COMMANDS.show.run(['1'], ctx);
+    },
+  },
+
+  mail: {
+    args: '[subject…]',
+    help: 'write to me, subject filled in',
+    detail: 'Opens your mail program with a message addressed to me, and the subject already written if you give one.',
+    examples: ['mail', 'mail Question about SPDnet'],
+    run(args, ctx) {
+      const subject = args.join(' ').replace(/^["“']|["”']$/g, '').trim();
+      const href = `mailto:${CONTACT.email}${subject ? `?subject=${encodeURIComponent(subject)}` : ''}`;
+      window.open(href, '_self');
+      ctx.print(`opening a mail to ${CONTACT.email}${subject ? ` — "${subject}"` : ''}…`, 'ok');
+      ctx.print('nothing happening? `copy email` puts the address on the clipboard.', 'dim');
+    },
+  },
+
+  copy: {
+    args: '<email|link>',
+    help: 'put the address or this page on the clipboard',
+    detail: '`copy email` copies my address; `copy link` copies the address of what you are looking at, floor and world included.',
+    examples: ['copy email', 'copy link'],
+    complete: () => ['email', 'link'],
+    async run(args, ctx) {
+      const what = args[0]?.toLowerCase();
+      if (what === 'email' || what === 'mail') {
+        ctx.print((await copyText(CONTACT.email)) ? `${CONTACT.email} copied.` : CONTACT.email, 'ok');
+        return;
+      }
+      if (what === 'link' || what === 'url') return COMMANDS.share.run([], ctx);
+      ctx.print('copy: try `copy email` or `copy link`.', 'err');
+    },
+  },
+
+  share: {
+    help: 'copy a link to what you are looking at',
+    detail: 'The floor you are on and the world the tower stands in are both in the address, so the link opens on exactly this view.',
+    examples: ['share'],
+    async run(_args, ctx) {
+      const url = location.href;
+      ctx.print((await copyText(url)) ? `copied: ${url}` : url, 'ok');
+    },
+  },
+
+  pubs: {
+    args: '[--all] [terms…]',
+    help: 'search the HAL record',
+    detail: 'Search the live HAL record. Every term must match somewhere in the title, authors, venue, type or year. The first 20 matches are listed, newest first; --all lists every one. The numbered result set is what show, cite and export then work from.',
+    examples: ['pubs', 'pubs --all', 'pubs riemannian', 'pubs sar 2021'],
+    async run(args, ctx) {
+      const docs = await loadDocs(ctx);
+      if (!docs) return;
+      const all = args.some((a) => a === '--all' || a === '-a');
+      const q = args.filter((a) => a !== '--all' && a !== '-a').join(' ');
       const hits = filterHalDocs(docs, q);
       if (!hits.length) { ctx.print(`nothing matches "${q}".`, 'err'); return; }
       if (q) ctx.print(`matches for "${q}":`, 'dim');
-      listDocs(ctx, hits);
+      listDocs(ctx, hits, all ? Infinity : 20, q);
     },
   },
 
@@ -777,6 +1002,8 @@ export const COMMANDS: Record<string, Command> = {
         ['lair-fps', 'the frame counter being shown'],
         ['lair-backdrop', 'the ground the tower stands on'],
         ['lair-console-history', 'the commands you have typed'],
+        ['lair-ascii-drawing', 'that you put the tower drawing away in the text console'],
+        ['lair-ask', 'that you let the keeper read meaning (his model sits in the browser cache — `ask off` deletes it)'],
       ];
       let any = false;
       for (const [key, what] of REMEMBERED) {
@@ -906,10 +1133,42 @@ export async function runCommand(raw: string, ctx: Ctx) {
   const [name, ...args] = line.split(/\s+/);
   const key = name.toLowerCase();
   const cmd = COMMANDS[key];
-  if (!cmd) { ctx.print(`command not found: ${name} — type "help"`, 'err'); return; }
+  if (!cmd) {
+    // Not a command, but it reads like a question: let the keeper have it.
+    // A lone unknown word is usually a typo — unless it is a request on its
+    // own ("thanks", "students").
+    if (line.includes('?') || args.length >= 1 || planCommand(line) || wordTopic(line)) {
+      await askCommand(line.split(/\s+/), ctx, (l) => runCommand(l, ctx));
+      return;
+    }
+    ctx.print(`command not found: ${name} — type "help", or ask a question`, 'err');
+    return;
+  }
   if (args.some((a) => a === '--help' || a === '-h')) { printUsage(key, cmd, ctx); return; }
+  /* A sentence that happens to start with a command's name — "now jump to
+     the sea", "jump to the seafloor" — is a request, not that command with
+     odd arguments. Told apart by the arguments themselves: a command that
+     takes none, or one whose values are a fixed list, cannot have been given
+     these on purpose. A single unknown value ("jump narnia") still reaches
+     the command, whose own error names the values it does take. */
+  if (args.length && !FREE_TEXT.has(key)) {
+    const fixed = cmd.complete?.(ctx) ?? [];
+    const misfit = !cmd.args
+      || (NUMBERED.has(key) && !/^\d+$/.test(args[0]))
+      || (fixed.length > 0 && !fixed.includes(args[0].toLowerCase()));
+    if (misfit && (args.length >= 2 || planCommand(line))) {
+      await askCommand(line.split(/\s+/), ctx, (l) => runCommand(l, ctx));
+      return;
+    }
+  }
   await cmd.run(args, ctx);
 }
+
+/** Commands whose arguments are free text — search terms, a subject line, a
+ *  name — so nothing they are given is a sign of a sentence. */
+const FREE_TEXT = new Set(['ask', 'pubs', 'mail', 'students', 'coauthors', 'sim']);
+/** Commands that take a result number, so "show me all the papers" is not one. */
+const NUMBERED = new Set(['cite', 'show']);
 
 /** Tab completion: the command name on the first word, then whatever that
  *  command declares for its argument. Returns the candidates plus the

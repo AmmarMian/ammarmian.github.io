@@ -20,8 +20,35 @@ try {
 } catch {}
 let auto: Theme = 'night';
 
+export type LightMode = 'auto' | 'day' | 'night';
+const LIGHT_OF: Record<ThemePref, LightMode> = { auto: 'auto', paper: 'day', night: 'night' };
+const PREF_OF: Record<LightMode, ThemePref> = { auto: 'auto', day: 'paper', night: 'night' };
+
+/* Where there is a scene, the theme and the scene's light are one setting.
+   They used to be two, and pinning Paper while the tower stood at night (or
+   in the city, which is always night) put light glass over a dark world,
+   unreadable. Now choosing light makes it day, choosing dark makes it night,
+   and the page always takes its theme from the light actually falling —
+   including in the worlds that refuse to change the hour. */
+let light: ((mode: LightMode) => void) | null = null;
+
 export function themePref(): ThemePref { return pref; }
-export function effectiveTheme(): Theme { return pref === 'auto' ? auto : pref; }
+export function effectiveTheme(): Theme { return light || pref === 'auto' ? auto : pref; }
+
+/** Called once by the scene: from here on, a theme choice is a light choice. */
+export function linkThemeToLight(setLight: (mode: LightMode) => void) {
+  light = setLight;
+  setLight(LIGHT_OF[pref]);
+  apply();
+}
+
+/** The light was pinned from somewhere else (the console, the Display
+ *  panel): the theme choice follows it, without calling back. */
+export function themeFollowsLight(mode: LightMode) {
+  pref = PREF_OF[mode];
+  try { if (pref === 'auto') localStorage.removeItem(KEY); else localStorage.setItem(KEY, pref); } catch {}
+  apply();
+}
 
 function apply() {
   const t = effectiveTheme();
@@ -38,6 +65,7 @@ export function setAutoTheme(t: Theme) {
 export function setThemePref(p: ThemePref) {
   pref = p;
   try { if (p === 'auto') localStorage.removeItem(KEY); else localStorage.setItem(KEY, p); } catch {}
+  light?.(LIGHT_OF[p]);
   apply();
 }
 
@@ -49,7 +77,7 @@ export function cycleTheme(): ThemePref {
 
 export const THEME_LABEL: Record<ThemePref, string> = {
   auto: 'Follows the hour',
-  paper: 'Paper (light)',
+  paper: 'Day (light)',
   night: 'Night (dark)',
 };
 
