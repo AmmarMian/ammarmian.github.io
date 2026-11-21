@@ -31,7 +31,7 @@ interface Meta {
   open: number;
 }
 interface Anim { T: number; delay: number; frames: number[][] }
-interface Spot { x: number; y: number; w: number; h: number; label: string; run?: () => void }
+interface Spot { x: number; y: number; w: number; h: number; label: string; run?: () => void; tag?: string }
 
 const ART = `${BASE}/pixel`;
 const READING = ['about', 'publications', 'projects', 'now', 'contact', 'elsewhere', 'settings'];
@@ -60,6 +60,7 @@ export async function renderPixelTower(root: HTMLElement) {
     <section class="px-stage" aria-label="The tower">
       <div class="px-picture">
         <canvas class="px-canvas" role="img"></canvas>
+        <p class="px-sky-title" hidden>${esc(PROFILE.role)}<span>${esc(PROFILE.affiliation)}</span></p>
         <div class="px-books"></div>
         <div class="px-spots"></div>
       </div>
@@ -80,6 +81,7 @@ export async function renderPixelTower(root: HTMLElement) {
   const stage = $<HTMLElement>('.px-stage');
   const spotsEl = $<HTMLElement>('.px-spots');
   const booksEl = $<HTMLElement>('.px-books');
+  const skyTitle = $<HTMLElement>('.px-sky-title');
   const contentEl = $<HTMLElement>('.px-content');
   const g = canvas.getContext('2d')!;
 
@@ -199,16 +201,16 @@ export async function renderPixelTower(root: HTMLElement) {
      edge, at a whole number of device pixels per art pixel. `need` is what
      must be seen whole (the tower, or a room with a strip of the floors
      either side); the rest of the pane is filled with more of the world. */
-  function size(needW: number, needH: number, phoneH: number, phoneMax: number) {
+  function size(needW: number, needH: number, phone: { h: number; max?: number; box?: number }) {
     const dpr = window.devicePixelRatio || 1;
     const wide = isWide();
     const boxW = stage.getBoundingClientRect().width;
-    // on a phone the picture may not take more than phoneMax of the screen's height: the land fills the sides
-    const k = Math.max(1, Math.floor(wide
-      ? Math.min((boxW * dpr) / needW, (window.innerHeight * dpr) / needH)
-      : Math.min((boxW * dpr) / needW, (phoneMax * window.innerHeight * dpr) / phoneH)));
+    // a phone: either a fixed box (the home: the screen between header and stairs), or at most
+    // `max` of the screen's height; the land fills whatever is left at the sides
+    const availH = wide ? window.innerHeight : phone.box ?? (phone.max ?? 1) * window.innerHeight;
+    const k = Math.max(1, Math.floor(Math.min((boxW * dpr) / needW, (availH * dpr) / (wide ? needH : phone.h))));
     const s = k / dpr;
-    const boxH = wide ? window.innerHeight : Math.round(phoneH * s);
+    const boxH = wide ? window.innerHeight : phone.box ?? Math.round(phone.h * s);
     const W = Math.ceil(boxW / s), H = Math.ceil(boxH / s);
     canvas.width = W; canvas.height = H;
     canvas.style.width = `${W * s}px`; canvas.style.height = `${H * s}px`;
@@ -220,8 +222,12 @@ export async function renderPixelTower(root: HTMLElement) {
 
   async function drawHome() {
     const im = await getOverview(-1);
-    const { W, H, s } = size(192, meta.overview.h, meta.overview.h, 0.72);
-    const ox = Math.round(W / 2 - meta.overview.cx), oy = H - meta.overview.h;   // the ground stays put; more sky if the pane is tall
+    const wide = isWide();
+    // a phone: the tower is the whole page, between the header and the stairs, its floors labelled beside it
+    const headH = $<HTMLElement>('.px-head').getBoundingClientRect().height;
+    const { W, H, s } = size(wide ? 192 : 150, meta.overview.h, { h: meta.overview.h, box: Math.round(window.innerHeight - headH - 64) });
+    // the ground stays put (more sky if the pane is tall); on a phone the tower steps left to leave its labels room
+    const ox = Math.round(W / 2 - meta.overview.cx - (wide ? 0 : 46 / s)), oy = H - meta.overview.h;
     layout = { W, H, ox, oy, scale: s };
     g.fillStyle = 'rgb(25, 26, 54)'; g.fillRect(0, 0, W, H);
     g.drawImage(im, ox, oy);
@@ -229,8 +235,10 @@ export async function renderPixelTower(root: HTMLElement) {
     canvas.setAttribute('aria-label', 'The whole tower, every floor lit');
     spots(meta.overview.floors.map(([y0, y1], k) => {
       const r = routeForSlug(slugOfFloor(k))!;
-      return { x: meta.overview.x0 + ox, y: y0 + oy, w: meta.overview.x1 - meta.overview.x0, h: y1 - y0 + 1, label: `${r.label} — ${r.title}`, run: () => go(r.slug) };
+      return { x: meta.overview.x0 + ox, y: y0 + oy, w: meta.overview.x1 - meta.overview.x0, h: y1 - y0 + 1, label: `${r.label} — ${r.title}`, run: () => go(r.slug),
+        tag: wide ? undefined : `<span class="px-floor-tag"><span>${String(k).padStart(2, '0')}</span>${esc(r.label)}</span>` };
     }), true);
+    skyTitle.hidden = wide;
   }
 
   /** A neighbouring room with its lights out: darken what is drawn, not the air around it. */
@@ -249,7 +257,8 @@ export async function renderPixelTower(root: HTMLElement) {
      outside, enlarged to the room's scale and lined up on this floor. */
   async function drawRoom(k: number) {
     const wide = isWide();
-    const { W, H, s } = size(RW + (wide ? 16 : 8), RH + (wide ? 48 : 0), RH + 28, 0.42);
+    const { W, H, s } = size(RW + (wide ? 16 : 8), RH + (wide ? 48 : 0), { h: RH + 28, max: 0.42 });
+    skyTitle.hidden = true;
     const PITCH = RH - 6;                                          // a room's ceiling slab sits on the floor of the one above
     const need: number[] = [k];
     for (let j = k + 1, y = (H - RH) / 2 - PITCH; j <= 6 && y > -RH; j++, y -= PITCH) need.push(j);
@@ -304,6 +313,7 @@ export async function renderPixelTower(root: HTMLElement) {
     if (k > 0) sp.push({ x: rx, y: ry + RH, w: RW, h: H - ry - RH, label: `Down the stairs — ${routeForSlug(slugOfFloor(k - 1))!.title}`, run: () => step(-1) });
     spots(sp, false);
     shelf.place();
+    collapse.set(ry, s);
     void loadAnim(k);
   }
 
@@ -352,7 +362,7 @@ export async function renderPixelTower(root: HTMLElement) {
       b.style.left = `${sp.x * s}px`; b.style.top = `${sp.y * s}px`;
       b.style.width = `${sp.w * s}px`; b.style.height = `${sp.h * s}px`;
       b.setAttribute('aria-label', sp.label);
-      b.innerHTML = `<span class="px-spot-tip">${esc(sp.label)}</span>`;
+      b.innerHTML = `<span class="px-spot-tip">${esc(sp.label)}</span>${sp.tag ?? ''}`;
       b.addEventListener('click', () => { sp.run ? sp.run() : showContent(sp.label); });
       spotsEl.appendChild(b);
     }
@@ -464,7 +474,8 @@ export async function renderPixelTower(root: HTMLElement) {
     floor = k;
     view.classList.toggle('px-in-room', k >= 0);
     if (k >= 0) { await drawRoom(k); if (was !== k) renderRoomText(route!); }
-    else { animFloor = -2; anim = null; await drawHome(); renderHomeText(); }
+    else { animFloor = -2; anim = null; await drawHome(); renderHomeText(); collapse.apply(); }
+    if (was !== k) view.scrollTop = 0;
     if (was !== k && !reduceMotion()) canvas.animate([{ opacity: 0.3 }, { opacity: 1 }], { duration: 180 });
     // the stairs bar
     $<HTMLElement>('.px-stairs-kicker').textContent = route ? `${String(route.index).padStart(2, '0')} · ${route.title}` : '7 floors · tap one';
@@ -491,6 +502,27 @@ export async function renderPixelTower(root: HTMLElement) {
     clearTimeout(resizeTimer);
     resizeTimer = window.setTimeout(() => { if (floor >= 0) void drawRoom(floor); else void drawHome(); }, 120);
   });
+
+  /* On a phone, reading a room: the picture starts large and, as the text
+     scrolls, folds up into a strip at the top that keeps the room's middle in
+     view — a sticky header that is the room itself. */
+  const collapse = (() => {
+    let roomMid = 0, strip = 76;
+    function apply() {
+      if (isWide() || floor < 0) { stage.style.top = ''; picture.style.transform = ''; return; }
+      const head = $<HTMLElement>('.px-head').getBoundingClientRect().height;
+      const full = stage.getBoundingClientRect().height;
+      const travel = Math.max(0, full - strip);
+      stage.style.top = `${head - travel}px`;
+      const p = Math.min(1, view.scrollTop / Math.max(1, travel));
+      picture.style.transform = `translateY(${Math.round(p * (full - strip / 2 - roomMid))}px)`;
+    }
+    view.addEventListener('scroll', () => requestAnimationFrame(apply), { passive: true });
+    return {
+      set(ry: number, s: number) { roomMid = (ry + RH / 2) * s; apply(); },
+      apply,
+    };
+  })();
 
   /* ------------------------------ the keeper ----------------------------- */
   const keeper = mountKeeper(view, () => floor);
