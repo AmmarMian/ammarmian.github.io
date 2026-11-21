@@ -10,7 +10,12 @@
   --px-ink: #efe3c8; --px-ink-dim: #cdbd9f; --px-ink-faint: #b4a486;
   --px-bg: #241a22; --px-bg-hi: #2f222c; --px-outer: #110b10; --px-gold: #c99a4b;
   --px-lit: #4a3640; --px-shade: #170f15; --px-accent: #f2b65a;
-  min-height: 100vh;
+  /* The site's body never scrolls (the 3D tower must not), so this view is
+     its own scroller: the sticky picture and header stick inside it. */
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-text);
