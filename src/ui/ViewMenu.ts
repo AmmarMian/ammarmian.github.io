@@ -1,10 +1,10 @@
 import { BASE } from '../router';
 
-type ViewKind = '3d' | 'console' | 'text';
+type ViewKind = '3d' | '2d' | 'text';
 
 const VIEWS: { kind: ViewKind; href: string; label: string; blurb: string }[] = [
-  { kind: '3d', href: '/', label: '3D tower', blurb: 'The full scene — six storeys and the gate' },
-  { kind: 'console', href: '/console', label: 'ASCII console', blurb: 'The same tower in text, driven by typing' },
+  { kind: '3d', href: '/?view=3d', label: '3D tower', blurb: 'The full scene — six storeys and the gate' },
+  { kind: '2d', href: '/2d?view=2d', label: 'Pixel tower', blurb: 'The same rooms, hand-drawn in pixels — light on any machine' },
   { kind: 'text', href: '/text', label: 'Text version', blurb: 'One plain page, everything on it' },
 ];
 

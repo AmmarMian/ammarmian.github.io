@@ -27,7 +27,7 @@
 import { BASE } from '../router';
 import { announce } from './io';
 
-export type LightView = 'text' | 'console';
+export type LightView = 'text' | '2d';
 
 const PREF_KEY = 'lair-view';
 const OFFERED_KEY = 'lair-offered';
@@ -36,7 +36,8 @@ const OFFERED_KEY = 'lair-offered';
 export function preferredView(): LightView | null {
   try {
     const v = localStorage.getItem(PREF_KEY);
-    return v === 'text' || v === 'console' ? v : null;
+    // 'console' is what the ASCII console used to be stored as: the pixel tower replaced it
+    return v === 'text' ? 'text' : v === '2d' || v === 'console' ? '2d' : null;
   } catch { return null; }
 }
 
@@ -52,8 +53,9 @@ export function setPreferredView(v: LightView | null) {
  *  so the URL that gets shared or bookmarked is the ordinary one. */
 export function honourViewOverride(): boolean {
   const p = new URLSearchParams(window.location.search);
-  if (p.get('view') !== '3d') return false;
-  setPreferredView(null);
+  const v = p.get('view');
+  if (v !== '3d' && v !== '2d') return false;
+  setPreferredView(v === '2d' ? '2d' : null);
   markOffered();   // they have just answered the question; don't ask again
   p.delete('view');
   const q = p.toString();
@@ -86,11 +88,11 @@ export function offerLighter(body: string, spoken = body) {
     <div class="kicker">a lighter way</div>
     <p>${body}</p>
     <div class="perf-offer-actions">
-      <button type="button" class="mode-btn mode-btn-primary" data-go="text">Plain text</button>
-      <button type="button" class="mode-btn" data-go="console">Text console</button>
+      <button type="button" class="mode-btn mode-btn-primary" data-go="2d">Pixel tower</button>
+      <button type="button" class="mode-btn" data-go="text">Plain text</button>
       <button type="button" class="mode-btn perf-offer-stay" data-go="stay">Stay here</button>
     </div>
-    <p class="perf-offer-fine">Either one becomes your default here; the link home on that page brings the tower back.</p>
+    <p class="perf-offer-fine">Either one becomes your default here; the 2D·3D switch at the top brings the 3D tower back.</p>
   `;
   document.body.appendChild(offer);
   requestAnimationFrame(() => offer.classList.add('perf-offer-in'));
@@ -104,7 +106,8 @@ export function offerLighter(body: string, spoken = body) {
       const go = btn.dataset.go;
       if (go === 'stay') { dismiss(); return; }
       setPreferredView(go as LightView);
-      window.location.href = BASE + '/' + go;
+      const here = window.location.pathname.slice(BASE.length).replace(/^\/+/, '');
+      window.location.href = go === '2d' ? `${BASE}/${here || '2d'}?view=2d` : BASE + '/text';
     });
   });
   announce(spoken);

@@ -7,9 +7,9 @@ import { createHelpButton } from './ui/HelpModal';
 import { createTerminal } from './ui/Terminal';
 import { createDestinationModal } from './ui/DestinationModal';
 import { renderTextPage } from './ui/TextPage';
-import { offerLighter, preferredView, honourViewOverride } from './ui/lighter';
+import { offerLighter, preferredView, honourViewOverride, setPreferredView } from './ui/lighter';
+import { shouldAsk, askView } from './ui/chooser';
 import { gpuInfo, guessTier } from './tower/quality';
-import { renderAsciiConsole } from './ui/AsciiConsole';
 import { createViewMenu } from './ui/ViewMenu';
 import { createSettingsButton } from './ui/SettingsPanel';
 import { createFpsMeter } from './ui/FpsMeter';
@@ -25,7 +25,8 @@ const app = document.getElementById('app')!;
 
 // Three ways in, all showing the same content:
 //   /text     — plain semantic HTML, for screen readers, crawlers and skimming
-//   /console  — an ASCII tower driven by typing or tapping, good on a phone
+//   /2d       — the pixel tower: every room drawn in pixel art, light on any machine
+//               (/console, where the ASCII console used to be, lands here too)
 //   /         — the 3D tower
 const entry = currentSlug();
 /* `?view=3d` on the way in means a visitor has come back for the tower; it
@@ -39,14 +40,21 @@ honourViewOverride();
 const stuck = !gpuInfo().ok;
 const chosen = preferredView();
 
+/* No WebGL at all used to mean the plain page. The pixel tower only needs a
+   2D canvas, so it is the better landing now; the plain page stays one link
+   away for anyone who wants it. */
+const pixelTower = () => import('./ui/PixelTower').then((m) => m.renderPixelTower(app));
 if (entry === 'text') {
   renderTextPage(app);
-} else if (entry === 'console') {
-  renderAsciiConsole(app);
-} else if (stuck || chosen === 'text') {
+} else if (entry === '2d' || entry === 'console') {
+  if (chosen !== 'text') setPreferredView('2d');
+  void pixelTower();
+} else if (chosen === 'text') {
   renderTextPage(app);
-} else if (chosen === 'console') {
-  renderAsciiConsole(app);
+} else if (chosen === '2d' || stuck) {
+  void pixelTower();
+} else if (shouldAsk(guessTier() === 'low')) {
+  void askView(app).then((v) => (v === '2d' ? pixelTower() : bootTower()));
 } else {
   void bootTower();
 }
@@ -383,7 +391,7 @@ sheetTool(ICON.gate, 'Worlds', () => destModal.open());
 const mTheme = sheetTool('', '', () => cycleTheme(), true);
 mTheme.innerHTML = themeShort();
 window.addEventListener('lair-theme', () => { mTheme.innerHTML = themeShort(); });
-sheetTool(ICON.console, 'Console', () => { window.location.href = BASE + '/console'; });
+sheetTool(ICON.console, 'Console', () => terminal.toggle());
 sheetTool('<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 4.5h10M5 8.5h10M5 12.5h10M5 16.5h6"/></svg>', 'Text page', () => { window.location.href = BASE + '/text'; });
 sheetTool(ICON.gear, 'Display', () => settings.toggle());
 sheetTool(ICON.help, 'Help', () => help.toggle());
@@ -426,8 +434,8 @@ window.addEventListener('lair-struggling', (e: any) => {
   const fps = Math.round(e.detail?.fps ?? 0);
   offerLighter(
     `The tower is drawing at about ${fps} frames a second here, and it is already as simple as it goes. `
-    + 'The same content reads well without the 3D.',
-    `This device is drawing about ${fps} frames a second. A lighter text version is available.`,
+    + 'The same rooms are drawn in pixel art too, light on any machine.',
+    `This device is drawing about ${fps} frames a second. A lighter pixel-art version is available.`,
   );
 });
 
@@ -440,23 +448,23 @@ if (g.software) {
   // Not a prediction: the browser has named a CPU rasteriser as the renderer.
   offerLighter(
     'This browser is drawing the tower on the processor rather than a graphics card, '
-    + 'which it will do slowly however much detail is turned off. Everything here is also one plain page.',
-    'No GPU is in use on this device. A lighter text version is available.',
+    + 'which it will do slowly however much detail is turned off. The pixel tower needs no graphics card at all.',
+    'No GPU is in use on this device. A lighter pixel-art version is available.',
   );
 } else if (guessTier() === 'low') {
   // Deliberately after the opening, so the tower gets to make its case first.
   setTimeout(() => offerLighter(
     'This looks like a modest machine for a scene this size, so the tower is running at its lowest detail. '
-    + 'If it feels heavy, the same content is one plain page.',
-    'The tower is running at its lowest detail. A lighter text version is available.',
+    + 'If it feels heavy, the pixel tower has the same rooms and weighs almost nothing.',
+    'The tower is running at its lowest detail. A lighter pixel-art version is available.',
   ), 9000);
 }
 window.addEventListener('lair-quality', (e: any) => {
   if (e.detail?.reason === 'demoted' && e.detail?.tier === 'low') {
     offerLighter(
       'The tower has turned itself down as far as it goes to keep moving. '
-      + 'If it still feels heavy, the same content reads well as one plain page.',
-      'The tower is now at its lowest detail. A lighter text version is available.',
+      + 'If it still feels heavy, the pixel tower has the same rooms and weighs almost nothing.',
+      'The tower is now at its lowest detail. A lighter pixel-art version is available.',
     );
   }
 });

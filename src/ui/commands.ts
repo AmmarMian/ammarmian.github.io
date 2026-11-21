@@ -7,7 +7,7 @@ import {
 import students from '../data/students.json';
 import { studentGroups } from '../data/studentGroups';
 import projects from '../data/projects.json';
-import { FLOORS, navigate } from '../router';
+import { FLOORS, navigate, currentSlug } from '../router';
 import { FLOOR_NAMES } from '../tower/scene-constants';
 import { copyText, downloadText } from './io';
 import { WORLD_BLURBS } from '../data/worlds';
@@ -79,8 +79,8 @@ export interface Ctx extends ConsoleHost {
   isCompact?: () => boolean;
   /** How many monospace characters fit across the output, if known. */
   columns?: () => number;
-  /** 'tower' drives the 3D scene; 'ascii' is the text-only console. */
-  mode: 'tower' | 'ascii';
+  /** 'tower' drives the 3D scene; '2d' is the pixel tower; 'ascii' is a text-only console. */
+  mode: 'tower' | '2d' | 'ascii';
   /** ASCII console only — re-draw the tower diagram. */
   draw?: (floor?: number | null) => void;
   /** Last publication result set, so `cite 3` means something. */
@@ -749,23 +749,26 @@ export const COMMANDS: Record<string, Command> = {
   },
 
   view: {
-    args: '<3d|ascii|text>',
+    args: '<3d|2d|text>',
     help: 'switch how this site is presented',
-    detail: 'Reload into another presentation of the same content: 3d is the tower, ascii is this console with the tower drawn in text, text is a plain semantic page.',
-    examples: ['view ascii', 'view text', 'view 3d'],
-    complete: () => ['3d', 'ascii', 'text'],
+    detail: 'Reload into another presentation of the same content: 3d is the tower you can walk round, 2d is the same tower drawn in pixel art (light on any machine), text is a plain semantic page. The floor you are on comes with you.',
+    examples: ['view 2d', 'view text', 'view 3d'],
+    complete: () => ['3d', '2d', 'text'],
     run(args, ctx) {
-      const v = args[0];
-      if (v !== '3d' && v !== 'ascii' && v !== 'text') {
-        ctx.print('view: try `view 3d`, `view ascii` or `view text`.', 'err');
+      let v = args[0];
+      if (v === 'pixel' || v === 'ascii' || v === 'console') v = '2d';
+      if (v !== '3d' && v !== '2d' && v !== 'text') {
+        ctx.print('view: try `view 3d`, `view 2d` or `view text`.', 'err');
         return;
       }
-      if (v === 'ascii' && ctx.mode === 'ascii') { ctx.print('already here.'); return; }
+      if (v === '2d' && ctx.mode === '2d') { ctx.print('already here.'); return; }
       if (v === '3d' && ctx.mode === 'tower') { ctx.print('already here.'); return; }
       // A view switch rebuilds the page from scratch — the 3D tower and the
-      // ASCII console are different worlds, not different stylesheets.
-      const path = BASE + (v === 'text' ? '/text' : v === 'ascii' ? '/console' : '/');
-      window.location.href = path;
+      // pixel tower are different pages, not different stylesheets.
+      const floor = FLOORS.find((f) => f.slug === currentSlug());
+      if (v === 'text') window.location.href = BASE + '/text';
+      else if (v === '2d') window.location.href = BASE + '/' + (floor ? floor.slug : '2d') + '?view=2d';
+      else window.location.href = BASE + '/' + (floor ? floor.slug : '') + '?view=3d';
     },
   },
 
@@ -776,7 +779,7 @@ export const COMMANDS: Record<string, Command> = {
     examples: ['jump forest', 'jump space', 'jump none'],
     complete: () => JUMP_TARGETS,
     run(args, ctx) {
-      if (ctx.mode === 'ascii') {
+      if (ctx.mode !== 'tower') {
         ctx.print('jump: the gate needs the 3D tower — `view 3d` to step through it.', 'err');
         return;
       }

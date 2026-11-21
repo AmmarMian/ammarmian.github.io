@@ -123,8 +123,9 @@ const light = (x, y) => {
 
 /* ---------- render; stars twinkle, a shooting star once a loop ---------- */
 const room = r.finish({ light });
+for (let y = MY - 9; y <= MY + 9; y++) for (let x = MX - 9; x <= MX + 9; x++) { const d = Math.hypot(x - MX, y - MY); if (d > 5.5 && d <= 9) P.blend(room.out, x, y, [200, 200, 230], d < 7.5 ? 0.18 : 0.08); }
+
 room.animate((b, t) => {
-  for (let y = MY - 9; y <= MY + 9; y++) for (let x = MX - 9; x <= MX + 9; x++) { const d = Math.hypot(x - MX, y - MY); if (d > 5.5 && d <= 9) P.blend(b, x, y, [200, 200, 230], d < 7.5 ? 0.18 : 0.08); }
   STARS.forEach(([x, y, c], k) => {
     const ph = (t + k * 7) % 48;
     if (k % 5 === 0 && ph < 6) b.pset(x, y, c.map((v) => Math.round(v * 0.45)));
