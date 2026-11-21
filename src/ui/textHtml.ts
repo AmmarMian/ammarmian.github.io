@@ -207,7 +207,7 @@ export function textPageEnhance(): void {
     try {
       const u = new URL(back, window.location.href);
       if (u.origin === window.location.origin) {
-        home.href = u.pathname + u.search + u.hash;
+        home.href = u.href;                                          // the whole checked address: a bare path could start with // and leave the site
         home.textContent = from === '2d' ? '\u2190 The pixel tower' : from === 'choose' ? '\u2190 Choose another view' : '\u2190 The interactive tower';
       }
     } catch { /* not a URL: keep the default way back */ }
