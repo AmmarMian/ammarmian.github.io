@@ -119,7 +119,7 @@
 .px-floor-tag span { font: 500 10px/1 var(--font-mono); color: #cdbd9f; }
 
 /* ------------------------------- the text -------------------------------- */
-.px-text { padding: 28px clamp(20px, 6vw, 96px) 48px; }
+.px-text { padding: 28px clamp(20px, 6vw, 96px) 48px; line-height: 1.55; }
 .px-head { display: flex; align-items: center; gap: 6px; margin-bottom: 28px; }
 .px-sig { flex: 1; font: 400 30px/1 var(--font-blackletter); color: var(--ink); text-decoration: none; }
 .px-sig:hover { color: var(--accent); }
@@ -225,12 +225,45 @@
 
 /* -------------------------------- narrow --------------------------------- */
 @media (max-width: 899.98px) {
-  .px-view { --px: 3px; padding-bottom: 72px; }
-  .px-text { padding: 18px 12px 24px; }
+  .px-view { --px: 3px; padding-bottom: 64px; }
+  /* in a room the text is one full-width panel butted under the picture, like the header and
+     the stairs: no gutter of page showing round it, and it runs down to the stairs even when
+     the room says little (head + folded strip + stairs ≈ 190px) */
+  .px-text { padding: 0; }
+  .px-text .px-frame { margin: 0; padding: 26px 24px 36px; min-height: calc(100dvh - 190px); }
+  /* the way back sits on the kicker's line, a quiet label, not a second heading */
+  .px-room { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; column-gap: 12px; }
+  .px-room > * { grid-column: 1 / -1; min-width: 0; }
+  .px-room > .px-kicker { grid-column: 1; grid-row: 1; margin-bottom: 10px; }
+  .px-room > .px-back { grid-column: 2; grid-row: 1; margin: 0; letter-spacing: .1em; text-decoration: none; color: var(--ink-faint); }
+  .px-room > .px-back:hover, .px-room > .px-back:focus-visible { color: var(--accent); }
+  .px-room > .px-title { margin-bottom: 14px; line-height: 1.05; }
   .px-view:not(.px-in-room) .px-text { display: none; }          /* home is the tower; the floors are the menu */
   .px-view:not(.px-in-room) { overflow: hidden; }
   .px-in-room .px-stage { position: sticky; z-index: 4; }        /* folds into a strip as the text scrolls (top set in script) */
   .px-in-room .px-picture { will-change: transform; }
+  /* The text panel's top edge belongs to the picture, not to the panel: the strip carries it
+     (outer line, lit bevel, the gold rule), so the text slides under a finished edge and the
+     panel's gold sides always close against it. At rest it lies exactly over the panel's own
+     top edge. The stage lets it hang 9px below; the picture is still clipped at its foot. */
+  .px-in-room .px-stage { overflow: visible; clip-path: inset(0 0 calc(-3 * var(--px)) 0); }
+  .px-in-room .px-stage::after {
+    content: ''; position: absolute; left: 0; right: 0; z-index: 5; pointer-events: none;
+    top: calc(100% - var(--px)); height: calc(4 * var(--px));
+    background:
+      linear-gradient(var(--px-outer), var(--px-outer)) 0 0 / 100% var(--px) no-repeat,
+      linear-gradient(var(--px-lit), var(--px-lit)) 0 var(--px) / 100% var(--px) no-repeat,
+      linear-gradient(var(--px-gold), var(--px-gold)) calc(2 * var(--px)) calc(3 * var(--px)) / calc(100% - 4 * var(--px)) var(--px) no-repeat,
+      linear-gradient(var(--px-lit), var(--px-lit)) 0 0 / var(--px) 100% no-repeat,
+      linear-gradient(var(--px-shade), var(--px-shade)) 100% 0 / var(--px) 100% no-repeat,
+      var(--px-bg);
+  }
+  .px-in-room .px-picture { overflow: hidden; }
+  /* the gate stands on the room's floor line, beside the room */
+  .px-in-room .px-gates { bottom: calc(3 * var(--px)); }
+  /* while the room's title is on screen the stairs bar names only the floor */
+  .px-title-on .px-stairs-label { display: none; }
+  .px-title-on .px-stairs-kicker { font-size: 12px; color: var(--px-ink-dim); }
   .px-head { position: sticky; top: 0; z-index: 5; margin: 0; padding: 6px 8px 6px 14px; background: var(--px-bg); color: var(--px-ink); box-shadow: 0 var(--px) 0 0 var(--px-outer); }
   .px-head .px-sig, .px-head .px-tool, .px-head .px-views-btn { color: var(--px-ink); }
   .px-head .px-sig { font-size: 24px; }

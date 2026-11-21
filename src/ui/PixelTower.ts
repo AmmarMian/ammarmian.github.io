@@ -407,13 +407,15 @@ export async function renderPixelTower(root: HTMLElement) {
     const { W, H, s } = size(RW + (wide ? 16 : 8), RH + (wide ? 48 : 0), { h: RH + 28, max: 0.42 });
     skyTitle.hidden = true;
     const PITCH = RH - 6;                                          // a room's ceiling slab sits on the floor of the one above
+    // wide: the room in the middle of the tower; a phone: the picture ends on the room's own
+    // floor, where the text panel's edge meets it, with a strip of the floor above for the stairs up
+    const rx = Math.round((W - RW) / 2), ry = wide ? Math.round((H - RH) / 2) : H - RH;
     const need: number[] = [k];
-    for (let j = k + 1, y = (H - RH) / 2 - PITCH; j <= 6 && y > -RH; j++, y -= PITCH) need.push(j);
-    for (let j = k - 1, y = (H - RH) / 2 + PITCH; j >= 0 && y < H; j--, y += PITCH) need.push(j);
+    for (let j = k + 1, y = ry - PITCH; j <= 6 && y > -RH; j++, y -= PITCH) need.push(j);
+    for (let j = k - 1, y = ry + PITCH; j >= 0 && y < H; j--, y += PITCH) need.push(j);
     const [bd, obsOpen, ...ims] = await Promise.all([getBackdrop(world), openObservatory, ...need.map(getRoom)]);
     if (floor !== k) return;
     const imOf = (j: number) => (j === 6 && (world || byDay()) ? obsOpen : ims[need.indexOf(j)]);   // open to whatever sky is over it
-    const rx = Math.round((W - RW) / 2), ry = Math.round((H - RH) / 2);
     layout = { W, H, ox: rx, oy: ry, scale: s };
 
     // outside: the land, ×3, with this floor of the tower where this room is
@@ -459,7 +461,7 @@ export async function renderPixelTower(root: HTMLElement) {
     canvas.setAttribute('aria-label', `${route.title}, drawn in pixels`);
     const sp: Spot[] = (SPOTS[route.slug] ?? []).map((p) => ({ ...p, x: p.x + rx, y: p.y + ry }));
     if (k < 6) sp.push({ x: rx, y: 0, w: RW, h: ry, label: `Up the stairs — ${routeForSlug(slugOfFloor(k + 1))!.title}`, run: () => step(1) });
-    if (k > 0) sp.push({ x: rx, y: ry + RH, w: RW, h: H - ry - RH, label: `Down the stairs — ${routeForSlug(slugOfFloor(k - 1))!.title}`, run: () => step(-1) });
+    if (k > 0 && H - ry - RH > 4) sp.push({ x: rx, y: ry + RH, w: RW, h: H - ry - RH, label: `Down the stairs — ${routeForSlug(slugOfFloor(k - 1))!.title}`, run: () => step(-1) });
     spots(sp, false);
     shelf.place();
     collapse.set(ry, s);
@@ -573,6 +575,7 @@ export async function renderPixelTower(root: HTMLElement) {
 
   /* --------------------------- the text column -------------------------- */
   const bodyEl = () => contentEl.querySelector('.px-body') as HTMLElement;
+  let titleWatch: IntersectionObserver | null = null;   // see watchTitle
   function renderHomeText() {
     content.unmount();
     contentEl.innerHTML = `
@@ -592,17 +595,32 @@ export async function renderPixelTower(root: HTMLElement) {
       a.addEventListener('click', (e) => { e.preventDefault(); go(slug); });
       nav.appendChild(a);
     }
+    watchTitle();
   }
   function renderRoomText(route: FloorRoute) {
     contentEl.innerHTML = `
       <article class="px-room ${isWide() ? '' : 'px-frame'}">
-        <a class="back-link px-back" href="${BASE}/">&larr; the whole tower</a>
+        <a class="back-link px-back" href="${BASE}/">&larr; ${isWide() ? 'the whole tower' : 'the tower'}</a>
         <p class="px-kicker">${String(route.index).padStart(2, '0')} · ${esc(route.title)}</p>
         <h1 class="px-title">${esc(route.label)}</h1>
         <div class="px-body"></div>
       </article>`;
     contentEl.querySelector('.px-back')!.addEventListener('click', (e) => { e.preventDefault(); go(null); });
     content.mount(route.slug, bodyEl());
+    watchTitle();
+  }
+  /* A phone: while the room's own title is on screen the stairs bar names only the floor,
+     so the name is not said twice; once the title has scrolled under the strip, the bar
+     carries it. (The strip is 76px under the header, as the fold below keeps it.) */
+  function watchTitle() {
+    titleWatch?.disconnect(); titleWatch = null;
+    view.classList.remove('px-title-on');
+    const t = contentEl.querySelector('.px-room .px-title');
+    if (!t || isWide()) return;
+    const top = Math.round($<HTMLElement>('.px-head').getBoundingClientRect().height + 76);
+    titleWatch = new IntersectionObserver(([e]) => view.classList.toggle('px-title-on', e.isIntersecting),
+      { root: view, rootMargin: `-${top}px 0px -64px 0px` });
+    titleWatch.observe(t);
   }
 
   /* ------------------------------ moving about --------------------------- */
