@@ -1,6 +1,7 @@
 import { PROFILE, CONTACT } from '../data/profile';
 import { routeForSlug, currentSlug, navigate, onRouteChange, BASE, type FloorRoute } from '../router';
 import { FloorContent } from './FloorContent';
+import { fetchHalPublications, type HalDoc } from '../data/hal';
 import { runCommand, JUMP_TARGETS, columnsOf, type Ctx } from './commands';
 import { attachLineEditor } from './lineEditor';
 import { setRouteMeta } from './meta';
@@ -26,6 +27,8 @@ interface Meta {
   room: { w: number; h: number };
   overview: { w: number; h: number; x0: number; x1: number; cx: number; floors: [number, number][] };
   rooms: { slug: string; floor: number }[];
+  books: [number, number, number, number][];
+  open: number;
 }
 interface Anim { T: number; delay: number; frames: number[][] }
 interface Spot { x: number; y: number; w: number; h: number; label: string; run?: () => void }
@@ -57,6 +60,7 @@ export async function renderPixelTower(root: HTMLElement) {
     <section class="px-stage" aria-label="The tower">
       <div class="px-picture">
         <canvas class="px-canvas" role="img"></canvas>
+        <div class="px-books"></div>
         <div class="px-spots"></div>
       </div>
     </section>
@@ -75,6 +79,7 @@ export async function renderPixelTower(root: HTMLElement) {
   const picture = $<HTMLElement>('.px-picture');
   const stage = $<HTMLElement>('.px-stage');
   const spotsEl = $<HTMLElement>('.px-spots');
+  const booksEl = $<HTMLElement>('.px-books');
   const contentEl = $<HTMLElement>('.px-content');
   const g = canvas.getContext('2d')!;
 
@@ -98,7 +103,74 @@ export async function renderPixelTower(root: HTMLElement) {
       // the gate opens in the 3D tower: go there, already standing in that world
       teleport: (kind) => { window.location.href = `${BASE}/elsewhere?view=3d${kind ? '&world=' + kind : ''}`; return true; },
     },
+    hoverDoc: (id) => shelf.hover(id, 'list'),
+    selectDoc: (id) => shelf.select(id),
+    showDocs: (ids) => shelf.show(ids),
   }, { view: '2d', onReset: pullThePlug });
+
+  /* ------------------------------ the shelves ----------------------------
+     Every publication is a book on the library's back shelves, as in the 3D
+     tower: spread evenly over the spines, newest on the top shelf. Point at
+     a book and its record lights in the list; point at a record and its book
+     lights; open one and its book comes a little way off the shelf. */
+  const shelf = (() => {
+    let docs: HalDoc[] = [];
+    const slot = new Map<string, number>();
+    let hovered: string | null = null, selected: string | null = null, shown: Set<string> | null = null;
+    void fetchHalPublications().then((d) => {
+      docs = d;
+      d.forEach((doc, i) => slot.set(doc.id, Math.floor((i * meta.books.length) / d.length)));
+      if (floor === 3) place();
+    }).catch(() => {});
+    const btnOf = (id: string | null) => (id ? booksEl.querySelector<HTMLElement>(`[data-doc="${CSS.escape(id)}"]`) : null);
+    const listItem = (id: string | null) => (id ? contentEl.querySelector<HTMLElement>(`.pub-item[data-doc="${CSS.escape(id)}"]`) : null);
+    function paint() {
+      for (const b of booksEl.querySelectorAll<HTMLElement>('.px-book')) {
+        const id = b.dataset.doc!;
+        b.classList.toggle('is-hover', id === hovered);
+        b.classList.toggle('is-open', id === selected);
+        b.classList.toggle('is-dim', !!shown && !shown.has(id));
+      }
+    }
+    function place() {
+      booksEl.innerHTML = '';
+      if (floor !== 3 || !docs.length) return;
+      const sc = layout.scale;
+      for (const doc of docs) {
+        const [x, y, w, h] = meta.books[slot.get(doc.id)!];
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'px-book';
+        b.dataset.doc = doc.id;
+        b.style.left = `${(x + layout.ox) * sc}px`; b.style.top = `${(y + layout.oy) * sc}px`;
+        b.style.width = `${w * sc}px`; b.style.height = `${h * sc}px`;
+        b.setAttribute('aria-label', `${doc.title}${doc.year ? ', ' + doc.year : ''}`);
+        b.innerHTML = `<span class="px-spot-tip">${esc(doc.title.length > 70 ? doc.title.slice(0, 68) + '…' : doc.title)}</span>`;
+        b.addEventListener('mouseenter', () => hover(doc.id, 'book'));
+        b.addEventListener('mouseleave', () => hover(null, 'book'));
+        b.addEventListener('focus', () => hover(doc.id, 'book'));
+        b.addEventListener('blur', () => hover(null, 'book'));
+        b.addEventListener('click', () => void content.openDoc(doc.id));
+        booksEl.appendChild(b);
+      }
+      paint();
+    }
+    function hover(id: string | null, from: 'book' | 'list') {
+      if (from === 'book') {
+        listItem(hovered)?.classList.remove('is-lit');
+        listItem(id)?.classList.add('is-lit');
+      }
+      hovered = id;
+      paint();
+    }
+    function select(id: string | null) {
+      selected = id;
+      paint();
+      btnOf(id)?.scrollIntoView?.({ block: 'nearest' });
+    }
+    function show(ids: string[] | null) { shown = ids ? new Set(ids) : null; paint(); }
+    return { place, hover, select, show };
+  })();
 
   function pullThePlug() {
     if (!window.confirm('Pull the plug? Everything this site remembers in this browser is emptied, and the tower reloads as a stranger would find it.')) return;
@@ -153,6 +225,7 @@ export async function renderPixelTower(root: HTMLElement) {
     layout = { W, H, ox, oy, scale: s };
     g.fillStyle = 'rgb(25, 26, 54)'; g.fillRect(0, 0, W, H);
     g.drawImage(im, ox, oy);
+    booksEl.innerHTML = '';
     canvas.setAttribute('aria-label', 'The whole tower, every floor lit');
     spots(meta.overview.floors.map(([y0, y1], k) => {
       const r = routeForSlug(slugOfFloor(k))!;
@@ -194,6 +267,24 @@ export async function renderPixelTower(root: HTMLElement) {
     g.drawImage(bd, bx, by, bd.width * Z, bd.height * Z);
     if (by + bd.height * Z < H) { g.fillStyle = 'rgb(42, 29, 22)'; g.fillRect(0, by + bd.height * Z, W, H); }
 
+    // above the observatory the night goes on: its sky, with stars, right across
+    if (need.includes(6)) {
+      const top = ry + (k - 6) * PITCH;
+      const NIGHT = [[18, 20, 46], [24, 27, 60], [32, 34, 74], [42, 42, 88], [56, 50, 100]];
+      const dim = k === 6 ? 1 : 0.34;                              // a neighbour's sky has its lights out too
+      for (let y = Math.min(top + meta.open, H) - 1; y >= 0; y--) {
+        const band = y < top ? 0 : Math.min(4, Math.floor(Math.pow((y - top) / 104, 1.4) * 5));
+        g.fillStyle = `rgb(${NIGHT[band].map((c) => Math.round(c * (0.55 + 0.45 * dim)))})`;
+        if (y < top) g.fillRect(0, y, W, 1); else { g.fillRect(0, y, rx, 1); g.fillRect(rx + RW, y, W - rx - RW, 1); }
+      }
+      g.fillStyle = `rgba(226, 226, 246, ${0.35 + 0.6 * dim})`;
+      for (let i = 0; i < 90; i++) {
+        const x = Math.floor((Math.sin(i * 12.9898) * 43758.5453 % 1 + 1) % 1 * W);
+        const y = Math.floor((Math.sin(i * 78.233) * 12543.123 % 1 + 1) % 1 * (top + meta.open * 0.7));
+        if ((y < top || x < rx || x >= rx + RW) && y >= 0) g.fillRect(x, y, 1, 1);
+      }
+    }
+
     // the rest of the tower, lights out
     for (const j of need) if (j !== k) drawDark(imOf(j), rx, ry + (k - j) * PITCH);
     under = g.getImageData(rx, ry, RW, RH);
@@ -212,6 +303,7 @@ export async function renderPixelTower(root: HTMLElement) {
     if (k < 6) sp.push({ x: rx, y: 0, w: RW, h: ry, label: `Up the stairs — ${routeForSlug(slugOfFloor(k + 1))!.title}`, run: () => step(1) });
     if (k > 0) sp.push({ x: rx, y: ry + RH, w: RW, h: H - ry - RH, label: `Down the stairs — ${routeForSlug(slugOfFloor(k - 1))!.title}`, run: () => step(-1) });
     spots(sp, false);
+    shelf.place();
     void loadAnim(k);
   }
 
@@ -291,8 +383,6 @@ export async function renderPixelTower(root: HTMLElement) {
       { x: 50, y: 132, w: 20, h: 10, label: 'The cat, asleep' },
     ],
     publications: [
-      { x: 37, y: 24, w: 36, h: 62, label: 'The shelves — every paper' },
-      { x: 119, y: 24, w: 36, h: 62, label: 'More shelves — search them all' },
       { x: 94, y: 98, w: 20, h: 10, label: 'The open book — how this site was made', run: () => content.openColophon() },
       { x: 12, y: 105, w: 26, h: 30, label: 'The globe — other worlds', run: () => go('elsewhere') },
     ],

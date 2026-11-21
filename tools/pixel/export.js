@@ -45,6 +45,9 @@ ROOMS.forEach(([slug, file], k) => {
 write("overview.png", P.png(ov.overview(-1)));
 write("backdrop.png", P.png(ov.backdrop(1)));                 // the land alone: drawn enlarged behind a room
 meta.overview.cx = ov.OX + 48;                                // the tower's centre line
+// the library's spines, top shelf first, left to right: where the papers go
+meta.books = require("./library.js").BOOKS.slice().sort((a, b) => a.y + a.h - (b.y + b.h) || a.x - b.x).map((b) => [b.x, b.y, b.w, b.h]);
+meta.open = require("./observatory.js").OPEN;                // above this row the observatory is open sky
 for (let k = 0; k < 7; k++) write(`overview-${k}.png`, P.png(ov.overview(k)));
 /* The keeper's portrait for the console box: 24×24, a few pixels, as codixel
    says characters drawn without a reference should be. A pointed hat, a

@@ -33,6 +33,11 @@ export interface PanelScene {
   worlds: { kinds: string[]; current: () => string | null; teleport: (kind: string | null) => boolean | void };
   qualityState?(): { tier: string; pinned: unknown; fps?: number | null };
   gpu?(): { ok: boolean; software?: boolean };
+  /** The pixel tower's shelves: which paper the reader is pointing at, which
+   *  one is open, and which ones the current search leaves showing (null: all). */
+  hoverDoc?(id: string | null): void;
+  selectDoc?(id: string | null): void;
+  showDocs?(ids: string[] | null): void;
 }
 
 /** The things the content needs that live outside it: emptying the site's
@@ -78,6 +83,9 @@ export class FloorContent {
   unmount() {
     this.openSlug = null;
     this.scene.shelveBook?.();
+    this.scene.hoverDoc?.(null);
+    this.scene.selectDoc?.(null);
+    this.scene.showDocs?.(null);
     this.clearDetailHandler();
   }
 
@@ -197,11 +205,18 @@ export class FloorContent {
         const li = document.createElement('li');
         const btn = document.createElement('button');
         btn.className = 'pub-item';
+        btn.dataset.doc = doc.id;
+        const point = (on: boolean) => this.scene.hoverDoc?.(on ? doc.id : null);
+        btn.addEventListener('mouseenter', () => point(true));
+        btn.addEventListener('mouseleave', () => point(false));
+        btn.addEventListener('focus', () => point(true));
+        btn.addEventListener('blur', () => point(false));
         btn.innerHTML = `<strong>${escapeHtml(doc.title)}</strong><span>${[venueLine(doc), doc.year || 'n.d.', doc.kind].filter(Boolean).map((x) => escapeHtml(String(x))).join(' &middot; ')}</span>`;
         btn.addEventListener('click', () => this.openPublication(doc));
         li.appendChild(btn);
         list.appendChild(li);
       }
+      this.scene.showDocs?.(results.length === docs.length ? null : results.map((d) => d.id));
     };
 
     let query = '';
@@ -289,6 +304,8 @@ export class FloorContent {
   }
 
   private openPublication(doc: HalDoc, pushHistory = true) {
+    this.scene.hoverDoc?.(null);
+    this.scene.selectDoc?.(doc.id);
     this.scene.focusFloor?.(this.scene.F?.library ?? null);
     const shelf = shelfFor(doc.id);
     // Fire-and-forget flourishes — the record opens immediately, the book
@@ -411,6 +428,7 @@ export class FloorContent {
     if (popHash && /^(#doc-|#colophon$)/.test(window.location.hash)) window.history.back();
     this.bodyEl.innerHTML = '';
     this.scene.shelveBook?.();
+    this.scene.selectDoc?.(null);
     // Pull the camera back out from the shelf close-up to the general
     // library view instead of leaving it parked in on the book.
     void this.scene.focusFloor?.(this.scene.F?.library ?? null);

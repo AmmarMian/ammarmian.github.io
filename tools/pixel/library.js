@@ -61,6 +61,9 @@ r.shell({ floor: (x, y, h) => r.planks(x, y, h), ceil: (x, y, h) => r.beams(x, y
 
 /* ---------- the back wall (drawn at its own scale) ---------- */
 rect(BX0, BY0, BX1, BY1, "wood", (x) => ((x - BX0) % 8 === 0 ? 0.18 : 0.3));
+/* Every spine on the back shelves, in room pixels: the page puts one
+   publication on each of a spread of them, so a book is a paper. */
+const BOOKS = [];
 function books(x0, x1, yTop, yBot, seed) {
   const r = P.rng(seed);
   let x = x0;
@@ -82,6 +85,7 @@ function books(x0, x1, yTop, yBot, seed) {
       if (m === "paper" && j === h - 2) v = 0.32;
       set(x + i, yBot - j, m, v);
     }
+    BOOKS.push({ x, y: yBot - h + 1, w: Math.min(w, x1 - x + 1), h });
     x += w + (r() < 0.15 ? 1 : 0);
   }
 }
@@ -259,6 +263,6 @@ room.animate((b, t, out) => {                                      // one loose 
 });
 const { out, frame, T, DELAY } = room;
 
-module.exports = { out, frame, T, DELAY };
+module.exports = { out, frame, T, DELAY, BOOKS };
 
 if (require.main === module) kit.preview("library", room, { ref: __dirname + "/../../spike/out/all_library.png" });
