@@ -148,9 +148,10 @@ function room() {
     rect(WX - inner, WY, WX + inner, WY, "wood", 0.3);
     rect(WX - r + 1, WY + r + 0.5, WX + r - 1, WY + r + 1.5, "stone", (x, y) => (y === Math.round(WY + r + 0.5) ? 0.9 : 0.45));
   }
-  function cutEdges() {
+  /** The section cut. openAbove: rows above this are open air (the observatory) — no cut there. */
+  function cutEdges(openAbove = -1) {
     const cut = (x0, y0, x1, y1) => {
-      for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+      for (let y = Math.max(y0, openAbove); y <= y1; y++) for (let x = x0; x <= x1; x++) {
         set(x, y, "cut", 0.55 + 0.2 * P.fbm(x * 0.05, y * 0.05, 2, 3));
         fixedL[y * W + x] = 1;
       }
@@ -161,8 +162,8 @@ function room() {
     cut(0, FY1 + 3, W - 1, H - 1);
     rect(0, FY1 + 1, W - 1, FY1 + 2, "floor", (x, y) => (y === FY1 + 1 ? 0.62 : 0.32));
     for (let x = 0; x < W; x++) fixedL[(FY1 + 1) * W + x] = fixedL[(FY1 + 2) * W + x] = 0.8;
-    for (let y = FY0 - 1; y <= FY1; y++) { set(FX0 - 1, y, "cut", 1.0); fixedL[y * W + FX0 - 1] = 1; set(FX1 + 1, y, "cut", 0.75); fixedL[y * W + FX1 + 1] = 1; }
-    for (let x = FX0 - 1; x <= FX1 + 1; x++) { set(x, FY0 - 1, "cut", 0.9); fixedL[(FY0 - 1) * W + x] = 1; }
+    for (let y = Math.max(FY0 - 1, openAbove); y <= FY1; y++) { set(FX0 - 1, y, "cut", 1.0); fixedL[y * W + FX0 - 1] = 1; set(FX1 + 1, y, "cut", 0.75); fixedL[y * W + FX1 + 1] = 1; }
+    if (openAbove < 0) for (let x = FX0 - 1; x <= FX1 + 1; x++) { set(x, FY0 - 1, "cut", 0.9); fixedL[(FY0 - 1) * W + x] = 1; }
   }
   /** A beam of window light: from (x0,y0) widening to (x1,y1). */
   function makeShaft(x0, y0, x1, y1, h0 = 5, h1 = 12) {

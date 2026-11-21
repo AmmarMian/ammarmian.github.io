@@ -16,7 +16,8 @@ const R = kit.RAMPS;
 /* ---------- the sky: everything above the parapet ---------- */
 const PARA = 104;                                                      // parapet top, in world Y
 const SKY = [[18, 20, 46], [24, 27, 60], [32, 34, 74], [42, 42, 88], [56, 50, 100]];
-const sky = (x, y) => { set(x, y, "night", 0); r.mat[Math.round(y) * 192 + Math.round(x)] = -1; glow(x, y, SKY[P.band(Math.min(1, Math.pow(y / 104, 1.4)), SKY.length, x, y, 0.08)]); };
+// the sky is left empty: the page draws the real sky behind the room, the same one the whole tower stands in
+const sky = (x, y) => { set(x, y, "night", 0); r.mat[Math.round(y) * 192 + Math.round(x)] = -1; };
 r.shell({
   floor: (x, y, h) => r.planks(x, y, h, { width: 12, seed: 21 }),
   ceil: (x, y) => sky(x, y),
@@ -32,21 +33,6 @@ for (let y = BY0; y <= BY1; y++) for (let x = BX0; x <= BX1; x++) {
   else if (y < BP && Math.floor((x - BX0) / 8) % 2) sky(x, y);
   else set(x, y, "stone", y < BP - 2 || (y < BP + 1 && !(Math.floor((x - BX0) / 8) % 2)) ? 0.85 : 0.48);
 }
-// the moon, with its halo
-const MX = 146, MY = 24;
-for (let y = MY - 9; y <= MY + 9; y++) for (let x = MX - 9; x <= MX + 9; x++) {
-  const d = Math.hypot(x - MX, y - MY);
-  if (d <= 5.5) glow(x, y, (Math.hypot(x - MX - 2, y - MY + 1) < 1.5 || Math.hypot(x - MX + 2, y - MY - 2) < 1.1) ? [208, 204, 190] : [240, 236, 214]);
-}
-const STARS = [];
-for (let k = 0; k < 46; k++) {
-  const x = 8 + Math.floor(P.hash(k, 1, 40) * 176), y = 8 + Math.floor(P.hash(k, 2, 40) * 72);
-  if (Math.hypot(x - MX, y - MY) < 12) continue;
-  const c = P.hash(k, 3, 40) < 0.3 ? [255, 236, 200] : [220, 222, 250];
-  glow(x, y, c.map((v) => Math.round(v * (0.6 + 0.4 * P.hash(k, 4, 40)))));
-  STARS.push([x, y, c]);
-}
-
 /* ---------- the sundial, set in the floor ---------- */
 r.onFloor(96, 0.36, 20, 0.12, (x, y, e, h) => {
   const a = Math.atan2((h.d - 0.36) / 0.12, (h.X - 96) / 20);
@@ -109,36 +95,20 @@ for (const dx of [-5, -2, 1, 4, -3, 2]) CANDLES.push([ZX + dx, ZY - 19 - (Math.a
 
 for (const [x, y] of [[112, 140], [80, 144], [140, 132]]) rect(x, y, x + 3, y, "paper", 0.9), rect(x + 1, y + 1, x + 4, y + 1, "paper", 0.7);
 
-r.cutEdges();
+r.cutEdges(proj(96, PARA, 0)[1] | 0);                               // open to the sky above the parapet
 
 /* ---------- light: cool moonlight over everything, the brazier warm ---------- */
 const light = (x, y) => {
   let L = 0.4;
-  L += 0.16 * Math.exp(-Math.hypot(x - MX, y - MY) / 120);
+  L += 0.1;                                                           // moonlight, from the sky behind
   L += 0.7 * Math.exp(-Math.hypot(x - ZX, y - ZY + 20) / 30);
   L += 0.18 * Math.exp(-Math.hypot(x - AX, y - ASY) / 10);
   const vx = (x - VX) / 100, vy = (y - 80) / 90;
   return L * (1 - 0.3 * (vx * vx + vy * vy));
 };
 
-/* ---------- render; stars twinkle, a shooting star once a loop ---------- */
+/* ---------- render: the brazier and the candles burn ---------- */
 const room = r.finish({ light });
-for (let y = MY - 9; y <= MY + 9; y++) for (let x = MX - 9; x <= MX + 9; x++) { const d = Math.hypot(x - MX, y - MY); if (d > 5.5 && d <= 9) P.blend(room.out, x, y, [200, 200, 230], d < 7.5 ? 0.18 : 0.08); }
-
-room.animate((b, t) => {
-  STARS.forEach(([x, y, c], k) => {
-    const ph = (t + k * 7) % 48;
-    if (k % 5 === 0 && ph < 6) b.pset(x, y, c.map((v) => Math.round(v * 0.45)));
-    if (k % 7 === 0 && ph > 20 && ph < 24) { b.pset(x - 1, y, c.map((v) => Math.round(v * 0.5))); b.pset(x + 1, y, c.map((v) => Math.round(v * 0.5))); }
-  });
-  if (t >= 10 && t < 18) {                                            // a meteor, left to right, fading tail
-    const s = t - 10;
-    for (let k = 0; k < 5; k++) {
-      const x = 30 + s * 5 - k * 2, y = 14 + s * 2 - k;
-      if (x > 8 && x < 120) P.blend(b, x, y, [255, 250, 230], (1 - k / 5) * (1 - s / 9));
-    }
-  }
-});
 
 module.exports = room;
 if (require.main === module) kit.preview("observatory", room, { ref: __dirname + "/../../spike/out/all_obs.png" });

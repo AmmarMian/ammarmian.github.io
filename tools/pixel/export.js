@@ -43,6 +43,8 @@ ROOMS.forEach(([slug, file], k) => {
   meta.overview.floors.push([y0 + ov.OY, y1 + ov.OY]);
 });
 write("overview.png", P.png(ov.overview(-1)));
+write("backdrop.png", P.png(ov.backdrop(1)));                 // the land alone: drawn enlarged behind a room
+meta.overview.cx = ov.OX + 48;                                // the tower's centre line
 for (let k = 0; k < 7; k++) write(`overview-${k}.png`, P.png(ov.overview(k)));
 /* The keeper's portrait for the console box: 24×24, a few pixels, as codixel
    says characters drawn without a reference should be. A pointed hat, a

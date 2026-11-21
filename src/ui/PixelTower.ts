@@ -24,7 +24,7 @@ import './pixel.css';
 
 interface Meta {
   room: { w: number; h: number };
-  overview: { w: number; h: number; x0: number; x1: number; floors: [number, number][] };
+  overview: { w: number; h: number; x0: number; x1: number; cx: number; floors: [number, number][] };
   rooms: { slug: string; floor: number }[];
 }
 interface Anim { T: number; delay: number; frames: number[][] }
@@ -32,8 +32,6 @@ interface Spot { x: number; y: number; w: number; h: number; label: string; run?
 
 const ART = `${BASE}/pixel`;
 const READING = ['about', 'publications', 'projects', 'now', 'contact', 'elsewhere', 'settings'];
-const SKY_TOP = [25, 26, 54];
-const EARTH = [42, 29, 22];
 
 const loadImage = (src: string) => new Promise<HTMLImageElement>((ok, fail) => {
   const im = new Image();
@@ -118,65 +116,101 @@ export async function renderPixelTower(root: HTMLElement) {
   const roomCanvas = document.createElement('canvas');
   roomCanvas.width = RW; roomCanvas.height = RH;
   const rg = roomCanvas.getContext('2d')!;
-  let layout = { W: 0, H: 0, M: 0, S: 0, scale: 1 };
+  let layout = { W: 0, H: 0, ox: 0, oy: 0, scale: 1 };
+  let under: ImageData | null = null;           // what lies behind the room, for redrawing its loop
+  const backdrop = loadImage(`${ART}/backdrop.png`);
+  const shadeCanvas = document.createElement('canvas');
+  shadeCanvas.width = RW; shadeCanvas.height = RH;
+  const sg = shadeCanvas.getContext('2d')!;
 
-  /** Size the canvas: native size × a whole number of device pixels. */
-  function fit(W: number, H: number) {
+  /* The canvas always covers the whole picture pane: the land runs to every
+     edge, at a whole number of device pixels per art pixel. `need` is what
+     must be seen whole (the tower, or a room with a strip of the floors
+     either side); the rest of the pane is filled with more of the world. */
+  function size(needW: number, needH: number, phoneH: number, phoneMax: number) {
     const dpr = window.devicePixelRatio || 1;
-    const box = stage.getBoundingClientRect();
-    const availW = box.width, availH = isWide() ? box.height : Infinity;
-    const k = Math.max(1, Math.floor(Math.min((availW * dpr) / W, (availH * dpr) / H)));
-    const scale = k / dpr;
+    const wide = isWide();
+    const boxW = stage.getBoundingClientRect().width;
+    // on a phone the picture may not take more than phoneMax of the screen's height: the land fills the sides
+    const k = Math.max(1, Math.floor(wide
+      ? Math.min((boxW * dpr) / needW, (window.innerHeight * dpr) / needH)
+      : Math.min((boxW * dpr) / needW, (phoneMax * window.innerHeight * dpr) / phoneH)));
+    const s = k / dpr;
+    const boxH = wide ? window.innerHeight : Math.round(phoneH * s);
+    const W = Math.ceil(boxW / s), H = Math.ceil(boxH / s);
     canvas.width = W; canvas.height = H;
-    canvas.style.width = `${W * scale}px`;
-    canvas.style.height = `${H * scale}px`;
-    picture.style.width = canvas.style.width;
-    picture.style.height = canvas.style.height;
-    return scale;
+    canvas.style.width = `${W * s}px`; canvas.style.height = `${H * s}px`;
+    picture.style.width = `${boxW}px`; picture.style.height = `${boxH}px`;
+    if (!wide) stage.style.height = `${boxH}px`;
+    g.imageSmoothingEnabled = false;
+    return { W, H, s };
   }
 
   async function drawHome() {
     const im = await getOverview(-1);
-    const W = meta.overview.w, H = meta.overview.h;
-    layout = { W, H, M: 0, S: 0, scale: fit(W, H) };
-    stage.style.background = '';
-    g.drawImage(im, 0, 0);
+    const { W, H, s } = size(192, meta.overview.h, meta.overview.h, 0.72);
+    const ox = Math.round(W / 2 - meta.overview.cx), oy = H - meta.overview.h;   // the ground stays put; more sky if the pane is tall
+    layout = { W, H, ox, oy, scale: s };
+    g.fillStyle = 'rgb(25, 26, 54)'; g.fillRect(0, 0, W, H);
+    g.drawImage(im, ox, oy);
     canvas.setAttribute('aria-label', 'The whole tower, every floor lit');
     spots(meta.overview.floors.map(([y0, y1], k) => {
       const r = routeForSlug(slugOfFloor(k))!;
-      return { x: meta.overview.x0, y: y0, w: meta.overview.x1 - meta.overview.x0, h: y1 - y0 + 1, label: `${r.label} — ${r.title}`, run: () => go(r.slug) };
+      return { x: meta.overview.x0 + ox, y: y0 + oy, w: meta.overview.x1 - meta.overview.x0, h: y1 - y0 + 1, label: `${r.label} — ${r.title}`, run: () => go(r.slug) };
     }), true);
   }
 
-  /** A floor: its room, the floor of the room above and the ceiling of the one below, lights out. */
+  /** A neighbouring room with its lights out: darken what is drawn, not the air around it. */
+  function drawDark(im: HTMLImageElement, x: number, y: number) {
+    sg.globalCompositeOperation = 'source-over';
+    sg.clearRect(0, 0, RW, RH);
+    sg.drawImage(im, 0, 0);
+    sg.globalCompositeOperation = 'source-atop';
+    sg.fillStyle = 'rgba(12, 8, 18, 0.66)';
+    sg.fillRect(0, 0, RW, RH);
+    g.drawImage(shadeCanvas, x, y);
+  }
+
+  /* A floor: the room as large as the pane allows, the rest of the tower
+     stacked above and below it with the lights out, and the same land
+     outside, enlarged to the room's scale and lined up on this floor. */
   async function drawRoom(k: number) {
     const wide = isWide();
-    const M = wide ? 10 : 0, S = wide ? 40 : 12;
-    const W = RW + 2 * M, H = RH + 2 * S;
-    layout = { W, H, M, S, scale: fit(W, H) };
-    const [im, above, below] = await Promise.all([getRoom(k), k < 6 ? getRoom(k + 1) : null, k > 0 ? getRoom(k - 1) : null]);
+    const { W, H, s } = size(RW + (wide ? 16 : 8), RH + (wide ? 48 : 0), RH + 28, 0.42);
+    const PITCH = RH - 6;                                          // a room's ceiling slab sits on the floor of the one above
+    const need: number[] = [k];
+    for (let j = k + 1, y = (H - RH) / 2 - PITCH; j <= 6 && y > -RH; j++, y -= PITCH) need.push(j);
+    for (let j = k - 1, y = (H - RH) / 2 + PITCH; j >= 0 && y < H; j--, y += PITCH) need.push(j);
+    const [bd, ...ims] = await Promise.all([backdrop, ...need.map(getRoom)]);
     if (floor !== k) return;
-    // outside the walls: sky above ground, earth below it
-    const sky = k === 0 ? EARTH : SKY_TOP.map((c, i) => Math.round(c + (k <= 1 ? 0.6 : 0.25) * ([108, 80, 121][i] - c)));
-    g.fillStyle = `rgb(${sky})`; g.fillRect(0, 0, W, H);
-    stage.style.background = k === 1 ? `linear-gradient(rgb(${sky}) 50%, rgb(${EARTH}) 50%)` : `rgb(${sky})`;
-    if (k === 1) { g.fillStyle = `rgb(${EARTH})`; g.fillRect(0, S + RH, W, S); }
-    if (above) g.drawImage(above, 0, RH - S, RW, S, M, 0, RW, S);
-    if (below) g.drawImage(below, 0, 0, RW, S, M, S + RH, RW, S);
-    g.fillStyle = 'rgba(14, 10, 20, 0.62)';                        // lights out next door
-    if (above) g.fillRect(M, 0, RW, S);
-    if (below) g.fillRect(M, S + RH, RW, S);
+    const imOf = (j: number) => ims[need.indexOf(j)];
+    const rx = Math.round((W - RW) / 2), ry = Math.round((H - RH) / 2);
+    layout = { W, H, ox: rx, oy: ry, scale: s };
+
+    // outside: the land, ×3, with this floor of the tower where this room is
+    const Z = 3, [fy0, fy1] = meta.overview.floors[k];
+    const bx = Math.round(rx + RW / 2 - meta.overview.cx * Z), by = Math.round(ry + RH / 2 - ((fy0 + fy1) / 2) * Z);
+    g.fillStyle = 'rgb(25, 26, 54)'; g.fillRect(0, 0, W, H);
+    g.drawImage(bd, bx, by, bd.width * Z, bd.height * Z);
+    if (by + bd.height * Z < H) { g.fillStyle = 'rgb(42, 29, 22)'; g.fillRect(0, by + bd.height * Z, W, H); }
+
+    // the rest of the tower, lights out
+    for (const j of need) if (j !== k) drawDark(imOf(j), rx, ry + (k - j) * PITCH);
+    under = g.getImageData(rx, ry, RW, RH);
+
+    // and this room, lit
     rg.clearRect(0, 0, RW, RH);
-    rg.drawImage(im, 0, 0);
+    rg.drawImage(imOf(k), 0, 0);
     roomData = rg.getImageData(0, 0, RW, RH);
     baseData = new Uint8ClampedArray(roomData.data);
     prevDelta = [];
-    g.drawImage(roomCanvas, M, S);
+    g.drawImage(roomCanvas, rx, ry);
+
     const route = routeForSlug(slugOfFloor(k))!;
     canvas.setAttribute('aria-label', `${route.title}, drawn in pixels`);
-    const sp: Spot[] = (SPOTS[route.slug] ?? []).map((s) => ({ ...s, x: s.x + M, y: s.y + S }));
-    if (above) sp.push({ x: M, y: 0, w: RW, h: S, label: `Up the stairs — ${routeForSlug(slugOfFloor(k + 1))!.title}`, run: () => step(1) });
-    if (below) sp.push({ x: M, y: S + RH, w: RW, h: S, label: `Down the stairs — ${routeForSlug(slugOfFloor(k - 1))!.title}`, run: () => step(-1) });
+    const sp: Spot[] = (SPOTS[route.slug] ?? []).map((p) => ({ ...p, x: p.x + rx, y: p.y + ry }));
+    if (k < 6) sp.push({ x: rx, y: 0, w: RW, h: ry, label: `Up the stairs — ${routeForSlug(slugOfFloor(k + 1))!.title}`, run: () => step(1) });
+    if (k > 0) sp.push({ x: rx, y: ry + RH, w: RW, h: H - ry - RH, label: `Down the stairs — ${routeForSlug(slugOfFloor(k - 1))!.title}`, run: () => step(-1) });
     spots(sp, false);
     void loadAnim(k);
   }
@@ -192,14 +226,15 @@ export async function renderPixelTower(root: HTMLElement) {
 
   /** Put one frame of the loop into the room: undo the last delta, lay the next. */
   function applyFrame(t: number) {
-    if (!anim || !roomData || !baseData || floor < 0) return;
+    if (!anim || !roomData || !baseData || !under || floor < 0) return;
     const d = roomData.data;
     for (let i = 0; i < prevDelta.length; i += 2) { const p = prevDelta[i] * 4; d[p] = baseData[p]; d[p + 1] = baseData[p + 1]; d[p + 2] = baseData[p + 2]; d[p + 3] = baseData[p + 3]; }
     const delta = anim.frames[t];
     for (let i = 0; i < delta.length; i += 2) { const p = delta[i] * 4, c = delta[i + 1]; d[p] = c >> 16; d[p + 1] = (c >> 8) & 255; d[p + 2] = c & 255; d[p + 3] = 255; }
     prevDelta = delta;
     rg.putImageData(roomData, 0, 0);
-    g.drawImage(roomCanvas, layout.M, layout.S);
+    g.putImageData(under, layout.ox, layout.oy);                    // the sky behind an open room, then the room
+    g.drawImage(roomCanvas, layout.ox, layout.oy);
   }
 
   function tick(now: number) {
@@ -321,7 +356,7 @@ export async function renderPixelTower(root: HTMLElement) {
   async function zoomInto(k: number) {
     if (reduceMotion() || floor !== -1) return;
     const [y0, y1] = meta.overview.floors[k];
-    const oy = ((y0 + y1) / 2 / meta.overview.h) * 100;
+    const oy = ((layout.oy + (y0 + y1) / 2) / layout.H) * 100;
     await canvas.animate(
       [{ transform: 'scale(1)', transformOrigin: `50% ${oy}%` }, { transform: 'scale(2.6)', transformOrigin: `50% ${oy}%`, opacity: 0.2 }],
       { duration: 240, easing: 'cubic-bezier(.5,0,.8,.4)' },
