@@ -8,7 +8,7 @@ import { createTerminal } from './ui/Terminal';
 import { createDestinationModal } from './ui/DestinationModal';
 import { renderTextPage } from './ui/TextPage';
 import { offerLighter, preferredView, honourViewOverride, setPreferredView } from './ui/lighter';
-import { shouldAsk, askView } from './ui/chooser';
+import { shouldAsk, askView, markAsked } from './ui/chooser';
 import { gpuInfo, guessTier } from './tower/quality';
 import { createViewMenu } from './ui/ViewMenu';
 import { createSettingsButton } from './ui/SettingsPanel';
@@ -18,7 +18,7 @@ import { announce } from './ui/io';
 import { themePref, cycleTheme, THEME_ICON, THEME_LABEL } from './ui/theme';
 import {
   FLOORS, routeForSlug, routeForIndex, currentSlug, navigate, onRouteChange, BASE,
-  worldFromUrl, setWorldInUrl,
+  worldFromUrl, setWorldInUrl, textPageHref,
 } from './router';
 
 const app = document.getElementById('app')!;
@@ -31,13 +31,23 @@ const app = document.getElementById('app')!;
 const entry = currentSlug();
 /* `?view=3d` on the way in means a visitor has come back for the tower; it
    clears any standing preference before the preference is read. */
-honourViewOverride();
+if (honourViewOverride() || entry === '2d' || entry === 'console' || entry === 'text') markAsked();   // a link that names a view is this visit's answer
 
 /* Two reasons to never reach the tower at all. One is a choice already made
    on this device; the other is a machine that cannot draw it — asking a
    browser with no WebGL context to spend 250KB finding that out for itself
    is the one case where guessing is better than measuring. */
 const stuck = !gpuInfo().ok;
+/* `?choose` asks again even if a default was set (the plain page's way back
+   from the chooser leads here); it leaves the address bar once read. */
+const forceAsk = (() => {
+  const p = new URLSearchParams(window.location.search);
+  if (!p.has('choose')) return false;
+  p.delete('choose');
+  const q = p.toString();
+  history.replaceState(history.state, '', window.location.pathname + (q ? '?' + q : '') + window.location.hash);
+  return true;
+})();
 const chosen = preferredView();
 
 /* No WebGL at all used to mean the plain page. The pixel tower only needs a
@@ -49,12 +59,16 @@ if (entry === 'text') {
 } else if (entry === '2d' || entry === 'console') {
   if (chosen !== 'text') setPreferredView('2d');
   void pixelTower();
+} else if (stuck) {
+  void pixelTower();
+} else if (forceAsk || shouldAsk()) {
+  // every visit is asked, unless a default was set; the view that suits this device is marked, not chosen for you
+  const phone = window.matchMedia('(pointer: coarse) and (max-width: 900px)').matches;
+  void askView(app, phone || guessTier() === 'low' ? '2d' : '3d').then((v) => (v === '2d' ? pixelTower() : bootTower()));
 } else if (chosen === 'text') {
   renderTextPage(app);
-} else if (chosen === '2d' || stuck) {
+} else if (chosen === '2d') {
   void pixelTower();
-} else if (shouldAsk(guessTier() === 'low')) {
-  void askView(app).then((v) => (v === '2d' ? pixelTower() : bootTower()));
 } else {
   void bootTower();
 }
@@ -392,7 +406,7 @@ const mTheme = sheetTool('', '', () => cycleTheme(), true);
 mTheme.innerHTML = themeShort();
 window.addEventListener('lair-theme', () => { mTheme.innerHTML = themeShort(); });
 sheetTool(ICON.console, 'Console', () => terminal.toggle());
-sheetTool('<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 4.5h10M5 8.5h10M5 12.5h10M5 16.5h6"/></svg>', 'Text page', () => { window.location.href = BASE + '/text'; });
+sheetTool('<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 4.5h10M5 8.5h10M5 12.5h10M5 16.5h6"/></svg>', 'Text page', () => { window.location.href = textPageHref('3d'); });
 sheetTool(ICON.gear, 'Display', () => settings.toggle());
 sheetTool(ICON.help, 'Help', () => help.toggle());
 

@@ -74,6 +74,16 @@ export function setWorldInUrl(kind: string | null) {
   }
 }
 
+/** The plain text page, told which view you are leaving and exactly where
+ *  you were in it, so its way back returns you there (the pixel tower or the
+ *  3D one, same floor, same world) instead of always to the 3D tower. */
+export function textPageHref(from: '2d' | '3d') {
+  const params = new URLSearchParams(window.location.search);
+  params.set('view', from);
+  const back = window.location.pathname + '?' + params.toString() + window.location.hash;
+  return `${BASE}/text?from=${from}&back=${encodeURIComponent(back)}`;
+}
+
 export function onRouteChange(cb: (slug: string | null) => void) {
   const handler = () => cb(currentSlug());
   window.addEventListener('popstate', handler);

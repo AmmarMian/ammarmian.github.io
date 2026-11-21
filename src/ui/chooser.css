@@ -1,0 +1,81 @@
+/* ============================ the first question ===========================
+ * Quieter than the pixel tower: the site's own paper (or night), its own
+ * type, and pixel art only where it earns it: the three pictures, card
+ * edges cut in whole pixels with notched corners, a dithered rule, a stepped
+ * tag. Follows the light/dark theme like the rest of the site. */
+
+.chooser {
+  --px: 3px;
+  --edge: var(--rule);
+  height: 100%; overflow-y: auto; box-sizing: border-box;
+  display: grid; place-items: center; padding: 40px 20px;
+  background: var(--bg); color: var(--ink); font-family: var(--font-text);
+}
+.ch-panel { box-sizing: border-box; width: min(960px, 100%); }
+.ch-sig { margin: 0 0 22px; font: 400 32px/1 var(--font-blackletter); color: var(--ink); }
+.ch-kicker { margin: 0 0 8px; font: 500 11px/1.2 var(--font-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--ink-faint); }
+.ch-title { margin: 0 0 12px; font: 300 clamp(30px, 4.6vw, 48px)/1.05 var(--font-display); color: var(--ink); }
+.ch-lede { margin: 0 0 18px; max-width: 60ch; color: var(--ink-dim); }
+/* a rule drawn in pixels: a 2-row checker, fading out to the right in steps */
+.ch-lede::after {
+  content: ''; display: block; height: calc(2 * var(--px)); margin-top: 22px; width: min(420px, 100%);
+  background: repeating-conic-gradient(var(--ink-faint) 0 25%, transparent 0 50%) 0 0 / calc(2 * var(--px)) calc(2 * var(--px));
+  -webkit-mask: linear-gradient(90deg, #000 0 40%, #0008 40% 70%, #0004 70% 90%, transparent 90%);
+          mask: linear-gradient(90deg, #000 0 40%, #0008 40% 70%, #0004 70% 90%, transparent 90%);
+}
+
+.ch-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 26px; }
+/* a card: a flat face, its edge one pixel wide with the corners left out */
+.ch-option {
+  position: relative; display: flex; flex-direction: column; align-items: stretch; gap: 14px;
+  margin: var(--px); padding: 12px 12px 18px; border: 0; text-align: left; cursor: pointer; font: inherit; color: var(--ink);
+  background: var(--card);
+  box-shadow: 0 calc(-1 * var(--px)) 0 0 var(--edge), 0 var(--px) 0 0 var(--edge), calc(-1 * var(--px)) 0 0 0 var(--edge), var(--px) 0 0 0 var(--edge);
+  transition: transform 120ms steps(2);
+}
+.ch-option img {
+  display: block; width: 100%; height: auto; aspect-ratio: 96 / 120; image-rendering: pixelated; image-rendering: crisp-edges;
+}
+.ch-text { display: flex; flex-direction: column; gap: 7px; padding: 0 4px; }
+.ch-name { font: 500 22px/1.1 var(--font-sc); letter-spacing: .04em; }
+.ch-blurb { font-size: 14px; line-height: 1.5; color: var(--ink-dim); }
+/* the tag: a little stepped label, notched like the cards */
+.ch-tag {
+  align-self: flex-start; margin: 0 var(--px); padding: 3px 7px; font: 500 10px/1.2 var(--font-mono); letter-spacing: .12em; text-transform: uppercase;
+  color: var(--bg); background: var(--accent);
+  box-shadow: calc(-1 * var(--px)) 0 0 0 var(--accent) inset, var(--px) 0 0 -1px var(--accent);
+}
+.ch-option.is-suggested { --edge: var(--ink-faint); }
+.ch-option:hover, .ch-option:focus-visible { outline: none; --edge: var(--accent); transform: translateY(calc(-1 * var(--px))); }
+.ch-option:hover .ch-name, .ch-option:focus-visible .ch-name { color: var(--accent); }
+
+/* "always open this way": a checkbox drawn as a pixel box, a tick in pixels */
+.ch-default { display: inline-flex; align-items: center; gap: 12px; margin-top: 26px; cursor: pointer; color: var(--ink-dim); font-size: 15px; }
+.ch-default input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.ch-box {
+  position: relative; flex: none; width: calc(5 * var(--px)); height: calc(5 * var(--px)); margin: var(--px); background: var(--card);
+  box-shadow: 0 calc(-1 * var(--px)) 0 0 var(--ink-faint), 0 var(--px) 0 0 var(--ink-faint), calc(-1 * var(--px)) 0 0 0 var(--ink-faint), var(--px) 0 0 0 var(--ink-faint);
+}
+.ch-default input:checked + .ch-box::after {      /* a tick, three pixels down and four up */
+  content: ''; position: absolute; left: 0; top: 0; width: var(--px); height: var(--px); background: transparent;
+  box-shadow:
+    0 calc(2 * var(--px)) 0 0 var(--accent), var(--px) calc(3 * var(--px)) 0 0 var(--accent), calc(2 * var(--px)) calc(2 * var(--px)) 0 0 var(--accent),
+    calc(3 * var(--px)) var(--px) 0 0 var(--accent), calc(4 * var(--px)) 0 0 0 var(--accent);
+}
+.ch-default:hover .ch-box, .ch-default input:focus-visible + .ch-box {
+  box-shadow: 0 calc(-1 * var(--px)) 0 0 var(--accent), 0 var(--px) 0 0 var(--accent), calc(-1 * var(--px)) 0 0 0 var(--accent), var(--px) 0 0 0 var(--accent);
+}
+.ch-default:hover { color: var(--ink); }
+
+@media (max-width: 760px) {
+  .chooser { place-items: start center; padding: 22px 14px; }
+  .ch-sig { font-size: 26px; margin-bottom: 14px; }
+  .ch-lede { font-size: 15px; }
+  .ch-options { grid-template-columns: 1fr; gap: 14px; margin-top: 18px; }
+  .ch-option { flex-direction: row; align-items: flex-start; gap: 14px; padding: 10px; }
+  .ch-option img { width: 96px; flex: none; }
+  .ch-name { font-size: 20px; }
+  .ch-blurb { font-size: 13.5px; }
+  .ch-default { margin-top: 18px; font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .ch-option { transition: none; } }

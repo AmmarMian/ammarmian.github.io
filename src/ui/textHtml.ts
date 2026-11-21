@@ -197,6 +197,21 @@ ${studentSections}
  *  Self-contained on purpose: vite.config.ts inlines its source into the
  *  static /text/index.html, and TextPage.ts calls it in the SPA. */
 export function textPageEnhance(): void {
+  /* The way back: to the view you came from, where you were in it (the link
+     says ?from=2d|3d&back=<path>). Only a path on this site is followed. */
+  const home = document.querySelector<HTMLAnchorElement>('.tp-toc-home');
+  const q = new URLSearchParams(window.location.search), from = q.get('from'), back = q.get('back');
+  if (home && back) {
+    // parsed the way the browser will follow it, so tabs, newlines or
+    // backslashes cannot turn it into a link to another site
+    try {
+      const u = new URL(back, window.location.href);
+      if (u.origin === window.location.origin) {
+        home.href = u.pathname + u.search + u.hash;
+        home.textContent = from === '2d' ? '\u2190 The pixel tower' : from === 'choose' ? '\u2190 Choose another view' : '\u2190 The interactive tower';
+      }
+    } catch { /* not a URL: keep the default way back */ }
+  }
   const toc = document.querySelector('.tp-toc');
   const scroller = document.querySelector('.text-page');
   if (!toc || !scroller) return;

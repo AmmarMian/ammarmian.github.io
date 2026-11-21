@@ -1,9 +1,12 @@
 import { PROFILE, CONTACT } from '../data/profile';
-import { routeForSlug, currentSlug, navigate, onRouteChange, BASE, type FloorRoute } from '../router';
+import { routeForSlug, currentSlug, navigate, onRouteChange, worldFromUrl, setWorldInUrl, textPageHref, BASE, type FloorRoute } from '../router';
 import { FloorContent } from './FloorContent';
 import { fetchHalPublications, type HalDoc } from '../data/hal';
 import { runCommand, JUMP_TARGETS, columnsOf, type Ctx } from './commands';
 import { attachLineEditor } from './lineEditor';
+import { WORLD_LABELS } from '../data/worlds';
+import { VIEWS } from './ViewMenu';
+import { effectiveTheme, themePref, setAutoTheme, cycleTheme, THEME_ICON, THEME_LABEL } from './theme';
 import { setRouteMeta } from './meta';
 import { announce } from './io';
 import './pixel.css';
@@ -16,16 +19,24 @@ import './pixel.css';
  *
  * The art is made by tools/pixel (node export.js → public/pixel): one still
  * per room, its loop as per-frame deltas, and the overview with each floor
- * lit in turn. Everything is drawn at its native size and scaled by a whole
+ * lit in turn, the tower alone, and the land it stands in: home, or one of
+ * the worlds beyond the sanctum's gate. Everything is drawn at its native size and scaled by a whole
  * number of device pixels, so a pixel is always a clean square.
  *
  * Wide screens: the picture on the left, the text plain on the right.
  * Phones: the picture on top, the text below it in a pixel frame, and the
  * stairs (down, the floor's name, up) along the bottom where the thumb is. */
 
+type RGB = [number, number, number];
+interface World { top: RGB; bottom: RGB; rain?: boolean; eye?: boolean }
+interface Loop { T: number; delay: number; tile: number; cols: number; frames: number[][] }
 interface Meta {
   room: { w: number; h: number };
-  overview: { w: number; h: number; x0: number; x1: number; cx: number; floors: [number, number][] };
+  overview: { w: number; h: number; x0: number; x1: number; cx: number; floors: [number, number][]; tower: [number, number]; ext: number };
+  worlds: Record<string, World>;
+  days: Record<string, World>;
+  eye: { size: number; T: number };
+  portholes: { size: number; order: string[] };
   rooms: { slug: string; floor: number }[];
   books: [number, number, number, number][];
   open: number;
@@ -52,18 +63,26 @@ export async function renderPixelTower(root: HTMLElement) {
   view.innerHTML = `
     <header class="px-head">
       <a class="px-sig" href="${BASE}/">${esc(PROFILE.name)}</a>
+      <button type="button" class="px-tool px-theme-btn"></button>
       <button type="button" class="px-tool px-keeper-btn" aria-label="Talk to the keeper (console, /)">
         <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14v9H9l-4 3v-3H3z"/><path d="M6.5 8.5h7"/></svg>
       </button>
-      <a class="px-switch" href="${BASE}/?view=3d" aria-label="Switch to the 3D tower"><span class="px-switch-on">2D</span><span>3D</span></a>
+      <div class="px-views">
+        <button type="button" class="px-views-btn" aria-haspopup="true" aria-expanded="false" aria-label="Choose a view (now: the pixel tower)">2D<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 8l4.5 4.5L14.5 8"/></svg></button>
+        <div class="px-views-menu px-frame" role="menu" aria-label="Choose a view" hidden>
+          ${VIEWS.map((v) => `<a class="px-views-item" role="menuitem" data-kind="${v.kind}" href="${BASE}${v.href}"${v.kind === '2d' ? ' aria-current="true"' : ''}><strong>${esc(v.label)}</strong><span>${esc(v.blurb)}</span></a>`).join('')}
+        </div>
+      </div>
     </header>
     <section class="px-stage" aria-label="The tower">
       <div class="px-picture">
+        <canvas class="px-world" aria-hidden="true"></canvas>
         <canvas class="px-canvas" role="img"></canvas>
         <p class="px-sky-title" hidden>${esc(PROFILE.role)}<span>${esc(PROFILE.affiliation)}</span></p>
         <div class="px-books"></div>
         <div class="px-spots"></div>
       </div>
+      <div class="px-gates" role="group" aria-label="The gate: other worlds"></div>
     </section>
     <section class="px-text">
       <div class="px-content"></div>
@@ -83,7 +102,11 @@ export async function renderPixelTower(root: HTMLElement) {
   const booksEl = $<HTMLElement>('.px-books');
   const skyTitle = $<HTMLElement>('.px-sky-title');
   const contentEl = $<HTMLElement>('.px-content');
+  const gatesEl = $<HTMLElement>('.px-gates');
   const g = canvas.getContext('2d')!;
+  // the world lives on its own layer behind the tower, so it can move without redrawing the rooms
+  const worldCanvas = $<HTMLCanvasElement>('.px-world');
+  const wg = worldCanvas.getContext('2d')!;
 
   /* ------------------------------ the art ------------------------------ */
   const meta: Meta = await (await fetch(`${ART}/meta.json`)).json();
@@ -91,19 +114,138 @@ export async function renderPixelTower(root: HTMLElement) {
   const slugOfFloor = (k: number) => meta.rooms.find((r) => r.floor === k)!.slug;
   const floorOfSlug = (s: string | null) => meta.rooms.find((r) => r.slug === s)?.floor ?? -1;
   const rooms = new Map<number, HTMLImageElement>();
-  const overviews = new Map<number, HTMLImageElement>();
   const getRoom = async (k: number) => rooms.get(k) ?? rooms.set(k, await loadImage(`${ART}/${slugOfFloor(k)}.png`)).get(k)!;
-  const getOverview = async (k: number) => overviews.get(k) ?? overviews.set(k, await loadImage(`${ART}/overview${k < 0 ? '' : '-' + k}.png`)).get(k)!;
   // everything is small: fetch every room up front so the stairs never wait
   void Promise.all(meta.rooms.map((r) => getRoom(r.floor)));
+
+  /* The world the tower stands in: home, or one beyond the gate. It lives in
+     the URL (?world=space) like the 3D tower's, so a view is a link, and the
+     two views agree when you switch. */
+  const WORLD_KINDS = JUMP_TARGETS.filter((k) => k !== 'none' && meta.worlds[k]);
+  const validWorld = (w: string | null) => (w && WORLD_KINDS.includes(w) ? w : null);
+  let world = validWorld(worldFromUrl());
+
+  /* Day or night follows the site's theme: Paper is day, Night is night.
+     Left on "auto", the 2D view takes it from the clock (day from 7 to 19).
+     Only the worlds whose light changes have a day picture; the moon,
+     space, the sea floor and the forest are the same at any hour. */
+  const byClock = () => { const h = new Date().getHours(); setAutoTheme(h >= 7 && h < 19 ? 'paper' : 'night'); };
+  if (themePref() === 'auto') byClock();
+  let day = effectiveTheme() === 'paper';
+  /* the switch in the header: Auto (by the clock) → Day → Night, as in the 3D tower */
+  const themeBtn = $<HTMLButtonElement>('.px-theme-btn');
+  const showTheme = () => {
+    const p = themePref();
+    themeBtn.innerHTML = THEME_ICON[p];
+    themeBtn.setAttribute('aria-label', `Day or night: ${THEME_LABEL[p]}${p === 'auto' ? (day ? ' — day now' : ' — night now') : ''}. Change`);
+    themeBtn.title = THEME_LABEL[p];
+  };
+  themeBtn.addEventListener('click', () => { if (cycleTheme() === 'auto') byClock(); showTheme(); });
+  showTheme();
+  const byDay = () => day && !!meta.days[world ?? 'home'];
+  const worldInfo = () => (byDay() ? meta.days : meta.worlds)[world ?? 'home'];
+  /** The file name of the world's picture, by day or night. */
+  const worldFile = (w: string | null, d: boolean) => `backdrop${w ? '-' + w : ''}${d ? '-day' : ''}`;
+  const css = (c: RGB) => `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+  const backdrops = new Map<string, Promise<HTMLImageElement>>();
+  const getBackdrop = (w: string | null, d = byDay()) => {
+    const name = worldFile(w, d);
+    if (!backdrops.has(name)) backdrops.set(name, loadImage(`${ART}/${name}.png`));
+    return backdrops.get(name)!;
+  };
+  const towerImage = loadImage(`${ART}/tower.png`);
+  // the observatory with its night cut out: away from home, the sky over it is the world's own
+  const openObservatory = loadImage(`${ART}/contact-open.png`);
+
+  /* ------------------------------ the world ------------------------------
+     The land is drawn on its own layer behind the tower, at its native size
+     into a small canvas, then enlarged onto the layer. Its loop (made by
+     tools/pixel, frame 0 being the still) lays a few 8×8 tiles over the
+     still each frame; the rain world's rain is drawn falling here, live. */
+  const loops = new Map<string, Promise<{ loop: Loop; atlas: HTMLImageElement } | null>>();
+  const getLoop = (w: string | null, d = byDay()) => {
+    const key = worldFile(w, d), name = key;
+    if (!loops.has(key)) loops.set(key, Promise.all([fetch(`${ART}/${name}.loop.json`).then((r) => r.json() as Promise<Loop>), loadImage(`${ART}/${name}.tiles.png`)])
+      .then(([loop, atlas]) => ({ loop, atlas })).catch(() => null));
+    return loops.get(key)!;
+  };
+  const land = document.createElement('canvas');
+  const lg = land.getContext('2d')!;
+  const sky = {
+    img: null as HTMLImageElement | null, loop: null as { loop: Loop; atlas: HTMLImageElement } | null,
+    x: 0, y: 0, z: 1, frame: 0, last: 0, lastFrame: 0, rain: false, eye: false, hold: false,
+  };
+  const hash = (i: number, k: number) => {
+    let h = Math.imul(i, 374761393) + Math.imul(k, 668265263);
+    h = Math.imul(h ^ (h >>> 13), 1274126177);
+    return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+  };
+  /** Rain, slanting a pixel across for every three down, falling at its own speed per drop. */
+  function drawRain(now: number) {
+    const ground = meta.overview.floors[1][1] + 3 + meta.overview.ext, span = land.width + 40;
+    const ink = byDay() ? '84, 98, 116' : '154, 170, 196';         // pale streaks at night, darker against a day sky
+    for (let i = 0; i < 700; i++) {
+      const speed = 220 + hash(i, 3) * 120, len = 3 + Math.floor(hash(i, 4) * 3);
+      const y = Math.floor((hash(i, 2) * ground + (now / 1000) * speed) % ground);
+      const x = Math.floor(((hash(i, 1) * span + y / 3) % span)) - 20;
+      lg.fillStyle = `rgba(${ink}, 0.3)`;
+      lg.fillRect(x, y, 1, len - 1);
+      lg.fillStyle = `rgba(${ink}, 0.5)`;
+      lg.fillRect(x + Math.floor((y + len - 1) / 3) - Math.floor(y / 3), y + len - 1, 1, 1);
+    }
+  }
+  /* The city's watcher flies a slow loop round the tower, forty seconds a
+     turn: the far half of it higher up, as a circle seen from a little
+     above. It always looks at the tower. Behind the tower it simply passes
+     behind; the world is the layer at the back. */
+  let eyeSheet: HTMLImageElement | null = null, eyeAsked = false;
+  function drawEye(now: number) {
+    if (!eyeSheet) {
+      if (!eyeAsked) { eyeAsked = true; void loadImage(`${ART}/eye.png`).then((im) => { eyeSheet = im; paintWorld(reduceMotion() ? 0 : performance.now()); }).catch(() => {}); }
+      return;
+    }
+    const S = meta.eye.size, a = reduceMotion() ? 0.35 : (now / 40000) * Math.PI * 2;
+    const x = meta.overview.cx + 112 * Math.cos(a), y = 62 + 20 * Math.sin(a) + meta.overview.ext;
+    const row = x > meta.overview.cx ? 0 : 1;                       // to the right of the tower it looks left, and the other way
+    lg.drawImage(eyeSheet, (sky.frame % meta.eye.T) * S, row * S, S, S, Math.round(x - S / 2), Math.round(y - S / 2), S, S);
+  }
+
+  /** Paint the world layer: the still, this frame's tiles, the rain, enlarged into place. */
+  function paintWorld(now = 0) {
+    const im = sky.img;
+    if (!im) return;
+    if (land.width !== im.width || land.height !== im.height) { land.width = im.width; land.height = im.height; }
+    lg.drawImage(im, 0, 0);
+    const L = sky.loop;
+    if (L && sky.frame > 0) {
+      const S = L.loop.tile, tw = im.width / S, f = L.loop.frames[sky.frame] ?? [];
+      for (let i = 0; i < f.length; i += 2) {
+        const ti = f[i], ai = f[i + 1];
+        lg.drawImage(L.atlas, (ai % L.loop.cols) * S, Math.floor(ai / L.loop.cols) * S, S, S, (ti % tw) * S, Math.floor(ti / tw) * S, S, S);
+      }
+    }
+    if (sky.rain) drawRain(now);
+    if (sky.eye) drawEye(now);
+    const wi = worldInfo(), Wd = worldCanvas.width, Hd = worldCanvas.height;
+    wg.fillStyle = css(wi.top); wg.fillRect(0, 0, Wd, Hd);
+    wg.drawImage(land, sky.x, sky.y, land.width * sky.z, land.height * sky.z);
+    const end = sky.y + land.height * sky.z;
+    if (end < Hd) { wg.fillStyle = css(wi.bottom); wg.fillRect(0, end, Wd, Hd - end); }
+  }
+  /** Set the world layer up for a view: which picture, where, how large. */
+  async function placeWorld(x: number, y: number, z: number) {
+    const [im, loop] = await Promise.all([getBackdrop(world), getLoop(world)]);
+    Object.assign(sky, { img: im, loop, x, y, z, rain: !!worldInfo().rain, eye: !!worldInfo().eye });
+    if (sky.frame >= (loop?.loop.T ?? 1)) sky.frame = 0;
+    paintWorld(reduceMotion() ? 0 : performance.now());           // still rain stays still
+  }
 
   /* ----------------------------- the content ---------------------------- */
   const content = new FloorContent({
     worlds: {
       kinds: JUMP_TARGETS.filter((k) => k !== 'none'),
-      current: () => null,
-      // the gate opens in the 3D tower: go there, already standing in that world
-      teleport: (kind) => { window.location.href = `${BASE}/elsewhere?view=3d${kind ? '&world=' + kind : ''}`; return true; },
+      current: () => world,
+      teleport: (kind) => { void teleport(kind); return true; },
     },
     hoverDoc: (id) => shelf.hover(id, 'list'),
     selectDoc: (id) => shelf.select(id),
@@ -192,7 +334,6 @@ export async function renderPixelTower(root: HTMLElement) {
   const rg = roomCanvas.getContext('2d')!;
   let layout = { W: 0, H: 0, ox: 0, oy: 0, scale: 1 };
   let under: ImageData | null = null;           // what lies behind the room, for redrawing its loop
-  const backdrop = loadImage(`${ART}/backdrop.png`);
   const shadeCanvas = document.createElement('canvas');
   shadeCanvas.width = RW; shadeCanvas.height = RH;
   const sg = shadeCanvas.getContext('2d')!;
@@ -214,14 +355,18 @@ export async function renderPixelTower(root: HTMLElement) {
     const W = Math.ceil(boxW / s), H = Math.ceil(boxH / s);
     canvas.width = W; canvas.height = H;
     canvas.style.width = `${W * s}px`; canvas.style.height = `${H * s}px`;
+    worldCanvas.width = W; worldCanvas.height = H;
+    worldCanvas.style.width = canvas.style.width; worldCanvas.style.height = canvas.style.height;
+    wg.imageSmoothingEnabled = false;
     picture.style.width = `${boxW}px`; picture.style.height = `${boxH}px`;
-    if (!wide) stage.style.height = `${boxH}px`;
+    stage.style.height = wide ? '' : `${boxH}px`;               // the phone's fixed box must not outlive the phone layout
     g.imageSmoothingEnabled = false;
     return { W, H, s };
   }
 
   async function drawHome() {
-    const im = await getOverview(-1);
+    const [bd, tw] = await Promise.all([getBackdrop(world), towerImage]);
+    if (floor !== -1) return;
     const wide = isWide();
     // a phone: the tower is the whole page, between the header and the stairs, its floors labelled beside it
     const headH = $<HTMLElement>('.px-head').getBoundingClientRect().height;
@@ -229,8 +374,10 @@ export async function renderPixelTower(root: HTMLElement) {
     // the ground stays put (more sky if the pane is tall); on a phone the tower steps left to leave its labels room
     const ox = Math.round(W / 2 - meta.overview.cx - (wide ? 0 : 46 / s)), oy = H - meta.overview.h;
     layout = { W, H, ox, oy, scale: s };
-    g.fillStyle = 'rgb(25, 26, 54)'; g.fillRect(0, 0, W, H);
-    g.drawImage(im, ox, oy);
+    void bd;
+    await placeWorld(ox, oy - meta.overview.ext, 1);              // the world goes on above the frame
+    g.clearRect(0, 0, W, H);
+    g.drawImage(tw, ox + meta.overview.tower[0], oy + meta.overview.tower[1]);
     booksEl.innerHTML = '';
     canvas.setAttribute('aria-label', 'The whole tower, every floor lit');
     spots(meta.overview.floors.map(([y0, y1], k) => {
@@ -263,21 +410,23 @@ export async function renderPixelTower(root: HTMLElement) {
     const need: number[] = [k];
     for (let j = k + 1, y = (H - RH) / 2 - PITCH; j <= 6 && y > -RH; j++, y -= PITCH) need.push(j);
     for (let j = k - 1, y = (H - RH) / 2 + PITCH; j >= 0 && y < H; j--, y += PITCH) need.push(j);
-    const [bd, ...ims] = await Promise.all([backdrop, ...need.map(getRoom)]);
+    const [bd, obsOpen, ...ims] = await Promise.all([getBackdrop(world), openObservatory, ...need.map(getRoom)]);
     if (floor !== k) return;
-    const imOf = (j: number) => ims[need.indexOf(j)];
+    const imOf = (j: number) => (j === 6 && (world || byDay()) ? obsOpen : ims[need.indexOf(j)]);   // open to whatever sky is over it
     const rx = Math.round((W - RW) / 2), ry = Math.round((H - RH) / 2);
     layout = { W, H, ox: rx, oy: ry, scale: s };
 
     // outside: the land, ×3, with this floor of the tower where this room is
     const Z = 3, [fy0, fy1] = meta.overview.floors[k];
     const bx = Math.round(rx + RW / 2 - meta.overview.cx * Z), by = Math.round(ry + RH / 2 - ((fy0 + fy1) / 2) * Z);
-    g.fillStyle = 'rgb(25, 26, 54)'; g.fillRect(0, 0, W, H);
-    g.drawImage(bd, bx, by, bd.width * Z, bd.height * Z);
-    if (by + bd.height * Z < H) { g.fillStyle = 'rgb(42, 29, 22)'; g.fillRect(0, by + bd.height * Z, W, H); }
+    void bd;
+    await placeWorld(bx, by - meta.overview.ext * Z, Z);         // the backdrop starts this far above the overview's frame
+    if (floor !== k) return;
+    g.clearRect(0, 0, W, H);
 
-    // above the observatory the night goes on: its sky, with stars, right across
-    if (need.includes(6)) {
+    // at home, above the observatory its night goes on, with stars, right across
+    // (away from home the room is open and the world's own sky shows through)
+    if (need.includes(6) && !world && !byDay()) {
       const top = ry + (k - 6) * PITCH;
       const NIGHT = [[18, 20, 46], [24, 27, 60], [32, 34, 74], [42, 42, 88], [56, 50, 100]];
       const dim = k === 6 ? 1 : 0.34;                              // a neighbour's sky has its lights out too
@@ -332,7 +481,11 @@ export async function renderPixelTower(root: HTMLElement) {
     const d = roomData.data;
     for (let i = 0; i < prevDelta.length; i += 2) { const p = prevDelta[i] * 4; d[p] = baseData[p]; d[p + 1] = baseData[p + 1]; d[p + 2] = baseData[p + 2]; d[p + 3] = baseData[p + 3]; }
     const delta = anim.frames[t];
-    for (let i = 0; i < delta.length; i += 2) { const p = delta[i] * 4, c = delta[i + 1]; d[p] = c >> 16; d[p + 1] = (c >> 8) & 255; d[p + 2] = c & 255; d[p + 3] = 255; }
+    for (let i = 0; i < delta.length; i += 2) {
+      const p = delta[i] * 4, c = delta[i + 1];
+      if (baseData[p + 3] === 0) continue;                          // the observatory's twinkling stars, when its night is cut out
+      d[p] = c >> 16; d[p + 1] = (c >> 8) & 255; d[p + 2] = c & 255; d[p + 3] = 255;
+    }
     prevDelta = delta;
     rg.putImageData(roomData, 0, 0);
     g.putImageData(under, layout.ox, layout.oy);                    // the sky behind an open room, then the room
@@ -341,7 +494,15 @@ export async function renderPixelTower(root: HTMLElement) {
 
   function tick(now: number) {
     raf = requestAnimationFrame(tick);
-    if (!anim || floor < 0 || document.hidden) return;
+    if (document.hidden) return;
+    // the world: its loop at its own pace; the rain needs a quicker beat to fall
+    if (!sky.hold && sky.img && (sky.loop || sky.rain || sky.eye)) {
+      const step = sky.loop?.loop.delay ?? 120;
+      const next = !!sky.loop && now - sky.lastFrame >= step;
+      if (next) { sky.frame = (sky.frame + 1) % sky.loop!.loop.T; sky.lastFrame = now; }
+      if (next || ((sky.rain || sky.eye) && now - sky.last >= 50)) { sky.last = now; paintWorld(now); }
+    }
+    if (!anim || floor < 0) return;
     if (now - lastTick < anim.delay) return;
     lastTick = now;
     frameNo = (frameNo + 1) % anim.T;
@@ -452,15 +613,193 @@ export async function renderPixelTower(root: HTMLElement) {
     if (k >= 0 && k <= 6) go(slugOfFloor(k));
   }
 
+  /* The gate: the tower stays where it is and the world around it changes,
+     the new one showing through the old in a fine ordered dither, cell by
+     cell, as if the picture were being re-drawn — the way a pixel world
+     would teleport. Only the land changes; the rooms are the same rooms. */
+  let teleporting: Promise<void> = Promise.resolve();
+  function teleport(kind: string | null) {
+    teleporting = teleporting.then(() => jump(validWorld(kind)));
+    return teleporting;
+  }
+  async function jump(kind: string | null) {
+    if (kind === world) return;
+    const fire = (phase: string) => window.dispatchEvent(new CustomEvent('lair-teleport', { detail: { kind, phase } }));
+    fire('out');
+    await getBackdrop(kind).catch(() => null);
+    const motion = !reduceMotion();
+    const w0 = canvas.width, h0 = canvas.height;
+    // the picture as seen: the world layer with the tower over it
+    const seen = () => {
+      const c = document.createElement('canvas'); c.width = canvas.width; c.height = canvas.height;
+      const x = c.getContext('2d')!; x.drawImage(worldCanvas, 0, 0); x.drawImage(canvas, 0, 0);
+      return x.getImageData(0, 0, c.width, c.height);
+    };
+    const before = seen();
+    // out: the light gathers round the tower until it is all you see
+    if (motion) await play(520, (u) => light.draw(ease(u), ease(u), true, u));
+    world = kind;
+    setWorldInUrl(kind);
+    fire('in');
+    if (floor >= 0) await drawRoom(floor); else await drawHome();
+    // in: under the light's peak the new world shows through, cell by cell, and the light lets go
+    if (motion && canvas.width === w0 && canvas.height === h0) {
+      // the new picture is laid, opaque, on the tower's layer while the world layer holds still beneath
+      const tower = g.getImageData(0, 0, w0, h0), after = seen(), out = g.createImageData(w0, h0);
+      sky.hold = true;
+      const a = after.data, bf = before.data, o = out.data;
+      const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];       // 4×4 ordered: an even pattern, not noise
+      let lim = -1;
+      await play(760, (u) => {
+        const l = Math.min(17, Math.floor((u / 0.55) * 17));
+        if (l !== lim) {
+          lim = l;
+          for (let y = 0; y < h0; y++) for (let x = 0; x < w0; x++) {
+            const i = (y * w0 + x) * 4, src = BAYER[((y & 3) << 2) | (x & 3)] < l ? a : bf;
+            o[i] = src[i]; o[i + 1] = src[i + 1]; o[i + 2] = src[i + 2]; o[i + 3] = 255;
+          }
+          g.putImageData(lim >= 17 ? after : out, 0, 0);
+        }
+        light.draw(1 - ease(u), 1 - ease(u), false, u);
+      });
+      g.putImageData(tower, 0, 0);                                  // the tower alone again, the world moving behind it
+      sky.hold = false;
+    }
+    light.clear();
+    gates.render();
+    announce(kind ? `The tower stands in another world: ${WORLD_LABELS[kind] ?? kind}` : 'The tower is home again');
+    fire('done');
+  }
+  const ease = (u: number) => (u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
+  const play = (dur: number, fn: (u: number) => void) => new Promise<void>((done) => {
+    const t0 = performance.now();
+    const f = (now: number) => { const u = Math.min(1, (now - t0) / dur); fn(u); if (u < 1) requestAnimationFrame(f); else done(); };
+    requestAnimationFrame(f);
+  });
+
+  /* The gate's light, as the 3D tower has it: a column of warm light round
+     the tower with rays in it, a disc and a ring of light on the ground that
+     spreads as the light gathers, sparks rising, and a flash at the peak.
+     Drawn at the art's own pixel size on a layer over the picture, in a few
+     flat strengths rather than smooth gradients. */
+  const light = (() => {
+    const fx = document.createElement('canvas');
+    fx.className = 'px-fx';
+    fx.setAttribute('aria-hidden', 'true');
+    canvas.after(fx);
+    const c = fx.getContext('2d')!;
+    const lvl = (v: number) => Math.round(v * 4) / 4;                           // a few flat steps, never a smooth ramp
+    function where() {
+      if (floor < 0) {
+        const [, groundY] = meta.overview.floors[1];
+        return { x0: layout.ox + meta.overview.x0, x1: layout.ox + meta.overview.x1, ground: layout.oy + groundY + 3 };
+      }
+      return { x0: layout.ox + 6, x1: layout.ox + RW - 6, ground: layout.oy + RH - 13 };
+    }
+    function size() {
+      if (fx.width !== canvas.width || fx.height !== canvas.height) { fx.width = canvas.width; fx.height = canvas.height; }
+      fx.style.width = canvas.style.width; fx.style.height = canvas.style.height;
+    }
+    function ring(cx: number, cy: number, rx: number, col: string) {
+      c.fillStyle = col;
+      const n = Math.ceil(rx * 7);
+      for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2; c.fillRect(Math.round(cx + Math.cos(a) * rx), Math.round(cy + Math.sin(a) * rx * 0.2), 1, 1); }
+    }
+    function draw(I: number, k: number, out: boolean, u: number) {
+      size();
+      c.clearRect(0, 0, fx.width, fx.height);
+      const { x0, x1, ground } = where(), w = x1 - x0, cx = (x0 + x1) / 2;
+      const glow = out ? Math.sin(u * Math.PI * 0.5) : I;
+      // the column, wider at the foot, in three flat strengths
+      for (let y = 0; y < ground; y++) {
+        const spread = 2 + ((y / ground) * 0.16 + 0.04) * w;
+        const a0 = x0 - spread, a1 = x1 + spread;
+        c.fillStyle = `rgba(255, 233, 184, ${lvl(0.22 * glow) || 0})`;
+        c.fillRect(Math.round(a0), y, Math.round(a1 - a0), 1);
+        c.fillStyle = `rgba(255, 244, 214, ${lvl(0.36 * glow)})`;
+        c.fillRect(Math.round(x0 + w * 0.12), y, Math.round(w * 0.76), 1);
+      }
+      // rays: thin streaks of brighter light running up the column
+      c.fillStyle = `rgba(255, 250, 230, ${lvl(0.5 * glow)})`;
+      for (let i = 0; i < 14; i++) {
+        const x = Math.round(x0 - 4 + ((i * 0.618 * 97) % 1) * (w + 8)), len = ground * (0.3 + ((i * 0.37) % 1) * 0.6);
+        const y = ((i * 53 + u * ground * 0.8) % ground);
+        c.fillRect(x, Math.round(Math.max(0, ground - y - len)), 1, Math.round(Math.min(len, ground - y)));
+      }
+      // the disc of light underfoot, and the ring spreading out from it
+      c.fillStyle = `rgba(255, 251, 232, ${lvl(0.6 * glow)})`;
+      for (let dy = -2; dy <= 2; dy++) { const half = (w / 2 + 6) * (1 + k * 0.4) * Math.sqrt(1 - (dy / 2.6) ** 2); c.fillRect(Math.round(cx - half), ground + dy, Math.round(half * 2), 1); }
+      ring(cx, ground, (w / 2) * (0.4 + k * 2.6), `rgba(255, 240, 200, ${lvl((out ? Math.sin(u * Math.PI) : 1 - u) * 0.9)})`);
+      ring(cx, ground, (w / 2) * (0.4 + k * 4.6), `rgba(255, 224, 160, ${lvl((out ? Math.sin(u * Math.PI) : 1 - u) * 0.4)})`);
+      // sparks rising through it
+      c.fillStyle = `rgba(255, 240, 192, ${lvl(0.85 * glow)})`;
+      for (let i = 0; i < 46; i++) {
+        const sx = x0 - 6 + ((i * 0.7548) % 1) * (w + 12), sp = 0.4 + ((i * 0.5698) % 1);
+        const sy = ground - ((((i * 0.31) % 1) * ground + u * sp * ground * 0.9) % ground);
+        c.fillRect(Math.round(sx), Math.round(sy), 1, 1);
+      }
+      // and the flash, at the peak, over everything
+      const flash = out ? Math.max(0, (u - 0.7) / 0.3) : Math.max(0, 1 - u / 0.35);
+      if (flash > 0) { c.fillStyle = `rgba(255, 246, 222, ${lvl(0.5 * flash)})`; c.fillRect(0, 0, fx.width, fx.height); }
+    }
+    return { draw, clear() { c.clearRect(0, 0, fx.width, fx.height); } };
+  })();
+
+  /* The gate, floating in the picture: a porthole onto every world, so the
+     tower can be carried anywhere from wherever you are. On the whole tower
+     they hang in a column beside it; in a room only the porthole of the
+     world you are in shows, in the corner, and opens into the full row. */
+  const gates = (() => {
+    const order = meta.portholes.order, S = meta.portholes.size;
+    let open = false;
+    function render() {
+      const home = floor < 0;
+      const dpr = window.devicePixelRatio || 1, k = Math.max(1, Math.round(2 * dpr)), px = k / dpr;   // whole device pixels per art pixel
+      gatesEl.style.setProperty('--gate', `${S * px}px`);
+      gatesEl.style.setProperty('--gate-sheet', `${S * px * order.length}px ${S * px * 2}px`);
+      gatesEl.classList.toggle('px-gates-home', home);
+      gatesEl.classList.toggle('is-open', home || open);
+      gatesEl.innerHTML = '';
+      const here = world ?? 'home';
+      // the current world first in a room, so the corner shows where you are
+      const list = home ? order : [here, ...order.filter((w) => w !== here)];
+      for (const name of list) {
+        const i = order.indexOf(name), current = name === here;
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'px-gate' + (current ? ' is-current' : '');
+        b.style.backgroundPosition = `${-i * S * px}px ${current ? -S * px : 0}px`;
+        b.style.backgroundImage = `url(${ART}/portholes.png)`;
+        const label = name === 'home' ? 'Home — the tower\'s own hills' : WORLD_LABELS[name] ?? name;
+        b.setAttribute('aria-label', current && !home ? `${label} — the gate: choose another world` : `${label}${current ? ' (here now)' : ''}`);
+        if (current) b.setAttribute('aria-current', 'true');
+        b.innerHTML = `<span class="px-spot-tip">${esc(label)}</span>`;
+        b.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (!home && current) { open = !open; render(); return; }
+          open = false;
+          if (current) return;
+          void teleport(name === 'home' ? null : name);
+          render();
+        });
+        gatesEl.appendChild(b);
+      }
+    }
+    document.addEventListener('click', (e) => { if (open && !gatesEl.contains(e.target as Node)) { open = false; render(); } });
+    window.addEventListener('keydown', (e) => { if (open && e.key === 'Escape') { open = false; render(); } });
+    return { render, close() { open = false; } };
+  })();
+
   /** The zoom: the overview grows toward the floor, then the room fades in. */
   async function zoomInto(k: number) {
     if (reduceMotion() || floor !== -1) return;
     const [y0, y1] = meta.overview.floors[k];
     const oy = ((layout.oy + (y0 + y1) / 2) / layout.H) * 100;
-    await canvas.animate(
+    const zoom = (el: HTMLElement) => el.animate(
       [{ transform: 'scale(1)', transformOrigin: `50% ${oy}%` }, { transform: 'scale(2.6)', transformOrigin: `50% ${oy}%`, opacity: 0.2 }],
       { duration: 240, easing: 'cubic-bezier(.5,0,.8,.4)' },
     ).finished.catch(() => {});
+    await Promise.all([zoom(canvas), zoom(worldCanvas)]);       // the world and the tower together
   }
 
   const stairsName = $<HTMLButtonElement>('.px-stairs-name');
@@ -475,8 +814,9 @@ export async function renderPixelTower(root: HTMLElement) {
     view.classList.toggle('px-in-room', k >= 0);
     if (k >= 0) { await drawRoom(k); if (was !== k) renderRoomText(route!); }
     else { animFloor = -2; anim = null; await drawHome(); renderHomeText(); collapse.apply(); }
-    if (was !== k) view.scrollTop = 0;
-    if (was !== k && !reduceMotion()) canvas.animate([{ opacity: 0.3 }, { opacity: 1 }], { duration: 180 });
+    if (was !== k) { view.scrollTop = 0; gates.close(); }
+    gates.render();
+    if (was !== k && !reduceMotion()) for (const el of [canvas, worldCanvas]) el.animate([{ opacity: 0.3 }, { opacity: 1 }], { duration: 180 });
     // the stairs bar
     $<HTMLElement>('.px-stairs-kicker').textContent = route ? `${String(route.index).padStart(2, '0')} · ${route.title}` : '7 floors · tap one';
     $<HTMLElement>('.px-stairs-label').textContent = route ? route.label : 'The whole tower';
@@ -490,17 +830,64 @@ export async function renderPixelTower(root: HTMLElement) {
   $<HTMLButtonElement>('.px-up').addEventListener('click', () => step(1));
   stairsName.addEventListener('click', () => go(null));
   $<HTMLAnchorElement>('.px-sig').addEventListener('click', (e) => { e.preventDefault(); go(null); });
-  // switching to 3D keeps the floor you are on
-  $<HTMLAnchorElement>('.px-switch').addEventListener('click', (e) => {
-    e.preventDefault();
-    const route = routeForSlug(currentSlug());
-    window.location.href = `${BASE}/${route ? route.slug : ''}?view=3d${window.location.hash}`;
+  /* The view menu: 2D, 3D or the plain text page. Going to 3D keeps the
+     floor you are on and the world the tower stands in. */
+  {
+    const btn = $<HTMLButtonElement>('.px-views-btn'), menu = $<HTMLElement>('.px-views-menu');
+    const items = [...menu.querySelectorAll<HTMLAnchorElement>('.px-views-item')];
+    const setOpen = (v: boolean, focus = false) => {
+      menu.hidden = !v;
+      btn.setAttribute('aria-expanded', String(v));
+      if (v && focus) items[0].focus();
+    };
+    btn.addEventListener('click', (e) => { e.stopPropagation(); setOpen(menu.hidden); });
+    btn.addEventListener('keydown', (e) => { if (e.key === 'ArrowDown') { e.preventDefault(); setOpen(true, true); } });
+    menu.addEventListener('keydown', (e) => {
+      const at = items.indexOf(document.activeElement as HTMLAnchorElement);
+      if (e.key === 'Escape') { e.preventDefault(); setOpen(false); btn.focus(); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); items[(at + 1) % items.length].focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); items[(at - 1 + items.length) % items.length].focus(); }
+    });
+    document.addEventListener('pointerdown', (e) => { if (!menu.hidden && !view.querySelector('.px-views')!.contains(e.target as Node)) setOpen(false); });
+    for (const a of items) a.addEventListener('click', (e) => {
+      const kind = a.dataset.kind;
+      if (kind === '2d') { e.preventDefault(); setOpen(false); return; }
+      if (kind === 'text') { e.preventDefault(); window.location.href = textPageHref('2d'); return; }
+      if (kind === '3d') {
+        e.preventDefault();
+        const route = routeForSlug(currentSlug());
+        window.location.href = `${BASE}/${route ? route.slug : ''}?view=3d${world ? '&world=' + world : ''}${window.location.hash}`;
+      }
+    });
+  }
+
+  /* Resizing: redraw at the new size. Crossing between the phone and wide
+     layouts also rebuilds the text (framed on a phone, plain when wide),
+     drops what the phone's folding strip left on the picture, and starts the
+     page from the top, since the two layouts scroll differently. */
+  // the theme changed (here, in the keeper, or on another view's tab): day or night, redraw
+  window.addEventListener('lair-theme', () => {
+    const d = effectiveTheme() === 'paper';
+    if (d === day) { showTheme(); return; }
+    day = d;
+    showTheme();
+    if (floor >= 0) void drawRoom(floor); else void drawHome();
   });
 
-  let resizeTimer = 0;
+  let resizeTimer = 0, wasWide = isWide();
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = window.setTimeout(() => { if (floor >= 0) void drawRoom(floor); else void drawHome(); }, 120);
+    resizeTimer = window.setTimeout(() => {
+      const wide = isWide();
+      if (wide !== wasWide) {
+        wasWide = wide;
+        stage.style.top = ''; picture.style.transform = '';
+        view.scrollTop = 0;
+        if (floor >= 0) renderRoomText(routeForSlug(slugOfFloor(floor))!); else renderHomeText();
+      }
+      if (floor >= 0) void drawRoom(floor); else void drawHome();
+      gates.render();
+    }, 120);
   });
 
   /* On a phone, reading a room: the picture starts large and, as the text
@@ -525,7 +912,7 @@ export async function renderPixelTower(root: HTMLElement) {
   })();
 
   /* ------------------------------ the keeper ----------------------------- */
-  const keeper = mountKeeper(view, () => floor);
+  const keeper = mountKeeper(view, () => floor, { kinds: WORLD_KINDS, current: () => world, teleport });
   $<HTMLButtonElement>('.px-keeper-btn').addEventListener('click', () => keeper.toggle());
 
   /* ------------------------------ keyboard ------------------------------- */
@@ -549,7 +936,8 @@ export async function renderPixelTower(root: HTMLElement) {
  * The console, as the keeper's dialogue box: his portrait, what he has said,
  * a few things to ask, and a line to type on. The same command table as the
  * 3D console — `goto`, `pubs`, `ask`, all of it — minus what needs a camera. */
-function mountKeeper(view: HTMLElement, currentFloor: () => number) {
+function mountKeeper(view: HTMLElement, currentFloor: () => number,
+  gate: { kinds: string[]; current: () => string | null; teleport: (kind: string | null) => void }) {
   const box = document.createElement('div');
   box.className = 'px-keeper';
   box.hidden = true;
@@ -591,7 +979,7 @@ function mountKeeper(view: HTMLElement, currentFloor: () => number) {
     columns: () => columnsOf(log),
     mode: '2d',
     scene: null,
-    worlds: { kinds: JUMP_TARGETS.filter((k) => k !== 'none'), current: () => null, teleport: () => false, reflections: () => false, reflectionsOn: () => false },
+    worlds: { kinds: gate.kinds, current: gate.current, teleport: (k: string | null) => { gate.teleport(k); return true; }, reflections: () => false, reflectionsOn: () => false },
     setShellOverride: () => {},
   };
   async function submit(line: string) {

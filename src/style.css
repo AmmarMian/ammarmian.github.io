@@ -125,6 +125,9 @@ body[data-backdrop="meadow"] { background: linear-gradient(#8fc4e8 0%, #bcd9ea 4
 /* a pinned theme beats the reader's system preference on the plain page */
 :root[data-theme="paper"]:has(.text-page) { color-scheme: light !important; }
 :root[data-theme="night"]:has(.text-page) { color-scheme: dark !important; }
+/* the pixel tower follows the site's theme too (its switch is in its header), not just the system's */
+:root[data-theme="paper"]:has(#app > .px-view) { color-scheme: light !important; }
+:root[data-theme="night"]:has(#app > .px-view) { color-scheme: dark !important; }
 .tp-toc-h {
   margin: 0 0 12px; font: 500 var(--fs-xs)/1.2 var(--font-mono);
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint);
@@ -1260,20 +1263,4 @@ body[data-gl-lost="1"] #tower-host::after {
   }
 }
 
-/* ---------- the first question: which tower ----------
-   Asked once, on phones and modest machines. Two plain choices in the site's
-   own type; the pixel tower shows itself, the 3D one is described. */
-.chooser { height: 100%; overflow-y: auto; box-sizing: border-box; padding: 48px 20px 32px; max-width: 560px; margin: 0 auto; background: var(--bg); color: var(--ink); font-family: var(--font-text); }
-.chooser-kicker { margin: 0 0 10px; font: 500 var(--fs-xs)/1.2 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); }
-.chooser-title { margin: 0 0 12px; font: 300 clamp(32px, 8vw, 46px)/1.05 var(--font-display); }
-.chooser-lede { margin: 0 0 24px; color: var(--ink-dim); }
-.chooser-options { display: grid; gap: 14px; }
-.chooser-option {
-  display: grid; grid-template-columns: 1fr; gap: 6px; text-align: left; cursor: pointer;
-  padding: 16px; border: 1px solid var(--rule); border-radius: 4px; background: var(--surface); color: var(--ink); font: inherit;
-}
-.chooser-option:hover { border-color: var(--accent); }
-.chooser-option img { width: 96px; height: 150px; image-rendering: pixelated; grid-row: span 2; float: left; }
-.chooser-option:has(img) { grid-template-columns: 96px 1fr; column-gap: 16px; align-items: start; }
-.chooser-name { font: 500 22px/1.1 var(--font-sc); letter-spacing: .04em; }
-.chooser-blurb { color: var(--ink-dim); font-size: var(--fs-sm); }
+/* the first question (which view) is styled in ui/chooser.css */

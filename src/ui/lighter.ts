@@ -24,7 +24,7 @@
  * `?view=3d`, which un-sticks it. That link is the only escape and it is at
  * the top of the page, so the preference can never trap anyone.
  */
-import { BASE } from '../router';
+import { BASE, textPageHref } from '../router';
 import { announce } from './io';
 
 export type LightView = 'text' | '2d';
@@ -107,7 +107,7 @@ export function offerLighter(body: string, spoken = body) {
       if (go === 'stay') { dismiss(); return; }
       setPreferredView(go as LightView);
       const here = window.location.pathname.slice(BASE.length).replace(/^\/+/, '');
-      window.location.href = go === '2d' ? `${BASE}/${here || '2d'}?view=2d` : BASE + '/text';
+      window.location.href = go === '2d' ? `${BASE}/${here || '2d'}?view=2d` : textPageHref('3d');
     });
   });
   announce(spoken);

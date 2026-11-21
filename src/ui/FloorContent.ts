@@ -5,7 +5,7 @@ import {
 } from '../data/hal';
 import { copyText, downloadText, flashLabel, announce } from './io';
 import { setRecordMeta, setRouteMeta } from './meta';
-import { routeForSlug, navigate, BASE } from '../router';
+import { routeForSlug, navigate, textPageHref, BASE } from '../router';
 import { WORLD_LABELS, WORLD_BLURBS } from '../data/worlds';
 import { createYearRangeSlider } from './YearRange';
 import { PROFILE, CONTACT } from '../data/profile';
@@ -468,7 +468,7 @@ export class FloorContent {
     const worlds = this.scene.worlds;
     const p = document.createElement('p');
     p.textContent = this.actions.view === '2d'
-      ? 'The portal here genuinely opens — in the 3D tower. Pick a world and the tower is drawn standing in it: the light, the fog and the glass all follow.'
+      ? 'The portal here genuinely opens. Pick a world and the whole tower is carried through it: the land outside changes, the rooms stay as they are.'
       : 'The portal here genuinely opens. Step the tower through it and the world outside the windows changes — the light, the fog and the glass all follow.';
     this.bodyEl.appendChild(p);
 
@@ -555,7 +555,7 @@ export class FloorContent {
       {
         label: 'Text version',
         blurb: 'One plain page, everything on it, no pictures at all',
-        run: () => { window.location.href = BASE + '/text'; },
+        run: () => { window.location.href = textPageHref(is2d ? '2d' : '3d'); },
       },
     ]);
 

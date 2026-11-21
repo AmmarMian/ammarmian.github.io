@@ -10,6 +10,8 @@
   --px-ink: #efe3c8; --px-ink-dim: #cdbd9f; --px-ink-faint: #b4a486;
   --px-bg: #241a22; --px-bg-hi: #2f222c; --px-outer: #110b10; --px-gold: #c99a4b;
   --px-lit: #4a3640; --px-shade: #170f15; --px-accent: #f2b65a;
+  --px-link: #9cc8e6; --px-rule: #efe3c840; --px-rule-soft: #efe3c824; --px-tint-2: #3a2a35;
+  --px-well: #160f15; --px-well-edge: #3a2a35; --px-chip-edge: #4a3640; --px-err: #f08f7a;
   /* The site's body never scrolls (the 3D tower must not), so this view is
      its own scroller: the sticky picture and header stick inside it. */
   height: 100%;
@@ -21,10 +23,44 @@
   font-family: var(--font-text);
 }
 
+/* By day (the light theme) the frames are parchment with dark ink, the same
+   bevel and gold line, so text and content go light as they do in 3D. What
+   lies on the picture itself (the sky title, the floor names) stays light
+   on the art. */
+:root[data-theme="paper"] .px-view {
+  --px-ink: #2b221d; --px-ink-dim: #4f4438; --px-ink-faint: #6b5e50;
+  --px-bg: #efe5cf; --px-bg-hi: #f7f0e1; --px-outer: #3b2d24; --px-gold: #b5823a;
+  --px-lit: #fffaee; --px-shade: #c9b691; --px-accent: #a8431a;
+  --px-link: #2f5f8a; --px-rule: #2b221d40; --px-rule-soft: #2b221d22; --px-tint-2: #e6d9bd;
+  --px-well: #e7dcc4; --px-well-edge: #c9b691; --px-chip-edge: #c9b691; --px-err: #b3341a;
+}
+
 /* ------------------------------ the picture ------------------------------ */
-.px-stage { overflow: hidden; background: #191a36; }
+.px-stage { position: relative; overflow: hidden; background: #191a36; }
+
+/* the gate: a porthole onto each world, floating in the picture (the art is
+   one sprite sheet; JS sets the porthole size in whole device pixels) */
+.px-gates {
+  position: absolute; left: 12px; bottom: 12px; z-index: 3;
+  display: flex; flex-direction: row; gap: 6px; pointer-events: none;
+}
+.px-gates-home { bottom: auto; top: 50%; transform: translateY(-50%); flex-direction: column; }
+.px-gate {
+  position: relative; width: var(--gate); height: var(--gate); padding: 0; border: 0; border-radius: 50%;
+  background-color: transparent; background-repeat: no-repeat; background-size: var(--gate-sheet);
+  image-rendering: pixelated; cursor: pointer; pointer-events: auto;
+  transition: transform 120ms steps(2), filter 120ms;
+}
+.px-gates:not(.is-open) .px-gate:not(.is-current) { display: none; }
+.px-gate:hover, .px-gate:focus-visible { outline: none; transform: translateY(-2px); filter: brightness(1.15); }
+.px-gate.is-current { filter: drop-shadow(0 0 6px #f2b65a88); }
+.px-gate:hover .px-spot-tip, .px-gate:focus-visible .px-spot-tip { opacity: 1; }
+.px-gates-home .px-gate .px-spot-tip { left: calc(100% + 8px); bottom: auto; top: 50%; transform: translateY(-50%); }
+@media (prefers-reduced-motion: reduce) { .px-gate { transition: none; } }
 .px-picture { position: relative; overflow: hidden; }
-.px-canvas { display: block; image-rendering: pixelated; image-rendering: crisp-edges; }
+.px-canvas { position: relative; display: block; image-rendering: pixelated; image-rendering: crisp-edges; }
+.px-world { position: absolute; left: 0; top: 0; image-rendering: pixelated; image-rendering: crisp-edges; }   /* the world, behind the tower */
+.px-fx { position: absolute; left: 0; top: 0; pointer-events: none; image-rendering: pixelated; image-rendering: crisp-edges; }   /* the gate's light, over the picture */
 .px-spots { position: absolute; inset: 0; pointer-events: none; }   /* only the spots themselves catch the pointer */
 .px-spot {
   position: absolute; padding: 0; margin: 0; border: 0; background: transparent; cursor: pointer;
@@ -90,13 +126,23 @@
 .px-tool { width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: transparent; color: var(--ink); cursor: pointer; }
 .px-tool svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
 .px-tool:hover { color: var(--accent); }
-.px-switch {
-  display: flex; align-items: center; height: 32px; text-decoration: none;
-  font: 500 16px/1 var(--font-sc); letter-spacing: .05em; color: var(--ink-faint);
+/* the view menu: the current view, and a pixel-framed list of all three */
+.px-views { position: relative; }
+.px-views-btn {
+  display: flex; align-items: center; gap: 2px; height: 40px; padding: 0 6px 0 10px; border: 0; background: transparent; cursor: pointer;
+  font: 500 16px/1 var(--font-sc); letter-spacing: .05em; color: var(--ink);
 }
-.px-switch span { padding: 6px 8px; }
-.px-switch-on { color: var(--ink); border-bottom: 2px solid var(--ink); }
-.px-switch:hover { color: var(--accent); }
+.px-views-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; transition: transform 120ms; }
+.px-views-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+.px-views-btn:hover, .px-views-btn:focus-visible { color: var(--accent); outline: none; }
+.px-views-menu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 40; width: min(280px, calc(100vw - 24px)); padding: 6px; }
+.px-views-menu[hidden] { display: none; }
+.px-views-item { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; text-decoration: none; color: var(--ink); }
+.px-views-item strong { font: 500 17px/1.1 var(--font-sc); letter-spacing: .04em; }
+.px-views-item span { font: 400 11px/1.4 var(--font-mono); color: var(--ink-faint); }
+.px-views-item:hover, .px-views-item:focus-visible { outline: none; background: var(--px-bg-hi); }
+.px-views-item:hover strong, .px-views-item:focus-visible strong { color: var(--accent); }
+.px-views-item[aria-current="true"] strong::after { content: ' \00b7  here'; font: 400 11px/1 var(--font-mono); color: var(--px-gold); letter-spacing: .08em; }
 
 .px-content { max-width: 720px; }
 .px-kicker { margin: 0 0 8px; font: 500 var(--fs-xs)/1.2 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); }
@@ -117,8 +163,8 @@
 /* ---------------------------- the pixel frame ---------------------------- */
 .px-frame {
   --ink: var(--px-ink); --ink-dim: var(--px-ink-dim); --ink-faint: var(--px-ink-faint);
-  --accent: var(--px-accent); --accent-warm: var(--px-accent); --link: #9cc8e6;
-  --rule: #efe3c840; --rule-soft: #efe3c824; --tint: var(--px-bg-hi); --tint-2: #3a2a35; --surface: var(--px-bg-hi); --card: var(--px-bg-hi);
+  --accent: var(--px-accent); --accent-warm: var(--px-accent); --link: var(--px-link);
+  --rule: var(--px-rule); --rule-soft: var(--px-rule-soft); --tint: var(--px-bg-hi); --tint-2: var(--px-tint-2); --surface: var(--px-bg-hi); --card: var(--px-bg-hi);
   color: var(--ink);
   background: var(--px-bg);
   padding: 20px 18px;
@@ -146,18 +192,18 @@
 .px-keeper-close { width: 40px; height: 40px; border: 0; background: transparent; color: var(--ink); font-size: 26px; cursor: pointer; }
 .px-keeper-log {
   flex: 1; min-height: 80px; overflow-y: auto; padding: 8px 10px;
-  font: 400 13px/1.5 var(--font-mono); background: #160f15; box-shadow: inset 0 0 0 2px #3a2a35;
+  font: 400 13px/1.5 var(--font-mono); background: var(--px-well); box-shadow: inset 0 0 0 2px var(--px-well-edge);
 }
 .px-line { white-space: pre-wrap; word-break: break-word; }
 .px-line-echo { color: var(--px-ink-faint); }
 .px-line-dim { color: var(--px-ink-dim); }
-.px-line-err { color: #f08f7a; }
+.px-line-err { color: var(--px-err); }
 .px-line-head { color: var(--px-accent); }
 .px-keeper-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .px-chip {
   min-height: 34px; padding: 0 10px; border: 0; cursor: pointer;
   font: 500 15px/1 var(--font-sc); letter-spacing: .04em; color: var(--px-ink); background: var(--px-bg-hi);
-  box-shadow: inset 0 0 0 2px #4a3640;
+  box-shadow: inset 0 0 0 2px var(--px-chip-edge);
 }
 .px-chip:hover { color: var(--px-accent); }
 .px-keeper-line { display: flex; gap: 8px; align-items: center; font-family: var(--font-mono); color: var(--px-accent); }
@@ -186,8 +232,7 @@
   .px-in-room .px-stage { position: sticky; z-index: 4; }        /* folds into a strip as the text scrolls (top set in script) */
   .px-in-room .px-picture { will-change: transform; }
   .px-head { position: sticky; top: 0; z-index: 5; margin: 0; padding: 6px 8px 6px 14px; background: var(--px-bg); color: var(--px-ink); box-shadow: 0 var(--px) 0 0 var(--px-outer); }
-  .px-head .px-sig, .px-head .px-tool, .px-head .px-switch-on { color: var(--px-ink); }
-  .px-head .px-switch-on { border-bottom-color: var(--px-ink); }
+  .px-head .px-sig, .px-head .px-tool, .px-head .px-views-btn { color: var(--px-ink); }
   .px-head .px-sig { font-size: 24px; }
   .px-stairs {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; height: 64px;

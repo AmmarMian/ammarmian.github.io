@@ -7,7 +7,7 @@ import {
 import students from '../data/students.json';
 import { studentGroups } from '../data/studentGroups';
 import projects from '../data/projects.json';
-import { FLOORS, navigate, currentSlug } from '../router';
+import { FLOORS, navigate, currentSlug, textPageHref } from '../router';
 import { FLOOR_NAMES } from '../tower/scene-constants';
 import { copyText, downloadText } from './io';
 import { WORLD_BLURBS } from '../data/worlds';
@@ -265,13 +265,13 @@ export async function describeFloor(slug: string, ctx: Ctx) {
       ctx.print('');
       return COMMANDS.remembers.run([], ctx);
     case 'elsewhere':
-      ctx.print('The portal here opens onto other worlds. In the 3D tower you can', 'dim');
-      ctx.print('step the whole building through it:', 'dim');
+      ctx.print('The portal here opens onto other worlds. Step the whole building', 'dim');
+      ctx.print('through it:', 'dim');
       for (const k of JUMP_TARGETS.filter((k) => k !== 'none')) {
         ctx.print(`  ${pad(k, 12)}${WORLD_BLURBS[k] ?? ''}`, 'cmd');
       }
       ctx.print('');
-      ctx.print('`view 3d` to go and stand in one.', 'dim');
+      ctx.print('`jump <world>` to go and stand in one, `jump none` to come home.', 'dim');
       return;
   }
 }
@@ -766,7 +766,7 @@ export const COMMANDS: Record<string, Command> = {
       // A view switch rebuilds the page from scratch — the 3D tower and the
       // pixel tower are different pages, not different stylesheets.
       const floor = FLOORS.find((f) => f.slug === currentSlug());
-      if (v === 'text') window.location.href = BASE + '/text';
+      if (v === 'text') window.location.href = textPageHref(ctx.mode === '2d' ? '2d' : '3d');
       else if (v === '2d') window.location.href = BASE + '/' + (floor ? floor.slug : '2d') + '?view=2d';
       else window.location.href = BASE + '/' + (floor ? floor.slug : '') + '?view=3d';
     },
@@ -779,8 +779,8 @@ export const COMMANDS: Record<string, Command> = {
     examples: ['jump forest', 'jump space', 'jump none'],
     complete: () => JUMP_TARGETS,
     run(args, ctx) {
-      if (ctx.mode !== 'tower') {
-        ctx.print('jump: the gate needs the 3D tower — `view 3d` to step through it.', 'err');
+      if (ctx.mode === 'ascii') {
+        ctx.print('jump: the gate needs a picture of the tower — `view 2d` or `view 3d` to step through it.', 'err');
         return;
       }
       const target = args[0];

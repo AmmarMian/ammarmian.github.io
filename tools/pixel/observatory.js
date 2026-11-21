@@ -16,7 +16,8 @@ const R = kit.RAMPS;
 /* ---------- the sky: everything above the parapet ---------- */
 const PARA = 104;                                                      // parapet top, in world Y
 const SKY = [[18, 20, 46], [24, 27, 60], [32, 34, 74], [42, 42, 88], [56, 50, 100]];
-const sky = (x, y) => { set(x, y, "night", 0); r.mat[Math.round(y) * 192 + Math.round(x)] = -1; glow(x, y, SKY[P.band(Math.min(1, Math.pow(y / 104, 1.4)), SKY.length, x, y, 0.08)]); };
+const SKYPX = new Set();                                               // which pixels are open sky: cut out when the tower is elsewhere
+const sky = (x, y) => { SKYPX.add(Math.round(y) * 192 + Math.round(x)); set(x, y, "night", 0); r.mat[Math.round(y) * 192 + Math.round(x)] = -1; glow(x, y, SKY[P.band(Math.min(1, Math.pow(y / 104, 1.4)), SKY.length, x, y, 0.08)]); };
 r.shell({
   floor: (x, y, h) => r.planks(x, y, h, { width: 12, seed: 21 }),
   ceil: (x, y) => sky(x, y),
@@ -145,5 +146,6 @@ room.animate((b, t) => {
 });
 
 room.OPEN = OPEN;
+room.SKY = SKYPX;
 module.exports = room;
 if (require.main === module) kit.preview("observatory", room, { ref: __dirname + "/../../spike/out/all_obs.png" });

@@ -1,8 +1,9 @@
-import { BASE } from '../router';
+import { BASE, textPageHref } from '../router';
 
 type ViewKind = '3d' | '2d' | 'text';
 
-const VIEWS: { kind: ViewKind; href: string; label: string; blurb: string }[] = [
+/** Shared with the pixel tower's own view menu, so the two describe the views alike. */
+export const VIEWS: { kind: ViewKind; href: string; label: string; blurb: string }[] = [
   { kind: '3d', href: '/?view=3d', label: '3D tower', blurb: 'The full scene — six storeys and the gate' },
   { kind: '2d', href: '/2d?view=2d', label: 'Pixel tower', blurb: 'The same rooms, hand-drawn in pixels — light on any machine' },
   { kind: 'text', href: '/text', label: 'Text version', blurb: 'One plain page, everything on it' },
@@ -38,6 +39,8 @@ export function createViewMenu(current: ViewKind) {
     a.setAttribute('role', 'menuitem');
     a.innerHTML = `<strong>${v.label}</strong><span>${v.blurb}</span>`;
     if (v.kind === current) a.setAttribute('aria-current', 'true');
+    // the text page is told where you were, so its way back returns you here
+    if (v.kind === 'text' && current !== 'text') a.addEventListener('click', (e) => { e.preventDefault(); window.location.href = textPageHref(current === '2d' ? '2d' : '3d'); });
     menu.appendChild(a);
     return a;
   });
